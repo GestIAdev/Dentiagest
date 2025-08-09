@@ -1,0 +1,231 @@
+# PLATFORM_EXTRACTABLE: User model - 100% reusable across all business verticals
+"""
+User model for authentication and role management.
+This model is designed to be universal and can be used across
+dental, veterinary, mechanic, and any other business vertical.
+"""
+
+from sqlalchemy import Column, String, Boolean, DateTime, Enum as SQLEnum
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+from datetime import datetime
+import uuid
+import enum
+
+from ..core.database import Base
+
+# PLATFORM_CORE: User roles enum - configurable per business vertical
+class UserRole(enum.Enum):
+    """
+    User roles in the system.
+    These roles are universal but can be customized per business vertical:
+    
+    DENTAL: admin, dentist, assistant, receptionist
+    VETERINARY: admin, veterinarian, vet_tech, receptionist  
+    MECHANIC: admin, mechanic, apprentice, service_advisor
+    """
+    ADMIN = "admin"                    # System administrator
+    PROFESSIONAL = "professional"     # Main professional (dentist/vet/mechanic)
+    ASSISTANT = "assistant"           # Assistant/technician
+    RECEPTIONIST = "receptionist"     # Front desk/reception
+    
+    # PLATFORM_CONFIGURABLE: Additional roles can be added per vertical
+    # DENTAL_SPECIFIC roles could be: orthodontist, surgeon, hygienist
+    # VETERINARY_SPECIFIC roles could be: vet_tech, groomer
+    # MECHANIC_SPECIFIC roles could be: diagnostician, parts_manager
+
+# PLATFORM_EXTRACTABLE: Complete User model
+class User(Base):
+    """
+    Universal User model for all business verticals.
+    
+    This model contains all the essential fields needed for user management
+    across different business types. No sector-specific fields are included,
+    making it 100% reusable in PlatformGest.
+    """
+    __tablename__ = "users"
+    
+    # PLATFORM_CORE: Primary identification
+    id = Column(
+        UUID(as_uuid=True), 
+        primary_key=True, 
+        default=uuid.uuid4,
+        comment="Unique identifier for the user"
+    )
+    
+    # PLATFORM_CORE: Authentication fields
+    username = Column(
+        String(255), 
+        unique=True, 
+        nullable=False,
+        index=True,
+        comment="Unique username for login"
+    )
+    
+    email = Column(
+        String(255), 
+        unique=True, 
+        nullable=False,
+        index=True,
+        comment="User email address"
+    )
+    
+    password_hash = Column(
+        String(255), 
+        nullable=False,
+        comment="Hashed password using bcrypt"
+    )
+    
+    # PLATFORM_CORE: User status and permissions
+    is_active = Column(
+        Boolean, 
+        default=True, 
+        nullable=False,
+        comment="Whether the user account is active"
+    )
+    
+    is_admin = Column(
+        Boolean, 
+        default=False, 
+        nullable=False,
+        comment="Whether user has admin privileges"
+    )
+    
+    role = Column(
+        SQLEnum(UserRole),
+        nullable=False,
+        default=UserRole.RECEPTIONIST,
+        comment="User role in the system"
+    )
+    
+    # PLATFORM_CORE: Multi-Factor Authentication
+    is_mfa_enabled = Column(
+        Boolean, 
+        default=False, 
+        nullable=False,
+        comment="Whether MFA is enabled for this user"
+    )
+    
+    mfa_secret = Column(
+        String(255),
+        nullable=True,
+        comment="Secret key for MFA (TOTP)"
+    )
+    
+    # PLATFORM_CORE: Personal information
+    first_name = Column(
+        String(255),
+        nullable=True,
+        comment="User's first name"
+    )
+    
+    last_name = Column(
+        String(255),
+        nullable=True,
+        comment="User's last name"
+    )
+    
+    phone = Column(
+        String(50),
+        nullable=True,
+        comment="User's phone number"
+    )
+    
+    # PLATFORM_CORE: Session and security tracking
+    last_login = Column(
+        DateTime,
+        nullable=True,
+        comment="Timestamp of last successful login"
+    )
+    
+    login_attempts = Column(
+        "login_attempts",
+        String(10),
+        default="0",
+        comment="Number of failed login attempts"
+    )
+    
+    password_changed_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        comment="When password was last changed"
+    )
+    
+    # PLATFORM_CORE: Audit fields - essential for all business types
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+        comment="When the user was created"
+    )
+    
+    updated_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+        comment="When the user was last updated"
+    )
+    
+    created_by = Column(
+        UUID(as_uuid=True),
+        nullable=True,
+        comment="ID of user who created this account"
+    )
+    
+    # PLATFORM_CORE: Soft deletion
+    deleted_at = Column(
+        DateTime,
+        nullable=True,
+        comment="When the user was soft deleted"
+    )
+    
+    # PLATFORM_CONFIGURABLE: Relationships will vary per business vertical
+    # These will be defined in sector-specific models:
+    # - DentiaGest: patients, appointments, treatments
+    # - VetGest: pets, appointments, medical_records  
+    # - MechaGest: vehicles, work_orders, estimates
+    
+    def __repr__(self):
+        return f"<User(id={self.id}, username={self.username}, role={self.role})>"
+    
+    # PLATFORM_CORE: Universal user methods
+    @property
+    def full_name(self) -> str:
+        """Get user's full name."""
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        elif self.first_name:
+            return self.first_name
+        else:
+            return self.username
+    
+    @property
+    def is_professional(self) -> bool:
+        """Check if user is a main professional (dentist/vet/mechanic)."""
+        return self.role == UserRole.PROFESSIONAL
+    
+    @property
+    def can_manage_users(self) -> bool:
+        """Check if user can manage other users."""
+        return self.is_admin or self.role == UserRole.ADMIN
+    
+    def has_permission(self, permission: str) -> bool:
+        """
+        Check if user has specific permission.
+        This method can be extended per business vertical.
+        """
+        # PLATFORM_CONFIGURABLE: Permission logic per sector
+        if self.is_admin:
+            return True
+            
+        # Basic role-based permissions
+        role_permissions = {
+            UserRole.ADMIN: ["*"],  # All permissions
+            UserRole.PROFESSIONAL: ["read_patients", "write_patients", "read_appointments", "write_appointments"],
+            UserRole.ASSISTANT: ["read_patients", "read_appointments", "write_appointments"],
+            UserRole.RECEPTIONIST: ["read_patients", "write_patients", "read_appointments", "write_appointments"]
+        }
+        
+        user_permissions = role_permissions.get(self.role, [])
+        return "*" in user_permissions or permission in user_permissions
