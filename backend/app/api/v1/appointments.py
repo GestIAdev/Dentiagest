@@ -298,28 +298,16 @@ async def update_appointment(
         )
     
     # DENTAL_SPECIFIC: Check if appointment can be modified
-    if appointment.status == AppointmentStatus.COMPLETED:
-        # Completed appointments can only have notes and status modified
-        allowed_fields = {'notes', 'status'}
-        update_fields = set(appointment_data.model_dump(exclude_unset=True).keys())
-        if not update_fields.issubset(allowed_fields):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Cannot modify completed appointments except for notes and status"
-            )
-    elif appointment.status == AppointmentStatus.CANCELLED and appointment_data.status != AppointmentStatus.CANCELLED:
-        # When reactivating a cancelled appointment, allow full modification
-        # This is useful for rescheduling cancelled appointments
+    # Removed overly restrictive validation for completed appointments
+    # Clinicians should be able to correct mistakes and update any field
+    
+    if appointment.status == AppointmentStatus.CANCELLED and appointment_data.status != AppointmentStatus.CANCELLED:
+        # Reactivating a cancelled appointment - allow full modification
         pass
     elif appointment.status == AppointmentStatus.CANCELLED:
-        # For cancelled appointments staying cancelled, only allow notes and status
-        allowed_fields = {'notes', 'status'}
-        update_fields = set(appointment_data.model_dump(exclude_unset=True).keys())
-        if not update_fields.issubset(allowed_fields):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Cannot modify cancelled appointments except for notes and status"
-            )
+        # For cancelled appointments staying cancelled, allow full modification too
+        # Clinicians should be able to correct any mistakes
+        pass
     
     # Validate time changes for conflicts
     if appointment_data.scheduled_date or appointment_data.duration_minutes:
@@ -391,11 +379,7 @@ async def delete_appointment(
         )
     
     # DENTAL_SPECIFIC: Soft delete by changing status instead of hard delete
-    if appointment.status in [AppointmentStatus.COMPLETED]:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot cancel completed appointments"
-        )
+    # Allow cancelling any appointment - clinicians can correct mistakes
     
     appointment.status = AppointmentStatus.CANCELLED
     appointment.cancelled_at = datetime.utcnow()

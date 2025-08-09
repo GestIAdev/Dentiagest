@@ -279,6 +279,8 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
                   name="time"
                   value={formData.time}
                   onChange={handleInputChange}
+                  min="07:00"
+                  max="21:00"
                   required
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
@@ -323,8 +325,8 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
                 <option value="extraction">Extracción</option>
                 <option value="orthodontics">Ortodoncia</option>
                 <option value="emergency">Emergencia</option>
-                <option value="followup">Seguimiento</option>
-                <option value="others">Otros</option>
+                <option value="follow_up">Seguimiento</option>
+                <option value="checkup">Revisión</option>
               </select>
             </div>
             
@@ -408,4 +410,4 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
   );
 };
 
-export { CreateAppointmentModal as default };
+export default CreateAppointmentModal;

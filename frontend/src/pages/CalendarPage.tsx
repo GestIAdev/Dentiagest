@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import CreateAppointmentModal from '../components/CreateAppointmentModal.tsx';
-import EditAppointmentModal from '../components/EditAppointmentModal.tsx';
+// 🔍 TEMP DEBUG: Cambiando a named imports para detectar el problema
+import { default as CreateAppointmentModal } from '../components/CreateAppointmentModal.tsx';
+import { default as EditAppointmentModal } from '../components/EditAppointmentModal.tsx';
 import { useAppointments } from '../hooks/useAppointments.ts';
 import { useAuth } from '../context/AuthContext.tsx';
 import { usePatients } from '../hooks/usePatients.ts';
@@ -8,6 +9,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import { formatLocalDateTime } from '../utils/timezone.ts';
 
 // 🎨 COLORES DE ESTADO PROFESIONALES
 const STATUS_COLORS = {
@@ -169,9 +171,9 @@ const CalendarPage = () => {
         </select>
       </div>
 
-      {/* 📅 CALENDARIO ÉPICO */}
+      {/* 📅 CALENDARIO ÉPICO - ALTURA DINÁMICA */}
       <div className="flex-1 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
-        <div className="p-6" style={{ height: '500px' }}>
+        <div className="h-full p-6">
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
@@ -191,24 +193,69 @@ const CalendarPage = () => {
             eventClick={handleEventClick}
             editable={true}
             eventDrop={async (info) => {
-              const apt = appointments.find(apt => apt.id === info.event.id);
-              if (!apt) return;
-              const updated = {
-                ...apt,
-                scheduled_date: info.event.startStr,
-                duration_minutes: (new Date(info.event.endStr).getTime() - new Date(info.event.startStr).getTime()) / 60000
-              };
-              await updateAppointment(updated.id, updated);
+              try {
+                console.log('🎯 EventDrop - Raw startStr:', info.event.startStr);
+                console.log('🎯 EventDrop - Raw endStr:', info.event.endStr);
+                console.log('🎯 EventDrop - Event ID:', info.event.id);
+                
+                // 🌍 Conversión correcta de timezone para drag&drop
+                const eventStart = new Date(info.event.start!);
+                const eventEnd = new Date(info.event.end!);
+                
+                // Convertir a UTC para envío al backend
+                const utcDateTime = eventStart.toISOString().slice(0, -5) + 'Z';
+                
+                const durationMs = eventEnd.getTime() - eventStart.getTime();
+                const durationMinutes = Math.round(durationMs / 60000);
+                const safeDuration = Math.max(15, durationMinutes);
+                
+                const updateData = {
+                  scheduled_date: utcDateTime,
+                  duration_minutes: safeDuration
+                };
+                console.log('🚀 EventDrop - To appointment ID:', info.event.id);
+                
+                await updateAppointment(info.event.id, updateData);
+                console.log('✅ EventDrop - Success');
+                
+              } catch (error) {
+                console.error('❌ EventDrop - Error:', error);
+                info.revert();
+                alert('Error al mover la cita. Inténtalo de nuevo.');
+              }
             }}
             eventResize={async (info) => {
-              const apt = appointments.find(apt => apt.id === info.event.id);
-              if (!apt) return;
-              const updated = {
-                ...apt,
-                scheduled_date: info.event.startStr,
-                duration_minutes: (new Date(info.event.endStr).getTime() - new Date(info.event.startStr).getTime()) / 60000
-              };
-              await updateAppointment(updated.id, updated);
+              try {
+                console.log('🎯 EventResize - Raw startStr:', info.event.startStr);
+                console.log('🎯 EventResize - Raw endStr:', info.event.endStr);
+                
+                const eventStart = new Date(info.event.start!);
+                const eventEnd = new Date(info.event.end!);
+                
+                console.log('🎯 EventResize - Parsed start:', eventStart);
+                console.log('🎯 EventResize - Parsed end:', eventEnd);
+                
+                // Formatear usando utilidades mundiales  
+                const localDateTime = formatLocalDateTime(eventStart);
+                
+                const durationMs = eventEnd.getTime() - eventStart.getTime();
+                const durationMinutes = Math.round(durationMs / 60000);
+                const safeDuration = Math.max(15, durationMinutes);
+                
+                const updateData = {
+                  scheduled_date: localDateTime,
+                  duration_minutes: safeDuration
+                };
+                
+                console.log('🚀 EventResize - Sending updateData:', updateData);
+                await updateAppointment(info.event.id, updateData);
+                console.log('✅ EventResize - Success');
+                
+              } catch (error) {
+                console.error('❌ EventResize - Error:', error);
+                info.revert();
+                alert('Error al redimensionar la cita. Inténtalo de nuevo.');
+              }
             }}
             eventContent={(eventInfo) => {
               const priorityIcon = {
@@ -228,16 +275,22 @@ const CalendarPage = () => {
               );
             }}
             height="100%"
+            contentHeight="auto"
+            aspectRatio={1.8}
             locale="es"
             firstDay={1}
-            slotMinTime="08:00:00"
-            slotMaxTime="20:00:00"
+            slotMinTime="07:00:00"
+            slotMaxTime="21:00:00"
+            slotDuration="00:15:00"
+            slotLabelInterval="01:00:00"
+            snapDuration="00:15:00"
             allDaySlot={false}
             eventDisplay="block"
-            dayMaxEvents={3}
+            dayMaxEvents={4}
             moreLinkText="más"
             selectable={true}
             selectMirror={true}
+            expandRows={true}
           />
         </div>
       </div>
@@ -265,7 +318,7 @@ const CalendarPage = () => {
         </div>
       </div>
 
-      {/* 🎯 MODALES */}
+      {/* 🎯 MODALES COMPLETAMENTE FUNCIONALES */}
       {showCreateModal && (
         <CreateAppointmentModal
           isOpen={showCreateModal}

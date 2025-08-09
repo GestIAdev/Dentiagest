@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.tsx';
+import { formatLocalDateTime, parseClinicDateTime } from '../utils/timezone.ts';
 
 export interface Appointment {
   id: string;
@@ -27,7 +28,9 @@ export interface CalendarEvent {
   backgroundColor: string;
   borderColor: string;
   extendedProps: {
+    patient_id: string;
     patient_name: string;
+    title: string;
     appointment_type: string;
     status: string;
     priority: string;
@@ -54,37 +57,36 @@ export const useAppointments = () => {
 
   // Convertir appointment a evento de FullCalendar
   const appointmentToEvent = (appointment: Appointment): CalendarEvent => {
-    // Si la fecha no tiene hora, asignar 09:00 por defecto
+    // 🌍 SOLUCIÓN MUNDIAL: Usar utilidades de timezone
     let startDate: Date;
     let duration = appointment.duration_minutes || 30;
-    if (/^\d{4}-\d{2}-\d{2}$/.test(appointment.scheduled_date)) {
-      startDate = new Date(appointment.scheduled_date + 'T09:00:00');
-    } else {
-      startDate = new Date(appointment.scheduled_date);
-      // Si la fecha no tiene hora, forzar 09:00
-      if (isNaN(startDate.getHours()) || startDate.getHours() === 0) {
-        startDate.setHours(9, 0, 0, 0);
-      }
-    }
-    // Forzar duración mínima de 30 minutos
-    if (duration < 30) duration = 30;
+    
+    // Parsear fecha usando utilidades de timezone
+    startDate = parseClinicDateTime(appointment.scheduled_date);
+    
+    // Forzar duración mínima de 15 minutos
+    if (duration < 15) duration = 15;
     const endDate = new Date(startDate.getTime() + duration * 60000);
 
-    return {
+    const event = {
       id: appointment.id,
       title: `${appointment.patient_name} - ${appointment.title}`,
-      start: startDate.toISOString(),
-      end: endDate.toISOString(),
+      start: formatLocalDateTime(startDate),
+      end: formatLocalDateTime(endDate),
       backgroundColor: STATUS_COLORS[appointment.status],
       borderColor: STATUS_COLORS[appointment.status],
       extendedProps: {
+        patient_id: appointment.patient_id,
         patient_name: appointment.patient_name,
+        title: appointment.title, // Título real sin concatenar
         appointment_type: appointment.appointment_type,
         status: appointment.status,
         priority: appointment.priority,
         notes: appointment.notes
       }
     };
+    
+    return event;
   };
 
   // GET - Listar todas las citas
@@ -180,7 +182,6 @@ export const useAppointments = () => {
     setError(null);
 
     try {
-      console.log('🚀 Enviando PUT data:', appointmentData);
       const response = await fetch(`${API_BASE}/${id}`, {
         method: 'PUT',
         headers: {
@@ -189,8 +190,6 @@ export const useAppointments = () => {
         },
         body: JSON.stringify(appointmentData)
       });
-
-      console.log('🔄 PUT Response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -244,7 +243,14 @@ export const useAppointments = () => {
 
   // Convertir appointments a eventos para FullCalendar
   const getCalendarEvents = (): CalendarEvent[] => {
-    return appointments.map(appointmentToEvent);
+    const events = appointments.map(appointmentToEvent);
+    
+    // Solo UN log cuando cambia la cantidad (no en cada render)
+    if (events.length > 0) {
+      console.log('� Calendar events loaded:', events.length, 'appointments');
+    }
+    
+    return events;
   };
 
   // Cargar citas al montar el hook
