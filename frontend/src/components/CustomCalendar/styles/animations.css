@@ -1,0 +1,399 @@
+/**
+ * 🏥 DENTIAGEST CALENDAR ANIMATIONS - PHASE 3
+ * 
+ * Purpose: Smooth animations and transitions for professional UX
+ * Created: August 9, 2025 - Phase 3 - POLISH & POWER
+ * Status: ANIMATION MAGIC
+ * 
+ * Key Features:
+ * - Smooth drag & drop animations
+ * - View transition effects
+ * - Appointment card hover states
+ * - Loading animations
+ * - Micro-interactions
+ * - Professional easing curves
+ * 
+ * PlatformGest Extraction Notes:
+ * - Universal animation patterns for all calendar systems
+ * - CSS-only animations for performance
+ * - Customizable timing and easing
+ * - Mobile-optimized transitions
+ * 
+ * Dependencies:
+ * - CSS custom properties for theme integration
+ * 
+ * @author Punk Claude & Platform Gestia Developer
+ */
+
+/* 🎨 CSS CUSTOM PROPERTIES FOR CONSISTENT ANIMATIONS */
+:root {
+  /* Animation durations */
+  --calendar-transition-fast: 150ms;
+  --calendar-transition-normal: 300ms;
+  --calendar-transition-slow: 500ms;
+  
+  /* Easing curves */
+  --calendar-ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+  --calendar-ease-in: cubic-bezier(0.4, 0.0, 1, 1);
+  --calendar-ease-in-out: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --calendar-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Shadow levels */
+  --calendar-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --calendar-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --calendar-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --calendar-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* 🎪 GLOBAL CALENDAR ANIMATIONS */
+.dentiagest-calendar {
+  transition: all var(--calendar-transition-normal) var(--calendar-ease-out);
+}
+
+/* 📅 VIEW TRANSITION ANIMATIONS */
+.calendar-content {
+  transition: opacity var(--calendar-transition-normal) var(--calendar-ease-out),
+              transform var(--calendar-transition-normal) var(--calendar-ease-out);
+}
+
+.calendar-content.fade-enter {
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+}
+
+.calendar-content.fade-enter-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.calendar-content.fade-exit {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.calendar-content.fade-exit-active {
+  opacity: 0;
+  transform: translateY(-10px) scale(1.02);
+}
+
+/* 🎯 APPOINTMENT CARD ANIMATIONS */
+.appointment-card {
+  transition: all var(--calendar-transition-fast) var(--calendar-ease-out);
+  transform-origin: center;
+}
+
+.appointment-card:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--calendar-shadow-lg);
+}
+
+.appointment-card.dragging {
+  transform: rotate(5deg) scale(1.05);
+  box-shadow: var(--calendar-shadow-xl);
+  z-index: 1000;
+  animation: dragPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes dragPulse {
+  from {
+    box-shadow: var(--calendar-shadow-xl);
+  }
+  to {
+    box-shadow: var(--calendar-shadow-xl), 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+}
+
+/* ⚡ QUICK ACTION ANIMATIONS */
+.quick-actions {
+  opacity: 0;
+  transform: translateY(-5px) scale(0.8);
+  transition: all var(--calendar-transition-fast) var(--calendar-ease-out);
+}
+
+.appointment-card:hover .quick-actions {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.quick-actions button {
+  transition: all var(--calendar-transition-fast) var(--calendar-ease-out);
+}
+
+.quick-actions button:hover {
+  transform: scale(1.1);
+  box-shadow: var(--calendar-shadow-md);
+}
+
+.quick-actions button:active {
+  transform: scale(0.95);
+}
+
+/* 🎯 DROP ZONE ANIMATIONS */
+.droppable-time-slot {
+  transition: all var(--calendar-transition-fast) var(--calendar-ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.droppable-time-slot::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(59, 130, 246, 0.1) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform var(--calendar-transition-normal) var(--calendar-ease-out);
+  opacity: 0;
+}
+
+.droppable-time-slot.drag-over {
+  background-color: rgba(34, 197, 94, 0.1);
+  border-color: rgb(34, 197, 94);
+  animation: dropZonePulse 1s ease-in-out infinite;
+}
+
+.droppable-time-slot.drag-over::before {
+  transform: translateX(100%);
+  opacity: 1;
+}
+
+.droppable-time-slot.drag-error {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgb(239, 68, 68);
+  animation: errorShake 0.5s ease-in-out;
+}
+
+@keyframes dropZonePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes errorShake {
+  0%, 20%, 40%, 60%, 80% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-2px);
+  }
+}
+
+/* 📊 STATS WIDGET ANIMATIONS */
+.daily-stats-widget {
+  transition: all var(--calendar-transition-normal) var(--calendar-ease-out);
+}
+
+.stat-card {
+  transition: all var(--calendar-transition-fast) var(--calendar-ease-out);
+  transform-origin: center;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: var(--calendar-shadow-md);
+}
+
+.stat-card:active {
+  transform: translateY(-1px) scale(1.01);
+}
+
+/* Progress bar animations */
+.stat-card .progress-bar {
+  transition: width var(--calendar-transition-slow) var(--calendar-ease-out);
+}
+
+/* Number count animations */
+.stat-card .stat-number {
+  transition: all var(--calendar-transition-normal) var(--calendar-ease-out);
+}
+
+/* 🎪 CALENDAR HEADER ANIMATIONS */
+.calendar-header {
+  transition: all var(--calendar-transition-normal) var(--calendar-ease-out);
+}
+
+.view-selector button {
+  transition: all var(--calendar-transition-fast) var(--calendar-ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.view-selector button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left var(--calendar-transition-normal) var(--calendar-ease-out);
+}
+
+.view-selector button:hover::before {
+  left: 100%;
+}
+
+.view-selector button.active {
+  transform: scale(1.05);
+  box-shadow: var(--calendar-shadow-md);
+}
+
+/* ⏰ TIME SLOT ANIMATIONS */
+.time-slot {
+  transition: all var(--calendar-transition-fast) var(--calendar-ease-out);
+  position: relative;
+}
+
+.time-slot:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+  transform: scale(1.02);
+}
+
+.time-slot.available:hover {
+  background-color: rgba(34, 197, 94, 0.1);
+}
+
+/* 💫 LOADING ANIMATIONS */
+.calendar-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.calendar-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(59, 130, 246, 0.1);
+  border-left-color: rgb(59, 130, 246);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 🎨 TOOLTIP ANIMATIONS */
+.appointment-tooltip {
+  opacity: 0;
+  transform: translateY(10px) scale(0.9);
+  transition: all var(--calendar-transition-fast) var(--calendar-ease-out);
+}
+
+.appointment-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* 📱 MOBILE OPTIMIZATIONS */
+@media (max-width: 768px) {
+  :root {
+    --calendar-transition-fast: 100ms;
+    --calendar-transition-normal: 200ms;
+    --calendar-transition-slow: 300ms;
+  }
+  
+  .appointment-card:hover {
+    transform: none; /* Reduce animations on mobile for performance */
+  }
+  
+  .stat-card:hover {
+    transform: scale(1.02);
+  }
+}
+
+/* ⚡ REDUCED MOTION SUPPORT */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 🎪 SUCCESS ANIMATIONS */
+.appointment-success {
+  animation: successBounce 0.6s var(--calendar-bounce);
+}
+
+@keyframes successBounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 🔥 ERROR ANIMATIONS */
+.appointment-error {
+  animation: errorPulse 0.5s ease-in-out 2;
+}
+
+@keyframes errorPulse {
+  0%, 100% {
+    background-color: rgba(239, 68, 68, 0.1);
+  }
+  50% {
+    background-color: rgba(239, 68, 68, 0.2);
+  }
+}
+
+/* 🎯 MICRO-INTERACTIONS */
+.micro-success {
+  animation: microSuccess 0.2s var(--calendar-ease-out);
+}
+
+.micro-error {
+  animation: microError 0.2s var(--calendar-ease-out);
+}
+
+.micro-pulse {
+  animation: microPulse 1s var(--calendar-ease-in-out) infinite;
+}
+
+@keyframes microSuccess {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+    background-color: rgba(34, 197, 94, 0.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes microError {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+    background-color: rgba(239, 68, 68, 0.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes microPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}

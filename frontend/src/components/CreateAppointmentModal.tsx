@@ -1,8 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePatients } from '../hooks/usePatients.ts';
 import { XMarkIcon, CalendarIcon, ClockIcon, UserIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useAppointments } from '../hooks/useAppointments.ts';
 import { useAuth } from '../context/AuthContext.tsx';
+
+// 🏴‍☠️ AINARKALENDAR TIME SLOTS - FREEDOM EDITION
+const generateTimeSlots = (): Array<{value: string, display: string}> => {
+  const slots: Array<{value: string, display: string}> = [];
+  // 7AM to 8PM (20:00) in 15-minute intervals
+  for (let hour = 7; hour <= 20; hour++) {
+    for (let minute = 0; minute < 60; minute += 15) {
+      const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      const displayTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      slots.push({ value: timeString, display: displayTime });
+    }
+  }
+  return slots;
+};
+
+const TIME_SLOTS = generateTimeSlots();
 
 interface CreateAppointmentModalProps {
   isOpen: boolean;
@@ -18,7 +34,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
   onCreate
 }) => {
   const { createAppointment, loading } = useAppointments();
-  const { patients, fetchPatients } = usePatients();
+  const { patients, fetchPatients, fetchAllPatients } = usePatients();
   const { state } = useAuth();
   
   // 🎯 ESTADO LIMPIO Y PROFESIONAL
@@ -39,23 +55,33 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredPatients, setFilteredPatients] = useState(patients || []);
 
-  // 🔍 AUTOCOMPLETADO PROFESIONAL
+  // 🔍 AUTOCOMPLETADO PROFESIONAL - NO MORE TEMPORARY BULLSHIT!
   const handlePatientSearch = async (searchTerm: string) => {
     setPatientSearch(searchTerm);
     
-    console.log('🔍 Buscando:', searchTerm);
-    
     if (searchTerm.length > 0) {
+      // 🔥 ANARQUIST DEBUG - TEST fetchAllPatients first
+      console.log('🔥 Testing fetchAllPatients vs fetchPatients');
+      console.log('🔥 Current patients array length:', patients.length);
+      
       // Buscar en pacientes locales primero
       const localResults = (patients || []).filter(p => 
         `${p.first_name} ${p.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        p.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.phone?.includes(searchTerm)
       );
       
-      // Si no hay resultados locales, buscar en API
+      // Si no hay resultados locales, buscar en API - FUCK TEMPORARY SOLUTIONS!
       if (localResults.length === 0) {
+        console.log('🔥 No local results, searching API for:', searchTerm);
+        
+        // 🔥 ANARQUIST TEST - Try fetchAllPatients first to see if it works
+        console.log('🔥 First testing fetchAllPatients...');
+        const allPatientsTest = await fetchAllPatients();
+        console.log('🔥 fetchAllPatients result:', allPatientsTest?.length || 'FAILED');
+        
+        // Now try the search endpoint
         const apiResults = await fetchPatients({ query: searchTerm });
-        // La API devuelve {items: [...], total: 4, ...}, extraer el array items
         const patients = apiResults?.items || [];
         setFilteredPatients(patients);
       } else {
@@ -273,17 +299,21 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
                 🕐 Hora *
               </label>
               <div className="relative">
-                <ClockIcon className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
-                <input
-                  type="time"
+                <ClockIcon className="w-5 h-5 text-gray-400 absolute left-3 top-3 z-10 pointer-events-none" />
+                <select
                   name="time"
                   value={formData.time}
                   onChange={handleInputChange}
-                  min="07:00"
-                  max="21:00"
                   required
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+                >
+                  <option value="">Selecciona hora</option>
+                  {TIME_SLOTS.map((slot) => (
+                    <option key={slot.value} value={slot.value}>
+                      {slot.display}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             

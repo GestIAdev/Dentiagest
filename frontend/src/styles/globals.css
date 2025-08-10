@@ -174,27 +174,6 @@
   }
 }
 
-/* 🗓️ FULLCALENDAR CUSTOM GRID HACK */
-/* Hacer las celdas de 15min más compactas */
-.fc-timegrid-slot {
-  height: 25px !important; /* Por defecto es ~40px */
-}
-
-.fc-timegrid-slot-minor {
-  border-top: 1px dotted #e5e7eb !important; /* Líneas más sutiles */
-}
-
-.fc-timegrid-slot-label {
-  font-size: 0.75rem !important; /* Labels más pequeños */
-  vertical-align: top !important;
-}
-
-/* Eventos más compactos también */
-.fc-event {
-  font-size: 0.75rem !important;
-  padding: 1px 4px !important;
-}
-
 /* Animaciones personalizadas */
 @keyframes fadeIn {
   from {

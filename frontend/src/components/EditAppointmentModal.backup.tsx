@@ -2,20 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { usePatients } from '../hooks/usePatients.ts';
 import { XMarkIcon, CalendarIcon, ClockIcon, UserIcon, MagnifyingGlassIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useAppointments } from '../hooks/useAppointments.ts';
-import { parseClinicDateTime } from '../utils/timezone.ts'; // 🌍 TIMEZONE SOLUTION!
-import { useAuth } from '../context/AuthContext.tsx'; // 🔐 AUTH SOLUTION!
 
 // 🏴‍☠️ AINARKALENDAR TIME SLOTS - FREEDOM EDITION
 const generateTimeSlots = (): Array<{value: string, display: string}> => {
   const slots: Array<{value: string, display: string}> = [];
+  // 7AM to 8PM (20:00) in 15-minute intervals
   for (let hour = 7; hour <= 20; hour++) {
     for (let minute = 0; minute < 60; minute += 15) {
       const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-      slots.push({ value: timeString, display: timeString });
+      const displayTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      slots.push({ value: timeString, display: displayTime });
     }
   }
   return slots;
 };
+
+const TIME_SLOTS = generateTimeSlots();
+
 const TIME_SLOTS = generateTimeSlots();
 
 interface EditAppointmentModalProps {
@@ -35,7 +38,6 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
 }) => {
   const { patients, fetchPatients } = usePatients();
   const { loading } = useAppointments();
-  const { state } = useAuth(); // 🔐 AUTH STATE FOR TOKEN
   
   // 🎯 ESTADO INICIAL BASADO EN LA CITA EXISTENTE
   const [formData, setFormData] = useState({
@@ -59,8 +61,10 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
   // 🔄 CARGAR DATOS DE LA CITA AL ABRIR EL MODAL
   useEffect(() => {
     if (appointment && isOpen) {
-      // 🌍 USE TIMEZONE UTILITIES - CYBERPUNK SOLUTION!
-      const appointmentDate = parseClinicDateTime(appointment.extendedProps?.scheduled_date || appointment.start);
+      console.log('🔍 DEBUG - Appointment object:', appointment);
+      console.log('🔍 DEBUG - Extended props:', appointment.extendedProps);
+      
+      const appointmentDate = new Date(appointment.extendedProps?.scheduled_date || appointment.start);
       const dateStr = appointmentDate.toISOString().split('T')[0];
       
       // 🏴‍☠️ AINARKALENDAR TIME PARSING - FREEDOM EDITION
@@ -68,7 +72,12 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
       const minutes = appointmentDate.getMinutes();
       // Round to nearest 15-minute slot
       const roundedMinutes = Math.round(minutes / 15) * 15;
-      const timeStr = `${hours.toString().padStart(2, '0')}:${roundedMinutes.toString().padStart(2, '0')}`;
+      // Ensure time is within our working hours (7AM-8PM)
+      const clampedHours = Math.max(7, Math.min(20, hours));
+      const timeStr = `${clampedHours.toString().padStart(2, '0')}:${roundedMinutes.toString().padStart(2, '0')}`;
+      
+      console.log('🔍 DEBUG - Original time:', appointmentDate.toTimeString().slice(0, 5));
+      console.log('🔍 DEBUG - Rounded time for slot:', timeStr);
       
       const newFormData = {
         patient_id: appointment.extendedProps?.patient_id || '',
@@ -84,6 +93,7 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
         notes: appointment.extendedProps?.notes || ''
       };
       
+      console.log('🔍 DEBUG - New form data:', newFormData);
       setFormData(newFormData);
       
       setPatientSearch(appointment.extendedProps?.patient_name || appointment.title || '');

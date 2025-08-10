@@ -68,6 +68,17 @@ export const useAppointments = () => {
     if (duration < 15) duration = 15;
     const endDate = new Date(startDate.getTime() + duration * 60000);
 
+    // 💥 TYLER DURDEN 2x2 GRID - SIMPLE & STABLE
+    // 2 columns: first half hour vs second half hour
+    const minutes = startDate.getMinutes();
+    let resourceId = 'slot1'; // Default: first half (:00-:29)
+    
+    if (minutes >= 30) {
+      resourceId = 'slot2'; // Second half (:30-:59)
+    }
+    
+    // For appointments >= 30min, they'll span both columns naturally
+
     const event = {
       id: appointment.id,
       title: `${appointment.patient_name} - ${appointment.title}`,
@@ -75,6 +86,7 @@ export const useAppointments = () => {
       end: formatLocalDateTime(endDate),
       backgroundColor: STATUS_COLORS[appointment.status],
       borderColor: STATUS_COLORS[appointment.status],
+      resourceId: resourceId, // 🚀 SIMPLE 2-COLUMN ASSIGNMENT
       extendedProps: {
         patient_id: appointment.patient_id,
         patient_name: appointment.patient_name,
