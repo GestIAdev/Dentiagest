@@ -1,5 +1,5 @@
 /**
- * 🏴‍☠️ IAnarkalendar v1.0 - PunkClaude & Raul © 2025
+ * 🏴‍☠️ IAnarkalendar © GestIA Dev + PunkClaude 2025
  */
 
 import React, { useEffect } from 'react';

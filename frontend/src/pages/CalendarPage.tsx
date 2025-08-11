@@ -201,9 +201,12 @@ const CalendarPage = () => {
           <option value="all">📋 Todos los estados</option>
           <option value="scheduled">📅 Programadas</option>
           <option value="confirmed">✅ Confirmadas</option>
+          <option value="checked_in">🏥 Llegaron</option>
           <option value="in_progress">⏳ En progreso</option>
           <option value="completed">✅ Completadas</option>
           <option value="cancelled">❌ Canceladas</option>
+          <option value="no_show">👻 No vinieron</option>
+          <option value="rescheduled">📆 Reprogramadas</option>
         </select>
       </div>
 
@@ -216,7 +219,7 @@ const CalendarPage = () => {
               <CalendarContainer 
                 view="month"
                 className="h-full"
-                appointments={appointments || []}
+                appointments={filteredAppointments || []}
                 onAppointmentClick={handleEventClick}
                 onDateClick={handleDateClick}
                 onTimeSlotClick={handleTimeSlotClick} // 🕒 + BUTTON MAGIC
