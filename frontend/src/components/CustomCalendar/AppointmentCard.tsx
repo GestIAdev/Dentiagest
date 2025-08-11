@@ -37,9 +37,9 @@ export interface AppointmentData {
   startTime: Date;
   endTime: Date;
   duration: number; // in minutes
-  type: 'consulta' | 'limpieza' | 'tratamiento' | 'emergencia';
-  status: 'confirmada' | 'pendiente' | 'cancelada' | 'completada';
-  priority: 'normal' | 'alta' | 'urgente';
+  type: 'consultation' | 'cleaning' | 'treatment' | 'emergency';
+  status: 'confirmed' | 'pending' | 'cancelled' | 'completed';
+  priority: 'normal' | 'high' | 'urgent';
   notes?: string;
   phone?: string;
   doctorName?: string;
@@ -61,28 +61,28 @@ interface AppointmentCardProps {
 
 // 🎨 DENTIAGEST COLOR SYSTEM (Following style guide)
 const APPOINTMENT_COLORS = {
-  consulta: {
+  consultation: {
     bg: 'bg-green-100',
     border: 'border-green-300',
     text: 'text-green-800',
     dot: 'bg-green-500',
     shadow: 'shadow-green-100'
   },
-  limpieza: {
+  cleaning: {
     bg: 'bg-blue-100', 
     border: 'border-blue-300',
     text: 'text-blue-800',
     dot: 'bg-blue-500',
     shadow: 'shadow-blue-100'
   },
-  tratamiento: {
+  treatment: {
     bg: 'bg-orange-100',
     border: 'border-orange-300', 
     text: 'text-orange-800',
     dot: 'bg-orange-500',
     shadow: 'shadow-orange-100'
   },
-  emergencia: {
+  emergency: {
     bg: 'bg-red-100',
     border: 'border-red-300',
     text: 'text-red-800',
@@ -91,11 +91,26 @@ const APPOINTMENT_COLORS = {
   }
 };
 
-// 🚨 PRIORITY INDICATORS
+// 🌐 DISPLAY LABELS - Values en inglés → Labels en español
+const TYPE_LABELS = {
+  consultation: 'Consulta',
+  cleaning: 'Limpieza',
+  treatment: 'Tratamiento',
+  emergency: 'Emergencia'
+};
+
+const STATUS_LABELS = {
+  confirmed: 'Confirmada',
+  pending: 'Pendiente', 
+  cancelled: 'Cancelada',
+  completed: 'Completada'
+};
+
+// 🚨 PRIORITY INDICATORS - Simple but effective
 const PRIORITY_INDICATORS = {
   normal: '',
-  alta: '⚡',
-  urgente: '🚨'
+  high: '⚡',
+  urgent: '🚨'
 };
 
 export function AppointmentCard({
@@ -119,9 +134,7 @@ export function AppointmentCard({
   // const responsive = useResponsiveAnimations();
   
   const colors = APPOINTMENT_COLORS[appointment.type];
-  const priorityIcon = PRIORITY_INDICATORS[appointment.priority || 'normal'];
-
-  const handleDragStart = (e: React.DragEvent) => {
+  const priorityIcon = PRIORITY_INDICATORS[appointment.priority || 'normal'];  const handleDragStart = (e: React.DragEvent) => {
     // Store appointment data for drop handler
     e.dataTransfer.setData('application/json', JSON.stringify(appointment));
     e.dataTransfer.effectAllowed = 'move';
@@ -217,8 +230,40 @@ export function AppointmentCard({
         ${isCompact ? 'p-1' : 'p-2'}
         ${className}
       `}
-      title={`${appointment.patientName} - ${appointment.type} (${formatDuration(appointment.duration)})`}
+      title={`${appointment.patientName} - ${TYPE_LABELS[appointment.type] || appointment.type} (${formatDuration(appointment.duration)})`}
     >
+      {/* 🚨 PRIORITY INDICATOR - FLOATING ABSOLUTE POSITION */}
+      {priorityIcon && (
+        <div
+          className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-white font-bold text-sm border-2 border-white shadow-lg z-[200]"
+          style={{
+            backgroundColor: appointment.priority === 'urgent' ? '#dc2626' : 
+                           appointment.priority === 'high' ? '#ea580c' : '#6b7280',
+            position: 'absolute',
+            zIndex: 200,
+            pointerEvents: 'none'
+          }}
+          title={`Prioridad: ${appointment.priority}${
+            // Check if this is auto-detected priority
+            (appointment.type === 'emergency' && appointment.priority === 'urgent') ||
+            (appointment.notes?.toLowerCase().includes('urgente') && appointment.priority === 'high') ||
+            (appointment.notes?.toLowerCase().includes('dolor') && appointment.priority === 'high') 
+            ? ' 🤖 (Auto-detectada)' 
+            : ' 👤 (Manual)'
+          }`}
+        >
+          {priorityIcon}
+          {/* 🤖 Auto-detection indicator */}
+          {((appointment.type === 'emergency' && appointment.priority === 'urgent') ||
+            (appointment.notes?.toLowerCase().includes('urgente') && appointment.priority === 'high') ||
+            (appointment.notes?.toLowerCase().includes('dolor') && appointment.priority === 'high')) && (
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
+              🤖
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Quick Actions (only show on hover) */}
       {showQuickActions && isHovered && !isDragging && (
         <div className="quick-actions absolute top-1 right-1 flex space-x-1 z-10">
@@ -266,23 +311,22 @@ export function AppointmentCard({
             <div className="flex items-center space-x-1">
               <div className={`w-2 h-2 rounded-full ${colors.dot}`}></div>
               <span className={`text-xs font-medium uppercase tracking-wide ${colors.text}`}>
-                {appointment.type}
+                {TYPE_LABELS[appointment.type] || appointment.type}
               </span>
-              {priorityIcon && <span className="text-xs">{priorityIcon}</span>}
             </div>
             
             {/* Status badge - VISIBLE */}
             <div className={`
               text-xs px-1.5 py-0.5 rounded-full font-bold
-              ${appointment.status === 'confirmada' ? 'bg-green-500 text-white' : ''}
-              ${appointment.status === 'pendiente' ? 'bg-yellow-500 text-white' : ''}
-              ${appointment.status === 'cancelada' ? 'bg-red-500 text-white' : ''}
-              ${appointment.status === 'completada' ? 'bg-gray-500 text-white' : ''}
+              ${appointment.status === 'confirmed' ? 'bg-green-500 text-white' : ''}
+              ${appointment.status === 'pending' ? 'bg-yellow-500 text-white' : ''}
+              ${appointment.status === 'cancelled' ? 'bg-red-500 text-white' : ''}
+              ${appointment.status === 'completed' ? 'bg-gray-500 text-white' : ''}
             `}>
-              {appointment.status === 'confirmada' ? '✓' : 
-               appointment.status === 'pendiente' ? '⏳' : 
-               appointment.status === 'cancelada' ? '✗' : 
-               appointment.status === 'completada' ? '✓' : '?'}
+              {appointment.status === 'confirmed' ? '✓' : 
+               appointment.status === 'pending' ? '⏳' : 
+               appointment.status === 'cancelled' ? '✗' : 
+               appointment.status === 'completed' ? '✓' : '?'}
             </div>
           </div>
         </>
@@ -294,13 +338,8 @@ export function AppointmentCard({
             <div className="flex items-center space-x-1">
               <div className={`w-2 h-2 rounded-full ${colors.dot}`}></div>
               <span className={`${isCompact ? 'text-xs' : 'text-xs'} font-medium uppercase tracking-wide`}>
-                {appointment.type}
+                {TYPE_LABELS[appointment.type] || appointment.type}
               </span>
-              {priorityIcon && (
-                <span className="text-xs" title={`Prioridad: ${appointment.priority}`}>
-                  {priorityIcon}
-                </span>
-              )}
             </div>
             {!isCompact && (
               <span className="text-xs text-gray-500">
@@ -344,12 +383,12 @@ export function AppointmentCard({
           <div className="flex items-center justify-between">
             <div className={`
               ${isCompact ? 'text-xs px-1 py-0.5' : 'text-xs px-2 py-1'} rounded-full font-medium
-              ${appointment.status === 'confirmada' ? 'bg-green-200 text-green-800' : ''}
-              ${appointment.status === 'pendiente' ? 'bg-yellow-200 text-yellow-800' : ''}
-              ${appointment.status === 'cancelada' ? 'bg-red-200 text-red-800' : ''}
-              ${appointment.status === 'completada' ? 'bg-gray-200 text-gray-800' : ''}
+              ${appointment.status === 'confirmed' ? 'bg-green-200 text-green-800' : ''}
+              ${appointment.status === 'pending' ? 'bg-yellow-200 text-yellow-800' : ''}
+              ${appointment.status === 'cancelled' ? 'bg-red-200 text-red-800' : ''}
+              ${appointment.status === 'completed' ? 'bg-gray-200 text-gray-800' : ''}
             `}>
-              {appointment.status}
+              {STATUS_LABELS[appointment.status] || appointment.status}
             </div>
             
             {/* Compact time display */}
@@ -387,7 +426,7 @@ export function AppointmentCard({
       {showTooltip && (
         <div className="tooltip absolute bottom-full left-0 mb-2 p-2 bg-black text-white text-xs rounded shadow-lg z-20 w-48">
           <div><strong>{appointment.patientName}</strong></div>
-          <div>{appointment.type} - {formatDuration(appointment.duration)}</div>
+          <div>{TYPE_LABELS[appointment.type] || appointment.type} - {formatDuration(appointment.duration)}</div>
           <div>{format(appointment.startTime, 'HH:mm')} - {format(appointment.endTime, 'HH:mm')}</div>
           {appointment.patientPhone && <div>📞 {appointment.patientPhone}</div>}
           {appointment.notes && <div>💬 {appointment.notes}</div>}

@@ -271,20 +271,14 @@ export function CalendarContainer({
         )}
       </div>
 
-      {/* Today button */}
+      {/* Today button - Clean & Simple */}
       <div className="calendar-footer mt-4 text-center">
         <button
           onClick={navigation.goToToday}
-          className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+          className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
         >
           Hoy
         </button>
-        
-        {/* 🏴‍☠️ AINARKALENDAR SIGNATURE - DISCREET BUT PRESENT */}
-        <div className="mt-2 text-xs text-gray-400 hover:text-blue-500 transition-colors cursor-default" 
-             title="AInarkalendar - Built by PunkClaude & Raul (GestIA Dev)">
-          🏴‍☠️ AInarkalendar
-        </div>
       </div>
     </div>
   );

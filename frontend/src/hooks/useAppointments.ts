@@ -136,10 +136,14 @@ export const useAppointments = () => {
       }
       
       // 🏥 GUARDAR TODAS LAS CITAS (incluidas canceladas) para filtros
-      const allAppointments = appointmentsArray;
+      const allAppointments = appointmentsArray.map((apt: any) => ({
+        ...apt,
+        // ✅ Priority values now match backend format
+        priority: apt.priority || 'normal'
+      }));
       
       // 🏥 FILTRAR CITAS CANCELADAS SOLO PARA VISTA PRINCIPAL (no para filtros)
-      const activeAppointments = appointmentsArray.filter((apt: any) => 
+      const activeAppointments = allAppointments.filter((apt: any) => 
         apt.status && apt.status.toLowerCase() !== 'cancelled'
       );
       
@@ -159,6 +163,8 @@ export const useAppointments = () => {
     setError(null);
 
     try {
+      console.log('✅ Creating appointment:', appointmentData);
+
       const response = await fetch(API_BASE, {
         method: 'POST',
         headers: {
@@ -178,8 +184,15 @@ export const useAppointments = () => {
       }
 
       const newAppointment = await response.json();
-      setAppointments(prev => [...prev, newAppointment]);
-      return newAppointment;
+      
+      // ✅ Priority values now match backend format
+      const mappedAppointment = {
+        ...newAppointment,
+        priority: newAppointment.priority || 'normal'
+      };
+      
+      setAppointments(prev => [...prev, mappedAppointment]);
+      return mappedAppointment;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       throw err;
@@ -194,6 +207,8 @@ export const useAppointments = () => {
     setError(null);
 
     try {
+      console.log('🔄 Updating appointment:', { id, appointmentData });
+
       const response = await fetch(`${API_BASE}/${id}`, {
         method: 'PUT',
         headers: {
@@ -210,10 +225,17 @@ export const useAppointments = () => {
       }
 
       const updatedAppointment = await response.json();
+      
+      // ✅ Priority values now match backend format
+      const mappedAppointment = {
+        ...updatedAppointment,
+        priority: updatedAppointment.priority || 'normal'
+      };
+      
       setAppointments(prev => 
-        prev.map(apt => apt.id === id ? updatedAppointment : apt)
+        prev.map(apt => apt.id === id ? mappedAppointment : apt)
       );
-      return updatedAppointment;
+      return mappedAppointment;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       throw err;

@@ -59,13 +59,17 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
   // 🔄 CARGAR DATOS DE LA CITA AL ABRIR EL MODAL
   useEffect(() => {
     if (appointment && isOpen) {
-      // 🛡️ DEFENSIVE DATE PARSING - Prevent "Invalid time value"
-      const rawDate = appointment.extendedProps?.scheduled_date || appointment.start;
+      // 🛡️ DEFENSIVE DATE PARSING - Handle both FullCalendar and direct appointment formats
+      const rawDate = appointment.extendedProps?.scheduled_date || 
+                     appointment.start || 
+                     appointment.scheduled_date; // 🎯 ADD DIRECT APPOINTMENT SUPPORT!
       
       if (!rawDate) {
         console.warn('⚠️ EditAppointmentModal: No date found in appointment:', appointment);
         return;
       }
+
+      console.log('🔍 EditAppointmentModal: Found date:', rawDate, 'from appointment:', appointment);
 
       try {
         // 🌍 USE TIMEZONE UTILITIES - CYBERPUNK SOLUTION!
@@ -86,23 +90,28 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
       const roundedMinutes = Math.round(minutes / 15) * 15;
       const timeStr = `${hours.toString().padStart(2, '0')}:${roundedMinutes.toString().padStart(2, '0')}`;
       
+      // 🎯 HELPER: Get field from either FullCalendar or direct appointment format
+      const getField = (fcField: string, directField: string, fallback: any = '') => {
+        return appointment.extendedProps?.[fcField] || appointment[directField] || fallback;
+      };
+      
       const newFormData = {
-        patient_id: appointment.extendedProps?.patient_id || '',
-        patient_name: appointment.extendedProps?.patient_name || appointment.title || '',
-        title: appointment.extendedProps?.title || appointment.title.split(' - ')[1] || appointment.title || '',
+        patient_id: getField('patient_id', 'patient_id'),
+        patient_name: getField('patient_name', 'patient_name') || appointment.title || '',
+        title: getField('title', 'title') || appointment.title?.split(' - ')[1] || appointment.title || '',
         date: dateStr,
         time: timeStr,
-        duration: appointment.extendedProps?.duration_minutes || 30,
-        appointment_type: appointment.extendedProps?.appointment_type || 'consultation',
-        priority: appointment.extendedProps?.priority || 'normal',
-        status: appointment.extendedProps?.status || 'scheduled',
-        description: appointment.extendedProps?.description || '',
-        notes: appointment.extendedProps?.notes || ''
+        duration: getField('duration_minutes', 'duration_minutes', 30),
+        appointment_type: getField('appointment_type', 'appointment_type', 'consultation'),
+        priority: getField('priority', 'priority', 'normal'),
+        status: getField('status', 'status', 'scheduled'),
+        description: getField('description', 'description'),
+        notes: getField('notes', 'notes')
       };
       
       setFormData(newFormData);
       
-      setPatientSearch(appointment.extendedProps?.patient_name || appointment.title || '');
+      setPatientSearch(getField('patient_name', 'patient_name') || appointment.title || '');
       
       } catch (error) {
         console.error('❌ EditAppointmentModal: Error processing appointment data:', error, appointment);
@@ -150,6 +159,7 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
     console.log('🔍 DEBUG - FormData al enviar:', formData);
     console.log('🔍 DEBUG - Patient ID:', formData.patient_id);
     console.log('🔍 DEBUG - Patient Name:', formData.patient_name);
+    console.log('🔍 DEBUG - Original appointment:', appointment);
     
     // 🚨 VALIDACIÓN MEJORADA
     if (!formData.patient_id && !formData.patient_name) {
@@ -174,20 +184,43 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
     };
 
     // Solo enviar fecha/tiempo si realmente cambiaron
-    const appointmentStart = new Date(appointment.start);
-    const originalDate = appointmentStart.toISOString().split('T')[0];
-    const originalTime = appointmentStart.toTimeString().substring(0, 5);
-    const originalDuration = appointment.extendedProps?.duration_minutes || 30;
-
-    if (formData.date !== originalDate || formData.time !== originalTime) {
-      // 🌍 SOLUCIÓN: Crear fecha local y convertir a UTC (como en drag&drop)
-      const localDateTime = new Date(`${formData.date}T${formData.time}:00`);
-      const utcDateTime = localDateTime.toISOString().slice(0, -5) + 'Z';
-      appointmentData.scheduled_date = utcDateTime;
-    }
+    // 🛡️ DEFENSIVE: Handle both FullCalendar and direct appointment formats
+    const rawOriginalDate = appointment.start || appointment.scheduled_date;
     
-    if (parseInt(formData.duration.toString()) !== originalDuration) {
-      appointmentData.duration_minutes = parseInt(formData.duration.toString());
+    if (!rawOriginalDate) {
+      console.warn('⚠️ No original date found for comparison:', appointment);
+      // Skip date comparison, just send the new data
+    } else {
+      const appointmentStart = new Date(rawOriginalDate);
+      
+      // 🛡️ CHECK IF DATE IS VALID before using toISOString()
+      if (isNaN(appointmentStart.getTime())) {
+        console.error('❌ Invalid original date:', rawOriginalDate);
+        // Skip date comparison, just send the new data
+      } else {
+        const originalDate = appointmentStart.toISOString().split('T')[0];
+        const originalTime = appointmentStart.toTimeString().substring(0, 5);
+        const originalDuration = appointment.extendedProps?.duration_minutes || appointment.duration_minutes || 30;
+
+        if (formData.date !== originalDate || formData.time !== originalTime) {
+          // 🌍 SOLUCIÓN: Crear fecha local y convertir a UTC (como en drag&drop)
+          const localDateTime = new Date(`${formData.date}T${formData.time}:00`);
+          
+          // 🛡️ VALIDATE local date before toISOString()
+          if (isNaN(localDateTime.getTime())) {
+            console.error('❌ Invalid local date time:', `${formData.date}T${formData.time}:00`);
+            alert('⚠️ Fecha u hora inválida. Por favor revisa los valores.');
+            return;
+          }
+          
+          const utcDateTime = localDateTime.toISOString().slice(0, -5) + 'Z';
+          appointmentData.scheduled_date = utcDateTime;
+        }
+        
+        if (parseInt(formData.duration.toString()) !== originalDuration) {
+          appointmentData.duration_minutes = parseInt(formData.duration.toString());
+        }
+      }
     }
 
     try {
@@ -369,17 +402,23 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 🎯 Prioridad
+                <span className="text-xs text-gray-500 ml-2" title="🤖 Auto: Emergencias=Urgente, 'dolor' en notas=Alta. 👤 Manual: sobrescribe automático">
+                  (Auto + Manual)
+                </span>
               </label>
               <select
                 value={formData.priority}
                 onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                title="🤖 Sistema Híbrido: Se auto-detecta por tipo/notas, pero puedes sobrescribir manualmente"
               >
-                <option value="low">🔵 Baja</option>
                 <option value="normal">🟢 Normal</option>
                 <option value="high">🟠 Alta</option>
                 <option value="urgent">🔴 Urgente</option>
               </select>
+              <div className="text-xs text-gray-500 mt-1">
+                🤖 Auto: Emergencias→Urgente, "dolor"/"urgente" en notas→Alta
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

@@ -1,5 +1,5 @@
 /**
- * 🗂️ DENTIAGEST COMPACT CALENDAR - PERFECTED FILE-TAB STACKING
+ * 🗂️ WEEKLY CALENDAR - Professional File-Tab Stacking
  * ⚡ Elegant • Compact • Professional • Smart Stacking
  */
 
@@ -30,6 +30,7 @@ export function WeekViewSimple({
   // 🔍 DEBUG: Log appointments data to check for invalid dates
   React.useEffect(() => {
     console.log('🔍 WeekViewSimple - Received appointments:', appointments.length);
+    
     appointments.forEach((apt, index) => {
       if (!apt?.scheduled_date) {
         console.warn(`⚠️ Appointment ${index} missing scheduled_date:`, apt);
@@ -70,43 +71,76 @@ export function WeekViewSimple({
     }
 
     // 🛡️ DEFENSIVE TYPE MAPPING - Handle unknown types
-    const mapAppointmentType = (type: string): 'consulta' | 'limpieza' | 'tratamiento' | 'emergencia' => {
-      const typeMap: { [key: string]: 'consulta' | 'limpieza' | 'tratamiento' | 'emergencia' } = {
-        'consulta': 'consulta',
-        'consultation': 'consulta',
-        'limpieza': 'limpieza', 
-        'cleaning': 'limpieza',
-        'tratamiento': 'tratamiento',
-        'treatment': 'tratamiento',
-        'filling': 'tratamiento',
-        'empaste': 'tratamiento',
-        'emergencia': 'emergencia',
-        'emergency': 'emergencia',
-        'urgente': 'emergencia'
+    const mapAppointmentType = (type: string): 'consultation' | 'cleaning' | 'treatment' | 'emergency' => {
+      const typeMap: { [key: string]: 'consultation' | 'cleaning' | 'treatment' | 'emergency' } = {
+        'consulta': 'consultation',
+        'consultation': 'consultation',
+        'limpieza': 'cleaning', 
+        'cleaning': 'cleaning',
+        'tratamiento': 'treatment',
+        'treatment': 'treatment',
+        'filling': 'treatment',
+        'empaste': 'treatment',
+        'extraction': 'treatment', // 🦷 EXTRACCIÓN ES TRATAMIENTO!
+        'extraccion': 'treatment',
+        'extracción': 'treatment',
+        'corona': 'treatment',
+        'crown': 'treatment',
+        'endodoncia': 'treatment',
+        'root_canal': 'treatment',
+        'emergencia': 'emergency',
+        'emergency': 'emergency',
+        'urgente': 'emergency'
       };
       
-      return typeMap[type?.toLowerCase()] || 'consulta'; // Default to 'consulta' if unknown
+      const mappedType = typeMap[type?.toLowerCase()] || 'consultation';
+      
+      return mappedType; // Default to 'consultation' if unknown
     };
 
     // 🛡️ DEFENSIVE STATUS MAPPING - Handle API status values
-    const mapAppointmentStatus = (status: string): 'confirmada' | 'pendiente' | 'cancelada' | 'completada' => {
-      const statusMap: { [key: string]: 'confirmada' | 'pendiente' | 'cancelada' | 'completada' } = {
-        'confirmada': 'confirmada',
-        'confirmed': 'confirmada',
-        'scheduled': 'pendiente',
-        'programada': 'pendiente',
-        'pendiente': 'pendiente',
-        'pending': 'pendiente',
-        'cancelada': 'cancelada',
-        'cancelled': 'cancelada',
-        'canceled': 'cancelada',
-        'completada': 'completada',
-        'completed': 'completada',
-        'finished': 'completada',
-        'done': 'completada'
+    const mapAppointmentStatus = (status: string): 'confirmed' | 'pending' | 'cancelled' | 'completed' => {
+      const statusMap: { [key: string]: 'confirmed' | 'pending' | 'cancelled' | 'completed' } = {
+        'confirmada': 'confirmed',
+        'confirmed': 'confirmed',
+        'scheduled': 'pending',
+        'programada': 'pending',
+        'pendiente': 'pending',
+        'pending': 'pending',
+        'cancelada': 'cancelled',
+        'cancelled': 'cancelled',
+        'canceled': 'cancelled',
+        'completada': 'completed',
+        'completed': 'completed',
+        'finished': 'completed',
+        'done': 'completed'
       };
       
-      return statusMap[status?.toLowerCase()] || 'pendiente'; // Default to 'pendiente' if unknown
+      return statusMap[status?.toLowerCase()] || 'pending'; // Default to 'pending' if unknown
+    };
+
+    // 🚨 HYBRID PRIORITY SYSTEM - Manual OVERRIDES Automatic
+    const determinePriority = (apt: any): 'normal' | 'high' | 'urgent' => {
+      // 🎯 RULE 1: Manual priority ALWAYS wins (if valid)
+      if (apt.priority && ['normal', 'high', 'urgent'].includes(apt.priority)) {
+        return apt.priority;
+      }
+      
+      // 🤖 RULE 2: Automatic detection as fallback
+      const mappedType = mapAppointmentType(apt.appointment_type);
+      
+      // Auto-detect: Emergency appointments are urgent
+      if (mappedType === 'emergency') {
+        return 'urgent';
+      }
+      
+      // Auto-detect: Pain/urgency keywords in notes
+      if (apt.notes?.toLowerCase().includes('urgente') || apt.notes?.toLowerCase().includes('dolor')) {
+        return 'high';
+      }
+      
+      // Default: normal priority
+      return 'normal';
     };
 
     return {
@@ -118,7 +152,7 @@ export function WeekViewSimple({
       duration: apt.duration || 30,
       type: mapAppointmentType(apt.appointment_type), // 🎯 FIXED: Proper mapping with defensive fallback
       status: mapAppointmentStatus(apt.status), // 🎯 NEW: Proper status mapping
-      priority: apt.priority || 'normal',
+      priority: determinePriority(apt), // 🚨 SMART PRIORITY WITH DEBUGGING!
       notes: apt.notes || '',
       phone: apt.patient_phone || '',
       doctorName: apt.doctor_name || '',
@@ -153,15 +187,15 @@ export function WeekViewSimple({
 
   return (
     <div className={`week-view-compact ${className}`}>
-      {/* 🎯 MINIMAL HEADER - Just days, no clutter */}
+      {/* 🎯 AINARKLENDAR HEADER - Gray Theme Consistency */}
       <div className="grid grid-cols-8 gap-1 mb-2">
-        <div className="text-sm p-2 bg-gray-100 border rounded text-center font-medium">
+        <div className="text-sm p-2 bg-gray-100 border rounded text-center font-medium text-gray-700">
           Hora
         </div>
         {weekDays.map(day => (
-          <div key={day.toISOString()} className="text-sm p-2 bg-blue-50 border rounded text-center">
-            <div className="font-medium">{format(day, 'EEE', { locale: es })}</div>
-            <div className="text-sm">{format(day, 'd')}</div>
+          <div key={day.toISOString()} className="text-sm p-2 bg-gray-100 border rounded text-center">
+            <div className="font-medium text-gray-700">{format(day, 'EEE', { locale: es })}</div>
+            <div className="text-sm text-gray-600">{format(day, 'd')}</div>
           </div>
         ))}
       </div>
@@ -170,8 +204,8 @@ export function WeekViewSimple({
       <div className="week-grid">
         {workingHours.map(hour => (
           <div key={hour} className="grid grid-cols-8 gap-1 mb-1">
-            {/* Time label - Readable but compact */}
-            <div className="text-sm p-2 bg-gray-50 border rounded text-center font-medium">
+            {/* Time label - AINARKLENDAR Gray Style */}
+            <div className="text-sm p-2 bg-gray-100 border border-gray-300 rounded text-center font-medium text-gray-700">
               {hour}:00
             </div>
 
@@ -182,7 +216,7 @@ export function WeekViewSimple({
               return (
                 <div 
                   key={`${day.toISOString()}-${hour}`}
-                  className="relative bg-white border rounded cursor-pointer hover:bg-gray-50 group"
+                  className="relative bg-white border border-gray-200 rounded cursor-pointer hover:bg-gray-50 group transition-colors"
                   style={{ 
                     height: '60px', // ⚡ OPTIMIZED: Perfect balance - compact but functional
                     overflow: 'visible',
@@ -190,9 +224,9 @@ export function WeekViewSimple({
                   }}
                   onClick={() => onTimeSlotClick?.(day, `${hour}:00`)}
                 >
-                  {/* EMPTY SLOT */}
+                  {/* EMPTY SLOT - AINARKLENDAR Style */}
                   {dayAppointments.length === 0 && (
-                    <div className="h-full flex items-center justify-center text-sm text-gray-300">
+                    <div className="h-full flex items-center justify-center text-sm text-gray-400">
                       <span className="opacity-0 group-hover:opacity-100 transition-opacity text-lg">+</span>
                     </div>
                   )}
@@ -208,7 +242,7 @@ export function WeekViewSimple({
                           <AppointmentCard
                             appointment={appointmentData}
                             isCompact={true}
-                            onClick={(apt) => onAppointmentClick?.(apt)} // 🎯 CONNECT TO REAL HANDLER!
+                            onClick={(clickedApt) => onAppointmentClick?.(dayAppointments[0])} // 🎯 PASS ORIGINAL!
                             className="h-full text-sm"
                           />
                         );
@@ -264,15 +298,17 @@ export function WeekViewSimple({
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
-                              // 🎯 CONNECT TO REAL HANDLER!
-                              onAppointmentClick?.(appointmentData);
+                              // 🔍 DEBUG: Check what we're passing to modal
+                              console.log('🎯 Clicking appointment - Original data:', apt);
+                              // 🎯 PASS ORIGINAL APPOINTMENT - Not converted data!
+                              onAppointmentClick?.(apt);
                             }}
                           >
                             {/* 🎯 REAL APPOINTMENTCARD - CLEAN AND CLICKEABLE */}
                             <AppointmentCard
                               appointment={appointmentData}
                               isCompact={true}
-                              onClick={(apt) => onAppointmentClick?.(apt)} // 🎯 CONNECT TO REAL HANDLER!
+                              onClick={(clickedApt) => onAppointmentClick?.(apt)} // 🎯 PASS ORIGINAL APT!
                               className={`
                                 h-full text-sm transition-all duration-300
                                 ${isTopCard 

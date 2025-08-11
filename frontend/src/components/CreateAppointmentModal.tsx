@@ -363,18 +363,24 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 ⚡ Prioridad
+                <span className="text-xs text-gray-500 ml-2" title="🤖 Auto: Emergencias=Urgente, 'dolor' en notas=Alta. 👤 Manual: sobrescribe automático">
+                  (Auto + Manual)
+                </span>
               </label>
               <select
                 name="priority"
                 value={formData.priority}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                title="🤖 Sistema Híbrido: Se auto-detecta por tipo/notas, pero puedes sobrescribir manualmente"
               >
-                <option value="low">🔵 Baja</option>
                 <option value="normal">🟢 Normal</option>
                 <option value="high">🟠 Alta</option>
                 <option value="urgent">🔴 Urgente</option>
               </select>
+              <div className="text-xs text-gray-500 mt-1">
+                🤖 Auto: Emergencias→Urgente, "dolor"/"urgente" en notas→Alta
+              </div>
             </div>
           </div>
 
