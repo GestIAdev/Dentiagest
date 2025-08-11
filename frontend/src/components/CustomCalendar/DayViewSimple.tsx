@@ -1,16 +1,5 @@
 /**
- * � AINARKLENDAR DAY VIEW - FULL SCREEN GRID
- * 
- * Purpose: Maximum space utilization with beautiful AppointmentCards
- * Status: OPTIMIZED FOR VISUAL EXCELLENCE
- * 
- * Key Features:
- * - Intelligent responsive grid (3-7 columns based on screen size)
- * - AppointmentCards with full visual glory
- * - No wasted space, no unnecessary headers
- * - Professional 15-minute slot system
- * 
- * @author AINARKLENDAR Team
+ * 🏴‍☠️ IAnarkalendar v1.0 - PunkClaude & Raul © 2025
  */
 
 import React from 'react';
@@ -34,15 +23,33 @@ interface TimeSlot {
   dateTime: Date;
 }
 
-// 🎯 APPOINTMENT TYPE MAPPING - Exact types for AppointmentCard
+// 🎯 APPOINTMENT TYPE MAPPING - SYNCHRONIZED WITH WEEKLY VIEW
 const mapAppointmentType = (type: string): 'consultation' | 'cleaning' | 'treatment' | 'emergency' => {
   const typeMap: { [key: string]: 'consultation' | 'cleaning' | 'treatment' | 'emergency' } = {
+    'consulta': 'consultation',
     'consultation': 'consultation',
-    'treatment': 'treatment', 
     'followup': 'consultation',
-    'emergency': 'emergency',
+    'limpieza': 'cleaning', 
+    'cleaning': 'cleaning',
+    'tratamiento': 'treatment',
+    'treatment': 'treatment',
+    'filling': 'treatment',
+    'empaste': 'treatment',
+    'extraction': 'treatment',
+    'extraccion': 'treatment',
+    'extracción': 'treatment',
+    'corona': 'treatment',
+    'crown': 'treatment',
+    'implante': 'treatment',     // ⚡ ADDED!
+    'implant': 'treatment',      // ⚡ ADDED!
+    'endodoncia': 'treatment',
+    'root_canal': 'treatment',
+    'orthodontics': 'treatment',  // ⚡ ADDED!
+    'ortodoncia': 'treatment',
     'surgery': 'treatment',
-    'cleaning': 'cleaning'
+    'emergencia': 'emergency',
+    'emergency': 'emergency',
+    'urgente': 'emergency'
   };
   return typeMap[type] || 'consultation';
 };
@@ -141,14 +148,7 @@ export function DayViewSimple({
       const appointmentDate = parseClinicDateTime(apt.scheduled_date);
       if (!appointmentDate || isNaN(appointmentDate.getTime())) return null;
 
-      // 📞 DEBUG: Ver qué datos de teléfono tenemos
-      console.log('📞 PHONE DEBUG:', {
-        appointment_id: apt.id,
-        patient_name: apt.patient_name,
-        patient_phone: apt.patient_phone,
-        has_phone: !!apt.patient_phone
-      });
-
+      // ✅ PHONE INTEGRATION: AppointmentCard handles phone display
       return {
         id: apt.id,
         patientName: apt.patient_name || 'Paciente',
@@ -244,6 +244,36 @@ export function DayViewSimple({
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* 💡 PONCIO PILATOS TIPS FOOTER */}
+      <div className="calendar-footer mt-4 px-4 py-3 bg-gray-50 border-t border-gray-200 text-xs text-gray-600">
+        <div className="flex flex-wrap gap-6 justify-center">
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-green-500 rounded"></div>
+            <span>Consultas</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-blue-500 rounded"></div>
+            <span>Limpiezas</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-yellow-400 rounded"></div>
+            <span>Tratamientos</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-red-500 rounded"></div>
+            <span>Emergencias</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-orange-500 font-bold">⚡</span>
+            <span>Alta Prioridad</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-red-600 font-bold">🚨</span>
+            <span>Urgente</span>
+          </div>
         </div>
       </div>
     </div>

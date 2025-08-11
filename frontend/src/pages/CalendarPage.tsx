@@ -78,8 +78,6 @@ const CalendarPage = () => {
 
   // 🕒 HANDLER PARA SLOTS DE TIEMPO CON PRESELECCIÓN
   const handleTimeSlotClick = (date: Date, time: string) => {
-    console.log('🎯 CALENDAR PAGE - Time slot clicked:', { date: date.toISOString(), time });
-    
     // 🌍 TIMEZONE FIX - Use local date format instead of UTC
     const localDateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     
@@ -88,16 +86,7 @@ const CalendarPage = () => {
       time.split(':').map(part => part.padStart(2, '0')).join(':') : 
       time;
     
-    console.log('🌍 TIMEZONE DEBUG:', {
-      originalDate: date,
-      originalTime: time,
-      formattedTime,
-      localDateString,
-      dateUTC: date.toISOString(),
-      dateLocal: date.toLocaleDateString(),
-      timezonOffset: date.getTimezoneOffset()
-    });
-    
+    // ✅ TIMEZONE INTEGRATION: Local date handling
     // Store the pre-selected date and time for the modal
     setSelectedDate(date);
     setSelectedTime(formattedTime); // 🕒 USE FORMATTED TIME

@@ -37,7 +37,7 @@ export interface AppointmentData {
   startTime: Date;
   endTime: Date;
   duration: number; // in minutes
-  type: 'consultation' | 'cleaning' | 'treatment' | 'emergency';
+  type: 'consultation' | 'cleaning' | 'treatment' | 'emergency' | 'filling' | 'extraction' | 'checkup' | 'orthodontics' | 'surgery';
   status: 'confirmed' | 'pending' | 'cancelled' | 'completed';
   priority: 'normal' | 'high' | 'urgent';
   notes?: string;
@@ -63,6 +63,7 @@ interface AppointmentCardProps {
 
 // 🎨 DENTIAGEST COLOR SYSTEM (Following style guide)
 const APPOINTMENT_COLORS = {
+  // 🟢 CONSULTAS Y REVISIONES
   consultation: {
     bg: 'bg-green-100',
     border: 'border-green-300',
@@ -70,6 +71,15 @@ const APPOINTMENT_COLORS = {
     dot: 'bg-green-500',
     shadow: 'shadow-green-100'
   },
+  checkup: {
+    bg: 'bg-emerald-100',
+    border: 'border-emerald-300',
+    text: 'text-emerald-800',
+    dot: 'bg-emerald-500',
+    shadow: 'shadow-emerald-100'
+  },
+  
+  // 🔵 LIMPIEZAS E HIGIENE
   cleaning: {
     bg: 'bg-blue-100', 
     border: 'border-blue-300',
@@ -77,6 +87,8 @@ const APPOINTMENT_COLORS = {
     dot: 'bg-blue-500',
     shadow: 'shadow-blue-100'
   },
+  
+  // 🟠 TRATAMIENTOS
   treatment: {
     bg: 'bg-orange-100',
     border: 'border-orange-300', 
@@ -84,21 +96,63 @@ const APPOINTMENT_COLORS = {
     dot: 'bg-orange-500',
     shadow: 'shadow-orange-100'
   },
+  filling: {
+    bg: 'bg-violet-100',
+    border: 'border-violet-300',
+    text: 'text-violet-800',
+    dot: 'bg-violet-500',
+    shadow: 'shadow-violet-100'
+  },
+  orthodontics: {
+    bg: 'bg-amber-100',
+    border: 'border-amber-300',
+    text: 'text-amber-800',
+    dot: 'bg-amber-500',
+    shadow: 'shadow-amber-100'
+  },
+  
+  // 🔴 EMERGENCIAS Y CIRUGÍAS
   emergency: {
     bg: 'bg-red-100',
     border: 'border-red-300',
     text: 'text-red-800',
     dot: 'bg-red-500',
     shadow: 'shadow-red-100'
+  },
+  extraction: {
+    bg: 'bg-red-200',
+    border: 'border-red-400',
+    text: 'text-red-900',
+    dot: 'bg-red-600',
+    shadow: 'shadow-red-200'
+  },
+  surgery: {
+    bg: 'bg-red-300',
+    border: 'border-red-500',
+    text: 'text-red-900',
+    dot: 'bg-red-700',
+    shadow: 'shadow-red-300'
   }
 };
 
 // 🌐 DISPLAY LABELS - Values en inglés → Labels en español
 const TYPE_LABELS = {
+  // Consultas y revisiones
   consultation: 'Consulta',
+  checkup: 'Revisión',
+  
+  // Limpiezas e higiene
   cleaning: 'Limpieza',
+  
+  // Tratamientos
   treatment: 'Tratamiento',
-  emergency: 'Emergencia'
+  filling: 'Empaste',
+  orthodontics: 'Ortodoncia',
+  
+  // Emergencias y cirugías
+  emergency: 'Emergencia',
+  extraction: 'Extracción',
+  surgery: 'Cirugía'
 };
 
 const STATUS_LABELS = {
@@ -137,7 +191,59 @@ export function AppointmentCard({
   // const microInteractions = useMicroInteractions();
   // const responsive = useResponsiveAnimations();
   
-  const colors = APPOINTMENT_COLORS[appointment.type] || APPOINTMENT_COLORS.consultation;
+  // 🎨 RAUL'S DIRECT COLOR LOGIC (same as monthly view!)
+  const getAppointmentColors = () => {
+    const type = appointment.type?.toLowerCase() || '';
+    
+    // 🔵 AZUL - Limpiezas únicamente
+    if (type.includes('limpieza') || type.includes('higiene') || type.includes('cleaning')) {
+      return {
+        bg: 'bg-blue-100',
+        border: 'border-blue-300',
+        text: 'text-blue-800',
+        dot: 'bg-blue-500',
+        shadow: 'shadow-blue-100'
+      };
+    }
+    
+    // 🔴 ROJO - Emergencias
+    if (type.includes('emergencia') || type.includes('urgencia') || type.includes('emergency')) {
+      return {
+        bg: 'bg-red-100',
+        border: 'border-red-300',
+        text: 'text-red-800',
+        dot: 'bg-red-500',
+        shadow: 'shadow-red-100'
+      };
+    }
+    
+    // 🟡 AMARILLO LIMÓN - TODO TRATAMIENTO
+    if (type.includes('endodoncia') || type.includes('corona') || type.includes('crown') ||
+        type.includes('extraccion') || type.includes('empaste') || type.includes('ortodoncia') || 
+        type.includes('orthodontics') || type.includes('implante') || type.includes('implant') ||
+        type.includes('cirugia') || type.includes('tratamiento') || type.includes('filling') || 
+        type.includes('surgery') || type.includes('treatment') || type.includes('brackets') || 
+        type.includes('root_canal') || type.includes('extraction')) {
+      return {
+        bg: 'bg-yellow-100',
+        border: 'border-yellow-300',
+        text: 'text-yellow-800',
+        dot: 'bg-yellow-500',
+        shadow: 'shadow-yellow-100'
+      };
+    }
+    
+    // 🟢 VERDE - TODO LO DEMÁS (consultas, seguimientos, revisiones)
+    return {
+      bg: 'bg-green-100',
+      border: 'border-green-300',
+      text: 'text-green-800',
+      dot: 'bg-green-500',
+      shadow: 'shadow-green-100'
+    };
+  };
+  
+  const colors = getAppointmentColors();
   const priorityIcon = PRIORITY_INDICATORS[appointment.priority || 'normal'];  const handleDragStart = (e: React.DragEvent) => {
     // Store appointment data for drop handler
     e.dataTransfer.setData('application/json', JSON.stringify(appointment));

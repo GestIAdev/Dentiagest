@@ -1,6 +1,5 @@
 /**
- * 🗂️ WEEKLY CALENDAR - Professional File-Tab Stacking
- * ⚡ Elegant • Compact • Professional • Smart Stacking
+ * 🏴‍☠️ IAnarkalendar v1.0 - PunkClaude & Raul © 2025
  */
 
 import React from 'react';
@@ -26,26 +25,6 @@ export function WeekViewSimple({
   appointments = [],
   className = '' 
 }: WeekViewProps) {
-
-  // 🔍 DEBUG: Log appointments data to check for invalid dates
-  React.useEffect(() => {
-    console.log('🔍 WeekViewSimple - Received appointments:', appointments.length);
-    
-    appointments.forEach((apt, index) => {
-      if (!apt?.scheduled_date) {
-        console.warn(`⚠️ Appointment ${index} missing scheduled_date:`, apt);
-      } else {
-        try {
-          const parsed = parseClinicDateTime(apt.scheduled_date);
-          if (isNaN(parsed.getTime())) {
-            console.error(`❌ Invalid date for appointment ${index}:`, apt.scheduled_date, '→', parsed);
-          }
-        } catch (error) {
-          console.error(`❌ Parse error for appointment ${index}:`, apt.scheduled_date, error);
-        }
-      }
-    });
-  }, [appointments]);
 
   // Generate week days starting from Monday
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
@@ -86,8 +65,12 @@ export function WeekViewSimple({
         'extracción': 'treatment',
         'corona': 'treatment',
         'crown': 'treatment',
+        'implante': 'treatment',     // ⚡ ADDED!
+        'implant': 'treatment',      // ⚡ ADDED!
         'endodoncia': 'treatment',
         'root_canal': 'treatment',
+        'orthodontics': 'treatment',  // ⚡ ADDED!
+        'ortodoncia': 'treatment',
         'emergencia': 'emergency',
         'emergency': 'emergency',
         'urgente': 'emergency'
@@ -223,7 +206,6 @@ export function WeekViewSimple({
                     zIndex: dayAppointments.length > 1 ? 40 : 1 // Higher z-index for multi-appointment slots
                   }}
                   onClick={() => {
-                    console.log('🔍 WEEK VIEW DEBUG:', { day, hour, timeString: `${hour}:00` });
                     onTimeSlotClick?.(day, `${hour}:00`);
                   }}
                 >
@@ -301,8 +283,6 @@ export function WeekViewSimple({
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
-                              // 🔍 DEBUG: Check what we're passing to modal
-                              console.log('🎯 Clicking appointment - Original data:', apt);
                               // 🎯 PASS ORIGINAL APPOINTMENT - Not converted data!
                               onAppointmentClick?.(apt);
                             }}
@@ -345,6 +325,36 @@ export function WeekViewSimple({
             })}
           </div>
         ))}
+      </div>
+
+      {/* 💡 PONCIO PILATOS TIPS FOOTER */}
+      <div className="calendar-footer mt-4 px-4 py-3 bg-gray-50 border-t border-gray-200 text-xs text-gray-600">
+        <div className="flex flex-wrap gap-6 justify-center">
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-green-500 rounded"></div>
+            <span>Consultas</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-blue-500 rounded"></div>
+            <span>Limpiezas</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-yellow-400 rounded"></div>
+            <span>Tratamientos</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-red-500 rounded"></div>
+            <span>Emergencias</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-orange-500 font-bold">⚡</span>
+            <span>Alta Prioridad</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-red-600 font-bold">🚨</span>
+            <span>Urgente</span>
+          </div>
+        </div>
       </div>
     </div>
   );

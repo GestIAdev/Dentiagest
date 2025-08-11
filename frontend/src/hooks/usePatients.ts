@@ -78,21 +78,16 @@ export const usePatients = () => {
 
   // Listar todos los pacientes
   const fetchAllPatients = async () => {
-    console.log('🔥 fetchAllPatients called');
     setLoading(true);
     setError(null);
     try {
-      console.log('🔥 fetchAllPatients - Making request to:', API_BASE);
-      console.log('🔥 fetchAllPatients - Token exists:', !!state.accessToken);
-      
+      // ⚡ FETCH ALL PATIENTS: Backend request
       const response = await fetch(API_BASE, {
         headers: {
           'Authorization': `Bearer ${state.accessToken}`,
           'Content-Type': 'application/json'
         }
       });
-      
-      console.log('🔥 fetchAllPatients - Response status:', response.status);
       
       // 🚨 CHECK FOR 401 UNAUTHORIZED
       if (response.status === 401) {
@@ -107,11 +102,9 @@ export const usePatients = () => {
       }
       
       const data = await response.json();
-      console.log('🔥 fetchAllPatients - Response data:', data);
       
       // 🎯 BACKEND RETURNS {items: Array, total, page, size, pages}
       const patientsArray = Array.isArray(data) ? data : (data.items || []);
-      console.log('🔥 fetchAllPatients - Processed patients array:', patientsArray);
       
       setPatients(patientsArray);
       return patientsArray;

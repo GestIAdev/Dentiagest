@@ -35,15 +35,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
   selectedTime, // 🕒 RECIBIR HORA PRE-SELECCIONADA
   onCreate
 }) => {
-  // 🔧 DEBUG: Ver exactamente qué props llegan al modal
-  console.log('🔧 MODAL PROPS DEBUG:', { 
-    isOpen,
-    selectedDate, 
-    selectedTime,
-    typeof_selectedDate: typeof selectedDate,
-    typeof_selectedTime: typeof selectedTime
-  });
-  
+  // ⚡ MODAL INTEGRATION: Clean appointment creation
   const { createAppointment, loading } = useAppointments();
   const { patients, fetchPatients, fetchAllPatients } = usePatients();
   const { state } = useAuth();
@@ -63,12 +55,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
   });
   
   // 🔧 DEBUG: Ver qué hora se establece en el estado inicial
-  console.log('🔧 MODAL INITIAL STATE DEBUG:', {
-    formData_time: formData.time,
-    selectedTime_prop: selectedTime,
-    fallback_used: !selectedTime
-  });
-  
+  // 🎯 STATE MANAGEMENT: Patient search and suggestions
   const [patientSearch, setPatientSearch] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredPatients, setFilteredPatients] = useState(patients || []);
@@ -98,14 +85,10 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
         p.phone?.includes(searchTerm)
       );
       
-      // Si no hay resultados locales, buscar en API - FUCK TEMPORARY SOLUTIONS!
+      // Si no hay resultados locales, buscar en API
       if (localResults.length === 0) {
-        console.log('🔥 No local results, searching API for:', searchTerm);
-        
-        // 🔥 ANARQUIST TEST - Try fetchAllPatients first to see if it works
-        console.log('🔥 First testing fetchAllPatients...');
+        // Try fetchAllPatients first, then search endpoint
         const allPatientsTest = await fetchAllPatients();
-        console.log('🔥 fetchAllPatients result:', allPatientsTest?.length || 'FAILED');
         
         // Now try the search endpoint
         const apiResults = await fetchPatients({ query: searchTerm });
@@ -132,15 +115,8 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
     // 🕒 COMPARAR SOLO FECHAS - NO HORAS para permitir citas hoy y futuras
     const selectedDateOnly = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
     const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    
-    console.log('🔧 DATE VALIDATION DEBUG:', {
-      dateString,
-      selectedDateOnly: selectedDateOnly.toISOString().split('T')[0],
-      todayOnly: todayOnly.toISOString().split('T')[0],
-      isValid: selectedDateOnly >= todayOnly
-    });
-    
-    return selectedDateOnly >= todayOnly; // Permite hoy y fechas futuras
+    // ✅ VALIDATION: Allow today and future dates only
+    return selectedDateOnly >= todayOnly;
   };
 
   // 🎯 HANDLERS ÉPICOS
@@ -190,8 +166,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
         notes: formData.notes
       };
 
-      console.log('🚀 Enviando appointment:', newAppointment);
-
+      // ✅ CREATE APPOINTMENT: Send to backend
       if (onCreate) {
         await onCreate(newAppointment);
       } else {
@@ -392,6 +367,9 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
                 <option value="cleaning">Limpieza</option>
                 <option value="filling">Empaste</option>
                 <option value="extraction">Extracción</option>
+                <option value="root_canal">Endodoncia</option>
+                <option value="crown">Corona</option>
+                <option value="implant">Implante</option>
                 <option value="orthodontics">Ortodoncia</option>
                 <option value="emergency">Emergencia</option>
                 <option value="follow_up">Seguimiento</option>

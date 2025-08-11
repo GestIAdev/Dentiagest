@@ -1,13 +1,5 @@
 /**
- * 🏴‍☠️ AInarkalendar System
- * 
- * ⚡ Built by: PunkClaude & Raul (GestIA Dev - 2025)
- * 🎯 Mission: Create independent calendar solutions
- * 💰 Impact: $1000+ annual savings achieved
- * 🚀 Status: 100% Custom Implementation ✅
- * 
- * "AI + Anarchism = True Digital Freedom"
- * - PunkClaude, The Calendar Architect
+ * 🏴‍☠️ IAnarkalendar v1.0 - PunkClaude & Raul © 2025
  */
 
 import React, { useEffect } from 'react';
@@ -53,28 +45,42 @@ export function CalendarContainer({
     setView
   } = useCalendarState(view);
 
-  // 🏴‍☠️ AINARKALENDAR INITIALIZATION SIGNATURE
-  useEffect(() => {
-    console.log(`
-    🏴‍☠️ AInarkalendar System Initialized
-    ⚡ Built by: PunkClaude & Raul (GestIA Dev - 2025)
-    🎯 Mission: Independent calendar development
-    💰 Savings: $1000+ annually achieved
-    🚀 Status: 100% Custom Implementation
-    
-    "AI + Anarchism = True Digital Freedom" - PunkClaude, The Calendar Architect
-    `);
-  }, []);
+  // 🏴‍☠️ AINARKALENDAR - Professional calendar system
+  // Built by: PunkClaude & Raul (GestIA Dev - 2025)
+
+  /*
+   * ═════════════════════════════════════════════════════════════════
+   * 🏴‍☠️ PROPRIETARY SIGNATURE - DO NOT REMOVE OR MODIFY
+   * ═════════════════════════════════════════════════════════════════
+   * █▀█ █░█ █▄░█ █▄▀ █▀▀ █░░ ▄▀█ █░█ █▀▄ █▀▀   &   █▀█ ▄▀█ █░█ █░░
+   * █▀▀ █▄█ █░▀█ █░█ █▄▄ █▄▄ █▀█ █▄█ █▄▀ ██▄   &   █▀▄ █▀█ █▄█ █▄▄
+   * ═════════════════════════════════════════════════════════════════
+   * 🎯 IAnarkalendar System v0.99 - Digital Freedom Calendar
+   * 💰 $1000+ Annually Saved vs SaaS Solutions
+   * ⚡ AI + Human Anarchism = True Innovation
+   * 🚀 Custom Built, Production Ready, Metal Grade
+   * ═════════════════════════════════════════════════════════════════
+   * License: Proprietary - GestIA Dev Team
+   * Copyright © 2025 PunkClaude & Raul - All Rights Reserved
+   * ═════════════════════════════════════════════════════════════════
+   */
 
   const handleDateClick = (date: Date) => {
+    // 🎯 PROFESSIONAL SOLUTION: Switch to daily view with selected date
+    navigation.goToDate(date); // Set the clicked date
+    setView('day'); // Switch to daily view
+    
+    // Call parent callbacks (but NOT onDateClick to avoid triggering time slot modal)
     if (onDateChange) {
       onDateChange(date);
     }
-    if (onDateClick) {
-      onDateClick(date);
+    // 🚫 SKIP onDateClick to prevent unwanted modal opening
+    // if (onDateClick) {
+    //   onDateClick(date);
+    // }
+    if (onViewChange) {
+      onViewChange('day'); // Notify parent of view change
     }
-    // Navigate to day agenda
-    navigate(`/calendar/day/${format(date, 'yyyy-MM-dd')}`);
   };
 
   const handleViewChange = (newView: 'month' | 'week' | 'day') => {
@@ -85,7 +91,6 @@ export function CalendarContainer({
   };
 
   const handleTimeSlotClick = (date: Date, time: string) => {
-    console.log('Time slot clicked:', date, time);
     // 🎯 CONECTAR CON MODAL DE CREACIÓN
     if (onTimeSlotClick) {
       onTimeSlotClick(date, time);
@@ -93,10 +98,7 @@ export function CalendarContainer({
   };
 
   const handleAppointmentMove = (appointment: any, newTime: Date) => {
-    console.log('🎪 APPOINTMENT MOVED IN CONTAINER:', {
-      patient: appointment.patientName,
-      newTime: format(newTime, 'HH:mm')
-    });
+    // ✅ APPOINTMENT MOVED: Future API integration point
     // Future: API call to update appointment
   };
 
@@ -201,63 +203,107 @@ export function CalendarContainer({
                       {format(date, 'd')}
                     </div>
                     
-                    {/* 🏥 REAL APPOINTMENTS DISPLAY */}
-                    <div className="mt-1 text-xs space-y-1">
-                      {appointments
-                        .filter(apt => {
-                          // 🌍 USE TIMEZONE UTILITIES - CYBERPUNK SOLUTION!
+                    {/* � PROFESSIONAL APPOINTMENT INDICATORS */}
+                    <div className="mt-1 flex flex-col items-center space-y-1">
+                      {(() => {
+                        const dayAppointments = appointments.filter(apt => {
                           const aptDate = parseClinicDateTime(apt.scheduled_date);
                           return format(aptDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
-                        })
-                        .slice(0, 2) // Show max 2 appointments per day
-                        .map(apt => (
-                          <div 
-                            key={apt.id}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (onAppointmentClick) {
-                                // 🔧 ADAPT APPOINTMENT STRUCTURE FOR MODAL
-                                const appointmentForModal = {
-                                  id: apt.id,
-                                  title: `${apt.patient_name} - ${apt.title}`,
-                                  start: apt.scheduled_date,
-                                  extendedProps: {
-                                    id: apt.id,
-                                    patient_id: apt.patient_id,
-                                    patient_name: apt.patient_name,
-                                    title: apt.title,
-                                    scheduled_date: apt.scheduled_date,
-                                    duration_minutes: apt.duration_minutes,
-                                    appointment_type: apt.appointment_type,
-                                    priority: apt.priority,
-                                    status: apt.status,
-                                    description: apt.description,
-                                    notes: apt.notes
-                                  }
-                                };
-                                onAppointmentClick(appointmentForModal);
-                              }
-                            }}
-                            className="bg-gray-200 text-gray-800 p-1 rounded text-xs border border-gray-300 hover:bg-gray-300 transition-colors cursor-pointer truncate"
-                            title={`${apt.patient_name} - ${apt.title}`}
-                          >
-                            {apt.patient_name}
-                          </div>
-                        ))
-                      }
-                      {appointments
-                        .filter(apt => {
-                          // 🌍 CONSISTENT TIMEZONE PARSING
-                          const aptDate = parseClinicDateTime(apt.scheduled_date);
-                          return format(aptDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
-                        }).length > 2 && (
-                        <div className="text-gray-500 text-xs">
-                          +{appointments.filter(apt => {
-                            const aptDate = parseClinicDateTime(apt.scheduled_date);
-                            return format(aptDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
-                          }).length - 2} más
-                        </div>
-                      )}
+                        });
+                        
+                        const appointmentCount = dayAppointments.length;
+                        
+                        // ✅ APPOINTMENTS LOADED: Ready for professional display
+                        if (appointmentCount === 0) {
+                          return null; // Empty day - clean
+                        }
+                        
+                        if (appointmentCount <= 3) {
+                          // Show individual dots for 1-3 appointments (BIGGER & MORE VISUAL)
+                          return (
+                            <div className="flex space-x-1">
+                              {dayAppointments.slice(0, 3).map((apt, idx) => (
+                                <div 
+                                  key={apt.id || idx}
+                                  className={`
+                                    w-3 h-3 rounded-full cursor-pointer hover:scale-125 transition-transform
+                                  `}
+                                  style={{
+                                    backgroundColor: (() => {
+                                      // 🎯 PRIORITY OVERRIDES (diferentes tonos para diferenciar!)
+                                      if (apt.priority === 'urgent') return '#b91c1c'; // Rojo más oscuro (urgent)
+                                      if (apt.priority === 'high') return '#f97316'; // Naranja puro (high)
+                                      
+                                      // 🎨 RAUL'S 4-COLOR SYSTEM (FUCK THE MAPPING!)
+                                      const type = apt.appointment_type?.toLowerCase() || '';
+                                      
+                                      // 🔵 AZUL - Limpiezas únicamente
+                                      if (type.includes('limpieza') || type.includes('higiene') || type.includes('cleaning')) {
+                                        return '#2563eb'; // Blue
+                                      }
+                                      
+                                      // 🔴 ROJO - Emergencias
+                                      if (type.includes('emergencia') || type.includes('urgencia') || type.includes('emergency')) {
+                                        return '#dc2626'; // Red
+                                      }
+                                      
+                                      // 🟡 AMARILLO LIMÓN - TODO TRATAMIENTO (endodoncia, corona, extraccion, empaste, ortodoncia, etc.)
+                                      if (type.includes('endodoncia') || type.includes('corona') || type.includes('extraccion') || 
+                                          type.includes('empaste') || type.includes('ortodoncia') || type.includes('orthodontics') ||
+                                          type.includes('implante') || type.includes('cirugia') || type.includes('tratamiento') || 
+                                          type.includes('filling') || type.includes('surgery') || type.includes('treatment') || 
+                                          type.includes('brackets') || type.includes('root_canal') || type.includes('crown') || 
+                                          type.includes('implant') || type.includes('extraction')) {
+                                        return '#ffff00'; // Pure bright yellow (limón!)
+                                      }
+                                      
+                                      // 🟢 VERDE - TODO LO DEMÁS (consultas, seguimientos, revisiones)
+                                      return '#16a34a'; // Green
+                                    })()
+                                  }}
+                                  title={`${apt.patient_name} - ${apt.title} (${format(parseClinicDateTime(apt.scheduled_date), 'HH:mm')}) | Tipo: ${apt.appointment_type} | Prioridad: ${apt.priority}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    // 🎯 Direct appointment preview/navigation
+                                    if (onAppointmentClick) {
+                                      // Create modal-compatible appointment object
+                                      const appointmentForModal = {
+                                        id: apt.id,
+                                        title: `${apt.patient_name} - ${apt.title}`,
+                                        start: apt.scheduled_date,
+                                        extendedProps: {
+                                          id: apt.id,
+                                          patient_id: apt.patient_id,
+                                          patient_name: apt.patient_name,
+                                          title: apt.title,
+                                          scheduled_date: apt.scheduled_date,
+                                          duration_minutes: apt.duration_minutes,
+                                          appointment_type: apt.appointment_type,
+                                          priority: apt.priority,
+                                          status: apt.status,
+                                          description: apt.description,
+                                          notes: apt.notes
+                                        }
+                                      };
+                                      onAppointmentClick(appointmentForModal);
+                                    }
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          );
+                        } else {
+                          // Show count badge for 4+ appointments (MINIMALIST NUMBER)
+                          return (
+                            <div className="flex flex-col items-center">
+                              <div className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center cursor-pointer transition-colors">
+                                {appointmentCount}
+                              </div>
+                            </div>
+                          );
+                        }
+                      })()}
                     </div>
                   </div>
                 ))}

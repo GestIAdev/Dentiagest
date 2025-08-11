@@ -164,8 +164,7 @@ export const useAppointments = () => {
     setError(null);
 
     try {
-      console.log('✅ Creating appointment:', appointmentData);
-
+      // ✅ CREATE APPOINTMENT: Send to backend
       const response = await fetch(API_BASE, {
         method: 'POST',
         headers: {
@@ -208,8 +207,7 @@ export const useAppointments = () => {
     setError(null);
 
     try {
-      console.log('🔄 Updating appointment:', { id, appointmentData });
-
+      // 🔄 UPDATE APPOINTMENT: Send changes to backend  
       const response = await fetch(`${API_BASE}/${id}`, {
         method: 'PUT',
         headers: {
@@ -281,10 +279,7 @@ export const useAppointments = () => {
     const events = appointments.map(appointmentToEvent);
     
     // Solo UN log cuando cambia la cantidad (no en cada render)
-    if (events.length > 0) {
-      console.log('� Calendar events loaded:', events.length, 'appointments');
-    }
-    
+    // ✅ CALENDAR EVENTS: Successfully loaded
     return events;
   };
 
