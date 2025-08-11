@@ -222,7 +222,10 @@ export function WeekViewSimple({
                     overflow: 'visible',
                     zIndex: dayAppointments.length > 1 ? 40 : 1 // Higher z-index for multi-appointment slots
                   }}
-                  onClick={() => onTimeSlotClick?.(day, `${hour}:00`)}
+                  onClick={() => {
+                    console.log('🔍 WEEK VIEW DEBUG:', { day, hour, timeString: `${hour}:00` });
+                    onTimeSlotClick?.(day, `${hour}:00`);
+                  }}
                 >
                   {/* EMPTY SLOT - AINARKLENDAR Style */}
                   {dayAppointments.length === 0 && (

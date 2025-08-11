@@ -10,6 +10,7 @@ import DashboardContent from './pages/DashboardContent.tsx';
 import PatientsPage from './pages/PatientsPage.tsx';
 import CalendarPage from './pages/CalendarPage.tsx';
 import './styles/globals.css';
+import './styles/calendar-anti-blue.css';
 
 // Página de inicio - redirige automáticamente según estado de autenticación
 function HomePage() {

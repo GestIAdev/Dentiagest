@@ -15,6 +15,7 @@ export interface Appointment {
   notes?: string;
   status: 'scheduled' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
   patient_name: string;
+  patient_phone?: string; // 📞 TELÉFONO DEL PACIENTE!
   dentist_name: string;
   created_at: string;
   updated_at: string;

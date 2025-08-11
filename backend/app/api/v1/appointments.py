@@ -239,6 +239,7 @@ async def list_appointments(
         patient_obj = patients.get(appointment.patient_id)
         dentist_obj = dentists.get(appointment.dentist_id)
         response.patient_name = getattr(patient_obj, 'full_name', None) if patient_obj else None
+        response.patient_phone = getattr(patient_obj, 'phone_primary', None) if patient_obj else None  # 📞 ADD PHONE!
         response.dentist_name = getattr(dentist_obj, 'full_name', None) if dentist_obj else None
         appointment_responses.append(response)
     

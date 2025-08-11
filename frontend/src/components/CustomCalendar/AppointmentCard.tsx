@@ -56,6 +56,8 @@ interface AppointmentCardProps {
   isDragging?: boolean;
   isCompact?: boolean;
   showQuickActions?: boolean;
+  showDuration?: boolean; // 🎯 CONTROL ESPECÍFICO PARA DURACIÓN
+  showNotes?: boolean; // 🎯 CONTROL ESPECÍFICO PARA NOTAS (false en vista diaria)
   className?: string;
 }
 
@@ -122,6 +124,8 @@ export function AppointmentCard({
   isDragging = false,
   isCompact = false,
   showQuickActions = false,
+  showDuration = false, // 🎯 DEFAULT: NO MOSTRAR DURACIÓN
+  showNotes = true, // 🎯 DEFAULT: SÍ MOSTRAR NOTAS (excepto en vista diaria)
   className = ''
 }: AppointmentCardProps) {
 
@@ -133,7 +137,7 @@ export function AppointmentCard({
   // const microInteractions = useMicroInteractions();
   // const responsive = useResponsiveAnimations();
   
-  const colors = APPOINTMENT_COLORS[appointment.type];
+  const colors = APPOINTMENT_COLORS[appointment.type] || APPOINTMENT_COLORS.consultation;
   const priorityIcon = PRIORITY_INDICATORS[appointment.priority || 'normal'];  const handleDragStart = (e: React.DragEvent) => {
     // Store appointment data for drop handler
     e.dataTransfer.setData('application/json', JSON.stringify(appointment));
@@ -235,12 +239,12 @@ export function AppointmentCard({
       {/* 🚨 PRIORITY INDICATOR - FLOATING ABSOLUTE POSITION */}
       {priorityIcon && (
         <div
-          className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-white font-bold text-sm border-2 border-white shadow-lg z-[200]"
+          className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-white font-bold text-sm border-2 border-white shadow-lg z-10"
           style={{
             backgroundColor: appointment.priority === 'urgent' ? '#dc2626' : 
                            appointment.priority === 'high' ? '#ea580c' : '#6b7280',
             position: 'absolute',
-            zIndex: 200,
+            zIndex: 10,
             pointerEvents: 'none'
           }}
           title={`Prioridad: ${appointment.priority}${
@@ -398,8 +402,9 @@ export function AppointmentCard({
               </div>
             )}
             
-            {/* Cost (only if not compact) */}
-            {!isCompact && appointment.estimatedCost && (
+            {/* Cost (only if not compact and has valid cost) */}
+            {!isCompact && appointment.estimatedCost != null && 
+             appointment.estimatedCost > 0 && (
               <span className="text-xs text-green-600 font-medium">
                 €{appointment.estimatedCost}
               </span>
@@ -408,19 +413,29 @@ export function AppointmentCard({
         </>
       )}
 
-      {/* Treatment code (if any) */}
-      {appointment.treatmentCode && (
+      {/* Treatment code (if any and not empty) */}
+      {appointment.treatmentCode && appointment.treatmentCode.trim() !== '' && appointment.treatmentCode !== '0' && (
         <div className="text-xs text-gray-500 mt-1 font-mono">
           #{appointment.treatmentCode}
         </div>
       )}
 
-      {/* Notes preview (if any) */}
-      {appointment.notes && !isCompact && (
+      {/* Notes preview (if any and allowed) */}
+      {appointment.notes && !isCompact && showNotes && (
         <div className="text-xs text-gray-500 mt-1 truncate">
           💬 {appointment.notes}
         </div>
       )}
+
+      {/* Patient phone (very useful for dentists!) */}
+      {appointment.phone && !isCompact && (
+        <div className="text-xs text-blue-600 mt-1 flex items-center space-x-1">
+          <span>📞</span>
+          <span className="font-medium">{appointment.phone}</span>
+        </div>
+      )}
+
+
 
       {/* Tooltip for detailed info */}
       {showTooltip && (

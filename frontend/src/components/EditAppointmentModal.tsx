@@ -4,6 +4,7 @@ import { XMarkIcon, CalendarIcon, ClockIcon, UserIcon, MagnifyingGlassIcon, Penc
 import { useAppointments } from '../hooks/useAppointments.ts';
 import { parseClinicDateTime } from '../utils/timezone.ts'; // 🌍 TIMEZONE SOLUTION!
 import { useAuth } from '../context/AuthContext.tsx'; // 🔐 AUTH SOLUTION!
+import { useScheduleValidator } from '../hooks/useScheduleValidator.ts'; // 🕐 SCHEDULE VALIDATION!
 
 // 🏴‍☠️ AINARKALENDAR TIME SLOTS - FREEDOM EDITION
 const generateTimeSlots = (): Array<{value: string, display: string}> => {
@@ -36,6 +37,7 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
   const { patients, fetchPatients } = usePatients();
   const { loading } = useAppointments();
   const { state } = useAuth(); // 🔐 AUTH STATE FOR TOKEN
+  const { validateTimeSlot, findAvailableSlots, isValidating } = useScheduleValidator(); // 🕐 SCHEDULE VALIDATOR
   
   // 🎯 ESTADO INICIAL BASADO EN LA CITA EXISTENTE
   const [formData, setFormData] = useState({
@@ -55,6 +57,13 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
   const [patientSearch, setPatientSearch] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredPatients, setFilteredPatients] = useState(patients || []);
+
+  // 🕐 ESTADO DE VALIDACIÓN DE HORARIOS
+  const [scheduleValidation, setScheduleValidation] = useState<{
+    message: string;
+    type: 'idle' | 'validating' | 'success' | 'error';
+    availableSlots?: string[];
+  }>({ message: '', type: 'idle' });
 
   // 🔄 CARGAR DATOS DE LA CITA AL ABRIR EL MODAL
   useEffect(() => {
@@ -119,7 +128,41 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
     }
   }, [appointment, isOpen]);
 
-  // 🔍 AUTOCOMPLETADO DE PACIENTES
+  // � VALIDAR HORARIO CUANDO CAMBIE FECHA/HORA
+  useEffect(() => {
+    const validateSchedule = async () => {
+      if (formData.date && formData.time) {
+        setScheduleValidation({ message: 'Validando horario...', type: 'validating' });
+        
+        const result = await validateTimeSlot(
+          formData.date, 
+          formData.time, 
+          formData.duration,
+          appointment.id // Excluir la cita actual
+        );
+        
+        if (result.hasConflict) {
+          const availableSlots = findAvailableSlots(formData.date, formData.duration);
+          setScheduleValidation({
+            message: result.message,
+            type: 'error',
+            availableSlots: availableSlots.slice(0, 5) // Mostrar solo 5 sugerencias
+          });
+        } else {
+          setScheduleValidation({
+            message: result.message,
+            type: 'success'
+          });
+        }
+      }
+    };
+
+    // Debounce la validación para no hacer demasiadas llamadas
+    const timeoutId = setTimeout(validateSchedule, 500);
+    return () => clearTimeout(timeoutId);
+  }, [formData.date, formData.time, formData.duration, validateTimeSlot, findAvailableSlots, appointment.id]);
+
+  // �🔍 AUTOCOMPLETADO DE PACIENTES
   const handlePatientSearch = async (searchTerm: string) => {
     setPatientSearch(searchTerm);
     
@@ -155,11 +198,11 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 🔍 DEBUG: Vamos a ver qué está pasando
-    console.log('🔍 DEBUG - FormData al enviar:', formData);
-    console.log('🔍 DEBUG - Patient ID:', formData.patient_id);
-    console.log('🔍 DEBUG - Patient Name:', formData.patient_name);
-    console.log('🔍 DEBUG - Original appointment:', appointment);
+    // � VALIDACIÓN DE HORARIOS ANTES DE ENVIAR
+    if (scheduleValidation.type === 'error') {
+      alert(`❌ ${scheduleValidation.message}`);
+      return;
+    }
     
     // 🚨 VALIDACIÓN MEJORADA
     if (!formData.patient_id && !formData.patient_name) {
@@ -375,6 +418,41 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
               </select>
             </div>
           </div>
+
+          {/* 🕐 VALIDACIÓN DE HORARIOS */}
+          {formData.date && formData.time && (
+            <div className={`
+              p-3 rounded-lg text-sm
+              ${scheduleValidation.type === 'validating' ? 'bg-blue-50 text-blue-700' : ''}
+              ${scheduleValidation.type === 'success' ? 'bg-green-50 text-green-700' : ''}
+              ${scheduleValidation.type === 'error' ? 'bg-red-50 text-red-700' : ''}
+            `}>
+              <div className="flex items-center space-x-2">
+                {scheduleValidation.type === 'validating' && <span className="animate-spin">⏳</span>}
+                {scheduleValidation.type === 'success' && <span>✅</span>}
+                {scheduleValidation.type === 'error' && <span>⚠️</span>}
+                <span>{scheduleValidation.message}</span>
+              </div>
+              
+              {scheduleValidation.type === 'error' && scheduleValidation.availableSlots && scheduleValidation.availableSlots.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-xs text-gray-600 mb-1">💡 Horarios disponibles:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {scheduleValidation.availableSlots.map(slot => (
+                      <button
+                        key={slot}
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, time: slot }))}
+                        className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200 transition-colors"
+                      >
+                        {slot}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* TIPO + PRIORIDAD + ESTADO (3 COLUMNAS) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

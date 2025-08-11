@@ -5,19 +5,33 @@
 /* Importar fuente Inter de Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* Configuración base */
+/* 🔥 AINARKLENDAR NUCLEAR ANTI-BLUE ZONE */
 @layer base {
+  /* Eliminar TODOS los bordes azules del navegador */
+  * {
+    border-color: #d1d5db !important;
+  }
+  
+  *:focus {
+    outline: none !important;
+    border-color: #d1d5db !important;
+    box-shadow: 0 0 0 2px rgba(209, 213, 219, 0.5) !important;
+  }
+  
+  button:focus,
+  .view-selector button:focus,
+  .calendar-container button:focus {
+    outline: none !important;
+    border-color: #d1d5db !important;
+    box-shadow: none !important;
+  }
+
   html {
     font-family: 'Inter', system-ui, sans-serif;
   }
   
   body {
     @apply bg-gray-50 text-gray-900;
-  }
-  
-  /* Mejorar la accesibilidad del focus */
-  *:focus {
-    @apply outline-none ring-2 ring-primary-500 ring-offset-2;
   }
 }
 

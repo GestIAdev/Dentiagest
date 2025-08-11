@@ -1,0 +1,62 @@
+/* 🔥 AINARKLENDAR NUCLEAR ANTI-BLUE DESTRUCTIVE CSS */
+/* Este archivo ANIQUILA cualquier elemento azul en el calendario */
+
+/* ZONA ANTI-AZUL UNIVERSAL */
+.view-selector,
+.view-selector *,
+.calendar-container,
+.calendar-container *,
+.calendar-content,
+.calendar-content * {
+  border-color: #d1d5db !important;
+  outline: none !important;
+}
+
+/* DESTRUCTOR ESPECÍFICO DE BORDES AZULES */
+.view-selector button {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.view-selector button:focus,
+.view-selector button:active,
+.view-selector button:hover {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+/* OVERRIDE TOTAL DE FOCUS STATES */
+.view-selector div {
+  border: 2px solid #d1d5db !important;
+  border-color: #d1d5db !important;
+  outline: none !important;
+}
+
+/* ANIQUILADOR DE AZULES DEL NAVEGADOR */
+button:focus,
+div:focus,
+*:focus {
+  outline: none !important;
+  border-color: #d1d5db !important;
+}
+
+/* FALLBACK NUCLEAR - Si todo lo demás falla */
+* {
+  border-color: #d1d5db !important;
+}
+
+/* OVERRIDE ESPECÍFICO PARA TAILWIND */
+.border-blue-500,
+.border-blue-600,
+.border-blue-300,
+.border-blue-400 {
+  border-color: #d1d5db !important;
+}
+
+.focus\:border-blue-500:focus,
+.focus\:border-blue-600:focus {
+  border-color: #d1d5db !important;
+}

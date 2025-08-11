@@ -24,6 +24,7 @@ interface CreateAppointmentModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedDate?: string | null;
+  selectedTime?: string | null; // 🕒 PROP PARA HORA PRE-SELECCIONADA
   onCreate?: (appointment: any) => void;
 }
 
@@ -31,8 +32,18 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
   isOpen,
   onClose,
   selectedDate,
+  selectedTime, // 🕒 RECIBIR HORA PRE-SELECCIONADA
   onCreate
 }) => {
+  // 🔧 DEBUG: Ver exactamente qué props llegan al modal
+  console.log('🔧 MODAL PROPS DEBUG:', { 
+    isOpen,
+    selectedDate, 
+    selectedTime,
+    typeof_selectedDate: typeof selectedDate,
+    typeof_selectedTime: typeof selectedTime
+  });
+  
   const { createAppointment, loading } = useAppointments();
   const { patients, fetchPatients, fetchAllPatients } = usePatients();
   const { state } = useAuth();
@@ -43,7 +54,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
     patient_name: '',
     title: '',
     date: selectedDate?.split('T')[0] || new Date().toISOString().split('T')[0],
-    time: '09:00',
+    time: selectedTime || '09:00', // 🕒 USAR HORA PRE-SELECCIONADA
     duration: 30,
     appointment_type: 'consultation',
     priority: 'normal',
@@ -51,11 +62,27 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
     notes: ''
   });
   
+  // 🔧 DEBUG: Ver qué hora se establece en el estado inicial
+  console.log('🔧 MODAL INITIAL STATE DEBUG:', {
+    formData_time: formData.time,
+    selectedTime_prop: selectedTime,
+    fallback_used: !selectedTime
+  });
+  
   const [patientSearch, setPatientSearch] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredPatients, setFilteredPatients] = useState(patients || []);
 
-  // 🔍 AUTOCOMPLETADO PROFESIONAL - NO MORE TEMPORARY BULLSHIT!
+  // � ACTUALIZAR FORMULARIO CUANDO CAMBIAN LAS PROPS PRE-SELECCIONADAS
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      date: selectedDate?.split('T')[0] || new Date().toISOString().split('T')[0],
+      time: selectedTime || prev.time
+    }));
+  }, [selectedDate, selectedTime]);
+
+  // �🔍 AUTOCOMPLETADO PROFESIONAL - NO MORE TEMPORARY BULLSHIT!
   const handlePatientSearch = async (searchTerm: string) => {
     setPatientSearch(searchTerm);
     
@@ -97,11 +124,23 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
 
   // 📅 VALIDACIÓN DE FECHAS PROFESIONAL
   const isValidDate = (dateString: string) => {
-    const selectedDate = new Date(dateString);
+    // 🌍 PARSE DATE IN LOCAL TIMEZONE TO AVOID UTC ISSUES
+    const [year, month, day] = dateString.split('-').map(Number);
+    const selectedDate = new Date(year, month - 1, day); // month-1 because Date uses 0-based months
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Resetear hora para comparar solo fechas
     
-    return selectedDate >= today; // Permite hoy y fechas futuras
+    // 🕒 COMPARAR SOLO FECHAS - NO HORAS para permitir citas hoy y futuras
+    const selectedDateOnly = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    
+    console.log('🔧 DATE VALIDATION DEBUG:', {
+      dateString,
+      selectedDateOnly: selectedDateOnly.toISOString().split('T')[0],
+      todayOnly: todayOnly.toISOString().split('T')[0],
+      isValid: selectedDateOnly >= todayOnly
+    });
+    
+    return selectedDateOnly >= todayOnly; // Permite hoy y fechas futuras
   };
 
   // 🎯 HANDLERS ÉPICOS

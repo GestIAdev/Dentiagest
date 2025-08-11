@@ -28,6 +28,7 @@ interface CalendarProps {
   appointments?: any[]; // 🏥 REAL APPOINTMENT DATA
   onAppointmentClick?: (appointment: any) => void;
   onDateClick?: (date: Date) => void;
+  onTimeSlotClick?: (date: Date, time: string) => void; // 🕒 FOR + BUTTON FUNCTIONALITY
 }
 
 export function CalendarContainer({ 
@@ -38,7 +39,8 @@ export function CalendarContainer({
   className = '',
   appointments = [],
   onAppointmentClick,
-  onDateClick
+  onDateClick,
+  onTimeSlotClick // 🕒 + BUTTON HANDLER
 }: CalendarProps) {
   
   const navigate = useNavigate();
@@ -84,7 +86,10 @@ export function CalendarContainer({
 
   const handleTimeSlotClick = (date: Date, time: string) => {
     console.log('Time slot clicked:', date, time);
-    // Future: Open appointment creation modal
+    // 🎯 CONECTAR CON MODAL DE CREACIÓN
+    if (onTimeSlotClick) {
+      onTimeSlotClick(date, time);
+    }
   };
 
   const handleAppointmentMove = (appointment: any, newTime: Date) => {
@@ -99,17 +104,18 @@ export function CalendarContainer({
 
   return (
     <div className={`dentiagest-calendar ${className}`}>
-      {/* Header with navigation and view selector */}
-      <div className="calendar-header flex justify-between items-center mb-4 p-4 bg-blue-50 rounded-lg">
-        <div className="flex items-center space-x-2">
+      {/* 🎯 AINARKLENDAR NAVIGATION - Complete Gray Theme */}
+      <div className="calendar-header flex justify-between items-center mb-4 p-4 bg-gray-100 rounded-lg border border-gray-200 shadow-sm">
+        <div className="flex items-center space-x-3">
           <button
             onClick={navigation.goToPrevious}
-            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors shadow-sm flex items-center justify-center min-w-[40px]"
+            title="Anterior"
           >
             ←
           </button>
           
-          <h2 className="text-xl font-semibold text-blue-800 min-w-[200px] text-center">
+          <h2 className="text-xl font-semibold text-gray-800 min-w-[200px] text-center">
             {currentView === 'month' && calendarData.monthName}
             {currentView === 'week' && format(currentDate, "'Semana del' d MMM yyyy", { locale: es })}
             {currentView === 'day' && format(currentDate, "EEEE, d MMM yyyy", { locale: es })}
@@ -117,25 +123,39 @@ export function CalendarContainer({
           
           <button
             onClick={navigation.goToNext}
-            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors shadow-sm flex items-center justify-center min-w-[40px]"
+            title="Siguiente"
           >
             →
           </button>
         </div>
 
-        {/* View Selector */}
-        <div className="view-selector flex space-x-1 bg-white rounded p-1">
+        {/* 🎨 AINARKLENDAR View Selector - NUCLEAR ANTI-BLUE ZONE */}
+        <div 
+          className="view-selector flex space-x-1 bg-white rounded-lg p-1 shadow-sm" 
+          style={{ 
+            border: '2px solid #d1d5db !important',
+            borderColor: '#d1d5db !important',
+            outline: 'none !important',
+            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important'
+          }}
+        >
           {(['month', 'week', 'day'] as const).map(viewOption => (
             <button
               key={viewOption}
               onClick={() => handleViewChange(viewOption)}
               className={`
-                px-3 py-1 rounded text-sm font-medium transition-colors
+                px-4 py-2 rounded-md text-sm font-medium transition-all duration-200
                 ${currentView === viewOption 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-blue-600 hover:bg-blue-100'
+                  ? 'bg-gray-700 text-white shadow-sm' 
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
                 }
               `}
+              style={{ 
+                border: 'none !important', 
+                outline: 'none !important',
+                boxShadow: currentView === viewOption ? '0 1px 3px 0 rgba(0, 0, 0, 0.1) !important' : 'none !important'
+              }}
             >
               {viewOption === 'month' ? 'Mes' : viewOption === 'week' ? 'Semana' : 'Día'}
             </button>
@@ -165,16 +185,16 @@ export function CalendarContainer({
                     key={index}
                     onClick={() => handleDateClick(date)}
                     className={`
-                      calendar-day p-3 text-center cursor-pointer rounded border h-20
+                      calendar-day p-3 text-center cursor-pointer rounded border h-20 transition-all
                       ${helpers.isDateInCurrentMonth(date) 
-                        ? 'bg-white text-gray-900 hover:bg-blue-50' 
-                        : 'bg-gray-100 text-gray-400'
+                        ? 'bg-white text-gray-900 hover:bg-gray-50 border-gray-200' 
+                        : 'bg-gray-100 text-gray-400 border-gray-300'
                       }
                       ${helpers.isDateToday(date) 
-                        ? 'ring-2 ring-blue-500 bg-blue-100' 
+                        ? 'ring-2 ring-gray-500 bg-gray-100 font-bold' 
                         : ''
                       }
-                      hover:shadow-md transition-all
+                      hover:shadow-md
                     `}
                   >
                     <div className="font-medium">
@@ -218,12 +238,7 @@ export function CalendarContainer({
                                 onAppointmentClick(appointmentForModal);
                               }
                             }}
-                            className={`
-                              px-1 py-0.5 rounded text-white cursor-pointer truncate
-                              ${apt.status === 'scheduled' ? 'bg-blue-500' : 
-                                apt.status === 'confirmed' ? 'bg-green-500' :
-                                apt.status === 'cancelled' ? 'bg-red-500' : 'bg-gray-500'}
-                            `}
+                            className="bg-gray-200 text-gray-800 p-1 rounded text-xs border border-gray-300 hover:bg-gray-300 transition-colors cursor-pointer truncate"
                             title={`${apt.patient_name} - ${apt.title}`}
                           >
                             {apt.patient_name}
@@ -266,6 +281,8 @@ export function CalendarContainer({
           <DayViewSimple
             currentDate={currentDate}
             onTimeSlotClick={handleTimeSlotClick}
+            onAppointmentClick={onAppointmentClick} // 🎯 CONECTAR CLICK EDITOR!
+            appointments={appointments} // 🏥 PASS REAL APPOINTMENTS!
             className="day-view-container"
           />
         )}

@@ -198,6 +198,11 @@ class AppointmentResponse(AppointmentBase):
     id: UUID
     status: AppointmentStatus
     
+    # PLATFORM_CORE: Patient information for display
+    patient_name: Optional[str] = None  # Added dynamically
+    patient_phone: Optional[str] = None  # 📞 ADD PHONE FIELD!
+    dentist_name: Optional[str] = None  # Added dynamically
+    
     # PLATFORM_CORE: Communication tracking
     confirmation_sent: bool
     confirmation_sent_at: Optional[datetime] = None

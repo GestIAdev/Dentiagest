@@ -89,6 +89,30 @@ export function DayViewSimple({
 
   const allTimeSlots = generateAllTimeSlots();
 
+  // 🚨 HYBRID PRIORITY SYSTEM - Manual OVERRIDES Automatic
+  const determinePriority = (apt: any): 'normal' | 'high' | 'urgent' => {
+    // 🎯 RULE 1: Manual priority ALWAYS wins (if valid)
+    if (apt.priority && ['normal', 'high', 'urgent'].includes(apt.priority)) {
+      return apt.priority;
+    }
+    
+    // 🤖 RULE 2: Automatic detection as fallback
+    const mappedType = mapAppointmentType(apt.appointment_type);
+    
+    // Auto-detect: Emergency appointments are urgent
+    if (mappedType === 'emergency') {
+      return 'urgent';
+    }
+    
+    // Auto-detect: Pain/urgency keywords in notes
+    if (apt.notes?.toLowerCase().includes('urgente') || apt.notes?.toLowerCase().includes('dolor')) {
+      return 'high';
+    }
+    
+    // Default: normal priority
+    return 'normal';
+  };
+
   // 🏥 Get appointment for specific time slot
   const getAppointmentForSlot = (hour: number, quarter: number) => {
     return appointments.find(apt => {
@@ -117,18 +141,26 @@ export function DayViewSimple({
       const appointmentDate = parseClinicDateTime(apt.scheduled_date);
       if (!appointmentDate || isNaN(appointmentDate.getTime())) return null;
 
+      // 📞 DEBUG: Ver qué datos de teléfono tenemos
+      console.log('📞 PHONE DEBUG:', {
+        appointment_id: apt.id,
+        patient_name: apt.patient_name,
+        patient_phone: apt.patient_phone,
+        has_phone: !!apt.patient_phone
+      });
+
       return {
         id: apt.id,
         patientName: apt.patient_name || 'Paciente',
         patientId: apt.patient_id || '',
         startTime: appointmentDate,
-        endTime: new Date(appointmentDate.getTime() + (apt.duration || 30) * 60000),
-        duration: apt.duration || 30,
+        endTime: new Date(appointmentDate.getTime() + (apt.duration_minutes || 30) * 60000),
+        duration: apt.duration_minutes || 30,
         type: mapAppointmentType(apt.appointment_type),
         status: mapAppointmentStatus(apt.status),
-        priority: 'normal' as 'normal' | 'high' | 'urgent',
+        priority: determinePriority(apt), // 🚨 SMART PRIORITY SYSTEM!
         notes: apt.notes || '',
-        phone: apt.patient_phone || '',
+        phone: apt.patient_phone || '', // 📞 PHONE MAPPING
         doctorName: apt.doctor_name || '',
         treatmentCode: apt.treatment_code || '',
         estimatedCost: apt.estimated_cost || 0
@@ -173,13 +205,13 @@ export function DayViewSimple({
                   time-slot border rounded-lg p-2 cursor-pointer transition-all min-h-[120px] flex flex-col
                   ${appointmentData 
                     ? 'bg-white border-gray-300 shadow-sm hover:shadow-md' 
-                    : 'bg-gray-50 border-gray-200 hover:bg-blue-50 hover:border-blue-300'
+                    : 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-400 hover:shadow-sm'
                   }
                 `}
                 onClick={() => appointmentData ? handleAppointmentClick(appointment) : handleTimeSlotClick(slot)}
                 title={appointmentData 
                   ? `${appointmentData.patientName} - ${slot.time}`
-                  : `Crear cita - ${slot.time}`
+                  : `Crear nueva cita - ${slot.time}`
                 }
               >
                 {/* Time Label */}
@@ -193,13 +225,20 @@ export function DayViewSimple({
                     <AppointmentCard
                       appointment={appointmentData}
                       onClick={() => handleAppointmentClick(appointment)}
-                      isCompact={true}
+                      isCompact={false}
+                      showDuration={true}
+                      showNotes={false}
                       className="h-full"
                     />
                   </div>
                 ) : (
-                  <div className="flex-1 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <span className="text-gray-400 text-lg">+</span>
+                  <div className="flex-1 flex items-center justify-center group">
+                    <div className="text-gray-300 group-hover:text-gray-500 transition-colors duration-200 flex flex-col items-center">
+                      <span className="text-2xl font-light">+</span>
+                      <span className="text-xs mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        Crear cita
+                      </span>
+                    </div>
                   </div>
                 )}
               </div>

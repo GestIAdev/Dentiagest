@@ -37,7 +37,11 @@ const CalendarPage = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   
-  // 🔍 FILTROS DE BÚSQUEDA
+  // � ESTADOS PARA PRESELECCIÓN DE FECHA/HORA
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  
+  // �🔍 FILTROS DE BÚSQUEDA
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -72,6 +76,34 @@ const CalendarPage = () => {
     setShowCreateModal(true);
   };
 
+  // 🕒 HANDLER PARA SLOTS DE TIEMPO CON PRESELECCIÓN
+  const handleTimeSlotClick = (date: Date, time: string) => {
+    console.log('🎯 CALENDAR PAGE - Time slot clicked:', { date: date.toISOString(), time });
+    
+    // 🌍 TIMEZONE FIX - Use local date format instead of UTC
+    const localDateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    
+    // 🕒 FORMAT TIME WITH LEADING ZERO TO MATCH TIME_SLOTS
+    const formattedTime = time.includes(':') ? 
+      time.split(':').map(part => part.padStart(2, '0')).join(':') : 
+      time;
+    
+    console.log('🌍 TIMEZONE DEBUG:', {
+      originalDate: date,
+      originalTime: time,
+      formattedTime,
+      localDateString,
+      dateUTC: date.toISOString(),
+      dateLocal: date.toLocaleDateString(),
+      timezonOffset: date.getTimezoneOffset()
+    });
+    
+    // Store the pre-selected date and time for the modal
+    setSelectedDate(date);
+    setSelectedTime(formattedTime); // 🕒 USE FORMATTED TIME
+    setShowCreateModal(true);
+  };
+
   const handleEventClick = (clickInfo: any) => {
     // 🔧 HANDLE BOTH FULLCALENDAR AND CUSTOM CALENDAR FORMATS
     const appointment = clickInfo.event || clickInfo;
@@ -82,6 +114,16 @@ const CalendarPage = () => {
   const handleCreateAppointment = async (newAppointment: any) => {
     await createAppointment(newAppointment);
     setShowCreateModal(false);
+    // 🧹 LIMPIAR ESTADOS DE PRESELECCIÓN
+    setSelectedDate(null);
+    setSelectedTime(null);
+  };
+
+  // 🧹 HANDLER PARA CERRAR MODAL DE CREACIÓN
+  const handleCloseCreateModal = () => {
+    setShowCreateModal(false);
+    setSelectedDate(null);
+    setSelectedTime(null);
   };
 
   const handleUpdateAppointment = async (appointmentId: string, appointmentData: any) => {
@@ -188,6 +230,7 @@ const CalendarPage = () => {
                 appointments={appointments || []}
                 onAppointmentClick={handleEventClick}
                 onDateClick={handleDateClick}
+                onTimeSlotClick={handleTimeSlotClick} // 🕒 + BUTTON MAGIC
               />
             </div>
           </div>
@@ -221,8 +264,10 @@ const CalendarPage = () => {
       {showCreateModal && (
         <CreateAppointmentModal
           isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
+          onClose={handleCloseCreateModal} // 🧹 USE PROPER CLEANUP HANDLER
           onCreate={handleCreateAppointment}
+          selectedDate={selectedDate ? `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}` : null} // 🌍 LOCAL DATE FORMAT
+          selectedTime={selectedTime} // 🕒 PRE-FILLED TIME
         />
       )}
 
