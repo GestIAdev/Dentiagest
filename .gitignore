@@ -221,3 +221,25 @@ temp_files/
 # Alembic
 alembic/versions/*.py
 !alembic/versions/__init__.py
+
+# 🧹 DESARROLLO - Archivos temporales y backups (Agregado por PunkClaude)
+# Archivos de desarrollo temporal
+*_BROKEN*
+*_CLEAN*
+*_BACKUP*
+*_OLD*
+*_NEW*
+*_TEMP*
+*_TEST*
+*.backup.*
+temp_refresh.txt
+
+# Copias de trabajo durante desarrollo intensivo
+**/WeekViewSimple_*
+**/CalendarPage_*
+**/EditAppointmentModal.backup.*
+
+# Archivos de debug y experimentación
+*_DEBUG*
+*_EXPERIMENT*
+*_DRAFT*
