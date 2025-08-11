@@ -59,9 +59,25 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
   // 🔄 CARGAR DATOS DE LA CITA AL ABRIR EL MODAL
   useEffect(() => {
     if (appointment && isOpen) {
-      // 🌍 USE TIMEZONE UTILITIES - CYBERPUNK SOLUTION!
-      const appointmentDate = parseClinicDateTime(appointment.extendedProps?.scheduled_date || appointment.start);
-      const dateStr = appointmentDate.toISOString().split('T')[0];
+      // 🛡️ DEFENSIVE DATE PARSING - Prevent "Invalid time value"
+      const rawDate = appointment.extendedProps?.scheduled_date || appointment.start;
+      
+      if (!rawDate) {
+        console.warn('⚠️ EditAppointmentModal: No date found in appointment:', appointment);
+        return;
+      }
+
+      try {
+        // 🌍 USE TIMEZONE UTILITIES - CYBERPUNK SOLUTION!
+        const appointmentDate = parseClinicDateTime(rawDate);
+        
+        // 🛡️ CHECK IF PARSED DATE IS VALID
+        if (!appointmentDate || isNaN(appointmentDate.getTime())) {
+          console.error('❌ EditAppointmentModal: Invalid parsed date:', rawDate, '→', appointmentDate);
+          return;
+        }
+
+        const dateStr = appointmentDate.toISOString().split('T')[0];
       
       // 🏴‍☠️ AINARKALENDAR TIME PARSING - FREEDOM EDITION
       const hours = appointmentDate.getHours();
@@ -87,6 +103,10 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
       setFormData(newFormData);
       
       setPatientSearch(appointment.extendedProps?.patient_name || appointment.title || '');
+      
+      } catch (error) {
+        console.error('❌ EditAppointmentModal: Error processing appointment data:', error, appointment);
+      }
     }
   }, [appointment, isOpen]);
 

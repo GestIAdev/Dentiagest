@@ -204,14 +204,12 @@ export function AppointmentCard({
   return (
     <div
       ref={cardRef}
-      draggable
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
+      draggable={false}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={`
-        appointment-card cursor-move transition-all duration-200 relative
+        appointment-card cursor-pointer transition-all duration-200 relative
         ${colors.bg} ${colors.border} ${colors.text}
         border-l-4 rounded-md shadow-sm
         ${isDragging ? 'opacity-50 transform rotate-3 z-50' : ''}
@@ -241,74 +239,135 @@ export function AppointmentCard({
         </div>
       )}
 
-      {/* Appointment header */}
-      <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center space-x-1">
-          <div className={`w-2 h-2 rounded-full ${colors.dot}`}></div>
-          <span className="text-xs font-medium uppercase tracking-wide">
-            {appointment.type}
-          </span>
-          {priorityIcon && (
-            <span className="text-xs" title={`Prioridad: ${appointment.priority}`}>
-              {priorityIcon}
+      {/* 🎯 COMPACT LAYOUT OPTIMIZATION - Patient name FIRST */}
+      {isCompact ? (
+        <>
+          {/* COMPACT: Patient name as MAIN title */}
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center space-x-1 flex-1 min-w-0">
+              {/* Patient initials circle */}
+              <div className={`w-4 h-4 rounded-full ${colors.dot} text-white flex items-center justify-center font-bold text-xs`}>
+                {getPatientInitials(appointment.patientName)}
+              </div>
+              {/* Patient name - PROMINENT */}
+              <span className="font-bold text-sm truncate text-gray-800">
+                {appointment.patientName.split(' ')[0]} {/* First name only for space */}
+              </span>
+            </div>
+            {/* Time in corner */}
+            <span className="text-xs text-gray-500 ml-1">
+              {format(appointment.startTime, 'HH:mm')}
             </span>
-          )}
-        </div>
-        <span className="text-xs text-gray-500">
-          {formatDuration(appointment.duration)}
-        </span>
-      </div>
-
-      {/* Patient info section */}
-      <div className="flex items-center space-x-2 mb-1">
-        {/* Patient avatar/initials */}
-        <div className={`
-          w-6 h-6 rounded-full ${colors.dot} text-white text-xs 
-          flex items-center justify-center font-bold
-        `}>
-          {getPatientInitials(appointment.patientName)}
-        </div>
-        
-        {/* Patient name */}
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold text-sm truncate">
-            {appointment.patientName}
           </div>
-        </div>
-      </div>
 
-      {/* Time range */}
-      <div className="text-xs text-gray-600 mb-1 flex items-center justify-between">
-        <span>{format(appointment.startTime, 'HH:mm')} - {format(appointment.endTime, 'HH:mm')}</span>
-        {appointment.doctorName && (
-          <span className="text-xs text-gray-500 truncate ml-1">
-            Dr. {appointment.doctorName}
-          </span>
-        )}
-      </div>
+          {/* COMPACT: Type + Status row */}
+          <div className="flex items-center justify-between">
+            {/* Type with icon */}
+            <div className="flex items-center space-x-1">
+              <div className={`w-2 h-2 rounded-full ${colors.dot}`}></div>
+              <span className={`text-xs font-medium uppercase tracking-wide ${colors.text}`}>
+                {appointment.type}
+              </span>
+              {priorityIcon && <span className="text-xs">{priorityIcon}</span>}
+            </div>
+            
+            {/* Status badge - VISIBLE */}
+            <div className={`
+              text-xs px-1.5 py-0.5 rounded-full font-bold
+              ${appointment.status === 'confirmada' ? 'bg-green-500 text-white' : ''}
+              ${appointment.status === 'pendiente' ? 'bg-yellow-500 text-white' : ''}
+              ${appointment.status === 'cancelada' ? 'bg-red-500 text-white' : ''}
+              ${appointment.status === 'completada' ? 'bg-gray-500 text-white' : ''}
+            `}>
+              {appointment.status === 'confirmada' ? '✓' : 
+               appointment.status === 'pendiente' ? '⏳' : 
+               appointment.status === 'cancelada' ? '✗' : 
+               appointment.status === 'completada' ? '✓' : '?'}
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* FULL LAYOUT - Keep existing */}
+          {/* Appointment header */}
+          <div className={`flex items-center justify-between ${isCompact ? 'mb-0' : 'mb-1'}`}>
+            <div className="flex items-center space-x-1">
+              <div className={`w-2 h-2 rounded-full ${colors.dot}`}></div>
+              <span className={`${isCompact ? 'text-xs' : 'text-xs'} font-medium uppercase tracking-wide`}>
+                {appointment.type}
+              </span>
+              {priorityIcon && (
+                <span className="text-xs" title={`Prioridad: ${appointment.priority}`}>
+                  {priorityIcon}
+                </span>
+              )}
+            </div>
+            {!isCompact && (
+              <span className="text-xs text-gray-500">
+                {formatDuration(appointment.duration)}
+              </span>
+            )}
+          </div>
 
-      {/* Status and actions row */}
-      <div className="flex items-center justify-between">
-        <div className={`
-          text-xs px-2 py-1 rounded-full font-medium
-          ${appointment.status === 'confirmada' ? 'bg-green-200 text-green-800' : ''}
-          ${appointment.status === 'pendiente' ? 'bg-yellow-200 text-yellow-800' : ''}
-          ${appointment.status === 'cancelada' ? 'bg-red-200 text-red-800' : ''}
-          ${appointment.status === 'completada' ? 'bg-gray-200 text-gray-800' : ''}
-        `}>
-          {appointment.status}
-        </div>
-        
-        {/* Drag handle visual cue */}
-        <div className="text-gray-400 text-xs flex items-center">
-          <span className="mr-1">⋮⋮</span>
-          {appointment.estimatedCost && (
-            <span className="text-xs text-green-600 font-medium">
-              €{appointment.estimatedCost}
-            </span>
+          {/* Patient info section */}
+          <div className={`flex items-center space-x-2 ${isCompact ? 'mb-0' : 'mb-1'}`}>
+            {/* Patient avatar/initials */}
+            <div className={`
+              ${isCompact ? 'w-4 h-4 text-xs' : 'w-6 h-6 text-xs'} 
+              rounded-full ${colors.dot} text-white 
+              flex items-center justify-center font-bold
+            `}>
+              {getPatientInitials(appointment.patientName)}
+            </div>
+            
+            {/* Patient name */}
+            <div className="flex-1 min-w-0">
+              <div className={`font-semibold ${isCompact ? 'text-xs' : 'text-sm'} truncate`}>
+                {appointment.patientName}
+              </div>
+            </div>
+          </div>
+
+          {/* Time range */}
+          {!isCompact && (
+            <div className="text-xs text-gray-600 mb-1 flex items-center justify-between">
+              <span>{format(appointment.startTime, 'HH:mm')} - {format(appointment.endTime, 'HH:mm')}</span>
+              {appointment.doctorName && (
+                <span className="text-xs text-gray-500 truncate ml-1">
+                  Dr. {appointment.doctorName}
+                </span>
+              )}
+            </div>
           )}
-        </div>
-      </div>
+
+          {/* Status and actions row */}
+          <div className="flex items-center justify-between">
+            <div className={`
+              ${isCompact ? 'text-xs px-1 py-0.5' : 'text-xs px-2 py-1'} rounded-full font-medium
+              ${appointment.status === 'confirmada' ? 'bg-green-200 text-green-800' : ''}
+              ${appointment.status === 'pendiente' ? 'bg-yellow-200 text-yellow-800' : ''}
+              ${appointment.status === 'cancelada' ? 'bg-red-200 text-red-800' : ''}
+              ${appointment.status === 'completada' ? 'bg-gray-200 text-gray-800' : ''}
+            `}>
+              {appointment.status}
+            </div>
+            
+            {/* Compact time display */}
+            {isCompact && (
+              <div className="text-xs text-gray-500">
+                {format(appointment.startTime, 'HH:mm')}
+              </div>
+            )}
+            
+            {/* Cost (only if not compact) */}
+            {!isCompact && appointment.estimatedCost && (
+              <span className="text-xs text-green-600 font-medium">
+                €{appointment.estimatedCost}
+              </span>
+            )}
+          </div>
+        </>
+      )}
 
       {/* Treatment code (if any) */}
       {appointment.treatmentCode && (

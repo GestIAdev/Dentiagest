@@ -1,25 +1,19 @@
 /**
- * 🏴‍☠️ AInarkalendar - Week View FICHERO DESIGN
- * 
- * ⚡ Built by: PunkClaude (FICHERO MODE ACTIVATED)
- * 🎯 Mission: 2x2 Grid Smart + Hora Colapsada Inteligente
- * 💀 Strategy: Aesthetic fichero design with professional UX
- * 
- * "Build the fichero armario that makes dentists weep with joy"
- * - PunkClaude, The Aesthetic Anarchist
+ * 🗂️ DENTIAGEST COMPACT CALENDAR - PERFECTED FILE-TAB STACKING
+ * ⚡ Elegant • Compact • Professional • Smart Stacking
  */
 
 import React from 'react';
 import { format, startOfWeek, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { parseClinicDateTime } from '../../utils/timezone.ts';
-import { TIME_SLOTS } from '../../utils/timeSlots.ts';
-import { AppointmentCard, AppointmentData } from './AppointmentCard.tsx';
+import { AppointmentCard } from './AppointmentCard.tsx';
 
 interface WeekViewProps {
   currentDate: Date;
   onDateClick?: (date: Date) => void;
   onTimeSlotClick?: (date: Date, time: string) => void;
+  onAppointmentClick?: (appointment: any) => void; // 🎯 CLICK HANDLER FOR EDITING!
   appointments?: any[];
   className?: string;
 }
@@ -28,176 +22,293 @@ export function WeekViewSimple({
   currentDate, 
   onDateClick,
   onTimeSlotClick,
+  onAppointmentClick, // 🎯 RECEIVE CLICK HANDLER!
   appointments = [],
   className = '' 
 }: WeekViewProps) {
+
+  // 🔍 DEBUG: Log appointments data to check for invalid dates
+  React.useEffect(() => {
+    console.log('🔍 WeekViewSimple - Received appointments:', appointments.length);
+    appointments.forEach((apt, index) => {
+      if (!apt?.scheduled_date) {
+        console.warn(`⚠️ Appointment ${index} missing scheduled_date:`, apt);
+      } else {
+        try {
+          const parsed = parseClinicDateTime(apt.scheduled_date);
+          if (isNaN(parsed.getTime())) {
+            console.error(`❌ Invalid date for appointment ${index}:`, apt.scheduled_date, '→', parsed);
+          }
+        } catch (error) {
+          console.error(`❌ Parse error for appointment ${index}:`, apt.scheduled_date, error);
+        }
+      }
+    });
+  }, [appointments]);
 
   // Generate week days starting from Monday
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   
-  // Working hours: 7am to 8pm (from TIME_SLOTS)
+  // Working hours: 7am to 9pm
   const workingHours = Array.from({ length: 14 }, (_, i) => i + 7);
 
-  // 🎯 SMART APPOINTMENT FILTER - POR 15-MINUTE SLOT
-  const getAppointmentsForDayAndSlot = (day: Date, hour: number, minute: number) => {
+  // 🎯 Convert appointment to AppointmentCard format
+  const convertToAppointmentData = (apt: any) => {
+    // 🛡️ DEFENSIVE DATE VALIDATION - Prevent "Invalid time value"
+    if (!apt?.scheduled_date) {
+      console.warn('⚠️ Appointment missing scheduled_date:', apt);
+      return null;
+    }
+
+    const appointmentDate = parseClinicDateTime(apt.scheduled_date);
+    
+    // 🛡️ CHECK IF DATE IS VALID - Prevent runtime crashes
+    if (!appointmentDate || isNaN(appointmentDate.getTime())) {
+      console.warn('⚠️ Invalid appointment date:', apt.scheduled_date, '→', appointmentDate);
+      return null;
+    }
+
+    // 🛡️ DEFENSIVE TYPE MAPPING - Handle unknown types
+    const mapAppointmentType = (type: string): 'consulta' | 'limpieza' | 'tratamiento' | 'emergencia' => {
+      const typeMap: { [key: string]: 'consulta' | 'limpieza' | 'tratamiento' | 'emergencia' } = {
+        'consulta': 'consulta',
+        'consultation': 'consulta',
+        'limpieza': 'limpieza', 
+        'cleaning': 'limpieza',
+        'tratamiento': 'tratamiento',
+        'treatment': 'tratamiento',
+        'filling': 'tratamiento',
+        'empaste': 'tratamiento',
+        'emergencia': 'emergencia',
+        'emergency': 'emergencia',
+        'urgente': 'emergencia'
+      };
+      
+      return typeMap[type?.toLowerCase()] || 'consulta'; // Default to 'consulta' if unknown
+    };
+
+    // 🛡️ DEFENSIVE STATUS MAPPING - Handle API status values
+    const mapAppointmentStatus = (status: string): 'confirmada' | 'pendiente' | 'cancelada' | 'completada' => {
+      const statusMap: { [key: string]: 'confirmada' | 'pendiente' | 'cancelada' | 'completada' } = {
+        'confirmada': 'confirmada',
+        'confirmed': 'confirmada',
+        'scheduled': 'pendiente',
+        'programada': 'pendiente',
+        'pendiente': 'pendiente',
+        'pending': 'pendiente',
+        'cancelada': 'cancelada',
+        'cancelled': 'cancelada',
+        'canceled': 'cancelada',
+        'completada': 'completada',
+        'completed': 'completada',
+        'finished': 'completada',
+        'done': 'completada'
+      };
+      
+      return statusMap[status?.toLowerCase()] || 'pendiente'; // Default to 'pendiente' if unknown
+    };
+
+    return {
+      id: apt.id,
+      patientName: apt.patient_name || 'Paciente',
+      patientId: apt.patient_id || '',
+      startTime: appointmentDate,
+      endTime: new Date(appointmentDate.getTime() + (apt.duration || 30) * 60000),
+      duration: apt.duration || 30,
+      type: mapAppointmentType(apt.appointment_type), // 🎯 FIXED: Proper mapping with defensive fallback
+      status: mapAppointmentStatus(apt.status), // 🎯 NEW: Proper status mapping
+      priority: apt.priority || 'normal',
+      notes: apt.notes || '',
+      phone: apt.patient_phone || '',
+      doctorName: apt.doctor_name || '',
+      treatmentCode: apt.treatment_code || '',
+      estimatedCost: apt.estimated_cost || 0
+    };
+  };
+
+  // 🎯 SIMPLE APPOINTMENT FILTER - COPY FROM MONTHLY VIEW SUCCESS
+  const getAppointmentsForDayAndHour = (day: Date, hour: number) => {
     return appointments.filter(apt => {
-      if (!apt.scheduled_date) return false;
+      if (!apt?.scheduled_date) return false;
       
       try {
         const aptDate = parseClinicDateTime(apt.scheduled_date);
-        if (!aptDate) return false;
+        
+        // 🛡️ DEFENSIVE DATE VALIDATION - Prevent crashes
+        if (!aptDate || isNaN(aptDate.getTime())) {
+          console.warn('⚠️ Invalid date in filter:', apt.scheduled_date, '→', aptDate);
+          return false;
+        }
         
         const sameDay = format(aptDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd');
         const sameHour = aptDate.getHours() === hour;
-        const slotMinute = Math.floor(aptDate.getMinutes() / 15) * 15; // Round to 15-min slot
         
-        return sameDay && sameHour && slotMinute === minute;
+        return sameDay && sameHour;
       } catch (error) {
         return false;
       }
     });
   };
 
-  // 🎨 CONVERT TO APPOINTMENTDATA FOR EPIC CARDS
-  const convertToAppointmentData = (apt: any): AppointmentData => {
-    const startTime = parseClinicDateTime(apt.scheduled_date) || new Date();
-    const duration = apt.duration || 30; // Default 30 minutes
-    const endTime = new Date(startTime.getTime() + duration * 60000);
-
-    return {
-      id: apt.id || Math.random().toString(),
-      patientName: apt.patient_name || 'Paciente Sin Nombre',
-      patientId: apt.patient_id || '',
-      patientPhone: apt.patient_phone,
-      patientEmail: apt.patient_email,
-      startTime,
-      endTime,
-      duration,
-      type: apt.type || 'consulta',
-      status: apt.status || 'pendiente',
-      priority: apt.priority || 'normal',
-      notes: apt.notes || apt.title,
-      doctorName: apt.doctor_name,
-      treatmentCode: apt.treatment_code,
-      estimatedCost: apt.estimated_cost
-    };
-  };
-
   return (
-    <div className={`week-view-simple ${className} bg-gray-50 p-3`}>
-      {/* Week Header - ESTILO DIARIO MINIMALISTA */}
-      <div className="week-header grid grid-cols-8 gap-1 mb-3">
-        <div className="time-header p-2 bg-gray-100 border border-gray-300 rounded text-center font-medium text-sm">
+    <div className={`week-view-compact ${className}`}>
+      {/* 🎯 MINIMAL HEADER - Just days, no clutter */}
+      <div className="grid grid-cols-8 gap-1 mb-2">
+        <div className="text-sm p-2 bg-gray-100 border rounded text-center font-medium">
           Hora
         </div>
         {weekDays.map(day => (
-          <div key={day.toISOString()} className="day-header p-2 bg-white border border-gray-300 rounded text-center">
-            <div className="font-medium text-gray-700 text-sm">{format(day, 'EEE', { locale: es })}</div>
-            <div className="text-lg font-semibold text-gray-800">{format(day, 'd')}</div>
+          <div key={day.toISOString()} className="text-sm p-2 bg-blue-50 border rounded text-center">
+            <div className="font-medium">{format(day, 'EEE', { locale: es })}</div>
+            <div className="text-sm">{format(day, 'd')}</div>
           </div>
         ))}
       </div>
 
-      {/* Week Grid - SIN CONTAINERS, ESTILO DIARIO COMPACTO */}
-      <div className="week-grid space-y-1">
+      {/* 🎯 OPTIMIZED GRID - Perfect balance of compact & functional */}
+      <div className="week-grid">
         {workingHours.map(hour => (
-          <div key={hour} className="hour-row grid grid-cols-8 gap-1">
-            {/* Time column - ESTILO DIARIO */}
-            <div className="time-column bg-gray-100 border border-gray-300 rounded flex items-center justify-center py-1">
-              <div className="text-center">
-                <div className="text-sm font-medium text-gray-700">{hour}</div>
-                <div className="text-xs text-gray-500">-{hour + 1}</div>
-              </div>
+          <div key={hour} className="grid grid-cols-8 gap-1 mb-1">
+            {/* Time label - Readable but compact */}
+            <div className="text-sm p-2 bg-gray-50 border rounded text-center font-medium">
+              {hour}:00
             </div>
 
-            {/* Day columns with 2x2 grid - ESTILO DIARIO COMPACTO */}
-            {weekDays.map(day => (
-              <div 
-                key={`slots-${day.toISOString()}-${hour}`}
-                className="day-column border border-gray-300 rounded bg-white"
-              >
-                <div className="grid grid-cols-2 grid-rows-2 h-20 gap-0">
-                  {/* Top-left: 00-15 */}
-                  <div 
-                    className="time-slot bg-gray-50 border-r border-b border-gray-200 p-1 cursor-pointer hover:bg-blue-50 transition-colors relative overflow-hidden"
-                    onClick={() => onTimeSlotClick?.(day, `${hour}:00`)}
-                  >
-                    {getAppointmentsForDayAndSlot(day, hour, 0).map(apt => (
-                      <AppointmentCard 
-                        key={apt.id}
-                        appointment={convertToAppointmentData(apt)}
-                        isCompact={true}
-                        showQuickActions={false}
-                        className="absolute inset-0 m-0.5 text-xs transform scale-95 z-10"
-                      />
-                    ))}
-                    <div className="slot-indicator text-xs text-gray-400 absolute bottom-0 right-0 p-0.5 z-0">00</div>
-                  </div>
+            {/* Day columns - PERFECT SIZE */}
+            {weekDays.map(day => {
+              const dayAppointments = getAppointmentsForDayAndHour(day, hour);
 
-                  {/* Top-right: 15-30 */}
-                  <div 
-                    className="time-slot bg-gray-50 border-b border-gray-200 p-1 cursor-pointer hover:bg-blue-50 transition-colors relative overflow-hidden"
-                    onClick={() => onTimeSlotClick?.(day, `${hour}:15`)}
-                  >
-                    {getAppointmentsForDayAndSlot(day, hour, 15).map(apt => (
-                      <AppointmentCard 
-                        key={apt.id}
-                        appointment={convertToAppointmentData(apt)}
-                        isCompact={true}
-                        showQuickActions={false}
-                        className="absolute inset-0 m-0.5 text-xs transform scale-95 z-10"
-                      />
-                    ))}
-                    <div className="slot-indicator text-xs text-gray-400 absolute bottom-0 right-0 p-0.5 z-0">15</div>
-                  </div>
+              return (
+                <div 
+                  key={`${day.toISOString()}-${hour}`}
+                  className="relative bg-white border rounded cursor-pointer hover:bg-gray-50 group"
+                  style={{ 
+                    height: '60px', // ⚡ OPTIMIZED: Perfect balance - compact but functional
+                    overflow: 'visible',
+                    zIndex: dayAppointments.length > 1 ? 40 : 1 // Higher z-index for multi-appointment slots
+                  }}
+                  onClick={() => onTimeSlotClick?.(day, `${hour}:00`)}
+                >
+                  {/* EMPTY SLOT */}
+                  {dayAppointments.length === 0 && (
+                    <div className="h-full flex items-center justify-center text-sm text-gray-300">
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity text-lg">+</span>
+                    </div>
+                  )}
 
-                  {/* Bottom-left: 30-45 */}
-                  <div 
-                    className="time-slot bg-gray-50 border-r border-gray-200 p-1 cursor-pointer hover:bg-blue-50 transition-colors relative overflow-hidden"
-                    onClick={() => onTimeSlotClick?.(day, `${hour}:30`)}
-                  >
-                    {getAppointmentsForDayAndSlot(day, hour, 30).map(apt => (
-                      <AppointmentCard 
-                        key={apt.id}
-                        appointment={convertToAppointmentData(apt)}
-                        isCompact={true}
-                        showQuickActions={false}
-                        className="absolute inset-0 m-0.5 text-xs transform scale-95 z-10"
-                      />
-                    ))}
-                    <div className="slot-indicator text-xs text-gray-400 absolute bottom-0 right-0 p-0.5 z-0">30</div>
-                  </div>
+                  {/* SINGLE APPOINTMENT - Full size, elegant */}
+                  {dayAppointments.length === 1 && (
+                    <div className="h-full p-1">
+                      {(() => {
+                        const appointmentData = convertToAppointmentData(dayAppointments[0]);
+                        if (!appointmentData) return null;
+                        
+                        return (
+                          <AppointmentCard
+                            appointment={appointmentData}
+                            isCompact={true}
+                            onClick={(apt) => onAppointmentClick?.(apt)} // 🎯 CONNECT TO REAL HANDLER!
+                            className="h-full text-sm"
+                          />
+                        );
+                      })()}
+                    </div>
+                  )}
 
-                  {/* Bottom-right: 45-60 */}
-                  <div 
-                    className="time-slot bg-gray-50 p-1 cursor-pointer hover:bg-blue-50 transition-colors relative overflow-hidden"
-                    onClick={() => onTimeSlotClick?.(day, `${hour}:45`)}
-                  >
-                    {getAppointmentsForDayAndSlot(day, hour, 45).map(apt => (
-                      <AppointmentCard 
-                        key={apt.id}
-                        appointment={convertToAppointmentData(apt)}
-                        isCompact={true}
-                        showQuickActions={false}
-                        className="absolute inset-0 m-0.5 text-xs transform scale-95 z-10"
-                      />
-                    ))}
-                    <div className="slot-indicator text-xs text-gray-400 absolute bottom-0 right-0 p-0.5 z-0">45</div>
-                  </div>
+                  {/* 🗂️ MULTIPLE APPOINTMENTS - SIMPLE BUT ELEGANT HOVER REVEAL */}
+                  {dayAppointments.length > 1 && (
+                    <div 
+                      className="absolute inset-0"
+                      style={{ 
+                        overflow: 'visible',
+                        zIndex: 50 // MUCH HIGHER: Above all other slots
+                      }}
+                      onMouseEnter={() => {
+                        // 🚀 MANUAL HOVER REVEAL - 100% reliable
+                        const cards = document.querySelectorAll(`[data-stack-id="${day.toISOString()}-${hour}"]`);
+                        cards.forEach((card, index) => {
+                          const yOffset = index === 0 ? 0 : index === 1 ? 20 : index === 2 ? 40 : index === 3 ? 64 : index === 4 ? 80 : 96;
+                          (card as HTMLElement).style.transform = `translateY(${yOffset}px)`;
+                        });
+                      }}
+                      onMouseLeave={() => {
+                        // Return to compact state
+                        const cards = document.querySelectorAll(`[data-stack-id="${day.toISOString()}-${hour}"]`);
+                        cards.forEach((card) => {
+                          (card as HTMLElement).style.transform = 'translateY(0px)';
+                        });
+                      }}
+                    >
+                      {dayAppointments.map((apt, index) => {
+                        const appointmentData = convertToAppointmentData(apt);
+                        if (!appointmentData) return null;
+
+                        const isTopCard = index === dayAppointments.length - 1;
+                        const baseTop = index * 4;
+                        const baseLeft = index * 3;
+                        const zIndex = 60 + index; // VERY HIGH z-index
+                        
+                        return (
+                          <div
+                            key={`${apt.id}-${index}`}
+                            data-stack-id={`${day.toISOString()}-${hour}`}
+                            className="absolute cursor-pointer transition-all duration-300 ease-out"
+                            style={{
+                              top: `${baseTop}px`,
+                              left: `${baseLeft}px`,
+                              right: `${Math.max(0, baseLeft - 2)}px`,
+                              height: 'calc(100% - 8px)',
+                              zIndex: zIndex,
+                              transform: 'translateY(0px)', // Start position
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // 🎯 CONNECT TO REAL HANDLER!
+                              onAppointmentClick?.(appointmentData);
+                            }}
+                          >
+                            {/* 🎯 REAL APPOINTMENTCARD - CLEAN AND CLICKEABLE */}
+                            <AppointmentCard
+                              appointment={appointmentData}
+                              isCompact={true}
+                              onClick={(apt) => onAppointmentClick?.(apt)} // 🎯 CONNECT TO REAL HANDLER!
+                              className={`
+                                h-full text-sm transition-all duration-300
+                                ${isTopCard 
+                                  ? 'shadow-md' 
+                                  : 'shadow-sm opacity-90 scale-98'
+                                }
+                                group-hover/stack:shadow-lg 
+                                group-hover/stack:scale-100 
+                                group-hover/stack:opacity-100
+                                hover:shadow-xl hover:scale-105
+                                cursor-pointer
+                              `}
+                            />
+                          </div>
+                        );
+                      })}
+                      
+                      {/* 📊 COUNTER - ALWAYS ON TOP */}
+                      <div 
+                        className="absolute -top-1 -right-1 bg-red-500 text-white text-sm px-2 py-1 rounded-full font-bold shadow-md transition-all duration-300"
+                        style={{ 
+                          zIndex: 100 // HIGHEST Z-INDEX: Always visible on top
+                        }}
+                      >
+                        {dayAppointments.length}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ))}
-      </div>
-
-      {/* Footer - ESTILO DIARIO MINIMALISTA */}
-      <div className="week-footer mt-4 text-center">
-        <div className="text-sm text-gray-600">
-          📅 Semana del {format(weekStart, 'd MMM', { locale: es })} al {format(addDays(weekStart, 6), 'd MMM yyyy', { locale: es })}
-        </div>
       </div>
     </div>
   );
 }
+
+export default WeekViewSimple;

@@ -256,6 +256,7 @@ export function CalendarContainer({
             currentDate={currentDate}
             onDateClick={handleDateClick}
             onTimeSlotClick={handleTimeSlotClick}
+            onAppointmentClick={onAppointmentClick} // 🎯 CONECTAR CLICK EDITOR!
             appointments={appointments} // 🏥 PASS REAL APPOINTMENTS!
             className="week-view-container"
           />

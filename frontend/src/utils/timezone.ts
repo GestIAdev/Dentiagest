@@ -66,6 +66,12 @@ export const formatLocalDateTime = (date: Date, timezone: string = CLINIC_TIMEZO
  */
 export const parseClinicDateTime = (dateStr: string, timezone: string = CLINIC_TIMEZONE): Date => {
   try {
+    // 🛡️ DEFENSIVE VALIDATION - Prevent crashes
+    if (!dateStr || typeof dateStr !== 'string') {
+      console.warn('⚠️ parseClinicDateTime: Invalid input:', dateStr);
+      return new Date(); // Return current date as fallback
+    }
+
     // Si es solo fecha, agregar hora por defecto
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
       dateStr = dateStr + 'T09:00:00';
