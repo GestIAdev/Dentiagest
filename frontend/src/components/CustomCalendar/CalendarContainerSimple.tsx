@@ -19,6 +19,7 @@ interface CalendarProps {
   className?: string;
   appointments?: any[]; // 🏥 REAL APPOINTMENT DATA
   onAppointmentClick?: (appointment: any) => void;
+  onAppointmentUpdate?: () => void; // 🔥 NEW: Callback to refresh appointments
   onDateClick?: (date: Date) => void;
   onTimeSlotClick?: (date: Date, time: string) => void; // 🕒 FOR + BUTTON FUNCTIONALITY
 }
@@ -31,6 +32,7 @@ export function CalendarContainer({
   className = '',
   appointments = [],
   onAppointmentClick,
+  onAppointmentUpdate, // 🔥 NEW: Callback to refresh appointments
   onDateClick,
   onTimeSlotClick // 🕒 + BUTTON HANDLER
 }: CalendarProps) {
@@ -43,7 +45,20 @@ export function CalendarContainer({
     helpers,
     view: currentView,
     setView
-  } = useCalendarState(view);
+  } = useCalendarState(view, initialDate); // 🔥 PASS INITIAL DATE
+
+  // 🔄 SYNC INTERNAL STATE CHANGES WITH PARENT
+  useEffect(() => {
+    if (onDateChange) {
+      onDateChange(currentDate);
+    }
+  }, [currentDate, onDateChange]);
+
+  useEffect(() => {
+    if (onViewChange) {
+      onViewChange(currentView);
+    }
+  }, [currentView, onViewChange]);
 
   // 🏴‍☠️ AINARKALENDAR - Professional calendar system
   // Built by: PunkClaude & Raul (GestIA Dev - 2025)
@@ -328,6 +343,7 @@ export function CalendarContainer({
             currentDate={currentDate}
             onTimeSlotClick={handleTimeSlotClick}
             onAppointmentClick={onAppointmentClick} // 🎯 CONECTAR CLICK EDITOR!
+            onAppointmentUpdate={onAppointmentUpdate} // 🔥 Pass refresh callback
             appointments={appointments} // 🏥 PASS REAL APPOINTMENTS!
             className="day-view-container"
           />

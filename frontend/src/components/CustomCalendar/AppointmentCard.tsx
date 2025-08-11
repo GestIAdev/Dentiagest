@@ -195,7 +195,18 @@ export function AppointmentCard({
   const getAppointmentColors = () => {
     const type = appointment.type?.toLowerCase() || '';
     
-    // 🔵 AZUL - Limpiezas únicamente
+    // � PRIORITY OVERRIDE: Urgent priority makes ANY type red!
+    if (appointment.priority === 'urgent') {
+      return {
+        bg: 'bg-red-100',
+        border: 'border-red-300',
+        text: 'text-red-800',
+        dot: 'bg-red-500',
+        shadow: 'shadow-red-100'
+      };
+    }
+    
+    // � AZUL - Limpiezas únicamente
     if (type.includes('limpieza') || type.includes('higiene') || type.includes('cleaning')) {
       return {
         bg: 'bg-blue-100',
@@ -206,16 +217,7 @@ export function AppointmentCard({
       };
     }
     
-    // 🔴 ROJO - Emergencias
-    if (type.includes('emergencia') || type.includes('urgencia') || type.includes('emergency')) {
-      return {
-        bg: 'bg-red-100',
-        border: 'border-red-300',
-        text: 'text-red-800',
-        dot: 'bg-red-500',
-        shadow: 'shadow-red-100'
-      };
-    }
+    // 🚫 REMOVED: Emergency type check (now handled by priority)
     
     // 🟡 AMARILLO LIMÓN - TODO TRATAMIENTO
     if (type.includes('endodoncia') || type.includes('corona') || type.includes('crown') ||
@@ -244,7 +246,9 @@ export function AppointmentCard({
   };
   
   const colors = getAppointmentColors();
-  const priorityIcon = PRIORITY_INDICATORS[appointment.priority || 'normal'];  const handleDragStart = (e: React.DragEvent) => {
+  const priorityIcon = PRIORITY_INDICATORS[appointment.priority || 'normal'];
+  
+  const handleDragStart = (e: React.DragEvent) => {
     // Store appointment data for drop handler
     e.dataTransfer.setData('application/json', JSON.stringify(appointment));
     e.dataTransfer.effectAllowed = 'move';
@@ -327,7 +331,9 @@ export function AppointmentCard({
   return (
     <div
       ref={cardRef}
-      draggable={false}
+      draggable={true}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -355,7 +361,6 @@ export function AppointmentCard({
           }}
           title={`Prioridad: ${appointment.priority}${
             // Check if this is auto-detected priority
-            (appointment.type === 'emergency' && appointment.priority === 'urgent') ||
             (appointment.notes?.toLowerCase().includes('urgente') && appointment.priority === 'high') ||
             (appointment.notes?.toLowerCase().includes('dolor') && appointment.priority === 'high') 
             ? ' 🤖 (Auto-detectada)' 
@@ -364,8 +369,7 @@ export function AppointmentCard({
         >
           {priorityIcon}
           {/* 🤖 Auto-detection indicator */}
-          {((appointment.type === 'emergency' && appointment.priority === 'urgent') ||
-            (appointment.notes?.toLowerCase().includes('urgente') && appointment.priority === 'high') ||
+          {((appointment.notes?.toLowerCase().includes('urgente') && appointment.priority === 'high') ||
             (appointment.notes?.toLowerCase().includes('dolor') && appointment.priority === 'high')) && (
             <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
               🤖

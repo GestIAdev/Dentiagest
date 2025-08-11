@@ -190,19 +190,9 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
       onClose();
     } catch (error: any) {
       console.error('❌ Error creating appointment:', error);
-      
-      // 🚨 MANEJO ESPECÍFICO DE CONFLICTOS DE HORARIO
-      if (error?.response?.status === 409) {
-        alert('⚠️ CONFLICTO DE HORARIOS\n\nYa existe una cita programada para ese horario.\nPor favor, selecciona una fecha/hora diferente.');
-      } else if (error?.message?.includes('409') || error?.message?.includes('conflict')) {
-        alert('⚠️ CONFLICTO DE HORARIOS\n\nYa existe una cita programada para ese horario.\nPor favor, selecciona una fecha/hora diferente.');
-      } else {
-        alert('❌ Error al crear la cita. Intenta nuevamente.');
-      }
+      alert('❌ Error al crear la cita. Intenta nuevamente.');
     }
   };
-
-  if (!isOpen) return null;
 
   if (!isOpen) return null;
 
@@ -371,7 +361,6 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
                 <option value="crown">Corona</option>
                 <option value="implant">Implante</option>
                 <option value="orthodontics">Ortodoncia</option>
-                <option value="emergency">Emergencia</option>
                 <option value="follow_up">Seguimiento</option>
                 <option value="checkup">Revisión</option>
               </select>
@@ -380,7 +369,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 ⚡ Prioridad
-                <span className="text-xs text-gray-500 ml-2" title="🤖 Auto: Emergencias=Urgente, 'dolor' en notas=Alta. 👤 Manual: sobrescribe automático">
+                <span className="text-xs text-gray-500 ml-2" title="🤖 Auto: 'dolor' en notas=Alta. 👤 Manual: sobrescribe automático">
                   (Auto + Manual)
                 </span>
               </label>
@@ -396,7 +385,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
                 <option value="urgent">🔴 Urgente</option>
               </select>
               <div className="text-xs text-gray-500 mt-1">
-                🤖 Auto: Emergencias→Urgente, "dolor"/"urgente" en notas→Alta
+                🤖 Auto: "dolor"/"urgente" en notas→Alta
               </div>
             </div>
           </div>

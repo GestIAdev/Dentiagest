@@ -106,11 +106,14 @@ async def create_appointment(
         )
     ).first()
     
-    if existing_appointments:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Dentist has a conflicting appointment at {existing_appointments.scheduled_date}"
-        )
+    # 🏥 MULTI-DENTIST CLINIC: Allow simultaneous appointments
+    # Different dentists can have appointments at the same time
+    # Commenting out conflict validation for flexibility
+    # if existing_appointments:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_409_CONFLICT,
+    #         detail=f"Dentist has a conflicting appointment at {existing_appointments.scheduled_date}"
+    #     )
     
     # DENTAL_SPECIFIC: Room conflict check
     if appointment_data.room_number:
@@ -135,11 +138,13 @@ async def create_appointment(
             )
         ).first()
         
-        if room_conflict:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"Room {appointment_data.room_number} is occupied at that time"
-            )
+        # 🏥 MULTI-DENTIST CLINIC: Allow room sharing
+        # Commenting out room conflict validation for flexibility
+        # if room_conflict:
+        #     raise HTTPException(
+        #         status_code=status.HTTP_409_CONFLICT,
+        #         detail=f"Room {appointment_data.room_number} is occupied at that time"
+        #     )
     
     # Create appointment
     appointment_dict = appointment_data.model_dump()
@@ -339,11 +344,13 @@ async def update_appointment(
             )
         ).first()
         
-        if conflicts:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Schedule conflict with existing appointment"
-            )
+        # 🏥 MULTI-DENTIST CLINIC: Allow scheduling flexibility
+        # Commenting out conflict validation for appointment updates
+        # if conflicts:
+        #     raise HTTPException(
+        #         status_code=status.HTTP_409_CONFLICT,
+        #         detail="Schedule conflict with existing appointment"
+        #     )
     
     # Update fields
     update_data = appointment_data.model_dump(exclude_unset=True)

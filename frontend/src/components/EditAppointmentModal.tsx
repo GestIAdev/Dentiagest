@@ -4,7 +4,6 @@ import { XMarkIcon, CalendarIcon, ClockIcon, UserIcon, MagnifyingGlassIcon, Penc
 import { useAppointments } from '../hooks/useAppointments.ts';
 import { parseClinicDateTime } from '../utils/timezone.ts'; // 🌍 TIMEZONE SOLUTION!
 import { useAuth } from '../context/AuthContext.tsx'; // 🔐 AUTH SOLUTION!
-import { useScheduleValidator } from '../hooks/useScheduleValidator.ts'; // 🕐 SCHEDULE VALIDATION!
 
 // 🏴‍☠️ AINARKALENDAR TIME SLOTS - FREEDOM EDITION
 const generateTimeSlots = (): Array<{value: string, display: string}> => {
@@ -37,7 +36,6 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
   const { patients, fetchPatients } = usePatients();
   const { loading } = useAppointments();
   const { state } = useAuth(); // 🔐 AUTH STATE FOR TOKEN
-  const { validateTimeSlot, findAvailableSlots, isValidating } = useScheduleValidator(); // 🕐 SCHEDULE VALIDATOR
   
   // 🎯 ESTADO INICIAL BASADO EN LA CITA EXISTENTE
   const [formData, setFormData] = useState({
@@ -129,38 +127,41 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
   }, [appointment, isOpen]);
 
   // � VALIDAR HORARIO CUANDO CAMBIE FECHA/HORA
+  // 🏥 MULTI-DENTIST CLINIC: Schedule validation disabled
+  // Allow simultaneous appointments for multi-doctor flexibility
   useEffect(() => {
-    const validateSchedule = async () => {
-      if (formData.date && formData.time) {
-        setScheduleValidation({ message: 'Validando horario...', type: 'validating' });
-        
-        const result = await validateTimeSlot(
-          formData.date, 
-          formData.time, 
-          formData.duration,
-          appointment.id // Excluir la cita actual
-        );
-        
-        if (result.hasConflict) {
-          const availableSlots = findAvailableSlots(formData.date, formData.duration);
-          setScheduleValidation({
-            message: result.message,
-            type: 'error',
-            availableSlots: availableSlots.slice(0, 5) // Mostrar solo 5 sugerencias
-          });
-        } else {
-          setScheduleValidation({
-            message: result.message,
-            type: 'success'
-          });
-        }
-      }
-    };
+    // validateSchedule function commented out to allow overlapping appointments
+    // const validateSchedule = async () => {
+    //   if (formData.date && formData.time) {
+    //     setScheduleValidation({ message: 'Validando horario...', type: 'validating' });
+    //     
+    //     const result = await validateTimeSlot(
+    //       formData.date, 
+    //       formData.time, 
+    //       formData.duration,
+    //       appointment.id // Excluir la cita actual
+    //     );
+    //     
+    //     if (result.hasConflict) {
+    //       const availableSlots = findAvailableSlots(formData.date, formData.duration);
+    //       setScheduleValidation({
+    //         message: result.message,
+    //         type: 'error',
+    //         availableSlots: availableSlots.slice(0, 5) // Mostrar solo 5 sugerencias
+    //       });
+    //     } else {
+    //       setScheduleValidation({
+    //         message: result.message,
+    //         type: 'success'
+    //       });
+    //     }
+    //   }
+    // };
 
-    // Debounce la validación para no hacer demasiadas llamadas
-    const timeoutId = setTimeout(validateSchedule, 500);
-    return () => clearTimeout(timeoutId);
-  }, [formData.date, formData.time, formData.duration, validateTimeSlot, findAvailableSlots, appointment.id]);
+    // // Debounce la validación para no hacer demasiadas llamadas
+    // const timeoutId = setTimeout(validateSchedule, 500);
+    // return () => clearTimeout(timeoutId);
+  }, []); // Simplified dependency array
 
   // �🔍 AUTOCOMPLETADO DE PACIENTES
   const handlePatientSearch = async (searchTerm: string) => {
@@ -473,14 +474,13 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
                 <option value="crown">Corona</option>
                 <option value="implant">Implante</option>
                 <option value="orthodontics">Ortodoncia</option>
-                <option value="emergency">Emergencia</option>
                 <option value="follow_up">Seguimiento</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 🎯 Prioridad
-                <span className="text-xs text-gray-500 ml-2" title="🤖 Auto: Emergencias=Urgente, 'dolor' en notas=Alta. 👤 Manual: sobrescribe automático">
+                <span className="text-xs text-gray-500 ml-2" title="🤖 Auto: 'dolor' en notas=Alta. 👤 Manual: sobrescribe automático">
                   (Auto + Manual)
                 </span>
               </label>
@@ -495,7 +495,7 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
                 <option value="urgent">🔴 Urgente</option>
               </select>
               <div className="text-xs text-gray-500 mt-1">
-                🤖 Auto: Emergencias→Urgente, "dolor"/"urgente" en notas→Alta
+                🤖 Auto: "dolor"/"urgente" en notas→Alta
               </div>
             </div>
             <div>

@@ -71,9 +71,22 @@ const CalendarPage = () => {
     return matchesSearch && matchesStatus;
   });
 
+  // 🗓️ CALENDAR STATE
+  const [currentView, setCurrentView] = useState<'month' | 'week' | 'day'>('month');
+  const [currentDate, setCurrentDate] = useState(new Date());
+
   // 🎯 HANDLERS PERFECTOS
   const handleDateClick = (selectInfo: any) => {
     setShowCreateModal(true);
+  };
+
+  // 🗓️ CALENDAR NAVIGATION HANDLERS
+  const handleDateChange = (date: Date) => {
+    setCurrentDate(date);
+  };
+
+  const handleViewChange = (view: 'month' | 'week' | 'day') => {
+    setCurrentView(view);
   };
 
   // 🕒 HANDLER PARA SLOTS DE TIEMPO CON PRESELECCIÓN
@@ -217,10 +230,14 @@ const CalendarPage = () => {
           <div className="h-full">
             <div className="bg-white h-full">
               <CalendarContainer 
-                view="month"
+                view={currentView}
+                initialDate={currentDate}
                 className="h-full"
                 appointments={filteredAppointments || []}
                 onAppointmentClick={handleEventClick}
+                onAppointmentUpdate={fetchAppointments} // 🔥 REFRESH CALLBACK FOR DRAG & DROP
+                onDateChange={handleDateChange} // 🗓️ SYNC DATE CHANGES
+                onViewChange={handleViewChange} // 🗓️ SYNC VIEW CHANGES
                 onDateClick={handleDateClick}
                 onTimeSlotClick={handleTimeSlotClick} // 🕒 + BUTTON MAGIC
               />

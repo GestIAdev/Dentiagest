@@ -2,7 +2,7 @@
  * 🏥 DENTIAGEST CALENDAR STATE HOOK - SIMPLIFIED VERSION
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { 
   startOfMonth, 
   endOfMonth, 
@@ -26,9 +26,16 @@ interface CalendarData {
   weeks: Date[][];
 }
 
-export function useCalendarState(initialView: CalendarView = 'month') {
-  const [currentDate, setCurrentDate] = useState(new Date());
+export function useCalendarState(initialView: CalendarView = 'month', initialDate?: Date) {
+  const [currentDate, setCurrentDate] = useState(initialDate || new Date());
   const [view, setView] = useState<CalendarView>(initialView);
+
+  // 🔄 SYNC WITH PARENT WHEN INITIAL DATE CHANGES
+  useEffect(() => {
+    if (initialDate) {
+      setCurrentDate(initialDate);
+    }
+  }, [initialDate]);
 
   // Navigation functions
   const goToNextMonth = () => setCurrentDate(prev => addMonths(prev, 1));

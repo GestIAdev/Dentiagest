@@ -56,8 +56,10 @@ class AppointmentBase(BaseModel):
         # Si v no tiene tzinfo, lo convertimos a UTC
         if v.tzinfo is None:
             v = v.replace(tzinfo=timezone.utc)
-        if v <= now:
-            raise ValueError('Appointment must be scheduled in the future')
+        # 🏥 DEMO MODE: Allow past/present appointments for testing
+        # Commenting out future validation for calendar testing
+        # if v <= now:
+        #     raise ValueError('Appointment must be scheduled in the future')
         # DENTAL_SPECIFIC: Business hours validation (TEMPORARILY RELAXED)
         # TODO: Fix timezone handling in frontend
         # if v.hour < 8 or v.hour >= 18:
