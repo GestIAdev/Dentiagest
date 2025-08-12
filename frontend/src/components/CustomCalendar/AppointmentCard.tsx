@@ -253,15 +253,21 @@ export function AppointmentCard({
     e.dataTransfer.setData('application/json', JSON.stringify(appointment));
     e.dataTransfer.effectAllowed = 'move';
     
-    // ⚡ Trigger drag animation
+    // 🎪 ENHANCED DRAG ANIMATIONS
     if (cardRef.current) {
       cardRef.current.classList.add('dragging');
+      // Add elevation and glow effect
+      cardRef.current.style.transform = 'scale(1.05) rotate(2deg)';
+      cardRef.current.style.zIndex = '1000';
+      cardRef.current.style.filter = 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))';
     }
     
-    // Create drag image (optional - for better UX)
+    // 🎨 Create enhanced drag image
     const dragImage = e.currentTarget.cloneNode(true) as HTMLElement;
-    dragImage.style.transform = 'rotate(5deg)';
-    dragImage.style.opacity = '0.8';
+    dragImage.style.transform = 'rotate(8deg) scale(0.95)';
+    dragImage.style.opacity = '0.9';
+    dragImage.style.filter = 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))';
+    dragImage.style.borderRadius = '8px';
     e.dataTransfer.setDragImage(dragImage, 10, 10);
     
     if (onDragStart) {
@@ -270,9 +276,22 @@ export function AppointmentCard({
   };
 
   const handleDragEnd = () => {
-    // ⚡ Remove drag animation
+    // 🎬 SMOOTH LANDING ANIMATION
     if (cardRef.current) {
       cardRef.current.classList.remove('dragging');
+      
+      // Reset transforms with smooth transition
+      cardRef.current.style.transform = '';
+      cardRef.current.style.zIndex = '';
+      cardRef.current.style.filter = '';
+      
+      // Brief success pulse
+      cardRef.current.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+      setTimeout(() => {
+        if (cardRef.current) {
+          cardRef.current.style.transition = '';
+        }
+      }, 300);
     }
     
     if (onDragEnd) {
@@ -338,13 +357,16 @@ export function AppointmentCard({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={`
-        appointment-card cursor-pointer transition-all duration-200 relative
+        appointment-card cursor-pointer relative
         ${colors.bg} ${colors.border} ${colors.text}
         border-l-4 rounded-md shadow-sm
-        ${isDragging ? 'opacity-50 transform rotate-3 z-50' : ''}
-        ${isHovered ? `shadow-md transform scale-102 ${colors.shadow}` : ''}
+        transition-all duration-300 ease-out
+        hover:shadow-lg hover:scale-105 hover:-translate-y-1
+        ${isDragging ? 'opacity-60 z-50' : ''}
+        ${isHovered ? `shadow-md ${colors.shadow}` : ''}
         ${isCompact ? 'p-1' : 'p-2'}
         ${className}
+        transform-gpu
       `}
       title={`${appointment.patientName} - ${TYPE_LABELS[appointment.type] || appointment.type} (${formatDuration(appointment.duration)})`}
     >

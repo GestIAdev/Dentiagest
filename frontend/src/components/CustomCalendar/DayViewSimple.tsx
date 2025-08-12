@@ -149,6 +149,19 @@ export function DayViewSimple({
     console.log('🎯 Drag ended');
     setDraggedAppointment(null);
     setIsDragging(false);
+    
+    // 🎯 RESET: Clear any residual transformations from DOM elements
+    // This ensures cards return to normal size when moved to individual slots
+    setTimeout(() => {
+      const allCards = document.querySelectorAll('[data-stack-card]');
+      allCards.forEach((card) => {
+        const htmlCard = card as HTMLElement;
+        htmlCard.style.transform = '';
+        htmlCard.style.scale = '';
+        htmlCard.style.opacity = '';
+        htmlCard.style.zIndex = '';
+      });
+    }, 100); // Small delay to allow drop animation to complete
   };
 
   const handleDropOnSlot = async (hour: number, quarter: number) => {
@@ -156,20 +169,7 @@ export function DayViewSimple({
     
     console.log('🎯 Drop on slot:', hour, quarter, draggedAppointment);
     
-    // 🚫 VALIDATION: No moving appointments to past time
-    // Only validate if we're moving within today
-    const targetDateTime = new Date(currentDate);
-    targetDateTime.setHours(hour, quarter, 0, 0);
-    
-    const now = new Date();
-    const isToday = currentDate.toDateString() === now.toDateString();
-    
-    if (isToday && targetDateTime < now) {
-      console.error('⏰ Cannot move appointment to past time');
-      alert('❌ No puedes mover una cita a una hora que ya pasó');
-      handleDragEnd();
-      return;
-    }
+    // 🚫 NO MORE ANNOYING ALERTS! UI prevents past drops already
     
     try {
       // Set loading state
@@ -346,6 +346,13 @@ export function DayViewSimple({
             const slotAppointments = getAppointmentsForSlot(slot.hour, slot.quarter);
             const hasAppointments = slotAppointments.length > 0;
             
+            // 🚫 CHECK IF SLOT IS IN THE PAST
+            const slotDateTime = new Date(currentDate);
+            slotDateTime.setHours(slot.hour, slot.quarter, 0, 0);
+            const now = new Date();
+            const isToday = currentDate.toDateString() === now.toDateString();
+            const isPastSlot = isToday && slotDateTime < now;
+            
             return (
               <div
                 key={`${slot.hour}-${slot.quarter}`}
@@ -355,29 +362,79 @@ export function DayViewSimple({
                     ? 'bg-white border-gray-300 shadow-sm hover:shadow-md' 
                     : 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-400 hover:shadow-sm'
                   }
-                  ${isDragging && !hasAppointments ? 'border-dashed border-2 border-blue-400 bg-blue-50' : ''}
+                  ${isDragging && !hasAppointments && !isPastSlot ? 'border-dashed border-2 border-blue-400 bg-blue-50' : ''}
+                  ${isDragging && isPastSlot ? 'border-dashed border-2 border-red-400 bg-red-50 cursor-not-allowed' : ''}
                   ${isUpdating ? 'opacity-50 pointer-events-none' : ''}
+                  ${slotAppointments.length > 1 ? 'min-h-[180px]' : ''}
+                  ${isPastSlot ? 'opacity-60' : ''}
                 `}
-                onClick={() => !hasAppointments && handleTimeSlotClick(slot)}
+                style={{
+                  overflow: 'visible', // 🔑 WEEKLY VIEW SECRET SAUCE!
+                  zIndex: slotAppointments.length > 1 ? 40 : 1 // Higher z-index for multi-appointment slots
+                }}
+                onClick={() => !hasAppointments && !isPastSlot && handleTimeSlotClick(slot)}
                 onDragOver={(e) => {
                   e.preventDefault();
-                  if (isDragging && !hasAppointments) {
-                    e.currentTarget.classList.add('bg-blue-100', 'border-blue-500');
+                  if (isDragging && !hasAppointments && !isPastSlot) {
+                    // 🎨 SUBLIME DROP ZONE ANIMATION (only for valid slots)
+                    e.currentTarget.style.transition = 'all 0.15s ease-out';
+                    e.currentTarget.classList.add('bg-blue-50', 'border-blue-300');
+                    e.currentTarget.style.transform = 'scale(1.01)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.2)';
+                  } else if (isDragging && isPastSlot) {
+                    // 🚫 PROHIBITED ZONE ANIMATION
+                    e.currentTarget.style.transition = 'all 0.15s ease-out';
+                    e.currentTarget.classList.add('bg-red-100', 'border-red-400');
+                    e.currentTarget.style.cursor = 'not-allowed';
                   }
                 }}
                 onDragLeave={(e) => {
-                  e.currentTarget.classList.remove('bg-blue-100', 'border-blue-500');
+                  // 🎨 SMOOTH RESET (both valid and invalid slots)
+                  e.currentTarget.style.transition = 'all 0.15s ease-out';
+                  e.currentTarget.classList.remove('bg-blue-50', 'border-blue-300', 'bg-red-100', 'border-red-400');
+                  e.currentTarget.style.transform = '';
+                  e.currentTarget.style.boxShadow = '';
+                  e.currentTarget.style.cursor = '';
                 }}
                 onDrop={(e) => {
                   e.preventDefault();
-                  e.currentTarget.classList.remove('bg-blue-100', 'border-blue-500');
+                  
+                  // 🚫 PREVENT DROP ON PAST SLOTS - No annoying alerts!
+                  if (isPastSlot) {
+                    console.log('🚫 Prevented drop on past slot - UX preserved');
+                    return;
+                  }
+                  
+                  // 🎬 ENHANCED SUCCESS ANIMATION (only for valid drops)
+                  const target = e.currentTarget;
+                  target.style.transition = 'all 0.2s ease-out';
+                  target.classList.remove('bg-blue-50', 'border-blue-300');
+                  target.style.transform = '';
+                  target.style.boxShadow = '';
+                  
+                  // More visible success flash
+                  target.style.backgroundColor = '#dcfce7'; // green-100
+                  target.style.borderColor = '#16a34a'; // green-600
+                  setTimeout(() => {
+                    if (target && target.style) {
+                      target.style.backgroundColor = '';
+                      target.style.borderColor = '';
+                    }
+                  }, 400);
+                  
                   if (!hasAppointments) {
+                    handleDropOnSlot(slot.hour, slot.quarter);
+                  } else {
+                    // 🎪 ALLOW STACKING: Multiple appointments on same hour
+                    console.log('🎯 Stacking appointment on occupied slot with', slotAppointments.length, 'existing appointments');
                     handleDropOnSlot(slot.hour, slot.quarter);
                   }
                 }}
                 title={hasAppointments 
                   ? `${slotAppointments.length} cita(s) - ${slot.time}`
-                  : `Crear nueva cita - ${slot.time}`
+                  : isPastSlot 
+                    ? `Hora pasada - ${slot.time}` 
+                    : `Crear nueva cita - ${slot.time}`
                 }
               >
                 {/* Time Label */}
@@ -388,43 +445,71 @@ export function DayViewSimple({
                 {/* Content */}
                 {hasAppointments ? (
                   slotAppointments.length === 1 ? (
-                    // Single appointment - original behavior
-                    <div className="flex-1">
+                    // Single appointment - original behavior with RESET STYLING
+                    <div 
+                      className="flex-1"
+                      style={{
+                        transform: 'none', // 🎯 RESET: Clear any residual transformations
+                        scale: '1', // 🎯 RESET: Ensure normal scale
+                        transition: 'all 0.3s ease-out' // Smooth transition to normal state
+                      }}
+                    >
                       <AppointmentCard
                         appointment={convertToAppointmentData(slotAppointments[0])!}
                         onClick={() => handleAppointmentClick(slotAppointments[0])}
                         isCompact={false}
                         showDuration={true}
                         showNotes={false}
-                        className="h-full"
+                        className="h-full transform-none scale-100" // 🎯 RESET: Utility classes for normal state
                         onDragStart={handleDragStart}
                         onDragEnd={handleDragEnd}
                       />
                     </div>
                   ) : (
-                    // Multiple appointments - hover reveal like WeekViewSimple
-                    <div className="flex-1 relative group/stack">
-                      <div className="text-center text-sm font-medium text-gray-700 mb-1">
-                        {slotAppointments.length} citas
-                      </div>
-                      
-                      {/* Hover reveal cards */}
+                    // 🎨 MULTIPLE APPOINTMENTS - WEEKLY VIEW ELEGANT PATTERN COPIED! 
+                    <div 
+                      className="absolute inset-0"
+                      style={{ 
+                        overflow: 'visible',
+                        zIndex: 50 // 🎯 EXACTLY LIKE WEEKLY VIEW
+                      }}
+                      onMouseEnter={() => {
+                        // 🚀 WEEKLY VIEW PATTERN EXACT COPY
+                        const cards = document.querySelectorAll(`[data-stack-id="day-${slot.hour}-${slot.quarter}"]`);
+                        cards.forEach((card, index) => {
+                          const yOffset = index === 0 ? 0 : index === 1 ? 18 : index === 2 ? 36 : index === 3 ? 54 : index === 4 ? 72 : 90;
+                          (card as HTMLElement).style.transform = `translateY(${yOffset}px)`;
+                        });
+                      }}
+                      onMouseLeave={() => {
+                        // Return to compact state
+                        const cards = document.querySelectorAll(`[data-stack-id="day-${slot.hour}-${slot.quarter}"]`);
+                        cards.forEach((card) => {
+                          (card as HTMLElement).style.transform = 'translateY(0px)';
+                        });
+                      }}
+                    >
                       {slotAppointments.map((apt, index) => {
                         const appointmentData = convertToAppointmentData(apt);
                         if (!appointmentData) return null;
-                        
-                        // Calculate staggered position
-                        const baseLeft = index * 8; // 8px stagger
+
+                        const isTopCard = index === slotAppointments.length - 1;
+                        const baseTop = index * 3; // Compact stacking like weekly view
+                        const baseLeft = index * 2; // Slight left offset like weekly view
+                        const zIndex = 60 + index; // 🎯 EXACTLY LIKE WEEKLY VIEW
                         
                         return (
                           <div
                             key={`${apt.id}-${index}`}
-                            data-stack-id={`stack-${slot.hour}-${slot.quarter}-${index}`}
-                            className="absolute inset-0 cursor-pointer transform transition-all duration-300 opacity-80 hover:opacity-100 hover:scale-105 group-hover/stack:opacity-100"
+                            data-stack-id={`day-${slot.hour}-${slot.quarter}`}
+                            className="absolute cursor-pointer transition-all duration-300 ease-out"
                             style={{
-                              zIndex: 10 + index,
-                              transform: `translateY(${index * 4}px)`,
-                              right: `${Math.max(0, baseLeft - 2)}px`,
+                              top: `${baseTop}px`,
+                              left: `${baseLeft}px`,
+                              right: `${Math.max(0, baseLeft - 1)}px`,
+                              height: 'calc(100% - 16px)', // Slightly smaller to show stack
+                              zIndex: zIndex, // 🎯 BACK TO SIMPLE - no !important needed
+                              transform: 'translateY(0px)', // 🎯 EXACTLY LIKE WEEKLY VIEW
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -433,25 +518,51 @@ export function DayViewSimple({
                           >
                             <AppointmentCard
                               appointment={appointmentData}
+                              isCompact={false} // Keep larger size for daily view
                               onClick={() => handleAppointmentClick(apt)}
-                              isCompact={true}
-                              showDuration={false}
-                              showNotes={false}
-                              className="h-full shadow-md group-hover/stack:shadow-lg group-hover/stack:scale-100 group-hover/stack:opacity-100 hover:shadow-xl hover:scale-105"
                               onDragStart={handleDragStart}
                               onDragEnd={handleDragEnd}
+                              className={`
+                                h-full text-sm transition-all duration-300
+                                ${isTopCard 
+                                  ? 'shadow-md' 
+                                  : 'shadow-sm opacity-90 scale-98'
+                                }
+                                group-hover/stack:shadow-lg 
+                                group-hover/stack:scale-100 
+                                group-hover/stack:opacity-100
+                                hover:shadow-xl hover:scale-105
+                                cursor-pointer
+                              `}
                             />
                           </div>
                         );
                       })}
+                      
+                      {/* 📊 COUNTER - ALWAYS ON TOP (like weekly view) */}
+                      <div 
+                        className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold shadow-md transition-all duration-300"
+                        style={{ 
+                          zIndex: 100 // 🎯 EXACTLY LIKE WEEKLY VIEW
+                        }}
+                      >
+                        {slotAppointments.length}
+                      </div>
                     </div>
                   )
                 ) : (
                   <div className="flex-1 flex items-center justify-center">
                     <div className="text-center text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-xs mt-1">
-                        {isDragging ? 'Soltar aquí' : 'Crear cita'}
-                      </span>
+                      {isPastSlot ? (
+                        <div className="text-red-400">
+                          <span className="text-lg">🚫</span>
+                          <span className="text-xs mt-1 block">Hora pasada</span>
+                        </div>
+                      ) : (
+                        <span className="text-xs mt-1">
+                          {isDragging ? 'Soltar aquí' : 'Crear cita'}
+                        </span>
+                      )}
                     </div>
                   </div>
                 )}

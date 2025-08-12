@@ -2,17 +2,19 @@
  * 🏴‍☠️ IAnarkalendar © GestIA Dev + PunkClaude 2025
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { format, startOfWeek, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { parseClinicDateTime } from '../../utils/timezone.ts';
 import { AppointmentCard } from './AppointmentCard.tsx';
+import { updateAppointmentTime } from '../../utils/appointmentService.ts';
 
 interface WeekViewProps {
   currentDate: Date;
   onDateClick?: (date: Date) => void;
   onTimeSlotClick?: (date: Date, time: string) => void;
   onAppointmentClick?: (appointment: any) => void; // 🎯 CLICK HANDLER FOR EDITING!
+  onAppointmentUpdate?: () => void; // 🔄 NEW: Callback to refresh data
   appointments?: any[];
   className?: string;
 }
@@ -22,9 +24,15 @@ export function WeekViewSimple({
   onDateClick,
   onTimeSlotClick,
   onAppointmentClick, // 🎯 RECEIVE CLICK HANDLER!
+  onAppointmentUpdate, // 🔄 NEW: Callback to refresh appointments
   appointments = [],
   className = '' 
 }: WeekViewProps) {
+
+  // 🎯 DRAG & DROP STATE (copied from Daily View)
+  const [draggedAppointment, setDraggedAppointment] = useState<any>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false); // 🔥 NEW: Loading state for API calls
 
   // Generate week days starting from Monday
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
@@ -32,6 +40,75 @@ export function WeekViewSimple({
   
   // Working hours: 7am to 9pm
   const workingHours = Array.from({ length: 14 }, (_, i) => i + 7);
+
+  // 🎯 DRAG & DROP HANDLERS (copied from Daily View)
+  const handleDragStart = (appointment: any) => {
+    console.log('🎯 Weekly View - Drag started:', appointment);
+    setDraggedAppointment(appointment);
+    setIsDragging(true);
+  };
+
+  const handleDragEnd = () => {
+    console.log('🎯 Weekly View - Drag ended');
+    setDraggedAppointment(null);
+    setIsDragging(false);
+  };
+
+  const handleDropOnSlot = async (day: Date, hour: number) => {
+    if (!draggedAppointment) return;
+    
+    console.log('🎯 Weekly View - Drop on slot:', day, hour, draggedAppointment);
+    
+    // 🚫 NO MORE ANNOYING ALERTS! UI will prevent bad drops
+    
+    try {
+      // Set loading state
+      setIsUpdating(true);
+      
+      // Parse the original appointment date
+      const originalDate = parseClinicDateTime(draggedAppointment.scheduled_date);
+      if (!originalDate) {
+        throw new Error('Invalid appointment date format');
+      }
+      
+      // 🗓️ WEEKLY VIEW: Change both DATE and HOUR 
+      const targetDate = new Date(day); // Use target day
+      targetDate.setHours(hour, 0, 0, 0); // Set new hour (00 minutes for weekly)
+      
+      console.log('🎯 Moving appointment from', originalDate.toISOString(), 'to', targetDate.toISOString());
+      
+      // Call the API to update appointment time
+      const result = await updateAppointmentTime(
+        draggedAppointment.id,
+        targetDate,
+        hour,
+        0 // Weekly view = exact hour (no quarters)
+      );
+      
+      if (result.success) {
+        console.log('🎉 WEEKLY DRAG & DROP SUCCESS! Appointment updated in database');
+        console.log(`✅ Cita movida exitosamente a ${format(day, 'dd/MM/yyyy')} a las ${hour}:00`);
+        
+        // 🔥 REFRESH APPOINTMENTS DATA TO SHOW VISUAL UPDATE
+        if (onAppointmentUpdate) {
+          console.log('🔄 Refreshing appointments data...');
+          onAppointmentUpdate();
+        }
+        
+      } else {
+        console.error('💥 WEEKLY DRAG & DROP FAILED:', result.error);
+        console.error(`❌ Error moviendo la cita: ${result.error}`);
+      }
+      
+    } catch (error: any) {
+      console.error('❌ Error in weekly handleDropOnSlot:', error);
+      console.error(`❌ Error inesperado: ${error.message}`);
+    } finally {
+      // Always reset states
+      setIsUpdating(false);
+      handleDragEnd();
+    }
+  };
 
   // 🎯 Convert appointment to AppointmentCard format
   const convertToAppointmentData = (apt: any) => {
@@ -196,17 +273,86 @@ export function WeekViewSimple({
             {weekDays.map(day => {
               const dayAppointments = getAppointmentsForDayAndHour(day, hour);
 
+              // 🚫 CHECK IF SLOT IS IN THE PAST (Weekly View validation)
+              const slotDateTime = new Date(day);
+              slotDateTime.setHours(hour, 0, 0, 0);
+              const now = new Date();
+              const isPastSlot = slotDateTime < now;
+
               return (
                 <div 
                   key={`${day.toISOString()}-${hour}`}
-                  className="relative bg-white border border-gray-200 rounded cursor-pointer hover:bg-gray-50 group transition-colors"
+                  className={`relative bg-white border border-gray-200 rounded cursor-pointer hover:bg-gray-50 group transition-colors`}
                   style={{ 
                     height: '60px', // ⚡ OPTIMIZED: Perfect balance - compact but functional
                     overflow: 'visible',
-                    zIndex: dayAppointments.length > 1 ? 40 : 1 // Higher z-index for multi-appointment slots
+                    zIndex: dayAppointments.length > 1 ? 40 : 1, // Higher z-index for multi-appointment slots
+                    // 🚫 PAST SLOT VISUAL STYLING - Always visible!
+                    opacity: isPastSlot ? 0.6 : 1,
+                    cursor: isPastSlot ? 'not-allowed' : 'pointer',
+                    // 🔴 RED BORDER for past slots (always visible)
+                    borderColor: isPastSlot ? '#ef4444' : '', // red-500
+                    backgroundColor: isPastSlot ? '#fef2f2' : '' // red-50
                   }}
                   onClick={() => {
-                    onTimeSlotClick?.(day, `${hour}:00`);
+                    if (!isPastSlot) {
+                      onTimeSlotClick?.(day, `${hour}:00`);
+                    }
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    if (isDragging && !isPastSlot) {
+                      // 🎨 VALID DRAG FEEDBACK - Blue inline styling
+                      e.currentTarget.style.transition = 'all 0.15s ease-out';
+                      e.currentTarget.style.backgroundColor = '#dbeafe'; // blue-50
+                      e.currentTarget.style.borderColor = '#93c5fd'; // blue-300
+                      e.currentTarget.style.transform = 'scale(1.02)';
+                    } else if (isDragging && isPastSlot) {
+                      // 🚫 PROHIBITED ZONE FEEDBACK - Red inline styling
+                      e.currentTarget.style.transition = 'all 0.15s ease-out';
+                      e.currentTarget.style.backgroundColor = '#fecaca'; // red-200
+                      e.currentTarget.style.borderColor = '#f87171'; // red-400
+                      e.currentTarget.style.cursor = 'not-allowed';
+                      e.currentTarget.style.transform = 'scale(0.98)'; // Slight shrink for rejection
+                    }
+                  }}
+                  onDragLeave={(e) => {
+                    // 🎨 RESET to original past slot styling
+                    e.currentTarget.style.transition = 'all 0.15s ease-out';
+                    e.currentTarget.style.backgroundColor = isPastSlot ? '#fef2f2' : ''; // red-50 or normal
+                    e.currentTarget.style.borderColor = isPastSlot ? '#ef4444' : ''; // red-500 or normal
+                    e.currentTarget.style.transform = '';
+                    e.currentTarget.style.cursor = isPastSlot ? 'not-allowed' : 'pointer';
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    
+                    // 🚫 PREVENT DROP ON PAST SLOTS - No annoying alerts!
+                    if (isPastSlot) {
+                      console.log('🚫 Prevented drop on past slot (Weekly) - UX preserved');
+                      // Reset to past slot styling
+                      e.currentTarget.style.backgroundColor = '#fef2f2'; // red-50
+                      e.currentTarget.style.borderColor = '#ef4444'; // red-500
+                      return;
+                    }
+                    
+                    // 🎬 SUCCESS ANIMATION (only for valid drops)
+                    const target = e.currentTarget;
+                    target.style.transition = 'all 0.2s ease-out';
+                    target.style.transform = '';
+                    
+                    // Green success flash
+                    target.style.backgroundColor = '#dcfce7'; // green-100
+                    target.style.borderColor = '#16a34a'; // green-600
+                    setTimeout(() => {
+                      if (target && target.style) {
+                        target.style.backgroundColor = '';
+                        target.style.borderColor = '';
+                      }
+                    }, 400);
+                    
+                    // Handle the drop
+                    handleDropOnSlot(day, hour);
                   }}
                 >
                   {/* EMPTY SLOT - AINARKLENDAR Style */}
@@ -228,6 +374,8 @@ export function WeekViewSimple({
                             appointment={appointmentData}
                             isCompact={true}
                             onClick={(clickedApt) => onAppointmentClick?.(dayAppointments[0])} // 🎯 PASS ORIGINAL!
+                            onDragStart={handleDragStart} // 🚀 DRAG & DROP ENABLED
+                            onDragEnd={handleDragEnd} // 🚀 DRAG & DROP ENABLED
                             className="h-full text-sm"
                           />
                         );
@@ -292,6 +440,8 @@ export function WeekViewSimple({
                               appointment={appointmentData}
                               isCompact={true}
                               onClick={(clickedApt) => onAppointmentClick?.(apt)} // 🎯 PASS ORIGINAL APT!
+                              onDragStart={handleDragStart} // 🚀 DRAG & DROP ENABLED
+                              onDragEnd={handleDragEnd} // 🚀 DRAG & DROP ENABLED
                               className={`
                                 h-full text-sm transition-all duration-300
                                 ${isTopCard 
@@ -329,6 +479,14 @@ export function WeekViewSimple({
 
       {/* 💡 PONCIO PILATOS TIPS FOOTER */}
       <div className="calendar-footer mt-4 px-4 py-3 bg-gray-50 border-t border-gray-200 text-xs text-gray-600">
+        {/* 🔄 LOADING INDICATOR */}
+        {isUpdating && (
+          <div className="flex items-center justify-center mb-2 text-blue-600 font-medium">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+            <span>Actualizando cita en la base de datos...</span>
+          </div>
+        )}
+        
         <div className="flex flex-wrap gap-6 justify-center">
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-green-500 rounded"></div>
@@ -353,6 +511,9 @@ export function WeekViewSimple({
           <div className="flex items-center gap-1">
             <span className="text-red-600 font-bold">🚨</span>
             <span>Urgente</span>
+          </div>
+          <div className="flex items-center gap-1 ml-4 border-l pl-4">
+            <span>{isUpdating ? '⏳ Actualizando...' : '🎯 Arrastra para reprogramar'}</span>
           </div>
         </div>
       </div>
