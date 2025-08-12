@@ -130,6 +130,12 @@ docker-compose down
 - **Frontend**: `/docs/specs/front_specs.md`
 - **IA**: `/docs/specs/api_ia_tech_specs.md`
 
----
+RESUMEN DE APIs Para DentIAgest
+
+1. Previsualización de Tratamientos Estéticos : Dall-E 3 . Escala con Estable Difussion
+2. Generacion de Texto e informes medicos : Claude Sonnet 4
+3. Analisis de radiografías y tomografías : Claude Sonnet 4
+4. Asistente de voz para dictado : Whisper TRanscript + Claude Sonnet 4
+
 
 **Este es nuestro manifiesto. Un plan claro, audaz y estratégico para construir no solo un software, sino el futuro de la gestión dental.**

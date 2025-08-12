@@ -292,7 +292,8 @@ class Patient(Base):
     # DENTAL_SPECIFIC: Relationships to other dental entities
     # appointments = relationship("Appointment", back_populates="patient")
     # treatments = relationship("Treatment", back_populates="patient")
-    # dental_records = relationship("DentalRecord", back_populates="patient")
+    medical_records = relationship("MedicalRecord", back_populates="patient", cascade="all, delete-orphan")
+    documents = relationship("MedicalDocument", back_populates="patient", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<Patient(id={self.id}, name={self.full_name})>"
