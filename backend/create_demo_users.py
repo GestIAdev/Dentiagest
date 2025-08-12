@@ -37,7 +37,7 @@ async def create_demo_users():
                 "password": "admin123",
                 "first_name": "Administrator",
                 "last_name": "System",
-                "role": UserRole.ADMIN,
+                "role": UserRole.admin,
                 "is_admin": True,
                 "is_active": True
             },
@@ -47,7 +47,7 @@ async def create_demo_users():
                 "password": "doctor123",
                 "first_name": "Dr. Juan",
                 "last_name": "Pérez",
-                    "role": UserRole.DENTIST,
+                "role": UserRole.professional,
                 "is_admin": False,
                 "is_active": True
             },
@@ -57,7 +57,7 @@ async def create_demo_users():
                 "password": "recep123", 
                 "first_name": "María",
                 "last_name": "García",
-                "role": UserRole.RECEPTIONIST,
+                "role": UserRole.receptionist,
                 "is_admin": False,
                 "is_active": True
             }

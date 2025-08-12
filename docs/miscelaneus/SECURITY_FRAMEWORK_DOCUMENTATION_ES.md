@@ -6,6 +6,56 @@ DentiaGest incorpora un framework de seguridad integral de nivel empresarial dis
 
 Nuestro framework de seguridad representa una ventaja competitiva significativa, ofreciendo a las prácticas de atención médica la confianza de que la información médica sensible de sus pacientes está protegida por medidas de seguridad de nivel bancario.
 
+## Modelo de Responsabilidad Compartida
+
+DentiaGest proporciona un framework de seguridad robusto a nivel de aplicación e infraestructura (Seguridad *de* la Nube). Sin embargo, la seguridad integral es una responsabilidad compartida. El cliente es responsable de la seguridad *en* la Nube, lo que incluye:
+
+### Responsabilidades del Cliente:
+- **Gestión de Credenciales de Usuario:** Asegurar que el personal siga prácticas de contraseñas seguras y no comparta cuentas
+- **Configuración de Roles:** Asignar roles y permisos dentro de DentiaGest de acuerdo con el principio de mínimo privilegio
+- **Seguridad de Dispositivos:** Garantizar que los ordenadores y dispositivos utilizados para acceder a DentiaGest estén libres de malware y sean seguros
+- **Formación del Personal:** Educar a los usuarios sobre los riesgos de phishing e ingeniería social
+- **Seguridad Física:** Controlar el acceso físico a dispositivos y estaciones de trabajo
+- **Seguridad de Red:** Mantener configuraciones seguras de Wi-Fi y red
+
+### Responsabilidades de DentiaGest:
+- **Seguridad de Aplicación:** Código seguro, gestión de vulnerabilidades y actualizaciones de seguridad
+- **Cifrado de Datos:** Cifrado extremo a extremo de datos médicos en tránsito y en reposo
+- **Controles de Acceso:** Sistemas de permisos basados en roles y mecanismos de autenticación
+- **Registro de Auditoría:** Seguimiento integral de todos los accesos y modificaciones de datos
+- **Seguridad de Infraestructura:** Entorno de hosting seguro y protección de base de datos
+
+**Protección Legal:** Nuestro framework proporciona las herramientas; las políticas internas de la clínica aseguran su correcta utilización. Este modelo compartido protege a ambas partes al definir claramente los límites y responsabilidades de seguridad.
+
+## Visión General de la Arquitectura de Seguridad
+
+```
+┌─────────────┐    ┌─────────────────┐    ┌──────────────────────┐
+│  USUARIOS   │    │   CAPAS DE      │    │    API GATEWAY       │
+│             │    │   PROTECCIÓN    │    │      (FastAPI)       │
+├─────────────┤    ├─────────────────┤    ├──────────────────────┤
+│ Dentista    │───▶│ Autenticación   │───▶│ Limitación de Tasa   │
+│ Admin       │    │ y Autorización  │    │ (Detección Amenazas) │
+│ Recepcionista│   │                 │    ├──────────────────────┤
+└─────────────┘    └─────────────────┘    │ Validación Permisos  │
+                                          │ (Middleware RBAC)    │
+                                          ├──────────────────────┤
+                                          │ Lógica de Negocio    │
+                                          │ (Historiales Médicos)│
+                                          ├──────────────────────┤
+                                          │ Sistema de Auditoría │
+                                          │ (Registro Cumplimiento)│
+                                          └──────────────────────┘
+                                                    │
+                                                    ▼
+                                          ┌──────────────────────┐
+                                          │  BASE DE DATOS       │
+                                          │  CIFRADA (PostgreSQL)│
+                                          └──────────────────────┘
+```
+
+**Estrategia de Defensa en Profundidad:** Múltiples capas de seguridad aseguran que si una capa falla, otras continúan protegiendo los datos médicos. Cada solicitud pasa por autenticación, limitación de tasa, validación de permisos y registro de auditoría antes de acceder a datos sensibles.
+
 ## Componentes de Seguridad Fundamentales
 
 ### 1. Sistema de Auditoría Inmutable
@@ -203,11 +253,65 @@ Cada componente de seguridad está implementado y probado independientemente:
 - **Confianza y Credibilidad:** Demuestra compromiso con la protección de privacidad del paciente
 - **Diferenciación de Mercado:** Características de seguridad avanzadas distinguen a DentiaGest de competidores
 
+## Kit de Aceleración de Cumplimiento
+
+Para ayudar a nuestros clientes a cumplir con su parte del Modelo de Responsabilidad Compartida, la licencia DentiaGest Enterprise incluye plantillas personalizables para:
+
+### 1. Política de Seguridad de la Información para Clínicas Dentales
+**Propósito:** Framework organizacional de seguridad completo adaptado para entornos sanitarios
+- **Gestión de Acceso de Usuarios:** Procedimientos para creación de cuentas, asignación de roles y revocación de acceso
+- **Seguridad de Contraseñas:** Requisitos mínimos y mejores prácticas para protección de credenciales
+- **Gestión de Dispositivos:** Estándares de seguridad para ordenadores, tablets y dispositivos móviles
+- **Manejo de Datos:** Protocolos para acceso, compartición y retención de datos de pacientes
+- **Respuesta a Incidentes:** Procedimientos paso a paso para manejo de violaciones de seguridad
+
+### 2. Plan Básico de Respuesta a Incidentes
+**Propósito:** Framework de respuesta rápida para incidentes de seguridad y violaciones de datos
+- **Clasificación de Incidentes:** Niveles de severidad y protocolos de respuesta
+- **Plantillas de Comunicación:** Notificaciones pre-escritas para pacientes y autoridades
+- **Respuesta Técnica:** Pasos para contención, investigación y recuperación
+- **Cumplimiento Legal:** Requisitos de notificación de violaciones RGPD y cronogramas
+- **Revisión Post-Incidente:** Mejora de procesos y documentación de lecciones aprendidas
+
+### 3. Capacitación en Concienciación de Seguridad para Personal Sanitario
+**Propósito:** Programa de educación en seguridad centrado en humanos
+- **Reconocimiento de Phishing:** Cómo identificar y reportar correos sospechosos
+- **Ingeniería Social:** Tácticas comunes usadas contra organizaciones sanitarias
+- **Seguridad Física:** Protección de dispositivos y prevención de acceso no autorizado
+- **Privacidad del Paciente:** Derechos RGPD y requisitos de confidencialidad sanitaria
+- **Comunicación Segura:** Mejores prácticas para transmisión de datos de pacientes
+
+### 4. Lista de Verificación de Cumplimiento RGPD
+**Propósito:** Herramienta de auditoría integral para cumplimiento regulatorio
+- **Evaluación de Procesamiento de Datos:** Documentación de base legal y gestión de consentimiento
+- **Implementación de Derechos del Paciente:** Procedimientos de acceso, corrección y eliminación
+- **Gestión de Proveedores:** Acuerdos de procesamiento de datos de terceros y supervisión
+- **Medidas de Seguridad:** Documentación de medidas técnicas y organizacionales
+- **Preparación para Violaciones:** Procedimientos de notificación de 72 horas y mantenimiento de registros
+
+**Valor Estratégico:** Este kit posiciona a DentiaGest no como un simple proveedor de software, sino como un **socio estratégico en seguridad y cumplimiento**. Los clientes reciben no solo software, sino una estrategia completa de ciberseguridad.
+
+## Acuerdo de Nivel de Servicio (SLA)
+
+### Garantías de Rendimiento
+- **Tiempo de Actividad:** Garantía de disponibilidad del 99.9% con monitoreo 24/7
+- **Sobrecarga de Seguridad:** Menos de 75ms de latencia en el percentil 95 para validación de seguridad
+- **Tiempo de Respuesta:** Actualizaciones críticas de seguridad desplegadas en 24 horas
+- **Soporte:** Consultoría de seguridad empresarial incluida con licencias premium
+
+### Compromisos de Cumplimiento
+- **Soporte de Auditoría:** Documentación anual de cumplimiento y asistencia de auditoría
+- **Actualizaciones de Seguridad:** Monitoreo continuo y parcheo de vulnerabilidades de seguridad
+- **Actualizaciones de Capacitación:** Actualizaciones anuales de materiales de capacitación en concienciación
+- **Cambios Legales:** Actualizaciones automáticas para nuevos requisitos regulatorios
+
 ## Conclusión
 
 El framework de seguridad de DentiaGest representa una solución integral de nivel empresarial para la protección de datos médicos. Al implementar múltiples capas de seguridad, registro de auditoría integral y controles de acceso estrictos, proporcionamos a las prácticas de atención médica la confianza de que la información sensible de sus pacientes está protegida por medidas de seguridad líderes en la industria.
 
 Esta implementación de seguridad no solo cumple con los requisitos regulatorios actuales, sino que está diseñada para adaptarse a amenazas de seguridad en evolución y estándares de cumplimiento, asegurando protección y valor a largo plazo para nuestros clientes.
+
+**Valor Agregado:** Con el Kit de Aceleración de Cumplimiento incluido, los clientes reciben una estrategia completa de ciberseguridad, no solo software - posicionando a DentiaGest como la solución definitiva para protección de datos sanitarios.
 
 ---
 

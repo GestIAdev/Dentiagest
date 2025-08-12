@@ -2,6 +2,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.tsx';
+import { MedicalSecurityProvider } from './components/MedicalRecords/MedicalSecurity.tsx';
+import MedicalRouter from './components/MedicalRecords/MedicalRouter.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 import RegisterPage from './pages/RegisterPage.tsx';
 import SettingsPage from './pages/SettingsPage.tsx';
@@ -94,34 +96,44 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Rutas públicas */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          
-          {/* Dashboard con rutas anidadas - TODAS PROTEGIDAS */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }>
-            <Route index element={<DashboardContent />} />
-            <Route path="patients" element={<PatientsPage />} />
-            <Route path="agenda" element={<CalendarPage />} />
-            <Route path="treatments" element={<ComingSoonPage pageName="Tratamientos" />} />
-            <Route path="billing" element={<ComingSoonPage pageName="Facturación" />} />
-          </Route>
-          
-          {/* Settings también protegida */}
-          <Route path="/settings" element={
-            <ProtectedRoute>
-              <SettingsPage />
-            </ProtectedRoute>
-          } />
-        </Routes>
-      </Router>
+      <MedicalSecurityProvider>
+        <Router>
+          <Routes>
+            {/* Rutas públicas */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            
+            {/* Dashboard con rutas anidadas - TODAS PROTEGIDAS */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<DashboardContent />} />
+              <Route path="patients" element={<PatientsPage />} />
+              <Route path="agenda" element={<CalendarPage />} />
+              <Route path="treatments" element={<ComingSoonPage pageName="Tratamientos" />} />
+              <Route path="billing" element={<ComingSoonPage pageName="Facturación" />} />
+            </Route>
+            
+            {/* Historiales médicos - PROTEGIDOS POR ROL */}
+            <Route path="/medical-records/*" element={
+              <ProtectedRoute>
+                <DashboardLayout />
+                <MedicalRouter />
+              </ProtectedRoute>
+            } />
+            
+            {/* Settings también protegida */}
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </Router>
+      </MedicalSecurityProvider>
     </AuthProvider>
   );
 }
@@ -154,4 +166,3 @@ root.render(
     <App />
   </React.StrictMode>
 );
-

@@ -59,7 +59,16 @@ class MedicalSecurityMiddleware:
         Returns:
             dict: Validation result with security metadata
         """
-        user_id = user.get("id")
+        # Handle both User model objects and dict format
+        if hasattr(user, 'id'):
+            # User model object
+            user_id = str(user.id)
+            user_role = user.role.value if hasattr(user.role, 'value') else str(user.role)
+        else:
+            # Dict format
+            user_id = user.get("id")
+            user_role = user.get("role")
+            
         ip_address = request_info.get("ip_address")
         
         # Step 1: Rate limiting check
@@ -67,7 +76,7 @@ class MedicalSecurityMiddleware:
             identifier=user_id,
             operation_type="medical_access",
             endpoint=request_info.get("endpoint", ""),
-            additional_context={"user_role": user.get("role")}
+            additional_context={"user_role": user_role}
         )
         
         if not rate_limit_result[0]:  # Rate limit exceeded
@@ -188,7 +197,11 @@ def secure_medical_endpoint(
             for key, value in kwargs.items():
                 if isinstance(value, Request):
                     request = value
+                elif hasattr(value, 'id') and hasattr(value, 'role'):
+                    # Handle User model object from get_current_user
+                    current_user = value
                 elif isinstance(value, dict) and "id" in value and "role" in value:
+                    # Handle dict format user
                     current_user = value
             
             if not request or not current_user:

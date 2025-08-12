@@ -6,56 +6,6 @@ DentiaGest incorporates a comprehensive, enterprise-grade security framework des
 
 Our security framework represents a significant competitive advantage, offering healthcare practices the confidence that their patients' sensitive medical information is protected by banking-level security measures.
 
-## Shared Responsibility Model
-
-DentiaGest provides a robust security framework at the application and infrastructure level (Security *of* the Cloud). However, comprehensive security is a shared responsibility. The client is responsible for security *in* the Cloud, which includes:
-
-### Client Responsibilities:
-- **User Credential Management:** Ensuring staff follow secure password practices and do not share accounts
-- **Role Configuration:** Assigning roles and permissions within DentiaGest according to the principle of least privilege
-- **Device Security:** Ensuring computers and devices used to access DentiaGest are malware-free and secure
-- **Staff Training:** Educating users about phishing risks and social engineering threats
-- **Physical Security:** Controlling physical access to devices and workstations
-- **Network Security:** Maintaining secure Wi-Fi and network configurations
-
-### DentiaGest Responsibilities:
-- **Application Security:** Secure code, vulnerability management, and security updates
-- **Data Encryption:** End-to-end encryption of medical data in transit and at rest
-- **Access Controls:** Role-based permission systems and authentication mechanisms
-- **Audit Logging:** Comprehensive tracking of all data access and modifications
-- **Infrastructure Security:** Secure hosting environment and database protection
-
-**Legal Protection:** Our framework provides the tools; the clinic's internal policies ensure their proper utilization. This shared model protects both parties by clearly defining security boundaries and responsibilities.
-
-## Security Architecture Overview
-
-```
-┌─────────────┐    ┌─────────────────┐    ┌──────────────────────┐
-│   USERS     │    │   PROTECTION    │    │    API GATEWAY       │
-│             │    │    LAYERS       │    │      (FastAPI)       │
-├─────────────┤    ├─────────────────┤    ├──────────────────────┤
-│ Dentist     │───▶│ Authentication  │───▶│ Rate Limiting        │
-│ Admin       │    │ & Authorization │    │ (Threat Detection)   │
-│ Receptionist│    │                 │    ├──────────────────────┤
-└─────────────┘    └─────────────────┘    │ Permission Validation│
-                                          │ (RBAC Middleware)    │
-                                          ├──────────────────────┤
-                                          │ Business Logic       │
-                                          │ (Medical Records)    │
-                                          ├──────────────────────┤
-                                          │ Audit System         │
-                                          │ (Compliance Logging) │
-                                          └──────────────────────┘
-                                                    │
-                                                    ▼
-                                          ┌──────────────────────┐
-                                          │   ENCRYPTED DATABASE │
-                                          │   (PostgreSQL)       │
-                                          └──────────────────────┘
-```
-
-**Defense-in-Depth Strategy:** Multiple security layers ensure that if one layer fails, others continue to protect medical data. Each request passes through authentication, rate limiting, permission validation, and audit logging before reaching sensitive data.
-
 ## Core Security Components
 
 ### 1. Immutable Audit Trail System
@@ -253,65 +203,11 @@ Each security component is independently implemented and tested:
 - **Trust and Credibility:** Demonstrates commitment to patient privacy protection
 - **Market Differentiation:** Advanced security features set DentiaGest apart from competitors
 
-## Compliance Acceleration Kit
-
-To help our clients fulfill their part of the Shared Responsibility Model, the DentiaGest Enterprise license includes customizable templates for:
-
-### 1. Information Security Policy for Dental Clinics
-**Purpose:** Complete organizational security framework tailored for healthcare environments
-- **User Access Management:** Procedures for account creation, role assignment, and access revocation
-- **Password Security:** Minimum requirements and best practices for credential protection
-- **Device Management:** Security standards for computers, tablets, and mobile devices
-- **Data Handling:** Protocols for patient data access, sharing, and retention
-- **Incident Response:** Step-by-step procedures for security breach handling
-
-### 2. Basic Incident Response Plan
-**Purpose:** Rapid response framework for security incidents and data breaches
-- **Incident Classification:** Severity levels and response protocols
-- **Communication Templates:** Pre-written notifications for patients and authorities
-- **Technical Response:** Steps for containment, investigation, and recovery
-- **Legal Compliance:** GDPR breach notification requirements and timelines
-- **Post-Incident Review:** Process improvement and lessons learned documentation
-
-### 3. Security Awareness Training for Healthcare Staff
-**Purpose:** Human-centered security education program
-- **Phishing Recognition:** How to identify and report suspicious emails
-- **Social Engineering:** Common tactics used against healthcare organizations
-- **Physical Security:** Protecting devices and preventing unauthorized access
-- **Patient Privacy:** GDPR rights and healthcare confidentiality requirements
-- **Secure Communication:** Best practices for patient data transmission
-
-### 4. GDPR Compliance Checklist
-**Purpose:** Comprehensive audit tool for regulatory compliance
-- **Data Processing Assessment:** Legal basis documentation and consent management
-- **Patient Rights Implementation:** Access, correction, and deletion procedures
-- **Vendor Management:** Third-party data processing agreements and oversight
-- **Security Measures:** Technical and organizational measures documentation
-- **Breach Preparedness:** 72-hour notification procedures and record keeping
-
-**Strategic Value:** This kit positions DentiaGest not as a simple software provider, but as a **strategic partner in security and compliance**. Clients receive not just software, but a complete cybersecurity strategy.
-
-## Service Level Agreement (SLA)
-
-### Performance Guarantees
-- **Uptime:** 99.9% availability guarantee with 24/7 monitoring
-- **Security Overhead:** Less than 75ms latency at 95th percentile for security validation
-- **Response Time:** Critical security updates deployed within 24 hours
-- **Support:** Enterprise security consultation included with premium licenses
-
-### Compliance Commitments
-- **Audit Support:** Annual compliance documentation and audit assistance
-- **Security Updates:** Continuous monitoring and patching of security vulnerabilities
-- **Training Updates:** Annual updates to awareness training materials
-- **Legal Changes:** Automatic updates for new regulatory requirements
-
 ## Conclusion
 
 The DentiaGest security framework represents a comprehensive, enterprise-grade solution for medical data protection. By implementing multiple layers of security, comprehensive audit logging, and strict access controls, we provide healthcare practices with the confidence that their patients' sensitive information is protected by industry-leading security measures.
 
 This security implementation not only meets current regulatory requirements but is designed to adapt to evolving security threats and compliance standards, ensuring long-term protection and value for our clients.
-
-**Added Value:** With the included Compliance Acceleration Kit, clients receive a complete cybersecurity strategy, not just software - positioning DentiaGest as the definitive solution for healthcare data protection.
 
 ---
 

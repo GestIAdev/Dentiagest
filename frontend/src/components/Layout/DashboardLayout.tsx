@@ -48,6 +48,16 @@ const DashboardLayout: React.FC = () => {
       )
     },
     {
+      name: 'Historiales Médicos',
+      href: '/medical-records',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      ),
+      badge: '🔒' // Indicador de que requiere permisos especiales
+    },
+    {
       name: 'Tratamientos',
       href: '/dashboard/treatments',
       icon: (
@@ -128,14 +138,21 @@ const DashboardLayout: React.FC = () => {
                   <li key={item.name}>
                     <button
                       onClick={() => navigate(item.href)}
-                      className={`flex items-center space-x-3 px-3 py-2 rounded-lg font-medium w-full text-left transition-colors ${
+                      className={`flex items-center justify-between px-3 py-2 rounded-lg font-medium w-full text-left transition-colors ${
                         isActive
                           ? 'text-primary-600 bg-primary-50'
                           : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
                       }`}
                     >
-                      {item.icon}
-                      <span>{item.name}</span>
+                      <div className="flex items-center space-x-3">
+                        {item.icon}
+                        <span>{item.name}</span>
+                      </div>
+                      {(item as any).badge && (
+                        <span className="text-xs px-1 text-gray-500">
+                          {(item as any).badge}
+                        </span>
+                      )}
                     </button>
                   </li>
                 );

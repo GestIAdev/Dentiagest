@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { MedicalProtectedRoute, useMedicalSecurity } from './MedicalSecurity';
+import { MedicalProtectedRoute, useMedicalSecurity } from './MedicalSecurity.tsx';
 
 // Páginas del módulo médico
 import {
@@ -15,7 +15,7 @@ import {
   MedicalRecordDetailPage,
   EditMedicalRecordPage,
   PatientMedicalRecordsPage
-} from './MedicalPages';
+} from './MedicalPages.tsx';
 
 // Página de información para roles sin acceso
 const MedicalAccessInfo: React.FC = () => {

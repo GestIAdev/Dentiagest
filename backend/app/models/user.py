@@ -210,12 +210,12 @@ class User(Base):
     @property
     def is_professional(self) -> bool:
         """Check if user is a main professional (dentist/vet/mechanic)."""
-        return self.role == UserRole.PROFESSIONAL
+        return self.role == UserRole.professional
     
     @property
     def can_manage_users(self) -> bool:
         """Check if user can manage other users."""
-        return self.is_admin or self.role == UserRole.ADMIN
+        return self.is_admin or self.role == UserRole.admin
     
     def has_permission(self, permission: str) -> bool:
         """
@@ -228,10 +228,10 @@ class User(Base):
             
         # Basic role-based permissions
         role_permissions = {
-            UserRole.ADMIN: ["*"],  # All permissions
-            UserRole.PROFESSIONAL: ["read_patients", "write_patients", "read_appointments", "write_appointments"],
-            UserRole.ASSISTANT: ["read_patients", "read_appointments", "write_appointments"],
-            UserRole.RECEPTIONIST: ["read_patients", "write_patients", "read_appointments", "write_appointments"]
+            UserRole.admin: ["*"],  # All permissions
+            UserRole.professional: ["read_patients", "write_patients", "read_appointments", "write_appointments"],
+            UserRole.assistant: ["read_patients", "read_appointments", "write_appointments"],
+            UserRole.receptionist: ["read_patients", "write_patients", "read_appointments", "write_appointments"]
         }
         
         user_permissions = role_permissions.get(self.role, [])

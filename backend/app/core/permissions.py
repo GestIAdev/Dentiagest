@@ -13,13 +13,7 @@ from typing import Optional, Dict, Any
 from enum import Enum
 
 from app.core.simple_audit import AuditLogger, AuditAction, AuditResourceType
-
-
-class UserRole(str, Enum):
-    """User roles with their permission levels."""
-    ADMIN = "admin"
-    DENTIST = "dentist"  
-    RECEPCIONISTA = "recepcionista"
+from app.models.user import UserRole
 
 
 class PermissionLevel(str, Enum):
@@ -39,7 +33,7 @@ class MedicalPermissionMatrix:
     
     # Permission matrix: role -> resource_type -> permission_level
     PERMISSIONS = {
-        UserRole.DENTIST: {
+        UserRole.professional: {
             "medical_records": PermissionLevel.FULL,
             "patient_demographics": PermissionLevel.FULL,
             "appointments": PermissionLevel.FULL,
@@ -47,7 +41,7 @@ class MedicalPermissionMatrix:
             "billing": PermissionLevel.READ,
             "user_management": PermissionLevel.NONE,
         },
-        UserRole.ADMIN: {
+        UserRole.admin: {
             "medical_records": PermissionLevel.NONE,  # 🚨 GDPR: Separation of powers
             "patient_demographics": PermissionLevel.READ,  # Only non-medical data
             "appointments": PermissionLevel.FULL,
@@ -55,7 +49,7 @@ class MedicalPermissionMatrix:
             "billing": PermissionLevel.FULL,
             "user_management": PermissionLevel.FULL,
         },
-        UserRole.RECEPCIONISTA: {
+        UserRole.receptionist: {
             "medical_records": PermissionLevel.NONE,  # 🚨 Legal requirement
             "patient_demographics": PermissionLevel.WRITE,  # Contact info only
             "appointments": PermissionLevel.FULL,
@@ -100,7 +94,7 @@ class MedicalPermissionValidator:
     
     @staticmethod
     def validate_medical_record_access(
-        user: Dict[str, Any],  # User object with id, role, etc.
+        user,  # User model object or dict with id, role, etc.
         action: str,  # 'read', 'write', 'delete'
         medical_record_id: Optional[str] = None,
         patient_id: Optional[str] = None,
@@ -108,6 +102,7 @@ class MedicalPermissionValidator:
     ) -> Dict[str, Any]:
         """
         Validate if user can access medical records.
+        Handles both User model objects and dict format.
         
         Returns:
             dict: {
@@ -116,8 +111,13 @@ class MedicalPermissionValidator:
                 "audit_entry_id": str (if access logged)
             }
         """
-        user_id = user.get("id")
-        user_role = UserRole(user.get("role"))
+        # Handle both User model objects and dict formats
+        if hasattr(user, 'id') and hasattr(user, 'role'):
+            user_id = user.id
+            user_role = UserRole(user.role)
+        else:
+            user_id = user.get("id")
+            user_role = UserRole(user.get("role"))
         
         # Check basic role permissions
         if not MedicalPermissionMatrix.can_read(user_role, "medical_records"):
@@ -229,7 +229,7 @@ class MedicalPermissionValidator:
     
     @staticmethod
     def validate_export_request(
-        user: Dict[str, Any],
+        user,
         export_type: str,  # 'patient_data', 'medical_records', 'billing'
         patient_id: Optional[str] = None,
         date_range: Optional[Dict[str, str]] = None,
@@ -240,20 +240,30 @@ class MedicalPermissionValidator:
         
         Data exports are high-risk operations that need special attention.
         """
-        user_role = UserRole(user.get("role"))
+        # Handle both User model objects and dict formats
+        if hasattr(user, 'role'):
+            user_role = UserRole(user.role)
+        else:
+            user_role = UserRole(user.get("role"))
         
         # Only certain roles can export medical data
         if export_type in ["medical_records", "patient_data"]:
-            if user_role not in [UserRole.DENTIST]:
+            if user_role not in [UserRole.professional]:
                 return {
                     "allowed": False,
                     "reason": f"Role {user_role.value} cannot export medical data",
                     "violation_type": "EXPORT_VIOLATION"
                 }
         
+        # Get user_id for logging
+        if hasattr(user, 'id'):
+            user_id = user.id
+        else:
+            user_id = user.get("id")
+        
         # Log high-risk export operation
         audit_entry_id = AuditLogger.log_medical_record_export(
-            user_id=user.get("id"),
+            user_id=user_id,
             patient_id=patient_id,
             session_id="extracted_from_session",  # Would come from request context
             ip_address="extracted_from_request",  # Would come from request context
@@ -273,7 +283,7 @@ class MedicalPermissionValidator:
         }
     
     @staticmethod
-    def _can_access_patient_data(user: Dict[str, Any], patient_id: str) -> bool:
+    def _can_access_patient_data(user, patient_id: str) -> bool:
         """
         Check if user can access specific patient's data.
         
@@ -282,11 +292,15 @@ class MedicalPermissionValidator:
         - Temporary access grants
         - Emergency access procedures
         """
-        user_role = UserRole(user.get("role"))
+        # Handle both User model objects and dict formats
+        if hasattr(user, 'role'):
+            user_role = UserRole(user.role)
+        else:
+            user_role = UserRole(user.get("role"))
         
-        # For now, dentists can access any patient's medical data
+        # For now, professionals can access any patient's medical data
         # Admins and receptionists are handled by the permission matrix
-        if user_role == UserRole.DENTIST:
+        if user_role == UserRole.professional:
             return True
         
         # Additional logic could go here for patient-specific assignments
@@ -330,12 +344,15 @@ class MedicalPermissionValidator:
                     "allowed": allowed,
                     "action": action,
                     "resource_type": resource_type,
-                    "user_role": user.get("role")
+                    "user_role": user.role if hasattr(user, 'role') else user.get("role")
                 }
             })
             
+            # Extract user_id from user object/dict
+            user_id = user.id if hasattr(user, 'id') else user.get("id", "unknown_user")
+            
             audit_entry_id = AuditLogger.log_medical_access(
-                user_id=user.get("id"),
+                user_id=user_id,
                 action=audit_action,
                 resource_type=audit_resource_type,
                 resource_id=resource_id,
