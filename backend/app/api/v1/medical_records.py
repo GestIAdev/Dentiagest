@@ -11,7 +11,7 @@ PLATFORM_PATTERN: Other verticals will have similar "service records" APIs:
 """
 
 from typing import Any, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, func, desc, asc
 from datetime import date, datetime
@@ -22,6 +22,12 @@ from pathlib import Path
 
 from ...core.database import get_db
 from ...core.security import get_current_user
+from ...core.medical_security import (
+    require_medical_read, 
+    require_medical_write, 
+    require_medical_delete,
+    require_export_permission
+)
 from ...models.user import User
 from ...models.patient import Patient
 from ...models.medical_record import MedicalRecord, TreatmentStatus, TreatmentPriority, ProcedureCategory
@@ -64,10 +70,13 @@ ALLOWED_MIME_TYPES = {
 
 # PLATFORM_EXTRACTABLE: Create service record pattern
 @router.post("/", response_model=MedicalRecordResponse, status_code=status.HTTP_201_CREATED)
+@require_medical_write("medical_record")
 async def create_medical_record(
     record_data: MedicalRecordCreate,
+    request: Request,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    security_metadata: dict = None
 ) -> Any:
     """Create a new medical record."""
     
@@ -119,10 +128,13 @@ async def create_medical_record(
 
 # PLATFORM_EXTRACTABLE: List service records with search and pagination
 @router.get("/", response_model=PaginatedMedicalRecordsResponse)
+@require_medical_read("medical_record")
 async def list_medical_records(
+    request: Request,
     search_params: MedicalRecordSearchParams = Depends(),
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    security_metadata: dict = None
 ) -> Any:
     """List medical records with search and filtering."""
     
@@ -194,10 +206,13 @@ async def list_medical_records(
 
 # PLATFORM_EXTRACTABLE: Get single service record by ID
 @router.get("/{record_id}", response_model=MedicalRecordResponse)
+@require_medical_read("medical_record")
 async def get_medical_record(
     record_id: UUID,
+    request: Request,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    security_metadata: dict = None
 ) -> Any:
     """Get a specific medical record by ID."""
     
@@ -215,11 +230,14 @@ async def get_medical_record(
 
 # PLATFORM_EXTRACTABLE: Update service record
 @router.put("/{record_id}", response_model=MedicalRecordResponse)
+@require_medical_write("medical_record")
 async def update_medical_record(
     record_id: UUID,
     record_update: MedicalRecordUpdate,
+    request: Request,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    security_metadata: dict = None
 ) -> Any:
     """Update a medical record."""
     
@@ -248,10 +266,13 @@ async def update_medical_record(
 
 # PLATFORM_EXTRACTABLE: Soft delete service record
 @router.delete("/{record_id}", status_code=status.HTTP_204_NO_CONTENT)
+@require_medical_delete("medical_record")
 async def delete_medical_record(
     record_id: UUID,
+    request: Request,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    security_metadata: dict = None
 ) -> None:
     """Soft delete a medical record."""
     
@@ -274,7 +295,9 @@ async def delete_medical_record(
 # ======= MEDICAL DOCUMENTS ENDPOINTS =======
 
 @router.post("/documents/upload", response_model=FileUploadResponse)
+@require_medical_write("medical_document")
 async def upload_medical_document(
+    request: Request,
     patient_id: str = Form(...),
     title: str = Form(...),
     document_type: DocumentType = Form(...),
@@ -284,7 +307,8 @@ async def upload_medical_document(
     access_level: AccessLevel = Form(default=AccessLevel.CLINICAL_STAFF),
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    security_metadata: dict = None
 ) -> Any:
     """Upload a medical document."""
     
@@ -457,12 +481,15 @@ async def list_medical_documents(
 # ======= STATISTICS ENDPOINTS =======
 
 @router.get("/statistics", response_model=MedicalRecordsStatistics)
+@require_export_permission()
 async def get_medical_records_statistics(
+    request: Request,
     patient_id: Optional[str] = Query(None),
     start_date: Optional[date] = Query(None),
     end_date: Optional[date] = Query(None),
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    security_metadata: dict = None
 ) -> Any:
     """Get medical records statistics."""
     
