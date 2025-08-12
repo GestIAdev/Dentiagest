@@ -12,7 +12,7 @@ NETRUNNER_PHILOSOPHY:
 from typing import Optional, Dict, Any
 from enum import Enum
 
-from app.core.audit import AuditLogger, AuditAction, AuditResourceType
+from app.core.simple_audit import AuditLogger, AuditAction, AuditResourceType
 
 
 class UserRole(str, Enum):
@@ -334,17 +334,26 @@ class MedicalPermissionValidator:
                 }
             })
             
-            return AuditLogger.log_medical_access(
+            audit_entry_id = AuditLogger.log_medical_access(
                 user_id=user.get("id"),
                 action=audit_action,
                 resource_type=audit_resource_type,
                 resource_id=resource_id,
                 patient_id=patient_id,
-                session_id="extracted_from_session",  # Would come from request context
-                ip_address="extracted_from_request",  # Would come from request context
+                session_id=additional_context.get("session_id", "unknown_session") if additional_context else "unknown_session",
+                ip_address=additional_context.get("ip_address", "unknown_ip") if additional_context else "unknown_ip",
+                user_agent=additional_context.get("user_agent", "unknown_agent") if additional_context else "unknown_agent",
                 additional_context=context,
                 legal_basis="Medical treatment"
             )
+            
+            # Return result with audit entry ID
+            return {
+                "allowed": allowed,
+                "reason": "Access granted" if allowed else "Access denied",
+                "audit_entry_id": audit_entry_id,
+                "violation_type": None if allowed else "UNKNOWN_VIOLATION"
+            }
         except Exception as e:
             # Log audit failure but don't break the permission check
             import logging
