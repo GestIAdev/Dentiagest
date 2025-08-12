@@ -1,11 +1,13 @@
 /**
  * 🏴‍☠️ IAnarkalendar © GestIA Dev + PunkClaude 2025
+ * 🔒 PHASE 3: DIGITAL FORTRESS INTEGRATION - Calendar + Security
  */
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useAuth } from '../../context/AuthContext.tsx'; // 🔒 SECURITY INTEGRATION!
 import { useCalendarState } from './hooks/useCalendarStateSimple.ts';
 import { WeekViewSimple } from './WeekViewSimple.tsx';
 import { DayViewSimple } from './DayViewSimple.tsx';
@@ -37,6 +39,37 @@ export function CalendarContainer({
   onDateClick,
   onTimeSlotClick // 🕒 + BUTTON HANDLER
 }: CalendarProps) {
+  
+  // 🔒 DIGITAL FORTRESS: Get user role for security filtering
+  const { state: authState } = useAuth();
+  const userRole = authState.user?.role;
+  
+  // 🏴‍☠️ PUNKCCLAUDE SECURITY: Filter appointments by role
+  const sanitizeAppointmentForRole = (appointment: any, role?: string) => {
+    if (!role || role === 'professional') return appointment; // Full anarchist access
+    
+    if (role === 'admin') return { 
+      ...appointment, 
+      medical_notes: '🔒 [Medical Data Protected by Digital Fortress]',
+      diagnosis: '🔒 [Protected Medical Information]',
+      treatment_notes: '🔒 [Professional Access Only]'
+    };
+    
+    if (role === 'recepcionista') return { 
+      ...appointment, 
+      medical_notes: '🔒 [Restricted - Contact Doctor]',
+      diagnosis: '🔒 [Protected Patient Privacy]',
+      treatment_plan: '🔒 [Medical Professional Only]',
+      treatment_notes: '🔒 [Medical Data Protected]'
+    };
+    
+    return appointment; // Default: no filtering
+  };
+
+  // 🎯 Apply security filtering to appointments
+  const secureAppointments = appointments.map(apt => 
+    sanitizeAppointmentForRole(apt, userRole)
+  );
   
   const navigate = useNavigate();
   const {
@@ -186,7 +219,7 @@ export function CalendarContainer({
         {currentView === 'month' && (
           <MonthViewSimple
             currentDate={currentDate}
-            appointments={appointments}
+            appointments={secureAppointments} // 🔒 SECURE APPOINTMENTS!
             onDateClick={handleDateClick}
             onAppointmentClick={onAppointmentClick}
             calendarData={calendarData}
@@ -201,7 +234,7 @@ export function CalendarContainer({
             onTimeSlotClick={handleTimeSlotClick}
             onAppointmentClick={onAppointmentClick} // 🎯 CONECTAR CLICK EDITOR!
             onAppointmentUpdate={onAppointmentUpdate} // 🔄 SAME AS DAILY VIEW!
-            appointments={appointments} // 🏥 PASS REAL APPOINTMENTS!
+            appointments={secureAppointments} // 🔒 SECURE APPOINTMENTS!
             className="week-view-container"
           />
         )}
@@ -212,7 +245,7 @@ export function CalendarContainer({
             onTimeSlotClick={handleTimeSlotClick}
             onAppointmentClick={onAppointmentClick} // 🎯 CONECTAR CLICK EDITOR!
             onAppointmentUpdate={onAppointmentUpdate} // 🔥 Pass refresh callback
-            appointments={appointments} // 🏥 PASS REAL APPOINTMENTS!
+            appointments={secureAppointments} // 🔒 SECURE APPOINTMENTS!
             className="day-view-container"
           />
         )}

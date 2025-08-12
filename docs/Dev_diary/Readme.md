@@ -124,7 +124,7 @@ docker-compose down
 
 ## 📚 Documentación
 
-- **API**: http://localhost:8000/docs (Swagger UI)
+- **API**: http://localhost:8002/docs (Swagger UI)
 - **Arquitectura**: `/docs/stack_tecnologico.md`
 - **Base de Datos**: `/docs/specs/detalied_spec_db.md`
 - **Frontend**: `/docs/specs/front_specs.md`

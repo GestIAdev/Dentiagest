@@ -20,6 +20,8 @@ from datetime import date, datetime, timedelta
 from uuid import UUID
 
 from ...core.database import get_db
+from ...core.security import get_current_user  # 🔒 SECURITY IMPORT!
+from ...core.medical_security import secure_medical_endpoint  # 🏴‍☠️ DIGITAL FORTRESS!
 from ...models.user import User
 from ...models.patient import Patient
 from ...models.appointment import Appointment, AppointmentStatus, AppointmentType, AppointmentPriority
@@ -43,10 +45,12 @@ router = APIRouter(prefix="/appointments", tags=["appointments"])
 
 # PLATFORM_EXTRACTABLE: Universal CRUD patterns
 @router.post("/", response_model=AppointmentResponse, status_code=status.HTTP_201_CREATED)
+@secure_medical_endpoint(action="CREATE", resource_type="appointment")  # 🔒 DIGITAL FORTRESS!
 async def create_appointment(
     appointment_data: AppointmentCreate,
     background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)  # 🏴‍☠️ SECURITY!
 ) -> Any:
     """
     Create a new appointment.
@@ -174,6 +178,7 @@ async def create_appointment(
 
 
 @router.get("/", response_model=AppointmentListResponse)
+@secure_medical_endpoint(action="READ", resource_type="appointment")  # 🔒 DIGITAL FORTRESS!
 async def list_appointments(
     start_date: Optional[date] = Query(None),
     end_date: Optional[date] = Query(None),
@@ -186,7 +191,8 @@ async def list_appointments(
     room_number: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     size: int = Query(50, ge=1, le=100),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)  # 🏴‍☠️ SECURITY!
 ) -> Any:
     """
     List appointments with filtering and pagination.
@@ -286,10 +292,12 @@ async def get_appointment(
 
 
 @router.put("/{appointment_id}", response_model=AppointmentResponse)
+@secure_medical_endpoint(action="UPDATE", resource_type="appointment")  # 🔒 DIGITAL FORTRESS!
 async def update_appointment(
     appointment_id: UUID,
     appointment_data: AppointmentUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)  # 🏴‍☠️ SECURITY!
 ) -> Any:
     """
     Update an existing appointment.
@@ -374,9 +382,11 @@ async def update_appointment(
 
 
 @router.delete("/{appointment_id}")
+@secure_medical_endpoint(action="DELETE", resource_type="appointment")  # 🔒 DIGITAL FORTRESS!
 async def delete_appointment(
     appointment_id: UUID,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)  # 🏴‍☠️ SECURITY!
 ) -> Any:
     """Cancel/delete an appointment."""
     appointment = db.query(Appointment).filter(Appointment.id == appointment_id).first()

@@ -37,6 +37,8 @@ class MedicalPermissionMatrix:
             "medical_records": PermissionLevel.FULL,
             "patient_demographics": PermissionLevel.FULL,
             "appointments": PermissionLevel.FULL,
+            "medical_calendar_data": PermissionLevel.FULL,  # 🔒 NEW: Medical notes in appointments
+            "patient_schedule": PermissionLevel.FULL,  # 🔒 NEW: Complete patient history
             "treatments": PermissionLevel.FULL,
             "billing": PermissionLevel.READ,
             "user_management": PermissionLevel.NONE,
@@ -44,7 +46,9 @@ class MedicalPermissionMatrix:
         UserRole.admin: {
             "medical_records": PermissionLevel.NONE,  # 🚨 GDPR: Separation of powers
             "patient_demographics": PermissionLevel.READ,  # Only non-medical data
-            "appointments": PermissionLevel.FULL,
+            "appointments": PermissionLevel.WRITE,  # 🔒 Basic appointment management
+            "medical_calendar_data": PermissionLevel.NONE,  # 🚨 NO medical notes access
+            "patient_schedule": PermissionLevel.READ,  # 🔒 Basic scheduling overview
             "treatments": PermissionLevel.NONE,  # Medical data
             "billing": PermissionLevel.FULL,
             "user_management": PermissionLevel.FULL,
@@ -52,7 +56,9 @@ class MedicalPermissionMatrix:
         UserRole.receptionist: {
             "medical_records": PermissionLevel.NONE,  # 🚨 Legal requirement
             "patient_demographics": PermissionLevel.WRITE,  # Contact info only
-            "appointments": PermissionLevel.FULL,
+            "appointments": PermissionLevel.WRITE,  # 🔒 Front desk scheduling
+            "medical_calendar_data": PermissionLevel.NONE,  # 🚨 NO medical data access
+            "patient_schedule": PermissionLevel.READ,  # 🔒 Basic appointment view
             "treatments": PermissionLevel.NONE,  # Medical data
             "billing": PermissionLevel.READ,
             "user_management": PermissionLevel.NONE,
