@@ -295,12 +295,12 @@ export function WeekViewSimple({
                     zIndex: dayAppointments.length > 1 ? 40 : 1, // Higher z-index for multi-appointment slots
                     // ✨ MAGICAL STYLING based on state
                     background: isPastSlot 
-                      ? 'linear-gradient(135deg, #fecaca 0%, #fef2f2 100%)' // Red gradient for past
+                      ? 'linear-gradient(135deg, #fefbfb 0%, #fef2f2 100%)' // 🌸 SUPER soft pink for past (matching MonthView)
                       : dayAppointments.length > 0 
                         ? 'linear-gradient(135deg, #dbeafe 0%, #f0f9ff 100%)' // Blue gradient for appointments
                         : 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)', // Clean gradient for empty
                     borderColor: isPastSlot 
-                      ? '#ef4444' // red-500 for past
+                      ? '#f87171' // 🌸 Soft pink border (matching MonthView)
                       : dayAppointments.length > 0 
                         ? '#3b82f6' // blue-500 for appointments  
                         : '#e2e8f0', // gray-300 for empty

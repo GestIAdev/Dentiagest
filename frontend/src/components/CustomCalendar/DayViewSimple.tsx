@@ -362,16 +362,24 @@ export function DayViewSimple({
             const slotAppointments = getAppointmentsForSlot(slot.hour, slot.quarter);
             const hasAppointments = slotAppointments.length > 0;
             
+            // 🚫 CHECK IF SLOT IS IN THE PAST (Day View validation)
+            const slotDateTime = new Date(currentDate);
+            slotDateTime.setHours(slot.hour, slot.quarter, 0, 0);
+            const now = new Date();
+            const isPastSlot = slotDateTime < now;
+            
             return (
               <div
                 key={`${slot.hour}-${slot.quarter}`}
                 className={`
-                  time-slot border-2 rounded-xl p-3 cursor-pointer transition-all flex flex-col relative group/stack
+                  time-slot border-2 rounded-xl p-3 transition-all flex flex-col relative group/stack
                   ${hasAppointments 
                     ? 'bg-gradient-to-br from-white to-gray-50/30 border-gray-300 shadow-md hover:shadow-lg transform hover:scale-[1.02]' 
-                    : 'bg-gradient-to-br from-gray-50/50 to-white border-gray-200/60 hover:bg-gradient-to-br hover:from-gray-100 hover:to-white hover:border-gray-400 hover:shadow-md transform hover:scale-[1.01]'
+                    : isPastSlot
+                      ? 'border-gray-300 opacity-85'
+                      : 'bg-gradient-to-br from-gray-50/50 to-white border-gray-200/60 hover:bg-gradient-to-br hover:from-gray-100 hover:to-white hover:border-gray-400 hover:shadow-md transform hover:scale-[1.01]'
                   }
-                  ${isDragging && !hasAppointments ? 'border-dashed border-2 border-blue-400 bg-blue-50' : ''}
+                  ${isDragging && !hasAppointments && !isPastSlot ? 'border-dashed border-2 border-blue-400 bg-blue-50' : ''}
                   ${isUpdating ? 'opacity-50 pointer-events-none' : ''}
                 `}
                 style={{ 
@@ -379,32 +387,48 @@ export function DayViewSimple({
                   zIndex: hasAppointments && slotAppointments.length > 1 ? 100 : 1, // 🚀 EVEN HIGHER for multi-appointment slots
                   position: 'relative', // 🚀 Ensure proper stacking context
                   // 🎯 DYNAMIC HEIGHT: More space for stacks, normal for singles
-                  minHeight: slotAppointments.length > 1 ? '180px' : '120px'
+                  minHeight: slotAppointments.length > 1 ? '180px' : '120px',
+                  cursor: isPastSlot ? 'not-allowed' : 'pointer',
+                  // 🌸 SUPER soft pink background for past slots (matching MonthView)
+                  background: isPastSlot 
+                    ? 'linear-gradient(135deg, #fefbfb 0%, #fef2f2 100%)' 
+                    : undefined
                 }}
-                onClick={() => !hasAppointments && handleTimeSlotClick(slot)}
+                onClick={() => !hasAppointments && !isPastSlot && handleTimeSlotClick(slot)}
                 onDragOver={(e) => {
                   e.preventDefault();
-                  if (isDragging) {
-                    // 🎯 ALLOW DROPS ON ALL SLOTS (empty OR occupied for stacking)
+                  if (isDragging && !isPastSlot) {
+                    // 🎯 ALLOW DROPS ON ALL SLOTS (empty OR occupied for stacking) - BUT NOT PAST SLOTS
                     if (hasAppointments) {
                       e.currentTarget.classList.add('bg-green-100', 'border-green-500'); // Green for stacking
                     } else {
                       e.currentTarget.classList.add('bg-blue-100', 'border-blue-500'); // Blue for empty
                     }
+                  } else if (isDragging && isPastSlot) {
+                    // 🚫 Visual feedback for invalid drop on past slot
+                    e.currentTarget.classList.add('bg-red-200', 'border-red-600');
                   }
                 }}
                 onDragLeave={(e) => {
-                  e.currentTarget.classList.remove('bg-blue-100', 'border-blue-500', 'bg-green-100', 'border-green-500');
+                  e.currentTarget.classList.remove('bg-blue-100', 'border-blue-500', 'bg-green-100', 'border-green-500', 'bg-red-200', 'border-red-600');
                 }}
                 onDrop={(e) => {
                   e.preventDefault();
-                  e.currentTarget.classList.remove('bg-blue-100', 'border-blue-500', 'bg-green-100', 'border-green-500');
-                  // 🚀 ALLOW DROPS ON ANY SLOT - Create stacks automatically!
+                  e.currentTarget.classList.remove('bg-blue-100', 'border-blue-500', 'bg-green-100', 'border-green-500', 'bg-red-200', 'border-red-600');
+                  
+                  // 🚫 PREVENT DROP ON PAST SLOTS - No annoying alerts!
+                  if (isPastSlot) {
+                    return; // Silently reject drop
+                  }
+                  
+                  // 🚀 ALLOW DROPS ON ANY FUTURE SLOT - Create stacks automatically!
                   handleDropOnSlot(slot.hour, slot.quarter);
                 }}
-                title={hasAppointments 
-                  ? `${slotAppointments.length} cita(s) - ${slot.time}`
-                  : `Crear nueva cita - ${slot.time}`
+                title={isPastSlot 
+                  ? `Slot pasado - ${slot.time} (no disponible)`
+                  : hasAppointments 
+                    ? `${slotAppointments.length} cita(s) - ${slot.time}`
+                    : `Crear nueva cita - ${slot.time}`
                 }
               >
                 {/* ✨ ELEGANT Time Label - Gray Theme */}
