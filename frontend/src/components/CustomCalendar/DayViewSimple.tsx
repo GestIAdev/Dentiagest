@@ -140,28 +140,13 @@ export function DayViewSimple({
 
   // 🎯 DRAG & DROP HANDLERS
   const handleDragStart = (appointment: any) => {
-    console.log('🎯 Drag started:', appointment);
     setDraggedAppointment(appointment);
     setIsDragging(true);
   };
 
   const handleDragEnd = () => {
-    console.log('🎯 Drag ended');
     setDraggedAppointment(null);
     setIsDragging(false);
-    
-    // 🎯 RESET: Clear any residual transformations from DOM elements
-    // This ensures cards return to normal size when moved to individual slots
-    setTimeout(() => {
-      const allCards = document.querySelectorAll('[data-stack-card]');
-      allCards.forEach((card) => {
-        const htmlCard = card as HTMLElement;
-        htmlCard.style.transform = '';
-        htmlCard.style.scale = '';
-        htmlCard.style.opacity = '';
-        htmlCard.style.zIndex = '';
-      });
-    }, 100); // Small delay to allow drop animation to complete
   };
 
   const handleDropOnSlot = async (hour: number, quarter: number) => {
@@ -169,7 +154,20 @@ export function DayViewSimple({
     
     console.log('🎯 Drop on slot:', hour, quarter, draggedAppointment);
     
-    // 🚫 NO MORE ANNOYING ALERTS! UI prevents past drops already
+    // 🚫 VALIDATION: No moving appointments to past time
+    // Only validate if we're moving within today
+    const targetDateTime = new Date(currentDate);
+    targetDateTime.setHours(hour, quarter, 0, 0);
+    
+    const now = new Date();
+    const isToday = currentDate.toDateString() === now.toDateString();
+    
+    if (isToday && targetDateTime < now) {
+      console.error('⏰ Cannot move appointment to past time');
+      alert('❌ No puedes mover una cita a una hora que ya pasó');
+      handleDragEnd();
+      return;
+    }
     
     try {
       // Set loading state
@@ -331,185 +329,158 @@ export function DayViewSimple({
   };
 
   return (
-    <div className={`day-view ${className}`}>
-      {/* Clean Header - No unnecessary text */}
-      <div className="day-header mb-4 p-3 bg-gray-100 rounded-lg text-center border">
-        <h2 className="text-xl font-bold text-gray-800">
+    <div className={`day-view ${className}`} style={{ 
+      backgroundColor: '#f8fafc', // 🎨 Actually gray this time!
+      minHeight: '100vh'
+    }}>
+      {/* ✨ ELEGANT HEADER with subtle gradient */}
+      <div className="day-header mb-4 p-4 rounded-xl text-center border shadow-sm" style={{
+        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+        borderColor: '#e2e8f0'
+      }}>
+        <h2 className="text-xl font-bold text-gray-800 mb-1">
           {format(currentDate, 'EEEE, d MMMM yyyy', { locale: es })}
         </h2>
+        <div className="text-gray-600 text-sm">
+          ✨ {allTimeSlots.filter(slot => getAppointmentsForSlot(slot.hour, slot.quarter).length > 0).length} slots con citas
+        </div>
       </div>
 
-      {/* 🎯 SPECTACULAR FULL-SCREEN GRID - Single Scroll */}
-      <div className="day-grid-container">
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 p-2">
+      {/* 🎯 SPECTACULAR FULL-SCREEN GRID with enhanced styling */}
+      <div className="day-grid-container" style={{ 
+        backgroundColor: '#ffffff',
+        borderRadius: '16px',
+        padding: '16px',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+        border: '1px solid #e2e8f0',
+        overflow: 'visible' // 🚀 CRITICAL: Stack animations NEED this!
+      }}>
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 p-2" style={{ 
+          overflow: 'visible' // 🚀 DOUBLE CRITICAL: Stack needs grid overflow too!
+        }}>
           {allTimeSlots.map(slot => {
             const slotAppointments = getAppointmentsForSlot(slot.hour, slot.quarter);
             const hasAppointments = slotAppointments.length > 0;
-            
-            // 🚫 CHECK IF SLOT IS IN THE PAST
-            const slotDateTime = new Date(currentDate);
-            slotDateTime.setHours(slot.hour, slot.quarter, 0, 0);
-            const now = new Date();
-            const isToday = currentDate.toDateString() === now.toDateString();
-            const isPastSlot = isToday && slotDateTime < now;
             
             return (
               <div
                 key={`${slot.hour}-${slot.quarter}`}
                 className={`
-                  time-slot border rounded-lg p-2 cursor-pointer transition-all min-h-[120px] flex flex-col relative group/stack
+                  time-slot border-2 rounded-xl p-3 cursor-pointer transition-all flex flex-col relative group/stack
                   ${hasAppointments 
-                    ? 'bg-white border-gray-300 shadow-sm hover:shadow-md' 
-                    : 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-400 hover:shadow-sm'
+                    ? 'bg-gradient-to-br from-white to-gray-50/30 border-gray-300 shadow-md hover:shadow-lg transform hover:scale-[1.02]' 
+                    : 'bg-gradient-to-br from-gray-50/50 to-white border-gray-200/60 hover:bg-gradient-to-br hover:from-gray-100 hover:to-white hover:border-gray-400 hover:shadow-md transform hover:scale-[1.01]'
                   }
-                  ${isDragging && !hasAppointments && !isPastSlot ? 'border-dashed border-2 border-blue-400 bg-blue-50' : ''}
-                  ${isDragging && isPastSlot ? 'border-dashed border-2 border-red-400 bg-red-50 cursor-not-allowed' : ''}
+                  ${isDragging && !hasAppointments ? 'border-dashed border-2 border-blue-400 bg-blue-50' : ''}
                   ${isUpdating ? 'opacity-50 pointer-events-none' : ''}
-                  ${slotAppointments.length > 1 ? 'min-h-[180px]' : ''}
-                  ${isPastSlot ? 'opacity-60' : ''}
                 `}
-                style={{
-                  overflow: 'visible', // 🔑 WEEKLY VIEW SECRET SAUCE!
-                  zIndex: slotAppointments.length > 1 ? 40 : 1 // Higher z-index for multi-appointment slots
+                style={{ 
+                  overflow: 'visible', // 🚀 CRITICAL: Stack animations need this!
+                  zIndex: hasAppointments && slotAppointments.length > 1 ? 100 : 1, // 🚀 EVEN HIGHER for multi-appointment slots
+                  position: 'relative', // 🚀 Ensure proper stacking context
+                  // 🎯 DYNAMIC HEIGHT: More space for stacks, normal for singles
+                  minHeight: slotAppointments.length > 1 ? '180px' : '120px'
                 }}
-                onClick={() => !hasAppointments && !isPastSlot && handleTimeSlotClick(slot)}
+                onClick={() => !hasAppointments && handleTimeSlotClick(slot)}
                 onDragOver={(e) => {
                   e.preventDefault();
-                  if (isDragging && !hasAppointments && !isPastSlot) {
-                    // 🎨 SUBLIME DROP ZONE ANIMATION (only for valid slots)
-                    e.currentTarget.style.transition = 'all 0.15s ease-out';
-                    e.currentTarget.classList.add('bg-blue-50', 'border-blue-300');
-                    e.currentTarget.style.transform = 'scale(1.01)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.2)';
-                  } else if (isDragging && isPastSlot) {
-                    // 🚫 PROHIBITED ZONE ANIMATION
-                    e.currentTarget.style.transition = 'all 0.15s ease-out';
-                    e.currentTarget.classList.add('bg-red-100', 'border-red-400');
-                    e.currentTarget.style.cursor = 'not-allowed';
+                  if (isDragging) {
+                    // 🎯 ALLOW DROPS ON ALL SLOTS (empty OR occupied for stacking)
+                    if (hasAppointments) {
+                      e.currentTarget.classList.add('bg-green-100', 'border-green-500'); // Green for stacking
+                    } else {
+                      e.currentTarget.classList.add('bg-blue-100', 'border-blue-500'); // Blue for empty
+                    }
                   }
                 }}
                 onDragLeave={(e) => {
-                  // 🎨 SMOOTH RESET (both valid and invalid slots)
-                  e.currentTarget.style.transition = 'all 0.15s ease-out';
-                  e.currentTarget.classList.remove('bg-blue-50', 'border-blue-300', 'bg-red-100', 'border-red-400');
-                  e.currentTarget.style.transform = '';
-                  e.currentTarget.style.boxShadow = '';
-                  e.currentTarget.style.cursor = '';
+                  e.currentTarget.classList.remove('bg-blue-100', 'border-blue-500', 'bg-green-100', 'border-green-500');
                 }}
                 onDrop={(e) => {
                   e.preventDefault();
-                  
-                  // 🚫 PREVENT DROP ON PAST SLOTS - No annoying alerts!
-                  if (isPastSlot) {
-                    console.log('🚫 Prevented drop on past slot - UX preserved');
-                    return;
-                  }
-                  
-                  // 🎬 ENHANCED SUCCESS ANIMATION (only for valid drops)
-                  const target = e.currentTarget;
-                  target.style.transition = 'all 0.2s ease-out';
-                  target.classList.remove('bg-blue-50', 'border-blue-300');
-                  target.style.transform = '';
-                  target.style.boxShadow = '';
-                  
-                  // More visible success flash
-                  target.style.backgroundColor = '#dcfce7'; // green-100
-                  target.style.borderColor = '#16a34a'; // green-600
-                  setTimeout(() => {
-                    if (target && target.style) {
-                      target.style.backgroundColor = '';
-                      target.style.borderColor = '';
-                    }
-                  }, 400);
-                  
-                  if (!hasAppointments) {
-                    handleDropOnSlot(slot.hour, slot.quarter);
-                  } else {
-                    // 🎪 ALLOW STACKING: Multiple appointments on same hour
-                    console.log('🎯 Stacking appointment on occupied slot with', slotAppointments.length, 'existing appointments');
-                    handleDropOnSlot(slot.hour, slot.quarter);
-                  }
+                  e.currentTarget.classList.remove('bg-blue-100', 'border-blue-500', 'bg-green-100', 'border-green-500');
+                  // 🚀 ALLOW DROPS ON ANY SLOT - Create stacks automatically!
+                  handleDropOnSlot(slot.hour, slot.quarter);
                 }}
                 title={hasAppointments 
                   ? `${slotAppointments.length} cita(s) - ${slot.time}`
-                  : isPastSlot 
-                    ? `Hora pasada - ${slot.time}` 
-                    : `Crear nueva cita - ${slot.time}`
+                  : `Crear nueva cita - ${slot.time}`
                 }
               >
-                {/* Time Label */}
-                <div className="text-xs font-medium text-gray-600 mb-2 text-center">
+                {/* ✨ ELEGANT Time Label - Gray Theme */}
+                <div className="text-xs font-bold mb-2 text-center px-2 py-1 rounded-lg" style={{
+                  background: hasAppointments 
+                    ? 'linear-gradient(45deg, #6b7280, #4b5563)' // gray-500 to gray-600
+                    : 'linear-gradient(45deg, #d1d5db, #9ca3af)', // gray-300 to gray-400
+                  color: 'white',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.2)'
+                }}>
                   {slot.time}
                 </div>
                 
                 {/* Content */}
                 {hasAppointments ? (
                   slotAppointments.length === 1 ? (
-                    // Single appointment - original behavior with RESET STYLING
-                    <div 
-                      className="flex-1"
-                      style={{
-                        transform: 'none', // 🎯 RESET: Clear any residual transformations
-                        scale: '1', // 🎯 RESET: Ensure normal scale
-                        transition: 'all 0.3s ease-out' // Smooth transition to normal state
-                      }}
-                    >
+                    // Single appointment - original behavior
+                    <div className="flex-1">
                       <AppointmentCard
                         appointment={convertToAppointmentData(slotAppointments[0])!}
                         onClick={() => handleAppointmentClick(slotAppointments[0])}
                         isCompact={false}
                         showDuration={true}
                         showNotes={false}
-                        className="h-full transform-none scale-100" // 🎯 RESET: Utility classes for normal state
+                        className="h-full"
                         onDragStart={handleDragStart}
                         onDragEnd={handleDragEnd}
                       />
                     </div>
                   ) : (
-                    // 🎨 MULTIPLE APPOINTMENTS - WEEKLY VIEW ELEGANT PATTERN COPIED! 
+                    // Multiple appointments - hover reveal like WeekViewSimple
                     <div 
-                      className="absolute inset-0"
-                      style={{ 
-                        overflow: 'visible',
-                        zIndex: 50 // 🎯 EXACTLY LIKE WEEKLY VIEW
-                      }}
+                      className="flex-1 relative group/stack"
                       onMouseEnter={() => {
-                        // 🚀 WEEKLY VIEW PATTERN EXACT COPY
-                        const cards = document.querySelectorAll(`[data-stack-id="day-${slot.hour}-${slot.quarter}"]`);
+                        // 🚀 MANUAL HOVER REVEAL - 100% reliable (copied from WeekView)
+                        console.log(`🔍 Hover enter: Looking for cards with ID "stack-${slot.hour}-${slot.quarter}"`);
+                        const cards = document.querySelectorAll(`[data-stack-id="stack-${slot.hour}-${slot.quarter}"]`);
+                        console.log(`🔍 Found ${cards.length} cards for hover reveal`);
                         cards.forEach((card, index) => {
-                          const yOffset = index === 0 ? 0 : index === 1 ? 18 : index === 2 ? 36 : index === 3 ? 54 : index === 4 ? 72 : 90;
+                          const yOffset = index === 0 ? 0 : index === 1 ? 20 : index === 2 ? 40 : index === 3 ? 64 : index === 4 ? 80 : 96;
                           (card as HTMLElement).style.transform = `translateY(${yOffset}px)`;
+                          console.log(`🔍 Card ${index}: transform to ${yOffset}px`);
                         });
                       }}
                       onMouseLeave={() => {
                         // Return to compact state
-                        const cards = document.querySelectorAll(`[data-stack-id="day-${slot.hour}-${slot.quarter}"]`);
-                        cards.forEach((card) => {
-                          (card as HTMLElement).style.transform = 'translateY(0px)';
+                        console.log(`🔍 Hover leave: Returning cards to compact state`);
+                        const cards = document.querySelectorAll(`[data-stack-id="stack-${slot.hour}-${slot.quarter}"]`);
+                        cards.forEach((card, index) => {
+                          (card as HTMLElement).style.transform = `translateY(${index * 4}px)`;
                         });
                       }}
                     >
+                      <div className="text-center text-sm font-medium text-gray-700 mb-1">
+                        {slotAppointments.length} citas
+                      </div>
+                      
+                      {/* Hover reveal cards */}
                       {slotAppointments.map((apt, index) => {
                         const appointmentData = convertToAppointmentData(apt);
                         if (!appointmentData) return null;
-
-                        const isTopCard = index === slotAppointments.length - 1;
-                        const baseTop = index * 3; // Compact stacking like weekly view
-                        const baseLeft = index * 2; // Slight left offset like weekly view
-                        const zIndex = 60 + index; // 🎯 EXACTLY LIKE WEEKLY VIEW
+                        
+                        // Calculate staggered position
+                        const baseLeft = index * 8; // 8px stagger
                         
                         return (
                           <div
                             key={`${apt.id}-${index}`}
-                            data-stack-id={`day-${slot.hour}-${slot.quarter}`}
-                            className="absolute cursor-pointer transition-all duration-300 ease-out"
+                            data-stack-id={`stack-${slot.hour}-${slot.quarter}`}
+                            data-stack-card // 🚀 MARKER for debugging
+                            className="absolute inset-0 cursor-pointer transform transition-all duration-300 opacity-80 hover:opacity-100 hover:scale-105"
                             style={{
-                              top: `${baseTop}px`,
-                              left: `${baseLeft}px`,
-                              right: `${Math.max(0, baseLeft - 1)}px`,
-                              height: 'calc(100% - 16px)', // Slightly smaller to show stack
-                              zIndex: zIndex, // 🎯 BACK TO SIMPLE - no !important needed
-                              transform: 'translateY(0px)', // 🎯 EXACTLY LIKE WEEKLY VIEW
+                              zIndex: 60 + index, // WEEKLY VIEW PATTERN: Higher than container
+                              transform: `translateY(${index * 4}px)`, // COMPACT STATE: 4px stagger
+                              right: `${Math.max(0, baseLeft - 2)}px`,
+                              overflow: 'visible' // WEEKLY VIEW EXACT COPY
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -518,51 +489,25 @@ export function DayViewSimple({
                           >
                             <AppointmentCard
                               appointment={appointmentData}
-                              isCompact={false} // Keep larger size for daily view
                               onClick={() => handleAppointmentClick(apt)}
+                              isCompact={true}
+                              showDuration={false}
+                              showNotes={false}
+                              className="h-full shadow-md hover:shadow-xl hover:scale-105"
                               onDragStart={handleDragStart}
                               onDragEnd={handleDragEnd}
-                              className={`
-                                h-full text-sm transition-all duration-300
-                                ${isTopCard 
-                                  ? 'shadow-md' 
-                                  : 'shadow-sm opacity-90 scale-98'
-                                }
-                                group-hover/stack:shadow-lg 
-                                group-hover/stack:scale-100 
-                                group-hover/stack:opacity-100
-                                hover:shadow-xl hover:scale-105
-                                cursor-pointer
-                              `}
                             />
                           </div>
                         );
                       })}
-                      
-                      {/* 📊 COUNTER - ALWAYS ON TOP (like weekly view) */}
-                      <div 
-                        className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold shadow-md transition-all duration-300"
-                        style={{ 
-                          zIndex: 100 // 🎯 EXACTLY LIKE WEEKLY VIEW
-                        }}
-                      >
-                        {slotAppointments.length}
-                      </div>
                     </div>
                   )
                 ) : (
                   <div className="flex-1 flex items-center justify-center">
                     <div className="text-center text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {isPastSlot ? (
-                        <div className="text-red-400">
-                          <span className="text-lg">🚫</span>
-                          <span className="text-xs mt-1 block">Hora pasada</span>
-                        </div>
-                      ) : (
-                        <span className="text-xs mt-1">
-                          {isDragging ? 'Soltar aquí' : 'Crear cita'}
-                        </span>
-                      )}
+                      <span className="text-xs mt-1">
+                        {isDragging ? 'Soltar aquí' : 'Crear cita'}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -572,13 +517,16 @@ export function DayViewSimple({
         </div>
       </div>
 
-      {/* 💡 PONCIO PILATOS TIPS FOOTER */}
-      <div className="calendar-footer mt-4 px-4 py-3 bg-gray-50 border-t border-gray-200 text-xs text-gray-600">
+      {/* ✨ ELEGANT STATS FOOTER */}
+      <div className="calendar-footer mt-6 px-6 py-4 rounded-xl shadow-lg border" style={{
+        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+        borderColor: '#e2e8f0'
+      }}>
         {/* 🔄 LOADING INDICATOR */}
         {isUpdating && (
-          <div className="flex items-center justify-center mb-2 text-blue-600 font-medium">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-            <span>Actualizando cita en la base de datos...</span>
+          <div className="flex items-center justify-center mb-3 text-gray-700 font-medium">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
+            <span>✨ Actualizando cita en la base de datos...</span>
           </div>
         )}
         

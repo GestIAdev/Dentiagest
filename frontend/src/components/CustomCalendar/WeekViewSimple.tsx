@@ -43,13 +43,11 @@ export function WeekViewSimple({
 
   // 🎯 DRAG & DROP HANDLERS (copied from Daily View)
   const handleDragStart = (appointment: any) => {
-    console.log('🎯 Weekly View - Drag started:', appointment);
     setDraggedAppointment(appointment);
     setIsDragging(true);
   };
 
   const handleDragEnd = () => {
-    console.log('🎯 Weekly View - Drag ended');
     setDraggedAppointment(null);
     setIsDragging(false);
   };
@@ -57,7 +55,6 @@ export function WeekViewSimple({
   const handleDropOnSlot = async (day: Date, hour: number) => {
     if (!draggedAppointment) return;
     
-    console.log('🎯 Weekly View - Drop on slot:', day, hour, draggedAppointment);
     
     // 🚫 NO MORE ANNOYING ALERTS! UI will prevent bad drops
     
@@ -75,7 +72,6 @@ export function WeekViewSimple({
       const targetDate = new Date(day); // Use target day
       targetDate.setHours(hour, 0, 0, 0); // Set new hour (00 minutes for weekly)
       
-      console.log('🎯 Moving appointment from', originalDate.toISOString(), 'to', targetDate.toISOString());
       
       // Call the API to update appointment time
       const result = await updateAppointmentTime(
@@ -86,12 +82,9 @@ export function WeekViewSimple({
       );
       
       if (result.success) {
-        console.log('🎉 WEEKLY DRAG & DROP SUCCESS! Appointment updated in database');
-        console.log(`✅ Cita movida exitosamente a ${format(day, 'dd/MM/yyyy')} a las ${hour}:00`);
         
         // 🔥 REFRESH APPOINTMENTS DATA TO SHOW VISUAL UPDATE
         if (onAppointmentUpdate) {
-          console.log('🔄 Refreshing appointments data...');
           onAppointmentUpdate();
         }
         
@@ -246,16 +239,26 @@ export function WeekViewSimple({
   };
 
   return (
-    <div className={`week-view-compact ${className}`}>
-      {/* 🎯 AINARKLENDAR HEADER - Gray Theme Consistency */}
-      <div className="grid grid-cols-8 gap-1 mb-2">
-        <div className="text-sm p-2 bg-gray-100 border rounded text-center font-medium text-gray-700">
+    <div className={`week-view-compact ${className}`} style={{ 
+      backgroundColor: '#f8fafc', // 🎨 Actually gray background
+      borderRadius: '16px',
+      padding: '20px',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+    }}>
+      {/* ✨ MAGICAL AINARKLENDAR HEADER */}
+      <div className="grid grid-cols-8 gap-2 mb-4">
+        <div className="text-sm p-3 rounded-xl text-center font-bold text-gray-700" style={{
+          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+          border: '1px solid #e2e8f0'
+        }}>
           Hora
         </div>
         {weekDays.map(day => (
-          <div key={day.toISOString()} className="text-sm p-2 bg-gray-100 border rounded text-center">
-            <div className="font-medium text-gray-700">{format(day, 'EEE', { locale: es })}</div>
-            <div className="text-sm text-gray-600">{format(day, 'd')}</div>
+          <div key={day.toISOString()} className="text-sm p-3 rounded-xl text-center border-2 border-gray-100 shadow-sm" style={{
+            background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
+          }}>
+            <div className="font-bold text-gray-700">{format(day, 'EEE', { locale: es })}</div>
+            <div className="text-xs text-gray-600 font-medium">{format(day, 'd')}</div>
           </div>
         ))}
       </div>
@@ -265,11 +268,14 @@ export function WeekViewSimple({
         {workingHours.map(hour => (
           <div key={hour} className="grid grid-cols-8 gap-1 mb-1">
             {/* Time label - AINARKLENDAR Gray Style */}
-            <div className="text-sm p-2 bg-gray-100 border border-gray-300 rounded text-center font-medium text-gray-700">
-              {hour}:00
-            </div>
+        <div className="text-sm p-3 rounded-xl text-center font-bold text-gray-700 shadow-sm" style={{
+          background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+          border: '1px solid #cbd5e0'
+        }}>
+          {hour}:00
+        </div>
 
-            {/* Day columns - PERFECT SIZE */}
+            {/* ✨ MAGICAL Day columns */}
             {weekDays.map(day => {
               const dayAppointments = getAppointmentsForDayAndHour(day, hour);
 
@@ -282,17 +288,28 @@ export function WeekViewSimple({
               return (
                 <div 
                   key={`${day.toISOString()}-${hour}`}
-                  className={`relative bg-white border border-gray-200 rounded cursor-pointer hover:bg-gray-50 group transition-colors`}
+                  className={`relative border-2 rounded-xl cursor-pointer group transition-all duration-300`}
                   style={{ 
-                    height: '60px', // ⚡ OPTIMIZED: Perfect balance - compact but functional
+                    height: '65px', // ⚡ Slightly taller for better visual
                     overflow: 'visible',
                     zIndex: dayAppointments.length > 1 ? 40 : 1, // Higher z-index for multi-appointment slots
-                    // 🚫 PAST SLOT VISUAL STYLING - Always visible!
-                    opacity: isPastSlot ? 0.6 : 1,
+                    // ✨ MAGICAL STYLING based on state
+                    background: isPastSlot 
+                      ? 'linear-gradient(135deg, #fecaca 0%, #fef2f2 100%)' // Red gradient for past
+                      : dayAppointments.length > 0 
+                        ? 'linear-gradient(135deg, #dbeafe 0%, #f0f9ff 100%)' // Blue gradient for appointments
+                        : 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)', // Clean gradient for empty
+                    borderColor: isPastSlot 
+                      ? '#ef4444' // red-500 for past
+                      : dayAppointments.length > 0 
+                        ? '#3b82f6' // blue-500 for appointments  
+                        : '#e2e8f0', // gray-300 for empty
+                    opacity: isPastSlot ? 0.7 : 1,
                     cursor: isPastSlot ? 'not-allowed' : 'pointer',
-                    // 🔴 RED BORDER for past slots (always visible)
-                    borderColor: isPastSlot ? '#ef4444' : '', // red-500
-                    backgroundColor: isPastSlot ? '#fef2f2' : '' // red-50
+                    transform: dayAppointments.length > 0 ? 'scale(1.02)' : 'scale(1)',
+                    boxShadow: dayAppointments.length > 0 
+                      ? '0 4px 15px rgba(59, 130, 246, 0.15)' 
+                      : '0 2px 8px rgba(0,0,0,0.05)'
                   }}
                   onClick={() => {
                     if (!isPastSlot) {
@@ -329,7 +346,6 @@ export function WeekViewSimple({
                     
                     // 🚫 PREVENT DROP ON PAST SLOTS - No annoying alerts!
                     if (isPastSlot) {
-                      console.log('🚫 Prevented drop on past slot (Weekly) - UX preserved');
                       // Reset to past slot styling
                       e.currentTarget.style.backgroundColor = '#fef2f2'; // red-50
                       e.currentTarget.style.borderColor = '#ef4444'; // red-500

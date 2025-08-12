@@ -160,21 +160,18 @@ export function getAppointmentsForHour(
   appointments: any[], // 🔧 TEMPORARY ANY FOR MIXED FORMATS
   hour: number
 ): any[] {
-  console.log(`🔍 getAppointmentsForHour called for hour ${hour} with ${appointments.length} appointments`);
   
   const filtered = appointments.filter(apt => {
     // 🔧 HANDLE BOTH MOCK AND REAL APPOINTMENT FORMATS
     if (apt.startTime && apt.startTime.getHours) {
       // Mock appointments format
       const aptHour = apt.startTime.getHours();
-      console.log(`🔍 Mock appointment hour: ${aptHour} (looking for ${hour})`);
       return aptHour === hour;
     } else if (apt.scheduled_date) {
       // 🏥 REAL APPOINTMENTS FORMAT - ISO string with CORRECT TIMEZONE PARSING
       const appointmentDate = parseClinicDateTime(apt.scheduled_date);
       if (appointmentDate && !isNaN(appointmentDate.getTime())) {
         const aptHour = appointmentDate.getHours();
-        console.log(`🔍 Real appointment hour: ${aptHour} from ${apt.scheduled_date} (looking for ${hour})`);
         return aptHour === hour;
       } else {
         console.warn(`🚨 Failed to parse scheduled_date: ${apt.scheduled_date}`);
@@ -183,12 +180,10 @@ export function getAppointmentsForHour(
     } else if (apt.time) {
       // Alternative format - parse time string like "14:30"
       const timeHour = parseInt(apt.time.split(':')[0], 10);
-      console.log(`🔍 Time string hour: ${timeHour} (looking for ${hour})`);
       return timeHour === hour;
     } else if (apt.appointment_time) {
       // Alternative real format
       const timeHour = parseInt(apt.appointment_time.split(':')[0], 10);
-      console.log(`🔍 Appointment time hour: ${timeHour} (looking for ${hour})`);
       return timeHour === hour;
     }
     
@@ -198,7 +193,6 @@ export function getAppointmentsForHour(
     return false;
   });
   
-  console.log(`🔍 getAppointmentsForHour result: ${filtered.length} appointments for hour ${hour}`);
   return filtered;
 }
 
