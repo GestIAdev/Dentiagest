@@ -313,35 +313,11 @@ def audit_medical_access(action: AuditAction, resource_type: AuditResourceType):
         def wrapper(*args, **kwargs):
             # Extract common parameters from request context
             # This would need to be adapted based on your FastAPI setup
-            from fastapi import Request
-            from app.core.auth import get_current_user
-            
             # Execute the original function
             result = func(*args, **kwargs)
             
-            # Log the access (simplified - needs request context handling)
-            try:
-                # This is a simplified example - you'd extract these from FastAPI request
-                user_id = "extracted_from_request"
-                session_id = "extracted_from_session"
-                ip_address = "extracted_from_request"
-                resource_id = kwargs.get("record_id") or kwargs.get("id")
-                patient_id = kwargs.get("patient_id")
-                
-                AuditLogger.log_medical_access(
-                    user_id=user_id,
-                    action=action,
-                    resource_type=resource_type,
-                    resource_id=resource_id,
-                    patient_id=patient_id,
-                    session_id=session_id,
-                    ip_address=ip_address
-                )
-            except Exception as e:
-                # Log the audit failure but don't break the API
-                import logging
-                logger = logging.getLogger("audit.decorator")
-                logger.error(f"Audit decorator failed: {str(e)}")
+            # Note: Audit logging decorator requires proper FastAPI context
+            # For now, audit logging is handled by the security middleware
             
             return result
         return wrapper
