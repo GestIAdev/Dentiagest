@@ -48,6 +48,7 @@ from ...schemas.medical_record import (
     BulkMedicalRecordUpdate,
     BulkMedicalDocumentUpdate,
     BulkOperationResponse,
+    DocumentCategory,  # 🔥 NEW: Import category enum
     PatientBasicInfo,  # 🚀 FOR ENTERPRISE JOIN OPTIMIZATION
     FileUploadResponse,
     MultipleFileUploadResponse
@@ -188,9 +189,15 @@ async def list_medical_records(
         search_term = f"%{search_params.search}%"
         query = query.filter(
             or_(
+                # 🔍 BÚSQUEDA POR NOMBRE DEL PACIENTE (FIXED BY RAUL!)
+                Patient.first_name.ilike(search_term),
+                Patient.last_name.ilike(search_term),
+                func.concat(Patient.first_name, ' ', Patient.last_name).ilike(search_term),
+                # 🩺 BÚSQUEDA POR CONTENIDO MÉDICO (ORIGINAL)
                 MedicalRecord.diagnosis.ilike(search_term),
                 MedicalRecord.clinical_notes.ilike(search_term),
-                MedicalRecord.treatment_performed.ilike(search_term)
+                MedicalRecord.treatment_performed.ilike(search_term),
+                MedicalRecord.chief_complaint.ilike(search_term)
             )
         )
     
@@ -231,6 +238,134 @@ async def list_medical_records(
     
     return PaginatedMedicalRecordsResponse(
         items=record_responses,
+        total=total,
+        page=search_params.page,
+        size=search_params.size,
+        pages=(total + search_params.size - 1) // search_params.size
+    )
+
+# ======= MEDICAL DOCUMENTS ENDPOINTS (MOVED UP for routing precedence) =======
+
+@router.get("/documents", response_model=PaginatedMedicalDocumentsResponse)
+async def list_medical_documents(
+    search_params: MedicalDocumentSearchParams = Depends(),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+) -> Any:
+    """List medical documents with search and filtering."""
+    
+    print(f"🔍 DEBUG: Received search params: {search_params}")
+    print(f"🏷️ DEBUG: Category filter: {search_params.category}")
+    
+    # Build query
+    query = db.query(MedicalDocument).filter(MedicalDocument.deleted_at.is_(None))
+    
+    # Apply filters
+    if search_params.patient_id:
+        query = query.filter(MedicalDocument.patient_id == search_params.patient_id)
+    
+    if search_params.medical_record_id:
+        query = query.filter(MedicalDocument.medical_record_id == search_params.medical_record_id)
+    
+    if search_params.document_type:
+        query = query.filter(MedicalDocument.document_type == search_params.document_type)
+    
+    # 🔥 NEW: Category filter - maps UI categories to document types
+    if search_params.category:
+        print(f"🎯 DEBUG: Applying category filter: {search_params.category}")
+        category_mappings = {
+            DocumentCategory.MEDICAL: [
+                DocumentType.XRAY_BITEWING, DocumentType.XRAY_PANORAMIC, 
+                DocumentType.XRAY_PERIAPICAL, DocumentType.XRAY_CEPHALOMETRIC,
+                DocumentType.CT_SCAN, DocumentType.CBCT_SCAN, DocumentType.INTRAORAL_PHOTO, 
+                DocumentType.EXTRAORAL_PHOTO, DocumentType.CLINICAL_PHOTO,
+                DocumentType.PROGRESS_PHOTO, DocumentType.BEFORE_AFTER_PHOTO, 
+                DocumentType.LAB_REPORT, DocumentType.VOICE_NOTE, DocumentType.SCAN_IMPRESSION, 
+                DocumentType.STL_FILE
+            ],
+            DocumentCategory.ADMINISTRATIVE: [
+                DocumentType.TREATMENT_PLAN, DocumentType.REFERRAL_LETTER, 
+                DocumentType.PRESCRIPTION, DocumentType.OTHER_DOCUMENT
+            ],
+            DocumentCategory.LEGAL: [
+                DocumentType.CONSENT_FORM
+            ],
+            DocumentCategory.BILLING: [
+                DocumentType.INSURANCE_FORM
+            ]
+        }
+        
+        allowed_types = category_mappings.get(search_params.category, [])
+        print(f"🎯 DEBUG: Allowed types for {search_params.category}: {allowed_types}")
+        if allowed_types:
+            query = query.filter(MedicalDocument.document_type.in_(allowed_types))
+            print(f"🎯 DEBUG: Applied filter for types: {allowed_types}")
+        else:
+            print(f"❌ DEBUG: No allowed types found for category: {search_params.category}")
+    else:
+        print("🔍 DEBUG: No category filter provided")
+    
+    if search_params.access_level:
+        query = query.filter(MedicalDocument.access_level == search_params.access_level)
+    
+    if search_params.tooth_number:
+        query = query.filter(func.jsonb_contains(MedicalDocument.tooth_numbers, [search_params.tooth_number]))
+    
+    if search_params.anatomical_region:
+        query = query.filter(MedicalDocument.anatomical_region == search_params.anatomical_region)
+    
+    if search_params.start_date:
+        query = query.filter(MedicalDocument.document_date >= search_params.start_date)
+    
+    if search_params.end_date:
+        query = query.filter(MedicalDocument.document_date <= search_params.end_date)
+    
+    if search_params.is_image is not None:
+        # Filter by image document types
+        if search_params.is_image:
+            image_types = [
+                DocumentType.XRAY_BITEWING, DocumentType.XRAY_PANORAMIC,
+                DocumentType.XRAY_PERIAPICAL, DocumentType.INTRAORAL_PHOTO,
+                DocumentType.CLINICAL_PHOTO, DocumentType.PROGRESS_PHOTO
+            ]
+            query = query.filter(MedicalDocument.document_type.in_(image_types))
+        else:
+            non_image_types = [DocumentType.VOICE_NOTE, DocumentType.TREATMENT_PLAN, 
+                             DocumentType.CONSENT_FORM, DocumentType.PRESCRIPTION]
+            query = query.filter(MedicalDocument.document_type.in_(non_image_types))
+    
+    if search_params.ai_analyzed is not None:
+        query = query.filter(MedicalDocument.ai_analyzed == search_params.ai_analyzed)
+    
+    if search_params.search:
+        search_term = f"%{search_params.search}%"
+        query = query.filter(
+            or_(
+                MedicalDocument.title.ilike(search_term),
+                MedicalDocument.description.ilike(search_term),
+                MedicalDocument.clinical_notes.ilike(search_term)
+            )
+        )
+    
+    # Get total count
+    total = query.count()
+    
+    # Apply sorting
+    sort_column = getattr(MedicalDocument, search_params.sort_by, MedicalDocument.created_at)
+    if search_params.sort_order == "asc":
+        query = query.order_by(asc(sort_column))
+    else:
+        query = query.order_by(desc(sort_column))
+    
+    # Apply pagination
+    offset = (search_params.page - 1) * search_params.size
+    documents = query.offset(offset).limit(search_params.size).all()
+    
+    # Convert to response format
+    document_responses = [_convert_document_to_response(doc) for doc in documents]
+    
+    return PaginatedMedicalDocumentsResponse(
+        items=document_responses,
         total=total,
         page=search_params.page,
         size=search_params.size,
@@ -423,93 +558,7 @@ async def upload_medical_document(
         message="File uploaded successfully"
     )
 
-@router.get("/documents", response_model=PaginatedMedicalDocumentsResponse)
-async def list_medical_documents(
-    search_params: MedicalDocumentSearchParams = Depends(),
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-) -> Any:
-    """List medical documents with search and filtering."""
-    
-    # Build query
-    query = db.query(MedicalDocument).filter(MedicalDocument.deleted_at.is_(None))
-    
-    # Apply filters
-    if search_params.patient_id:
-        query = query.filter(MedicalDocument.patient_id == search_params.patient_id)
-    
-    if search_params.medical_record_id:
-        query = query.filter(MedicalDocument.medical_record_id == search_params.medical_record_id)
-    
-    if search_params.document_type:
-        query = query.filter(MedicalDocument.document_type == search_params.document_type)
-    
-    if search_params.access_level:
-        query = query.filter(MedicalDocument.access_level == search_params.access_level)
-    
-    if search_params.tooth_number:
-        query = query.filter(func.jsonb_contains(MedicalDocument.tooth_numbers, [search_params.tooth_number]))
-    
-    if search_params.anatomical_region:
-        query = query.filter(MedicalDocument.anatomical_region == search_params.anatomical_region)
-    
-    if search_params.start_date:
-        query = query.filter(MedicalDocument.document_date >= search_params.start_date)
-    
-    if search_params.end_date:
-        query = query.filter(MedicalDocument.document_date <= search_params.end_date)
-    
-    if search_params.is_image is not None:
-        # Filter by image document types
-        if search_params.is_image:
-            image_types = [
-                DocumentType.XRAY_BITEWING, DocumentType.XRAY_PANORAMIC,
-                DocumentType.XRAY_PERIAPICAL, DocumentType.INTRAORAL_PHOTO,
-                DocumentType.CLINICAL_PHOTO, DocumentType.PROGRESS_PHOTO
-            ]
-            query = query.filter(MedicalDocument.document_type.in_(image_types))
-        else:
-            non_image_types = [DocumentType.VOICE_NOTE, DocumentType.TREATMENT_PLAN, 
-                             DocumentType.CONSENT_FORM, DocumentType.PRESCRIPTION]
-            query = query.filter(MedicalDocument.document_type.in_(non_image_types))
-    
-    if search_params.ai_analyzed is not None:
-        query = query.filter(MedicalDocument.ai_analyzed == search_params.ai_analyzed)
-    
-    if search_params.search:
-        search_term = f"%{search_params.search}%"
-        query = query.filter(
-            or_(
-                MedicalDocument.title.ilike(search_term),
-                MedicalDocument.description.ilike(search_term),
-                MedicalDocument.clinical_notes.ilike(search_term)
-            )
-        )
-    
-    # Get total count
-    total = query.count()
-    
-    # Apply sorting
-    sort_column = getattr(MedicalDocument, search_params.sort_by, MedicalDocument.created_at)
-    if search_params.sort_order == "asc":
-        query = query.order_by(asc(sort_column))
-    else:
-        query = query.order_by(desc(sort_column))
-    
-    # Apply pagination
-    offset = (search_params.page - 1) * search_params.size
-    documents = query.offset(offset).limit(search_params.size).all()
-    
-    # Convert to response format
-    document_responses = [_convert_document_to_response(doc) for doc in documents]
-    
-    return PaginatedMedicalDocumentsResponse(
-        items=document_responses,
-        total=total,
-        page=search_params.page,
-        size=search_params.size,
-        pages=(total + search_params.size - 1) // search_params.size
-    )
+# MOVED TO BEFORE /{record_id} - See line 247
 
 # ======= STATISTICS ENDPOINTS =======
 

@@ -11,6 +11,7 @@ import DashboardLayout from './components/Layout/DashboardLayout.tsx';
 import DashboardContent from './pages/DashboardContent.tsx';
 import PatientsPage from './pages/PatientsPage.tsx';
 import CalendarPage from './pages/CalendarPage.tsx';
+import { DocumentsPage } from './pages/DocumentsPage.tsx';
 import './styles/globals.css';
 import './styles/calendar-anti-blue.css';
 
@@ -114,6 +115,7 @@ function App() {
               <Route path="patients" element={<PatientsPage />} />
               <Route path="agenda" element={<CalendarPage />} />
               <Route path="medical-records/*" element={<MedicalRouter />} />
+              <Route path="documents" element={<DocumentsPage />} />
               <Route path="treatments" element={<ComingSoonPage pageName="Tratamientos" />} />
               <Route path="billing" element={<ComingSoonPage pageName="Facturación" />} />
             </Route>

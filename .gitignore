@@ -243,3 +243,10 @@ temp_refresh.txt
 *_DEBUG*
 *_EXPERIMENT*
 *_DRAFT*
+
+# 🔒 INFORMACIÓN PRIVADA DE NEGOCIO (Agregado por RaulVisionario)
+# Documentos estratégicos privados, análisis de mercado, inspiración de negocio
+docs/Dev_diary/Private/
+docs/**/Private/
+**/Private/
+*.private.*

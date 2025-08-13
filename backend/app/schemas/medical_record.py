@@ -17,6 +17,15 @@ from enum import Enum
 # Import enums from models
 from ..models.medical_record import TreatmentStatus, TreatmentPriority, ProcedureCategory
 from ..models.medical_document import DocumentType, AccessLevel, ImageQuality
+import enum
+
+# 🔥 DOCUMENT CATEGORIES for UI filtering
+class DocumentCategory(enum.Enum):
+    """Document categories for UI filtering."""
+    MEDICAL = "medical"
+    ADMINISTRATIVE = "administrative"
+    LEGAL = "legal"
+    BILLING = "billing"
 
 # PLATFORM_CORE: Patient info schemas (for embedding)
 class PatientBasicInfo(BaseModel):
@@ -302,6 +311,7 @@ class MedicalDocumentSearchParams(BaseModel):
     patient_id: Optional[str] = None
     medical_record_id: Optional[str] = None
     document_type: Optional[DocumentType] = None
+    category: Optional[DocumentCategory] = None  # 🔥 NEW: Category filter
     access_level: Optional[AccessLevel] = None
     tooth_number: Optional[int] = None
     anatomical_region: Optional[str] = None

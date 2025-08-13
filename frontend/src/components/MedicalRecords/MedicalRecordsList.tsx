@@ -358,7 +358,7 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Buscar por diagnóstico, notas clínicas o tratamiento..."
+                  placeholder="Buscar por nombre del paciente, diagnóstico, notas clínicas o tratamiento..."
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                   value={filters.search}
                   onChange={(e) => updateFilter('search', e.target.value)}
@@ -586,9 +586,15 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
                     {/* Información principal */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2">
-                        <p className="text-lg font-semibold text-gray-900 truncate">
+                        {/* 🖱️ NOMBRE CLICKEABLE PARA ABRIR HISTORIAL (RAUL'S BRILLIANT IDEA!) */}
+                        <button
+                          type="button"
+                          className="text-lg font-semibold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer transition-colors duration-200 truncate"
+                          title="Click para ver detalles del historial"
+                          onClick={() => onViewDetail && onViewDetail(record.id)}
+                        >
                           👤 {record.patient ? `${record.patient.first_name} ${record.patient.last_name}` : 'Paciente no disponible'}
-                        </p>
+                        </button>
                         {record.is_recent && (
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                             Reciente
