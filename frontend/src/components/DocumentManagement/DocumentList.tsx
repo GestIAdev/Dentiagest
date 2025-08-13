@@ -2,7 +2,13 @@
 /**
  * DocumentList Component - Professional Medical Document Management
  * 
- * Features que hacen que los sistemas enterprise lloreen de envidia:
+ * Features que hacen que los sistemas enterprise lloreen d        if (response.ok) {
+          const data = await response.json();
+          setDocuments(data.items || []);
+          setTotalDocuments(data.total || 0);
+        }
+      } catch (err) {
+        console.error('Error fetching documents:', err);a:
  * ✅ Advanced search & filtering (by patient, type, date)
  * ✅ Document preview & download
  * ✅ AI analysis status & results display
@@ -155,16 +161,12 @@ export const DocumentList: React.FC<DocumentListProps> = ({
   // 🎯 FILTER DOCUMENTS BY CATEGORY (Frontend filtering)
   const getFilteredDocuments = (docs: MedicalDocument[], category: DocumentCategory): MedicalDocument[] => {
     const allowedTypes = getCategoryDocumentTypes(category);
-    console.log('🔍 FILTERING:', category, 'allowed types:', allowedTypes);
-    console.log('📄 DOCS TO FILTER:', docs.map(d => ({ title: d.title, type: d.document_type })));
     
     const filtered = docs.filter(doc => {
       const match = allowedTypes.includes(doc.document_type);
-      console.log(`  - ${doc.title} (${doc.document_type}): ${match ? '✅' : '❌'}`);
       return match;
     });
     
-    console.log('✅ FILTERED RESULT:', filtered.length, 'documents');
     return filtered;
   };
 
@@ -183,7 +185,6 @@ export const DocumentList: React.FC<DocumentListProps> = ({
       
       if (categoryFilter) {
         params.append('category', categoryFilter);
-        console.log('🔥 DIRECT CATEGORY FETCH:', categoryFilter);
       }
       
       if (patientId) {
@@ -192,7 +193,6 @@ export const DocumentList: React.FC<DocumentListProps> = ({
       
       try {
         setLoading(true);
-        console.log('🔥 DIRECT REQUEST:', `http://127.0.0.1:8002/api/v1/medical-records/documents?${params}`);
         
         const response = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/documents?${params}`, {
           headers: {
@@ -278,9 +278,6 @@ export const DocumentList: React.FC<DocumentListProps> = ({
           queryParams.append(key, value.toString());
         }
       });
-      
-      console.log('📡 SENDING REQUEST TO:', `http://127.0.0.1:8002/api/v1/medical-records/documents?${queryParams}`);
-      console.log('🔍 FILTERS:', filters);
 
       const response = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/documents?${queryParams}`, {
         headers: {
@@ -289,11 +286,9 @@ export const DocumentList: React.FC<DocumentListProps> = ({
         },
       });
 
-      console.log('📡 RESPONSE STATUS:', response.status, response.statusText);
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('💥 BACKEND ERROR:', response.status, errorText);
+        console.error('Backend error:', response.status, errorText);
         throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
 

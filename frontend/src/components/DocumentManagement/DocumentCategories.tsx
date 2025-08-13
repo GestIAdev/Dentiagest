@@ -87,15 +87,11 @@ export const DocumentCategories: React.FC<DocumentCategoriesProps> = ({
 }) => {
   const { state } = useAuth();
   const userRole = state.user?.role || 'doctor'; // 🔧 DEFAULT to doctor for now
-  
-  console.log('🔐 USER ROLE:', userRole, 'USER STATE:', state.user); // DEBUG
 
   // 🔐 FILTER TABS BY USER PERMISSIONS
   const availableTabs = CATEGORY_TABS.filter(tab => 
     tab.requiredRoles.includes(userRole)
   );
-  
-  console.log('📂 AVAILABLE TABS:', availableTabs.length, availableTabs.map(t => t.name)); // DEBUG
 
   // 🎨 GET TAB STYLE (NEON PUNK AESTHETIC)
   const getTabStyle = (tab: DocumentCategoryTab, isActive: boolean) => {

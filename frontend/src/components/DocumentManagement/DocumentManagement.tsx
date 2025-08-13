@@ -12,7 +12,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { DocumentUpload } from './DocumentUpload.tsx';
-import { DocumentListSimple as DocumentList } from './DocumentList_SIMPLE.tsx';
+import { DocumentList } from './DocumentList.tsx';
 import { DocumentViewer } from './DocumentViewer.tsx';
 import { PatientSelector } from './PatientSelector.tsx';
 import { DocumentCategories, DocumentCategory } from './DocumentCategories.tsx';
@@ -86,7 +86,6 @@ export const DocumentManagement: React.FC<DocumentManagementProps> = ({
     setRefreshKey(prev => prev + 1);
     setActiveTab('list'); // 🎯 ANARCHIST MAGIC: Auto-return to list after upload
     // TODO: Show success notification with document count
-    console.log(`Successfully uploaded ${documents.length} documents`);
   };
 
   // ❌ ERROR HANDLER for upload failures

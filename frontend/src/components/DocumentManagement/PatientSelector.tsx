@@ -57,7 +57,6 @@ export const PatientSelector: React.FC<PatientSelectorProps> = ({
 
         if (response.ok) {
           const data = await response.json();
-          console.log('🔍 PATIENTS API RESPONSE:', data); // DEBUG
           
           // 🎯 HANDLE DIFFERENT API RESPONSE FORMATS
           if (Array.isArray(data)) {

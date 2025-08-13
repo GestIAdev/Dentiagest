@@ -244,7 +244,47 @@ temp_refresh.txt
 *_EXPERIMENT*
 *_DRAFT*
 
-# 🔒 INFORMACIÓN PRIVADA DE NEGOCIO (Agregado por RaulVisionario)
+# � ANTI-MAGIA NEGRA DEL CÓDIGO (Limpieza profesional RaulVisionario)
+# Archivos duplicados, rotos, versiones de desarrollo
+*_SIMPLE*
+*_SIMPLE.*
+*_COMPACT*
+*_COMPACT.*
+*_FIXED*
+*_FIXED.*
+*_BROKEN*
+*_BROKEN.*
+*_DUPLICATE*
+*_DUPLICATE.*
+*_COPY*
+*_COPY.*
+*_BACKUP*
+*_BACKUP.*
+*_VERSION*
+*_VERSION.*
+*_V1*
+*_V2*
+*_V3*
+*_TEST*
+*_TESTING*
+*.backup
+*.copy
+*.duplicate
+
+# Archivos temporales de desarrollo específicos
+DocumentList_*.tsx
+DocumentManagement_*.tsx
+DocumentUpload_*.tsx
+DocumentViewer_*.tsx
+*Component_*.tsx
+*Page_*.tsx
+
+# Logs de debug que aparecen por arte de magia
+console.log.*
+debug.log.*
+temp_logs.*
+
+# �🔒 INFORMACIÓN PRIVADA DE NEGOCIO (Agregado por RaulVisionario)
 # Documentos estratégicos privados, análisis de mercado, inspiración de negocio
 docs/Dev_diary/Private/
 docs/**/Private/
