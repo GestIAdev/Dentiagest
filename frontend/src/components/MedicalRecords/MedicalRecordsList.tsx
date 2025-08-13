@@ -1,7 +1,17 @@
 // MEDICAL_RECORDS: Lista principal de historiales médicos
 /**
  * Componente principal para mostrar y filtrar historiales médicos.
- * Incluye búsqueda, filtros, paginación y acciones CRUD.
+ * Incluye búsqueda, filtr      const token = state.accessToken; // 🔒 TOKEN DEL AUTHCONTEXT
+      if (!token) {
+        throw new Error('No hay token de autenticación válido');
+      }
+
+      // 🔍 DEBUG REQUEST
+      console.log('🚀 MAKING REQUEST TO:', `http://127.0.0.1:8002/api/v1/medical-records/?${queryParams}`);
+      console.log('🔑 TOKEN HEADERS:', {
+        'Authorization': `Bearer ${token.substring(0, 20)}...`,
+        'Content-Type': 'application/json'
+      });paginación y acciones CRUD.
  * 
  * PLATFORM_PATTERN: Este patrón se repetirá en otros verticales:
  * - VetGest: Lista de historiales veterinarios
@@ -10,6 +20,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext.tsx'; // 🔒 INTEGRACIÓN AUTHCONTEXT
 import { 
   MagnifyingGlassIcon, 
   FunnelIcon, 
@@ -27,6 +38,14 @@ import {
 interface MedicalRecord {
   id: string;
   patient_id: string;
+  patient?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email?: string;
+    phone?: string;
+    birth_date?: string;
+  }; // 👤 DATOS DEL PACIENTE
   visit_date: string;
   chief_complaint: string;
   diagnosis: string;
@@ -90,6 +109,9 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
   onEdit,
   onRefresh
 }) => {
+  // 🔒 INTEGRACIÓN CON AUTHCONTEXT
+  const { state } = useAuth();
+  
   // Estados
   const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -116,11 +138,30 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
   // Estado del modal de filtros
   const [showFilters, setShowFilters] = useState(false);
 
+  // Estado del modal de confirmación de eliminación
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [recordToDelete, setRecordToDelete] = useState<string | null>(null);
+
   // Función para obtener historiales
   const fetchMedicalRecords = async () => {
+    // 🛡️ VERIFICACIÓN DE SEGURIDAD TEMPRANA
+    if (!state.isAuthenticated || !state.accessToken) {
+      setError('No autenticado - Redirigiendo...');
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
+
+      // 🔍 DEBUG TOKEN
+      console.log('🔍 AUTH STATE:', {
+        isAuthenticated: state.isAuthenticated,
+        hasToken: !!state.accessToken,
+        tokenPreview: state.accessToken ? state.accessToken.substring(0, 20) + '...' : 'NO TOKEN',
+        user: state.user
+      });
 
       // Construir parámetros de consulta
       const queryParams = new URLSearchParams();
@@ -131,9 +172,9 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
         }
       });
 
-      const token = localStorage.getItem('token');
+      const token = state.accessToken; // � TOKEN DEL AUTHCONTEXT
       if (!token) {
-        throw new Error('No hay token de autenticación');
+        throw new Error('No hay token de autenticación válido');
       }
 
       const response = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/?${queryParams}`, {
@@ -158,6 +199,50 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
       console.error('Error fetching medical records:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Función para eliminar historial médico
+  const handleDeleteRecord = async (recordId: string) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/${recordId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${state.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        // Eliminar de la lista local
+        setRecords(prev => prev.filter(record => record.id !== recordId));
+        setTotalRecords(prev => prev - 1);
+      } else {
+        const errorData = await response.json();
+        console.error('❌ Error deleting medical record:', errorData);
+        setError('Error al eliminar el historial médico');
+      }
+    } catch (err) {
+      console.error('❌ Error deleting medical record:', err);
+      setError('Error al eliminar el historial médico');
+    }
+  };
+
+  // Funciones para el modal de confirmación
+  const openDeleteModal = (recordId: string) => {
+    setRecordToDelete(recordId);
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setRecordToDelete(null);
+    setShowDeleteModal(false);
+  };
+
+  const confirmDelete = async () => {
+    if (recordToDelete) {
+      await handleDeleteRecord(recordToDelete);
+      closeDeleteModal();
     }
   };
 
@@ -501,8 +586,8 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
                     {/* Información principal */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {record.chief_complaint || 'Sin queja principal'}
+                        <p className="text-lg font-semibold text-gray-900 truncate">
+                          👤 {record.patient ? `${record.patient.first_name} ${record.patient.last_name}` : 'Paciente no disponible'}
                         </p>
                         {record.is_recent && (
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
@@ -515,6 +600,9 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
                           </span>
                         )}
                       </div>
+                      <p className="text-sm text-gray-600 mt-1 truncate">
+                        🩺 {record.chief_complaint || 'Sin queja principal especificada'}
+                      </p>
                       <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500">
                         <span>📅 {formatDate(record.visit_date)}</span>
                         <span>🦷 {record.procedure_category}</span>
@@ -553,12 +641,7 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
                       type="button"
                       className="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                       title="Eliminar"
-                      onClick={() => {
-                        if (window.confirm('¿Estás seguro de que quieres eliminar este historial médico?')) {
-                          // TODO: Implementar eliminación
-                          // console.log('Eliminar historial:', record.id);
-                        }
-                      }}
+                      onClick={() => openDeleteModal(record.id)}
                     >
                       <TrashIcon className="h-4 w-4" />
                     </button>
@@ -681,6 +764,43 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
                     </svg>
                   </button>
                 </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3 text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg leading-6 font-medium text-gray-900 mt-2">
+                Eliminar Historial Médico
+              </h3>
+              <div className="mt-2 px-7 py-3">
+                <p className="text-sm text-gray-500">
+                  ¿Estás seguro de que quieres eliminar este historial médico? Esta acción no se puede deshacer.
+                </p>
+              </div>
+              <div className="items-center px-4 py-3">
+                <button
+                  onClick={confirmDelete}
+                  className="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md w-24 mr-2 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300"
+                >
+                  Eliminar
+                </button>
+                <button
+                  onClick={closeDeleteModal}
+                  className="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                >
+                  Cancelar
+                </button>
               </div>
             </div>
           </div>

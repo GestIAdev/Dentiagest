@@ -113,17 +113,10 @@ function App() {
               <Route index element={<DashboardContent />} />
               <Route path="patients" element={<PatientsPage />} />
               <Route path="agenda" element={<CalendarPage />} />
+              <Route path="medical-records/*" element={<MedicalRouter />} />
               <Route path="treatments" element={<ComingSoonPage pageName="Tratamientos" />} />
               <Route path="billing" element={<ComingSoonPage pageName="Facturación" />} />
             </Route>
-            
-            {/* Historiales médicos - PROTEGIDOS POR ROL */}
-            <Route path="/medical-records/*" element={
-              <ProtectedRoute>
-                <DashboardLayout />
-                <MedicalRouter />
-              </ProtectedRoute>
-            } />
             
             {/* Settings también protegida */}
             <Route path="/settings" element={

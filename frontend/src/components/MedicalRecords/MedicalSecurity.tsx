@@ -66,14 +66,14 @@ export const MedicalSecurityProvider: React.FC<{ children: React.ReactNode }> = 
     const userRole = state.user.role;
 
     switch (userRole) {
-      case 'dentist': // Dentista/Doctor - ÚNICO AUTORIZADO para datos médicos
+      case 'professional': // Profesional médico - DOCTOR LOGIN (ROL CORRECTO DEL BACKEND)
         return {
           canViewMedicalRecords: true,
           canEditMedicalRecords: true,
           canViewDocuments: true,
           canUploadDocuments: true,
           canViewSensitiveData: true,
-          reason: 'Dentista autorizado - Acceso médico completo'
+          reason: 'Profesional médico autorizado - Acceso médico completo'
         };
 
       case 'admin': // Administrador - SEPARACIÓN DE PODERES
@@ -86,7 +86,7 @@ export const MedicalSecurityProvider: React.FC<{ children: React.ReactNode }> = 
           reason: 'Administrador - Separación de poderes médicos (GDPR Article 5)'
         };
 
-      case 'recepcionista': // Recepcionista - SOLO AGENDA
+      case 'receptionist': // Recepcionista - SOLO AGENDA
         return {
           canViewMedicalRecords: false,  // 🚨 Solo agenda y contacto
           canEditMedicalRecords: false,
@@ -94,6 +94,16 @@ export const MedicalSecurityProvider: React.FC<{ children: React.ReactNode }> = 
           canUploadDocuments: false,
           canViewSensitiveData: false,
           reason: 'Recepcionista - Solo acceso a agenda y contacto'
+        };
+
+      case 'assistant': // Asistente - ACCESO LIMITADO
+        return {
+          canViewMedicalRecords: true,   // ✅ Puede ver historiales
+          canEditMedicalRecords: false,  // ❌ No puede editar
+          canViewDocuments: true,        // ✅ Puede ver documentos
+          canUploadDocuments: false,     // ❌ No puede subir
+          canViewSensitiveData: false,   // ❌ No datos sensibles
+          reason: 'Asistente - Acceso limitado de solo lectura'
         };
 
       default:

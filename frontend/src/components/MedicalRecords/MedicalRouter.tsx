@@ -114,7 +114,7 @@ const MedicalRouter: React.FC = () => {
       />
       
       {/* Ruta por defecto - redirigir a lista */}
-      <Route path="*" element={<Navigate to="/medical-records" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard/medical-records" replace />} />  {/* 🔧 FIXED: Added /dashboard prefix */}
     </Routes>
   );
 };

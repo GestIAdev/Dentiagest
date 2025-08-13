@@ -18,6 +18,19 @@ from enum import Enum
 from ..models.medical_record import TreatmentStatus, TreatmentPriority, ProcedureCategory
 from ..models.medical_document import DocumentType, AccessLevel, ImageQuality
 
+# PLATFORM_CORE: Patient info schemas (for embedding)
+class PatientBasicInfo(BaseModel):
+    """Basic patient information for embedding in records."""
+    id: str = Field(..., description="Patient UUID")
+    first_name: str = Field(..., description="Patient first name")
+    last_name: str = Field(..., description="Patient last name")
+    email: Optional[str] = Field(None, description="Patient email")
+    phone: Optional[str] = Field(None, description="Patient phone")
+    birth_date: Optional[date] = Field(None, description="Patient birth date")
+    
+    class Config:
+        from_attributes = True
+
 # DENTAL_SPECIFIC: Medical Record schemas
 class MedicalRecordBase(BaseModel):
     """Base schema for medical records."""
@@ -117,6 +130,9 @@ class MedicalRecordResponse(MedicalRecordBase):
     id: str = Field(..., description="Record UUID")
     patient_id: str = Field(..., description="Patient UUID")
     appointment_id: Optional[str] = None
+    
+    # 👤 PATIENT INFO - NUEVO!
+    patient: Optional[PatientBasicInfo] = Field(None, description="Patient basic information")
     
     # AI fields
     ai_transcribed: bool = Field(default=False)

@@ -10,6 +10,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext.tsx';
+import { usePatients, Patient } from '../../hooks/usePatients.ts';
 import { 
   XMarkIcon,
   DocumentPlusIcon,
@@ -42,13 +44,6 @@ interface MedicalRecordFormData {
   is_confidential: boolean;
 }
 
-interface Patient {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-}
-
 interface MedicalRecordFormProps {
   isOpen: boolean;
   onClose: () => void;
@@ -64,6 +59,9 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
   patientId,
   onSave
 }) => {
+  const { state } = useAuth();
+  const { patients, loading: loadingPatients, fetchPatients, fetchAllPatients } = usePatients();
+  
   // Estados del formulario
   const [formData, setFormData] = useState<MedicalRecordFormData>({
     patient_id: patientId || '',
@@ -88,42 +86,80 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [loadingPatients, setLoadingPatients] = useState(false);
+  
+  // Estados para autocompletado de pacientes
+  const [patientSearch, setPatientSearch] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
+
+  // Helper para obtener el nombre del paciente
+  const getPatientName = (patientId: string): string => {
+    const patient = patients.find(p => p.id === patientId);
+    return patient ? `${patient.first_name} ${patient.last_name}` : 'Cargando...';
+  };
+
+  // Función de búsqueda de pacientes con autocompletado
+  const handlePatientSearch = async (searchTerm: string) => {
+    setPatientSearch(searchTerm);
+    
+    if (searchTerm.length >= 2) {
+      // Usar el hook para buscar pacientes
+      const results = await fetchPatients({ query: searchTerm });
+      
+      // Mapear resultados del API al formato esperado
+      const mappedResults = (results || []).map((suggestion: any) => ({
+        id: suggestion.id,
+        first_name: suggestion.name.split(' ')[0] || '',
+        last_name: suggestion.name.split(' ').slice(1).join(' ') || '',
+        email: suggestion.email || ''
+      }));
+      
+      setFilteredPatients(mappedResults);
+      setShowSuggestions(true);
+    } else if (searchTerm.length > 0) {
+      // Buscar en pacientes locales para términos cortos
+      const localResults = (patients || []).filter(p => 
+        `${p.first_name} ${p.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredPatients(localResults);
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+      setFormData(prev => ({ ...prev, patient_id: '' }));
+    }
+  };
+
+  // Función para seleccionar un paciente
+  const handlePatientSelect = (patient: Patient) => {
+    setFormData(prev => ({ ...prev, patient_id: patient.id }));
+    setPatientSearch(`${patient.first_name} ${patient.last_name}`);
+    setShowSuggestions(false);
+  };
 
   // Cargar pacientes al montar el componente
   useEffect(() => {
-    if (isOpen) {
-      fetchPatients();
-      if (recordId) {
-        fetchMedicalRecord();
+    if (isOpen && patients.length === 0) {
+      fetchAllPatients();
+    }
+  }, [isOpen]);
+
+  // Cargar medical record después de cargar pacientes
+  useEffect(() => {
+    if (isOpen && recordId && patients.length > 0) {
+      fetchMedicalRecord();
+    }
+  }, [isOpen, recordId, patients.length]);
+
+  // Actualizar patientSearch cuando se carga el record en modo edición
+  useEffect(() => {
+    if (recordId && formData.patient_id && patients.length > 0) {
+      const patient = patients.find(p => p.id === formData.patient_id);
+      if (patient) {
+        setPatientSearch(`${patient.first_name} ${patient.last_name}`);
       }
     }
-  }, [isOpen, recordId]);
-
-  // Función para obtener lista de pacientes
-  const fetchPatients = async () => {
-    try {
-      setLoadingPatients(true);
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch('http://127.0.0.1:8002/api/v1/patients/?size=1000', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setPatients(data.items || []);
-      }
-    } catch (error) {
-      console.error('Error fetching patients:', error);
-    } finally {
-      setLoadingPatients(false);
-    }
-  };
+  }, [recordId, formData.patient_id, patients]);
 
   // Función para obtener historial médico existente
   const fetchMedicalRecord = async () => {
@@ -131,11 +167,10 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
 
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
       
       const response = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/${recordId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${state.accessToken}`,
           'Content-Type': 'application/json',
         },
       });
@@ -230,7 +265,6 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
 
     try {
       setSaving(true);
-      const token = localStorage.getItem('token');
 
       // Preparar datos para envío
       const submitData = {
@@ -239,6 +273,9 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
         actual_cost: formData.actual_cost ? parseFloat(formData.actual_cost) : null,
         follow_up_date: formData.follow_up_required && formData.follow_up_date ? formData.follow_up_date : null
       };
+
+      // Envolver datos en record_data para el backend
+      const requestBody = recordId ? submitData : { record_data: submitData };
 
       const url = recordId 
         ? `http://127.0.0.1:8002/api/v1/medical-records/${recordId}`
@@ -249,10 +286,10 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
       const response = await fetch(url, {
         method,
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${state.accessToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(submitData)
+        body: JSON.stringify(requestBody)
       });
 
       if (response.ok) {
@@ -261,7 +298,8 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
         resetForm();
       } else {
         const errorData = await response.json();
-        console.error('Error saving medical record:', errorData);
+        console.error('❌ Error saving medical record:', errorData);
+        console.error('❌ Submitted data was:', submitData);
         
         // Manejar errores de validación del servidor
         if (errorData.detail && Array.isArray(errorData.detail)) {
@@ -359,25 +397,64 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Paciente */}
-                  <div>
+                  <div className="relative">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Paciente *
                     </label>
-                    <select
-                      className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
-                        errors.patient_id ? 'border-red-300' : 'border-gray-300'
-                      }`}
-                      value={formData.patient_id}
-                      onChange={(e) => handleChange('patient_id', e.target.value)}
-                      disabled={loadingPatients}
-                    >
-                      <option value="">Seleccionar paciente...</option>
-                      {patients.map(patient => (
-                        <option key={patient.id} value={patient.id}>
-                          {patient.first_name} {patient.last_name} - {patient.email}
-                        </option>
-                      ))}
-                    </select>
+                    {recordId ? (
+                      // Modo edición: campo de solo lectura
+                      <div className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-700">
+                        {formData.patient_id ? getPatientName(formData.patient_id) : 'Cargando...'}
+                      </div>
+                    ) : (
+                      // Modo creación: autocompletado de paciente
+                      <>
+                        <input
+                          type="text"
+                          className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
+                            errors.patient_id ? 'border-red-300' : 'border-gray-300'
+                          }`}
+                          value={patientSearch}
+                          onChange={(e) => handlePatientSearch(e.target.value)}
+                          placeholder="Buscar paciente por nombre o email..."
+                          onFocus={() => {
+                            if (patientSearch.length > 0) setShowSuggestions(true);
+                          }}
+                          onBlur={() => {
+                            // Delay para permitir click en sugerencias
+                            setTimeout(() => setShowSuggestions(false), 200);
+                          }}
+                        />
+                        
+                        {/* Dropdown de sugerencias */}
+                        {showSuggestions && filteredPatients.length > 0 && (
+                          <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                            {filteredPatients.map((patient) => (
+                              <div
+                                key={patient.id}
+                                className="px-3 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                onMouseDown={(e) => {
+                                  e.preventDefault(); // Prevenir que el input pierda focus
+                                  handlePatientSelect(patient);
+                                }}
+                              >
+                                <div className="font-medium text-gray-900">
+                                  {patient.first_name} {patient.last_name}
+                                </div>
+                                <div className="text-sm text-gray-600">{patient.email}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {/* Mensaje si no hay sugerencias */}
+                        {showSuggestions && patientSearch.length > 0 && filteredPatients.length === 0 && (
+                          <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg p-3 text-gray-500 text-sm">
+                            No se encontraron pacientes
+                          </div>
+                        )}
+                      </>
+                    )}
                     {errors.patient_id && (
                       <p className="mt-1 text-sm text-red-600">{errors.patient_id}</p>
                     )}

@@ -1,13 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-// Tipos según documentación
+// Tipos según documentación del backend
 interface User {
   id: string;
   username: string;
   email: string;
   first_name: string;
   last_name: string;
-  role: 'admin' | 'dentist' | 'recepcionista';
+  role: 'admin' | 'professional' | 'assistant' | 'receptionist'; // 🔧 ROLES CORRECTOS DEL BACKEND
   is_active: boolean;
 }
 

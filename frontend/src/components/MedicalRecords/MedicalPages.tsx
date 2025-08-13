@@ -1,7 +1,26 @@
 // MEDICAL_PAGES: Páginas específicas para rutas de historiales médicos
 /**
  * Componentes de página que integran los componentes médicos con el router.
- * Cada página maneja su propio estado y parámetros de URL.
+ * Cada página maneja sexport const PatientMedicalRecordsPage: React.FC = () => {
+  const { patientId } = useParams<{ patientId: string }>();
+  const navigate = useNavigate();
+
+  if (!patientId) {
+    navigate('/dashboard/medical-records');  // 🔧 FIXED: Added /dashboard prefix
+    return null;
+  }
+
+  const handleCreateNew = (selectedPatientId?: string) => {
+    navigate(`/dashboard/medical-records/new?patientId=${patientId}`);  // 🔧 FIXED: Added /dashboard prefix
+  };
+
+  const handleViewDetail = (recordId: string) => {
+    navigate(`/dashboard/medical-records/${recordId}`);  // 🔧 FIXED: Added /dashboard prefix
+  };
+
+  const handleEdit = (recordId: string, patientId?: string) => {
+    navigate(`/dashboard/medical-records/${recordId}/edit`);  // 🔧 FIXED: Added /dashboard prefix
+  };rámetros de URL.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -19,15 +38,15 @@ export const MedicalRecordsListPage: React.FC = () => {
 
   const handleCreateNew = (selectedPatientId?: string) => {
     const params = selectedPatientId ? `?patientId=${selectedPatientId}` : '';
-    navigate(`/medical-records/new${params}`);
+    navigate(`/dashboard/medical-records/new${params}`);  // 🔧 FIXED: Added /dashboard prefix
   };
 
   const handleViewDetail = (recordId: string) => {
-    navigate(`/medical-records/${recordId}`);
+    navigate(`/dashboard/medical-records/${recordId}`);  // 🔧 FIXED: Added /dashboard prefix
   };
 
   const handleEdit = (recordId: string, patientId?: string) => {
-    navigate(`/medical-records/${recordId}/edit`);
+    navigate(`/dashboard/medical-records/${recordId}/edit`);  // 🔧 FIXED: Added /dashboard prefix
   };
 
   return (
@@ -63,11 +82,11 @@ export const NewMedicalRecordPage: React.FC = () => {
 
   const handleSave = () => {
     // La lógica de guardado se maneja internamente en el componente MedicalRecordForm
-    navigate('/medical-records');
+    navigate('/dashboard/medical-records');  // 🔧 FIXED: Added /dashboard prefix
   };
 
   const handleClose = () => {
-    navigate('/medical-records');
+    navigate('/dashboard/medical-records');  // 🔧 FIXED: Added /dashboard prefix
   };
 
   return (
@@ -99,16 +118,16 @@ export const MedicalRecordDetailPage: React.FC = () => {
   const navigate = useNavigate();
 
   if (!recordId) {
-    navigate('/medical-records');
+    navigate('/dashboard/medical-records');  // 🔧 FIXED: Added /dashboard prefix
     return null;
   }
 
   const handleClose = () => {
-    navigate('/medical-records');
+    navigate('/dashboard/medical-records');  // 🔧 FIXED: Added /dashboard prefix
   };
 
   const handleEdit = () => {
-    navigate(`/medical-records/${recordId}/edit`);
+    navigate(`/dashboard/medical-records/${recordId}/edit`);  // 🔧 FIXED: Added /dashboard prefix
   };
 
   return (
@@ -140,17 +159,17 @@ export const EditMedicalRecordPage: React.FC = () => {
   const navigate = useNavigate();
 
   if (!recordId) {
-    navigate('/medical-records');
+    navigate('/dashboard/medical-records');  // 🔧 FIXED: Added /dashboard prefix
     return null;
   }
 
   const handleSave = () => {
     // La lógica de actualización se maneja internamente en el componente MedicalRecordForm
-    navigate(`/medical-records/${recordId}`);
+    navigate(`/dashboard/medical-records/${recordId}`);  // 🔧 FIXED: Added /dashboard prefix
   };
 
   const handleClose = () => {
-    navigate(`/medical-records/${recordId}`);
+    navigate(`/dashboard/medical-records/${recordId}`);  // 🔧 FIXED: Added /dashboard prefix
   };
 
   return (

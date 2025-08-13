@@ -27,6 +27,7 @@ import {
   ShareIcon,
   ArchiveBoxIcon
 } from '@heroicons/react/24/outline';
+import { useAuth } from '../../context/AuthContext.tsx';  // 🔧 FIXED: Added .tsx extension for webpack
 
 // Types
 interface MedicalRecord {
@@ -79,6 +80,9 @@ const MedicalRecordDetail: React.FC<MedicalRecordDetailProps> = ({
   recordId,
   onEdit
 }) => {
+  // 🔧 AUTH: Use AuthContext for proper token handling
+  const { state } = useAuth();
+  
   // Estados
   const [record, setRecord] = useState<MedicalRecord | null>(null);
   const [patient, setPatient] = useState<Patient | null>(null);
@@ -100,7 +104,11 @@ const MedicalRecordDetail: React.FC<MedicalRecordDetailProps> = ({
       setLoading(true);
       setError(null);
       
-      const token = localStorage.getItem('token');
+      const token = state.accessToken; // 🔧 FIXED: Use AuthContext token instead of localStorage
+      
+      if (!token) {
+        throw new Error('No hay token de autenticación válido');
+      }
       
       // Obtener historial médico
       const recordResponse = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/${recordId}`, {
@@ -127,7 +135,7 @@ const MedicalRecordDetail: React.FC<MedicalRecordDetailProps> = ({
           setPatient(patientData);
         }
       } else {
-        throw new Error('Error al cargar el historial médico');
+        throw new Error(`Error ${recordResponse.status}: ${recordResponse.statusText}`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
