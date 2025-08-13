@@ -152,7 +152,7 @@ export function DayViewSimple({
   const handleDropOnSlot = async (hour: number, quarter: number) => {
     if (!draggedAppointment) return;
     
-    console.log('🎯 Drop on slot:', hour, quarter, draggedAppointment);
+    // console.log('🎯 Drop on slot:', hour, quarter, draggedAppointment);
     
     // 🚫 VALIDATION: No moving appointments to past time
     // Only validate if we're moving within today
@@ -184,7 +184,7 @@ export function DayViewSimple({
       const targetDate = new Date(originalDate); // Keep original date
       targetDate.setHours(hour, quarter, 0, 0); // Only change time
       
-      console.log('🎯 Moving appointment within same day from', originalDate.toISOString(), 'to', targetDate.toISOString());
+      // console.log('🎯 Moving appointment within same day from', originalDate.toISOString(), 'to', targetDate.toISOString());
       
       // Call the API to update appointment time
       const result = await updateAppointmentTime(
@@ -195,15 +195,15 @@ export function DayViewSimple({
       );
       
       if (result.success) {
-        console.log('🎉 DRAG & DROP SUCCESS! Appointment updated in database');
+        // console.log('🎉 DRAG & DROP SUCCESS! Appointment updated in database');
         
         // Show success feedback
         // alert(`✅ Cita movida exitosamente a las ${hour.toString().padStart(2, '0')}:${quarter.toString().padStart(2, '0')}`);
-        console.log(`✅ Cita movida exitosamente a las ${hour.toString().padStart(2, '0')}:${quarter.toString().padStart(2, '0')}`);
+        // console.log(`✅ Cita movida exitosamente a las ${hour.toString().padStart(2, '0')}:${quarter.toString().padStart(2, '0')}`);
         
         // 🔥 REFRESH APPOINTMENTS DATA TO SHOW VISUAL UPDATE
         if (onAppointmentUpdate) {
-          console.log('� Refreshing appointments data...');
+          // console.log('🔄 Refreshing appointments data...');
           onAppointmentUpdate();
         }
         
@@ -257,8 +257,8 @@ export function DayViewSimple({
     if (!appointment) return null;
     
     // 🔍 DEBUG: Let's see what data structure we're getting
-    console.log('🔍 Raw appointment data:', appointment);
-    console.log('🔍 Available fields:', Object.keys(appointment));
+    // console.log('🔍 Raw appointment data:', appointment);
+    // console.log('🔍 Available fields:', Object.keys(appointment));
     
     try {
       const aptDate = parseClinicDateTime(appointment.scheduled_date);
@@ -282,13 +282,13 @@ export function DayViewSimple({
                              appointment.category ||
                              'consultation';
       
-      console.log('🎯 Mapped data:', { 
-        patientName, 
-        appointmentType, 
-        phone: appointment.patient_phone,
-        originalType: appointment.appointment_type,
-        originalName: appointment.patient_name 
-      });
+      // console.log('🎯 Mapped data:', { 
+      //   patientName, 
+      //   appointmentType, 
+      //   phone: appointment.patient_phone,
+      //   originalType: appointment.appointment_type,
+      //   originalName: appointment.patient_name 
+      // });
       
       const mappedType = mapAppointmentType(appointmentType);
       const originalPriority = getAppointmentPriority(appointment); // 'low' | 'normal' | 'high' | 'urgent'
@@ -300,13 +300,13 @@ export function DayViewSimple({
       const mappedPriority = originalPriority === 'urgent' ? 'urgent' :
                             originalPriority === 'high' ? 'high' : 'normal';
       
-      console.log('🎨 Color mapping:', { 
-        originalType: appointmentType, 
-        mappedType, 
-        originalPriority,
-        mappedPriority,
-        isUrgent: mappedPriority === 'urgent'
-      });
+      // console.log('🎨 Color mapping:', { 
+      //   originalType: appointmentType, 
+      //   mappedType, 
+      //   originalPriority,
+      //   mappedPriority,
+      //   isUrgent: mappedPriority === 'urgent'
+      // });
       
       return {
         id: appointment.id || '',
@@ -464,18 +464,18 @@ export function DayViewSimple({
                       className="flex-1 relative group/stack"
                       onMouseEnter={() => {
                         // 🚀 MANUAL HOVER REVEAL - 100% reliable (copied from WeekView)
-                        console.log(`🔍 Hover enter: Looking for cards with ID "stack-${slot.hour}-${slot.quarter}"`);
+                        // console.log(`🔍 Hover enter: Looking for cards with ID "stack-${slot.hour}-${slot.quarter}"`);
                         const cards = document.querySelectorAll(`[data-stack-id="stack-${slot.hour}-${slot.quarter}"]`);
-                        console.log(`🔍 Found ${cards.length} cards for hover reveal`);
+                        // console.log(`🔍 Found ${cards.length} cards for hover reveal`);
                         cards.forEach((card, index) => {
                           const yOffset = index === 0 ? 0 : index === 1 ? 20 : index === 2 ? 40 : index === 3 ? 64 : index === 4 ? 80 : 96;
                           (card as HTMLElement).style.transform = `translateY(${yOffset}px)`;
-                          console.log(`🔍 Card ${index}: transform to ${yOffset}px`);
+                          // console.log(`🔍 Card ${index}: transform to ${yOffset}px`);
                         });
                       }}
                       onMouseLeave={() => {
                         // Return to compact state
-                        console.log(`🔍 Hover leave: Returning cards to compact state`);
+                        // console.log(`🔍 Hover leave: Returning cards to compact state`);
                         const cards = document.querySelectorAll(`[data-stack-id="stack-${slot.hour}-${slot.quarter}"]`);
                         cards.forEach((card, index) => {
                           (card as HTMLElement).style.transform = `translateY(${index * 4}px)`;

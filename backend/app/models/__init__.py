@@ -16,6 +16,8 @@ PLATFORM_EXTRACTABLE vs DENTAL_SPECIFIC:
 from .user import User, UserRole
 from .patient import Patient, BloodType, Gender, AnxietyLevel  
 from .appointment import Appointment, AppointmentStatus, AppointmentType, AppointmentPriority
+from .medical_record import MedicalRecord, TreatmentStatus, TreatmentPriority, ProcedureCategory  # 🔒 MEDICAL RECORDS!
+from .medical_document import MedicalDocument, DocumentType, AccessLevel, ImageQuality  # 🔒 MEDICAL DOCUMENTS!
 
 # Export all models and enums for easy importing
 __all__ = [
@@ -23,6 +25,8 @@ __all__ = [
     "User",
     "Patient", 
     "Appointment",
+    "MedicalRecord",  # 🔒 MEDICAL RECORDS!
+    "MedicalDocument",  # 🔒 MEDICAL DOCUMENTS!
     
     # User enums
     "UserRole",
@@ -36,4 +40,14 @@ __all__ = [
     "AppointmentStatus",
     "AppointmentType",
     "AppointmentPriority",
+    
+    # Medical Record enums
+    "TreatmentStatus",
+    "TreatmentPriority", 
+    "ProcedureCategory",
+    
+    # Medical Document enums
+    "DocumentType",
+    "AccessLevel",
+    "ImageQuality",
 ]

@@ -302,7 +302,7 @@ RESULT: Both weekly & daily views with perfect drag & drop
 4. **Visual validation** - Always check against individual cards
 5. **Fresh eyes** - If confused, step back and restart approach
 
-### **💪 PUNKCCLAUDE POWER MANTRAS:**
+### **💪 PUNKKLAUDE POWER MANTRAS:**
 - *"I am the anarchist who makes GPT cry"*
 - *"Epic fails teach more than boring successes"*  
 - *"Fresh starts unlock creative breakthroughs"*

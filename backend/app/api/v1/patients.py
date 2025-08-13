@@ -14,14 +14,15 @@ patterns ARE extractable across all verticals.
 """
 
 from typing import Any, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Request  # 🔒 Added Request
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, func
 from datetime import date, datetime
 from uuid import UUID
 
 from ...core.database import get_db
-from ...core.security import get_current_user, require_permissions
+from ...core.security import get_current_user
+from ...core.medical_security import secure_medical_endpoint  # 🔒 DIGITAL FORTRESS IMPORT!
 from ...models.user import User
 from ...models.patient import Patient, AnxietyLevel, BloodType, Gender, AnxietyLevel, InsuranceStatus
 from ...schemas.patient import (
@@ -38,7 +39,9 @@ router = APIRouter(prefix="/patients", tags=["patient-management"])
 
 # PLATFORM_EXTRACTABLE: Create client/customer/patient pattern
 @router.post("/", status_code=status.HTTP_201_CREATED)
+@secure_medical_endpoint(action="CREATE", resource_type="patient")  # 🔒 DIGITAL FORTRESS!
 async def create_patient(
+    request: Request,  # 🔒 Required for Digital Fortress security
     patient_data: PatientCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -47,7 +50,7 @@ async def create_patient(
     Create a new patient record for the dental practice.
     
     DENTAL_SPECIFIC: Contains medical history, dental insurance, allergies.
-    Required permissions: patients:create
+    🔒 SECURITY: Digital Fortress protects this endpoint automatically
     
     PLATFORM_PATTERN: Every vertical needs client creation:
     - VetGest: create_pet() with veterinary-specific fields
@@ -56,13 +59,6 @@ async def create_patient(
     
     UNIVERSAL_STRUCTURE: Permission check → Duplicate check → Create → Audit
     """
-    
-    # PLATFORM_EXTRACTABLE: Permission checking pattern
-    if not current_user.has_permission("patients:create"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to create patient records"
-        )
     
     # PLATFORM_EXTRACTABLE: Duplicate email check pattern
     if patient_data.email:
@@ -156,7 +152,9 @@ async def create_patient(
 
 # PLATFORM_EXTRACTABLE: List clients/customers/patients with search and pagination
 @router.get("/")
+@secure_medical_endpoint(action="READ", resource_type="patient")  # 🔒 DIGITAL FORTRESS!
 async def list_patients(
+    request: Request,  # 🔒 Required for Digital Fortress security
     search_params: PatientSearchParams = Depends(),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -165,7 +163,7 @@ async def list_patients(
     List patients with search, filtering, and pagination.
     
     DENTAL_SPECIFIC: Includes medical and insurance filtering.
-    Required permissions: patients:read
+    🔒 SECURITY: Digital Fortress protects this endpoint automatically
     
     PLATFORM_PATTERN: Universal client listing structure:
     - VetGest: list_pets() with species/breed filters
@@ -174,13 +172,6 @@ async def list_patients(
     
     UNIVERSAL_STRUCTURE: Permission → Query building → Search → Pagination
     """
-    
-    # PLATFORM_EXTRACTABLE: Permission check
-    if not current_user.has_permission("patients:read"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to list patients"
-        )
     
     # PLATFORM_EXTRACTABLE: Base query with soft delete filter
     query = db.query(Patient).filter(Patient.deleted_at.is_(None))
@@ -288,7 +279,9 @@ async def list_patients(
 
 # PLATFORM_EXTRACTABLE: Get single client/customer/patient by ID
 @router.get("/{patient_id}", response_model=PatientWithMedicalHistory)
+@secure_medical_endpoint(action="READ", resource_type="patient")  # 🔒 DIGITAL FORTRESS!
 async def get_patient(
+    request: Request,  # 🔒 Required for Digital Fortress security
     patient_id: UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -297,20 +290,13 @@ async def get_patient(
     Get a specific patient by ID with full medical history.
     
     DENTAL_SPECIFIC: Returns sensitive medical information.
-    Required permissions: patients:read
+    🔒 SECURITY: Digital Fortress protects this endpoint automatically
     
     PLATFORM_PATTERN: Universal single client retrieval:
     - VetGest: get_pet() with veterinary records
     - MechaGest: get_vehicle() with service history
     - RestaurantGest: get_customer() with dining history
     """
-    
-    # PLATFORM_EXTRACTABLE: Permission check
-    if not current_user.has_permission("patients:read"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to view patient details"
-        )
     
     # PLATFORM_EXTRACTABLE: Entity lookup with soft delete check
     patient = db.query(Patient).filter(
@@ -327,7 +313,9 @@ async def get_patient(
 
 # PLATFORM_EXTRACTABLE: Update client/customer/patient
 @router.put("/{patient_id}", response_model=PatientResponse)
+@secure_medical_endpoint(action="UPDATE", resource_type="patient")  # 🔒 DIGITAL FORTRESS!
 async def update_patient(
+    request: Request,  # 🔒 Required for Digital Fortress security
     patient_id: UUID,
     patient_data: PatientUpdate,
     current_user: User = Depends(get_current_user),
@@ -337,20 +325,13 @@ async def update_patient(
     Update an existing patient record.
     
     DENTAL_SPECIFIC: Updates medical history and insurance information.
-    Required permissions: patients:update
+    🔒 SECURITY: Digital Fortress protects this endpoint automatically
     
     PLATFORM_PATTERN: Universal client update structure:
     - VetGest: update_pet() with veterinary-specific fields
     - MechaGest: update_vehicle() with automotive-specific fields
     - RestaurantGest: update_customer() with dining-specific fields
     """
-    
-    # PLATFORM_EXTRACTABLE: Permission check
-    if not current_user.has_permission("patients:update"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to update patient records"
-        )
     
     # PLATFORM_EXTRACTABLE: Entity lookup
     patient = db.query(Patient).filter(
@@ -379,11 +360,14 @@ async def update_patient(
                 detail="Patient with this email already exists"
             )
     
-    # PLATFORM_EXTRACTABLE: Update fields
+    # PLATFORM_EXTRACTABLE: Update fields with proper mapping
     update_data = patient_data.dict(exclude_unset=True)
     for field, value in update_data.items():
         if field == "email" and value:
             setattr(patient, field, value.lower())
+        elif field == "phone" and value:
+            # Map frontend "phone" to database "phone_primary"
+            setattr(patient, "phone_primary", value)
         else:
             setattr(patient, field, value)
     
@@ -393,11 +377,44 @@ async def update_patient(
     db.commit()
     db.refresh(patient)
     
-    return PatientResponse.from_orm(patient)
+    # Convert UUIDs to strings for JSON serialization
+    response_data = {
+        "id": str(patient.id),
+        "first_name": patient.first_name,
+        "last_name": patient.last_name,
+        "email": patient.email,
+        "phone": patient.phone_primary,
+        "phone_secondary": patient.phone_secondary,
+        "date_of_birth": patient.date_of_birth,
+        "gender": patient.gender,
+        "address_street": patient.address_street,
+        "address_city": patient.address_city,
+        "address_state": patient.address_state,
+        "address_postal_code": patient.address_postal_code,
+        "address_country": patient.address_country,
+        "emergency_contact_name": patient.emergency_contact_name,
+        "emergency_contact_phone": patient.emergency_contact_phone,
+        "emergency_contact_relationship": patient.emergency_contact_relationship,
+        "anxiety_level": patient.anxiety_level,
+        "consent_to_treatment": patient.consent_to_treatment,
+        "consent_to_contact": patient.consent_to_contact,
+        "is_active": patient.is_active,
+        "created_at": patient.created_at,
+        "updated_at": patient.updated_at,
+        "created_by": str(patient.created_by),
+        "age": None,  # Calculated field
+        "full_address": None,  # Calculated field
+        "has_insurance": bool(patient.insurance_provider),
+        "requires_special_care": bool(patient.special_needs)
+    }
+    
+    return response_data
 
 # PLATFORM_EXTRACTABLE: Soft delete client/customer/patient
 @router.delete("/{patient_id}", status_code=status.HTTP_204_NO_CONTENT)
+@secure_medical_endpoint(action="DELETE", resource_type="patient")  # 🔒 DIGITAL FORTRESS!
 async def delete_patient(
+    request: Request,  # 🔒 Required for Digital Fortress security
     patient_id: UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -406,20 +423,13 @@ async def delete_patient(
     Soft delete a patient (mark as deleted without removing from database).
     
     DENTAL_SPECIFIC: Preserves medical records for legal compliance.
-    Required permissions: patients:delete
+    🔒 SECURITY: Digital Fortress protects this endpoint automatically
     
     PLATFORM_PATTERN: Universal soft deletion for data integrity:
     - Preserve audit trails and relationships
     - Enable potential restoration
     - Comply with data retention policies
     """
-    
-    # PLATFORM_EXTRACTABLE: Permission check
-    if not current_user.has_permission("patients:delete"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to delete patient records"
-        )
     
     # PLATFORM_EXTRACTABLE: Entity lookup
     patient = db.query(Patient).filter(
@@ -441,6 +451,7 @@ async def delete_patient(
 
 # DENTAL_SPECIFIC: Activate/deactivate patient
 @router.post("/{patient_id}/activate", response_model=PatientResponse)
+@secure_medical_endpoint(action="UPDATE", resource_type="patient")  # 🔒 DIGITAL FORTRESS!
 async def activate_patient(
     patient_id: UUID,
     current_user: User = Depends(get_current_user),
@@ -450,20 +461,13 @@ async def activate_patient(
     Activate a patient account (allow appointments and services).
     
     DENTAL_SPECIFIC: Manages patient treatment eligibility.
-    Required permissions: patients:update
+    🔒 SECURITY: Digital Fortress protects this endpoint automatically
     
     PLATFORM_PATTERN: Most verticals need activation/deactivation:
     - VetGest: activate_pet() for treatment eligibility
     - MechaGest: activate_vehicle() for service eligibility
     - RestaurantGest: activate_customer() for reservation eligibility
     """
-    
-    # PLATFORM_EXTRACTABLE: Permission check
-    if not current_user.has_permission("patients:update"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to activate patient"
-        )
     
     # PLATFORM_EXTRACTABLE: Entity lookup and activation
     patient = db.query(Patient).filter(
@@ -485,6 +489,7 @@ async def activate_patient(
     return PatientResponse.from_orm(patient)
 
 @router.post("/{patient_id}/deactivate", response_model=PatientResponse)
+@secure_medical_endpoint(action="UPDATE", resource_type="patient")  # 🔒 DIGITAL FORTRESS!
 async def deactivate_patient(
     patient_id: UUID,
     current_user: User = Depends(get_current_user),
@@ -494,15 +499,8 @@ async def deactivate_patient(
     Deactivate a patient account (prevent new appointments).
     
     DENTAL_SPECIFIC: Temporarily suspend patient services.
-    Required permissions: patients:update
+    🔒 SECURITY: Digital Fortress protects this endpoint automatically
     """
-    
-    # PLATFORM_EXTRACTABLE: Permission check
-    if not current_user.has_permission("patients:update"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to deactivate patient"
-        )
     
     # PLATFORM_EXTRACTABLE: Entity lookup and deactivation
     patient = db.query(Patient).filter(
@@ -525,6 +523,7 @@ async def deactivate_patient(
 
 # DENTAL_SPECIFIC: Medical history endpoints
 @router.get("/{patient_id}/medical-history")
+@secure_medical_endpoint(action="READ", resource_type="patient")  # 🔒 DIGITAL FORTRESS!
 async def get_patient_medical_history(
     patient_id: UUID,
     current_user: User = Depends(get_current_user),
@@ -534,20 +533,13 @@ async def get_patient_medical_history(
     Get comprehensive medical history for a patient.
     
     DENTAL_SPECIFIC: Returns detailed medical information for treatment planning.
-    Required permissions: patients:read_medical
+    🔒 SECURITY: Digital Fortress protects this endpoint automatically
     
     VERTICAL_SPECIFIC: Each vertical has different "history" patterns:
     - VetGest: get_pet_medical_history() → vaccinations, treatments, surgeries
     - MechaGest: get_vehicle_service_history() → repairs, maintenance, inspections
     - RestaurantGest: get_customer_dining_history() → orders, preferences, allergies
     """
-    
-    # PLATFORM_EXTRACTABLE: Enhanced permission check
-    if not current_user.has_permission("patients:read_medical"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to view medical history"
-        )
     
     # PLATFORM_EXTRACTABLE: Entity lookup
     patient = db.query(Patient).filter(
@@ -599,6 +591,7 @@ async def get_patient_medical_history(
 
 # DENTAL_SPECIFIC: Insurance management
 @router.put("/{patient_id}/insurance")
+@secure_medical_endpoint(action="UPDATE", resource_type="patient")  # 🔒 DIGITAL FORTRESS!
 async def update_patient_insurance(
     patient_id: UUID,
     insurance_data: dict,
@@ -609,20 +602,13 @@ async def update_patient_insurance(
     Update patient insurance information.
     
     DENTAL_SPECIFIC: Manages dental insurance details for billing.
-    Required permissions: patients:update_insurance
+    🔒 SECURITY: Digital Fortress protects this endpoint automatically
     
     VERTICAL_ADAPTATION: Insurance concept varies by vertical:
     - VetGest: Pet insurance for veterinary care
     - MechaGest: Vehicle insurance for service liability
     - RestaurantGest: No insurance typically, but could be loyalty programs
     """
-    
-    # PLATFORM_EXTRACTABLE: Permission check
-    if not current_user.has_permission("patients:update_insurance"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to update insurance information"
-        )
     
     # PLATFORM_EXTRACTABLE: Entity lookup
     patient = db.query(Patient).filter(
@@ -647,6 +633,7 @@ async def update_patient_insurance(
 
 # PLATFORM_EXTRACTABLE: Search suggestions (universal pattern)
 @router.get("/search/suggestions")
+@secure_medical_endpoint(action="READ", resource_type="patient")  # 🔒 DIGITAL FORTRESS!
 async def get_patient_search_suggestions(
     query: str = Query(..., min_length=2),
     limit: int = Query(10, ge=1, le=50),
@@ -657,20 +644,13 @@ async def get_patient_search_suggestions(
     Get patient search suggestions for autocomplete.
     
     DENTAL_SPECIFIC: Searches patient names and basic info.
-    Required permissions: patients:read
+    🔒 SECURITY: Digital Fortress protects this endpoint automatically
     
     PLATFORM_PATTERN: Universal search suggestions across verticals:
     - VetGest: Pet name and owner suggestions
     - MechaGest: Vehicle and owner suggestions  
     - RestaurantGest: Customer name and contact suggestions
     """
-    
-    # PLATFORM_EXTRACTABLE: Permission check
-    if not current_user.has_permission("patients:read"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to search patients"
-        )
     
     # PLATFORM_EXTRACTABLE: Search query building
     search_term = f"%{query.lower()}%"

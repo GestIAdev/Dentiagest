@@ -13,7 +13,7 @@ PLATFORM_PATTERN: Other verticals will have similar "appointment" management:
 """
 
 from typing import Any, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, Query, BackgroundTasks, Request
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_, or_, func, text
 from datetime import date, datetime, timedelta
@@ -47,6 +47,7 @@ router = APIRouter(prefix="/appointments", tags=["appointments"])
 @router.post("/", response_model=AppointmentResponse, status_code=status.HTTP_201_CREATED)
 @secure_medical_endpoint(action="CREATE", resource_type="appointment")  # 🔒 DIGITAL FORTRESS!
 async def create_appointment(
+    request: Request,  # 🛡️ DIGITAL FORTRESS REQUEST
     appointment_data: AppointmentCreate,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
@@ -180,6 +181,7 @@ async def create_appointment(
 @router.get("/", response_model=AppointmentListResponse)
 @secure_medical_endpoint(action="READ", resource_type="appointment")  # 🔒 DIGITAL FORTRESS!
 async def list_appointments(
+    request: Request,  # 🛡️ DIGITAL FORTRESS REQUEST
     start_date: Optional[date] = Query(None),
     end_date: Optional[date] = Query(None),
     patient_id: Optional[UUID] = Query(None),
@@ -294,6 +296,7 @@ async def get_appointment(
 @router.put("/{appointment_id}", response_model=AppointmentResponse)
 @secure_medical_endpoint(action="UPDATE", resource_type="appointment")  # 🔒 DIGITAL FORTRESS!
 async def update_appointment(
+    request: Request,  # 🛡️ DIGITAL FORTRESS REQUEST
     appointment_id: UUID,
     appointment_data: AppointmentUpdate,
     db: Session = Depends(get_db),
@@ -384,6 +387,7 @@ async def update_appointment(
 @router.delete("/{appointment_id}")
 @secure_medical_endpoint(action="DELETE", resource_type="appointment")  # 🔒 DIGITAL FORTRESS!
 async def delete_appointment(
+    request: Request,  # 🛡️ DIGITAL FORTRESS REQUEST
     appointment_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)  # 🏴‍☠️ SECURITY!

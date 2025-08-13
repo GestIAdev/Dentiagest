@@ -244,7 +244,7 @@ const PatientFormModal: React.FC<PatientFormModalProps> = ({
         }
       });
 
-      console.log('Sending patient data:', transformedData);
+      // console.log('Sending patient data:', transformedData);
 
       const url = patient 
         ? `http://localhost:8002/api/v1/patients/${patient.id}`

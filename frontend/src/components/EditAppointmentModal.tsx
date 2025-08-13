@@ -76,7 +76,7 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
         return;
       }
 
-      console.log('🔍 EditAppointmentModal: Found date:', rawDate, 'from appointment:', appointment);
+      // console.log('🔍 EditAppointmentModal: Found date:', rawDate, 'from appointment:', appointment);
 
       try {
         // 🌍 USE TIMEZONE UTILITIES - CYBERPUNK SOLUTION!
@@ -213,7 +213,7 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
 
     // 🔧 FALLBACK: Si no hay patient_id pero hay patient_name, buscar el ID
     if (!formData.patient_id && formData.patient_name) {
-      console.log('⚠️ Falta patient_id, pero tenemos patient_name. Esto puede ser un problema de carga de datos.');
+      // console.log('⚠️ Falta patient_id, pero tenemos patient_name. Esto puede ser un problema de carga de datos.');
       // Por ahora continuamos, pero logueamos el problema
     }
 

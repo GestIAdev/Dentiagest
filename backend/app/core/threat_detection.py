@@ -80,23 +80,25 @@ class RateLimitConfig:
     
     # Login attempts - critical security operation
     LOGIN_ATTEMPTS = RateLimit(
-        requests_per_minute=5,
+        requests_per_minute=5,    # Keep strict - brute force protection
         requests_per_hour=20,
         burst_limit=3
     )
     
-    # Medical record access - high sensitivity
+    # Medical record access - high sensitivity BUT realistic for doctors
+    # NOTE: A busy doctor might legitimately access 60+ records/hour
     MEDICAL_RECORD_ACCESS = RateLimit(
-        requests_per_minute=30,
-        requests_per_hour=300,
-        burst_limit=10
+        requests_per_minute=100,  # � REALISTIC: Busy doctor/receptionist
+        requests_per_hour=1000,   # � REALISTIC: Heavy usage days
+        burst_limit=50            # � REALISTIC: Quick searches
     )
     
-    # Patient data queries
+    # Patient data queries - for searches, autocomplete, etc.
+    # NOTE: Autocomplete + search can generate many requests quickly
     PATIENT_DATA_ACCESS = RateLimit(
-        requests_per_minute=50,
-        requests_per_hour=500,
-        burst_limit=20
+        requests_per_minute=150,  # 🔍 REALISTIC: Search-heavy workflows
+        requests_per_hour=1500,   # 🔍 REALISTIC: Full day of patient management
+        burst_limit=75            # 🔍 REALISTIC: Rapid autocomplete/search
     )
     
     # Data export operations - highest risk
@@ -106,11 +108,11 @@ class RateLimitConfig:
         burst_limit=1
     )
     
-    # General API operations
+    # General API operations - generous for normal workflow
     GENERAL_API = RateLimit(
-        requests_per_minute=100,
-        requests_per_hour=1000,
-        burst_limit=50
+        requests_per_minute=200,  # 🚀 REALISTIC: Normal API usage
+        requests_per_hour=2000,   # 🚀 REALISTIC: Active work session
+        burst_limit=100           # 🚀 REALISTIC: UI interactions
     )
 
 
@@ -141,6 +143,18 @@ class ThreatDetectionMiddleware:
         Returns:
             Tuple of (allowed, block_reason, threat_level)
         """
+        # 🏴‍☠️ DEVELOPMENT ANARCHY MODE: Bypass all rate limiting
+        # 
+        # WHY: React development mode is like a hyperactive kid who
+        # makes 300+ requests when you just drag & drop 3 times.
+        # 
+        # FOR PRODUCTION: Change environment to "production" and 
+        # prepare for angry emails from receptionists! 📧😡
+        from app.core.config import get_settings
+        settings = get_settings()
+        if settings.environment == "development":
+            return True, None, None  # ¡YOLO MODE ACTIVATED!
+        
         current_time = time.time()
         
         # Check if entity is currently blocked
@@ -266,6 +280,15 @@ class ThreatDetectionMiddleware:
         - Access at unusual times (3 AM)
         - Rapid sequential access to unrelated patients
         """
+        # 🏴‍☠️ DEVELOPMENT ANARCHY MODE: Bypass anomaly detection
+        # 
+        # WHY: Developers work at weird hours (1 AM drag & drop testing)
+        # and have unusual access patterns during development/testing.
+        from app.core.config import get_settings
+        settings = get_settings()
+        if settings.environment == "development":
+            return True, None, None  # ¡NIGHT OWL DEVELOPER MODE!
+        
         if timestamp is None:
             timestamp = datetime.now(timezone.utc)
         
@@ -540,6 +563,22 @@ class ThreatDetectionMiddleware:
             import logging
             logger = logging.getLogger("security.error")
             logger.error(f"Failed to log security event: {str(e)}")
+
+    def reset_for_development(self):
+        """
+        🏴‍☠️ DEVELOPMENT ONLY: Reset all rate limiting memory.
+        This clears all blocked users and request history.
+        
+        WARNING: NEVER use this in production!
+        """
+        self._request_history.clear()
+        self._failed_attempts.clear() 
+        self._blocked_entities.clear()
+        self._access_patterns.clear()
+        
+        import logging
+        logger = logging.getLogger("security.development")
+        logger.warning("🏴‍☠️ DEV MODE: Rate limiting memory has been RESET!")
 
 
 # Global threat detection middleware instance

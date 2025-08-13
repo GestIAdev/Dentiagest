@@ -75,8 +75,8 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
     
     if (searchTerm.length > 0) {
       // 🔥 ANARQUIST DEBUG - TEST fetchAllPatients first
-      console.log('🔥 Testing fetchAllPatients vs fetchPatients');
-      console.log('🔥 Current patients array length:', patients.length);
+      // console.log('🔥 Testing fetchAllPatients vs fetchPatients');
+      // console.log('🔥 Current patients array length:', patients.length);
       
       // Buscar en pacientes locales primero
       const localResults = (patients || []).filter(p => 

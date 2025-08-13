@@ -374,6 +374,29 @@ async def get_practice_info():
         ]
     }
 
+
+# 🏴‍☠️ DEVELOPMENT ONLY ENDPOINT
+@app.post("/api/dev/reset-rate-limits", tags=["development"])
+async def reset_rate_limits():
+    """
+    🏴‍☠️ DEVELOPMENT ONLY: Reset all rate limiting memory.
+    
+    This endpoint clears all blocked users and rate limiting history.
+    Use this when React development mode triggers too many requests.
+    
+    WARNING: This endpoint should NEVER exist in production!
+    """
+    from .core.threat_detection import threat_detector
+    
+    threat_detector.reset_for_development()
+    
+    return {
+        "message": "🏴‍☠️ Rate limiting memory has been reset!",
+        "status": "cleared",
+        "warning": "This is a DEVELOPMENT-ONLY operation"
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
     

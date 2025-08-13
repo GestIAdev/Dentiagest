@@ -556,7 +556,7 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
                       onClick={() => {
                         if (window.confirm('¿Estás seguro de que quieres eliminar este historial médico?')) {
                           // TODO: Implementar eliminación
-                          console.log('Eliminar historial:', record.id);
+                          // console.log('Eliminar historial:', record.id);
                         }
                       }}
                     >

@@ -198,8 +198,15 @@ def secure_medical_endpoint(
                 if isinstance(value, Request):
                     request = value
                 elif hasattr(value, 'id') and hasattr(value, 'role'):
-                    # Handle User model object from get_current_user
-                    current_user = value
+                    # Handle User model object from get_current_user - convert to dict
+                    current_user = {
+                        "id": str(value.id),
+                        "role": value.role.value if hasattr(value.role, 'value') else str(value.role),
+                        "email": getattr(value, 'email', 'unknown'),
+                        "first_name": getattr(value, 'first_name', ''),
+                        "last_name": getattr(value, 'last_name', ''),
+                        "is_active": getattr(value, 'is_active', True)
+                    }
                 elif isinstance(value, dict) and "id" in value and "role" in value:
                     # Handle dict format user
                     current_user = value
@@ -235,7 +242,7 @@ def secure_medical_endpoint(
                 )
                 
                 # Add security metadata to kwargs for the endpoint to use
-                kwargs["security_metadata"] = security_result["security_metadata"]
+                # kwargs["security_metadata"] = security_result["security_metadata"]  # 🔒 Disabled - not needed
                 
             except HTTPException:
                 # Security validation failed - re-raise the exception
