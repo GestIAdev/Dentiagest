@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.tsx';
+import LegalTransparencyModule from '../Legal/LegalTransparencyModule.tsx';
 
 const DashboardLayout: React.FC = () => {
   const { state, logout } = useAuth();
@@ -107,6 +108,12 @@ const DashboardLayout: React.FC = () => {
               <div className="flex-shrink-0">
                 <h1 className="text-2xl font-bold text-primary-500">🦷 DentiaGest</h1>
               </div>
+            </div>
+            
+            {/* Área Central del Top Bar */}
+            <div className="flex items-center space-x-4">
+              {/* Legal Transparency Module */}
+              <LegalTransparencyModule />
             </div>
             
             {/* Información del Usuario */}

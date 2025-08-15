@@ -18,6 +18,7 @@
 
 import React, { useState, useRef, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
+import { LegalCategory, UnifiedDocumentType, getUnifiedTypeLabel, getCategoryFromUnifiedType } from './DocumentCategories.tsx';
 import { 
   CloudArrowUpIcon, 
   DocumentIcon, 
@@ -28,28 +29,191 @@ import {
   XCircleIcon 
 } from '@heroicons/react/24/outline';
 
-// 🦷 DENTAL_SPECIFIC: Document types
-export enum DocumentType {
-  XRAY_BITEWING = 'xray_bitewing',
-  XRAY_PANORAMIC = 'xray_panoramic', 
-  XRAY_PERIAPICAL = 'xray_periapical',
-  INTRAORAL_PHOTO = 'intraoral_photo',
-  CLINICAL_PHOTO = 'clinical_photo',
-  PROGRESS_PHOTO = 'progress_photo',
-  CONSENT_FORM = 'consent_form',
-  TREATMENT_PLAN = 'treatment_plan',
-  VOICE_NOTE = 'voice_note',
-  PRESCRIPTION = 'prescription',
-  LAB_REPORT = 'lab_report',
-  INSURANCE_DOCUMENT = 'insurance_document'
+// 🗂️ UNIFIED SYSTEM: Now using UnifiedDocumentType from DocumentCategories
+// Legacy DocumentType enum removed - using UnifiedDocumentType instead
+// 🔐 ACCESS_LEVEL: LEGAL COMPLIANCE - Spanish Medical Data Law
+export enum AccessLevel {
+  MEDICAL = 'medical',                    // Medical professionals only (doctors + qualified assistants)
+  ADMINISTRATIVE = 'administrative'      // All staff can access (receptionists + admins + doctors)
 }
 
-// 🔐 ACCESS_LEVEL: GDPR Article 9 compliance
-export enum AccessLevel {
-  PUBLIC = 'public',
-  RESTRICTED = 'restricted',
-  CONFIDENTIAL = 'confidential'
-}
+// 🤖 SMART CATEGORIZATION ENGINE - UNIFIED SYSTEM
+const detectDocumentCategory = (file: File): { 
+  documentType: UnifiedDocumentType; 
+  category: LegalCategory; 
+  confidence: number; 
+  accessLevel: AccessLevel 
+} => {
+  const name = file.name.toLowerCase();
+  const mime = file.type.toLowerCase();
+  
+  // 🦷 DENTAL X-RAYS DETECTION → UNIFIED: XRAY
+  if (name.includes('rayos') || name.includes('xray') || name.includes('radiografia') || name.includes('rx') ||
+      name.includes('panoramica') || name.includes('panoramic') || name.includes('periapical') || name.includes('bitewing')) {
+    return { 
+      documentType: UnifiedDocumentType.XRAY, 
+      category: LegalCategory.MEDICAL, 
+      confidence: 0.95, 
+      accessLevel: AccessLevel.MEDICAL 
+    };
+  }
+  
+  // 🎵 AUDIO FILES DETECTION → UNIFIED: VOICE_NOTE
+  if (mime.includes('audio') || name.includes('nota') || name.includes('voice') || name.includes('grabacion')) {
+    return { 
+      documentType: UnifiedDocumentType.VOICE_NOTE, 
+      category: LegalCategory.MEDICAL, 
+      confidence: 0.9, 
+      accessLevel: AccessLevel.MEDICAL 
+    };
+  }
+  
+  // 💰 BILLING DOCUMENTS DETECTION → UNIFIED: INVOICE/BUDGET
+  if (name.includes('factura') || name.includes('invoice')) {
+    return { 
+      documentType: UnifiedDocumentType.INVOICE, 
+      category: LegalCategory.BILLING, 
+      confidence: 0.9, 
+      accessLevel: AccessLevel.ADMINISTRATIVE 
+    };
+  }
+  if (name.includes('presupuesto') || name.includes('budget')) {
+    return { 
+      documentType: UnifiedDocumentType.BUDGET, 
+      category: LegalCategory.BILLING, 
+      confidence: 0.9, 
+      accessLevel: AccessLevel.ADMINISTRATIVE 
+    };
+  }
+  
+  // � LEGAL DOCUMENTS DETECTION → UNIFIED: CONSENT_FORM/LEGAL_DOCUMENT
+  if (name.includes('consentimiento') || name.includes('consent')) {
+    return { 
+      documentType: UnifiedDocumentType.CONSENT_FORM, 
+      category: LegalCategory.LEGAL, 
+      confidence: 0.9, 
+      accessLevel: AccessLevel.ADMINISTRATIVE 
+    };
+  }
+  if (name.includes('contrato') || name.includes('legal')) {
+    return { 
+      documentType: UnifiedDocumentType.LEGAL_DOCUMENT, 
+      category: LegalCategory.LEGAL, 
+      confidence: 0.9, 
+      accessLevel: AccessLevel.ADMINISTRATIVE 
+    };
+  }
+  
+  // 📊 TREATMENT PLANS DETECTION → UNIFIED: TREATMENT_PLAN
+  if (name.includes('plan') || name.includes('tratamiento') || name.includes('treatment')) {
+    return { 
+      documentType: UnifiedDocumentType.TREATMENT_PLAN, 
+      category: LegalCategory.MEDICAL, 
+      confidence: 0.85, 
+      accessLevel: AccessLevel.MEDICAL 
+    };
+  }
+  
+  // 🧪 LAB REPORTS DETECTION → UNIFIED: LAB_REPORT
+  if (name.includes('laboratorio') || name.includes('lab') || name.includes('reporte') || name.includes('analisis')) {
+    return { 
+      documentType: UnifiedDocumentType.LAB_REPORT, 
+      category: LegalCategory.MEDICAL, 
+      confidence: 0.85, 
+      accessLevel: AccessLevel.MEDICAL 
+    };
+  }
+  
+  // 💊 PRESCRIPTION DETECTION → UNIFIED: PRESCRIPTION
+  if (name.includes('receta') || name.includes('prescription') || name.includes('medicamento')) {
+    return { 
+      documentType: UnifiedDocumentType.PRESCRIPTION, 
+      category: LegalCategory.MEDICAL, 
+      confidence: 0.9, 
+      accessLevel: AccessLevel.MEDICAL 
+    };
+  }
+  
+  // � PHOTO DETECTION → UNIFIED: PHOTO_CLINICAL
+  if (mime.includes('image')) {
+    return { 
+      documentType: UnifiedDocumentType.PHOTO_CLINICAL, 
+      category: LegalCategory.MEDICAL, 
+      confidence: 0.8, 
+      accessLevel: AccessLevel.MEDICAL 
+    };
+  }
+  
+  // 🏥 INSURANCE FORMS → UNIFIED: INSURANCE_FORM
+  if (name.includes('seguro') || name.includes('insurance') || name.includes('obra') || name.includes('social')) {
+    return { 
+      documentType: UnifiedDocumentType.INSURANCE_FORM, 
+      category: LegalCategory.ADMINISTRATIVE, 
+      confidence: 0.9, 
+      accessLevel: AccessLevel.ADMINISTRATIVE 
+    };
+  }
+  
+  // 📄 PDF DETECTION (general) → UNIFIED: DOCUMENT_GENERAL
+  if (mime.includes('pdf') || mime.includes('msword') || mime.includes('wordprocessingml') || 
+      name.endsWith('.doc') || name.endsWith('.docx')) {
+    return { 
+      documentType: UnifiedDocumentType.DOCUMENT_GENERAL, 
+      category: LegalCategory.ADMINISTRATIVE, 
+      confidence: 0.75, 
+      accessLevel: AccessLevel.ADMINISTRATIVE 
+    };
+  }
+  
+  // 📊 DEFAULT FALLBACK → UNIFIED: DOCUMENT_GENERAL
+  return { 
+    documentType: UnifiedDocumentType.DOCUMENT_GENERAL, 
+    category: LegalCategory.ADMINISTRATIVE, 
+    confidence: 0.5, 
+    accessLevel: AccessLevel.ADMINISTRATIVE 
+  };
+};
+
+// 🎨 CONFIDENCE LEVEL STYLING
+const getConfidenceColor = (confidence: number): string => {
+  if (confidence >= 0.9) return 'text-green-600 bg-green-100';
+  if (confidence >= 0.7) return 'text-yellow-600 bg-yellow-100';
+  return 'text-red-600 bg-red-100';
+};
+
+// 🎯 UNIFIED DOCUMENT TYPE LABELS (SPANISH)
+const getDocumentTypeLabel = (type: UnifiedDocumentType): string => {
+  const labels: Record<UnifiedDocumentType, string> = {
+    [UnifiedDocumentType.XRAY]: 'Rayos X',
+    [UnifiedDocumentType.PHOTO_CLINICAL]: 'Foto Clínica',
+    [UnifiedDocumentType.VOICE_NOTE]: 'Nota de Voz',
+    [UnifiedDocumentType.INVOICE]: 'Factura',
+    [UnifiedDocumentType.BUDGET]: 'Presupuesto',
+    [UnifiedDocumentType.CONSENT_FORM]: 'Consentimiento Informado',
+    [UnifiedDocumentType.LEGAL_DOCUMENT]: 'Documento Legal',
+    [UnifiedDocumentType.TREATMENT_PLAN]: 'Plan de Tratamiento',
+    [UnifiedDocumentType.LAB_REPORT]: 'Reporte de Laboratorio',
+    [UnifiedDocumentType.PRESCRIPTION]: 'Receta Médica',
+    [UnifiedDocumentType.INSURANCE_FORM]: 'Formulario de Seguro',
+    [UnifiedDocumentType.SCAN_3D]: 'Escáner 3D',
+    [UnifiedDocumentType.PAYMENT_PROOF]: 'Comprobante de Pago',
+    [UnifiedDocumentType.REFERRAL_LETTER]: 'Carta de Derivación',
+    [UnifiedDocumentType.DOCUMENT_GENERAL]: 'Documento General'
+  };
+  // Completar tipos faltantes en enum
+  return labels[type] || 'Documento';
+};
+
+// 🏷️ CATEGORY LABELS (SPANISH)
+const getCategoryLabel = (category: LegalCategory): string => {
+  const labels: Record<LegalCategory, string> = {
+    [LegalCategory.MEDICAL]: 'Médico',
+    [LegalCategory.ADMINISTRATIVE]: 'Administrativo',
+    [LegalCategory.LEGAL]: 'Legal',
+    [LegalCategory.BILLING]: 'Facturación'
+  };
+  return labels[category] || category;
+};
 
 interface DocumentUploadProps {
   patientId?: string;  // 🤘 ANARCHIST: Optional for global mode
@@ -68,9 +232,13 @@ interface UploadFile {
   progress: number;
   status: 'pending' | 'uploading' | 'success' | 'error';
   error?: string;
-  documentType?: DocumentType;
+  documentType?: UnifiedDocumentType;
   accessLevel?: AccessLevel;
   preview?: string;
+  // 🤖 SMART CATEGORIZATION FIELDS
+  detectedCategory?: LegalCategory;
+  detectedConfidence?: number;
+  categoryOverride?: boolean; // User manually changed category
 }
 
 export const DocumentUpload: React.FC<DocumentUploadProps> = ({
@@ -80,8 +248,24 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
   onUploadComplete,
   onUploadError,
   acceptedTypes = [
-    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
-    'application/pdf', 'audio/mp3', 'audio/wav', 'audio/ogg'
+    // 🖼️ IMAGES
+    'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/tiff',
+    // 📄 DOCUMENTS  
+    'application/pdf',
+    // 📝 MICROSOFT OFFICE
+    'application/msword', // .doc
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+    'application/vnd.ms-excel', // .xls
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+    'application/vnd.ms-powerpoint', // .ppt
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
+    // 📋 TEXT FILES
+    'text/plain', // .txt
+    'text/markdown', // .md
+    'text/csv', // .csv
+    'application/rtf', // .rtf
+    // 🎵 AUDIO
+    'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/mpeg', 'audio/mp4'
   ],
   maxFileSize = 50, // 50MB default
   className = ''
@@ -106,13 +290,13 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
       };
     } else {
       return {
-        mode: '🌐 SUBIDA GLOBAL',
-        icon: '📁',
-        description: 'Los archivos se subirán globalmente - podrás asignarlos después',
-        bgColor: 'from-purple-500/10 to-pink-500/10',
-        borderColor: 'border-purple-300',
-        textColor: 'text-purple-700',
-        badgeColor: 'bg-purple-100 text-purple-800'
+        mode: '� DOCUMENTOS CLÍNICA',
+        icon: '�️',
+        description: 'Documentos administrativos de la clínica - facturas, contratos, etc.',
+        bgColor: 'from-blue-500/10 to-cyan-500/10',
+        borderColor: 'border-blue-300',
+        textColor: 'text-blue-700',
+        badgeColor: 'bg-blue-100 text-blue-800'
       };
     }
   };
@@ -145,14 +329,26 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
 
     fileArray.forEach(file => {
       const validationError = validateFile(file);
+      
+      // 🤖 SMART CATEGORIZATION: Detect document type automatically
+      const detection = detectDocumentCategory(file);
+      console.log('🤖 Smart categorization result:', detection);
+      
       const uploadFile: UploadFile = {
         file,
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         progress: 0,
         status: validationError ? 'error' : 'pending',
         error: validationError || undefined,
-        preview: generatePreview(file)
+        preview: generatePreview(file),
+        // 🎯 AUTO-DETECTED VALUES
+        documentType: detection.documentType,
+        accessLevel: detection.accessLevel,  // 🔧 FIX: Use detected access level
+        detectedCategory: detection.category,
+        detectedConfidence: detection.confidence,
+        categoryOverride: false
       };
+      console.log('📁 Created uploadFile with accessLevel:', uploadFile.accessLevel);
       validFiles.push(uploadFile);
     });
 
@@ -211,13 +407,67 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
       for (const uploadFile of pendingFiles) {
         updateFileMetadata(uploadFile.id, { status: 'uploading', progress: 0 });
 
+        // 🔄 UNIFIED TO LEGACY MAPPING SYSTEM - Backend v1 compatibility
+        const mapToBackendType = (frontendType: UnifiedDocumentType): string => {
+          // Map unified types to legacy backend types
+          const unifiedToLegacyMap: { [key in UnifiedDocumentType]: string } = {
+            [UnifiedDocumentType.XRAY]: 'xray_panoramic',
+            [UnifiedDocumentType.PHOTO_CLINICAL]: 'clinical_photo',
+            [UnifiedDocumentType.VOICE_NOTE]: 'voice_note',
+            [UnifiedDocumentType.TREATMENT_PLAN]: 'treatment_plan',
+            [UnifiedDocumentType.LAB_REPORT]: 'lab_report',
+            [UnifiedDocumentType.PRESCRIPTION]: 'prescription',
+            [UnifiedDocumentType.SCAN_3D]: 'stl_file',
+            [UnifiedDocumentType.CONSENT_FORM]: 'consent_form',
+            [UnifiedDocumentType.INSURANCE_FORM]: 'insurance_form',
+            [UnifiedDocumentType.DOCUMENT_GENERAL]: 'other_document',
+            [UnifiedDocumentType.INVOICE]: 'other_document',
+            [UnifiedDocumentType.BUDGET]: 'other_document',
+            [UnifiedDocumentType.PAYMENT_PROOF]: 'other_document',
+            [UnifiedDocumentType.REFERRAL_LETTER]: 'referral_letter',
+            [UnifiedDocumentType.LEGAL_DOCUMENT]: 'other_document'
+          };
+          
+          return unifiedToLegacyMap[frontendType] || 'other_document';
+        };
+
+        const mapToBackendAccessLevel = (frontendAccessLevel: AccessLevel): string => {
+          // Mapear access levels del frontend (MAYÚSCULAS) a backend (minúsculas)
+          console.log('🔍 DEBUG mapToBackendAccessLevel input:', frontendAccessLevel, typeof frontendAccessLevel);
+          
+          // 🔧 EXPLICIT STRING COMPARISON - Fix enum weirdness
+          const accessLevelStr = String(frontendAccessLevel);
+          console.log('🔍 DEBUG accessLevelStr:', accessLevelStr);
+          
+          if (accessLevelStr === 'medical' || accessLevelStr === AccessLevel.MEDICAL) {
+            console.log('✅ Mapping MEDICAL to medical');
+            return 'medical';
+          }
+          if (accessLevelStr === 'administrative' || accessLevelStr === AccessLevel.ADMINISTRATIVE) {
+            console.log('✅ Mapping ADMINISTRATIVE to administrative');
+            return 'administrative';
+          }
+          
+          console.log('⚠️ Using default fallback to administrative');
+          return 'administrative'; // Default fallback
+        };
+
+        console.log('🔍 DEBUG uploadFile.accessLevel:', uploadFile.accessLevel);
+        const backendDocumentType = mapToBackendType(uploadFile.documentType || UnifiedDocumentType.PHOTO_CLINICAL);
+        const backendAccessLevel = mapToBackendAccessLevel(uploadFile.accessLevel || AccessLevel.ADMINISTRATIVE);
+        console.log('🔍 DEBUG final backendAccessLevel:', backendAccessLevel);
+
         const formData = new FormData();
         formData.append('file', uploadFile.file);
-        formData.append('document_type', uploadFile.documentType || DocumentType.CLINICAL_PHOTO);
-        formData.append('access_level', uploadFile.accessLevel || AccessLevel.RESTRICTED);
+        formData.append('title', uploadFile.file.name); // 🔧 FIX: Add required title
+        formData.append('document_type', backendDocumentType);
+        formData.append('access_level', backendAccessLevel); // 🔧 FIX: Mapped to lowercase
         
         // 🎯 CONDITIONAL PARAMETERS: Only append if they exist
-        if (patientId) formData.append('patient_id', patientId);
+        if (patientId) {
+          formData.append('patient_id', patientId);
+        }
+        // 🌍 GLOBAL MODE: Allow uploads without patient (administrative docs, general files)
         if (medicalRecordId) formData.append('medical_record_id', medicalRecordId);
         if (appointmentId) formData.append('appointment_id', appointmentId);
 
@@ -405,6 +655,31 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
                   {(file.file.size / 1024 / 1024).toFixed(1)} MB
                 </p>
                 
+                {/* 🤖 SMART CATEGORIZATION PREVIEW */}
+                {file.detectedCategory && file.detectedConfidence && (
+                  <div className="mt-2 flex items-center space-x-2">
+                    <span className="text-xs font-medium text-gray-600">
+                      🤖 Detectado:
+                    </span>
+                    <span 
+                      className={`text-xs px-2 py-1 rounded-full ${getConfidenceColor(file.detectedConfidence)}`}
+                    >
+                      {getCategoryLabel(file.detectedCategory)} • {getDocumentTypeLabel(file.documentType || UnifiedDocumentType.PHOTO_CLINICAL)}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      ({Math.round(file.detectedConfidence * 100)}% confianza)
+                    </span>
+                    {!file.categoryOverride && (
+                      <button
+                        onClick={() => updateFileMetadata(file.id, { categoryOverride: true })}
+                        className="text-xs text-blue-600 hover:text-blue-800 underline"
+                      >
+                        Cambiar
+                      </button>
+                    )}
+                  </div>
+                )}
+                
                 {/* 📊 PROGRESS BAR */}
                 {file.status === 'uploading' && (
                   <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
@@ -418,6 +693,35 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
                 {/* ❌ ERROR MESSAGE */}
                 {file.error && (
                   <p className="text-sm text-red-600 mt-1">{file.error}</p>
+                )}
+                
+                {/* 🎛️ MANUAL CATEGORY OVERRIDE */}
+                {file.categoryOverride && (
+                  <div className="mt-3 p-3 bg-white rounded border border-gray-200">
+                    <p className="text-sm font-medium text-gray-700 mb-2">
+                      Seleccionar categoría manualmente:
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {Object.values(LegalCategory).map((category) => (
+                        <button
+                          key={category}
+                          onClick={() => updateFileMetadata(file.id, { 
+                            detectedCategory: category,
+                            categoryOverride: false 
+                          })}
+                          className={`
+                            text-xs px-3 py-2 rounded border transition-colors
+                            ${file.detectedCategory === category
+                              ? 'bg-blue-100 border-blue-300 text-blue-800'
+                              : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
+                            }
+                          `}
+                        >
+                          {getCategoryLabel(category)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
 

@@ -181,7 +181,7 @@ class MedicalDocumentBase(BaseModel):
     expiry_date: Optional[datetime] = Field(None, description="Document expiry date")
     
     # Access control
-    access_level: AccessLevel = Field(default=AccessLevel.CLINICAL_STAFF)
+    access_level: AccessLevel = Field(default=AccessLevel.MEDICAL)
     is_confidential: bool = Field(default=False)
     
     # Image quality (for images)

@@ -11,12 +11,16 @@ PLATFORM_PATTERN: This structure is reusable across business verticals:
 
 from fastapi import APIRouter
 from .v1 import api_router as api_v1_router
+from .v2.unified_documents_minimal import router as unified_documents_router
 
 # PLATFORM_EXTRACTABLE: Main API router
 api_router = APIRouter(prefix="/api")
 
 # Include v1 routes
 api_router.include_router(api_v1_router, prefix="/v1")
+
+# Include v2 unified documents routes
+api_router.include_router(unified_documents_router)
 
 # Basic endpoints for now
 @api_router.get("/")
@@ -26,7 +30,7 @@ async def api_root():
         "message": "DentiaGest API",
         "status": "active",
         "version": "1.0.0",
-        "available_versions": ["v1"]
+        "available_versions": ["v1", "v2"]
     }
 
 @api_router.get("/status")

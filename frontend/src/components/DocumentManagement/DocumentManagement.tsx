@@ -15,8 +15,7 @@ import { DocumentUpload } from './DocumentUpload.tsx';
 import { DocumentList } from './DocumentList.tsx';
 import { DocumentViewer } from './DocumentViewer.tsx';
 import { PatientSelector } from './PatientSelector.tsx';
-import { DocumentCategories, DocumentCategory } from './DocumentCategories.tsx';
-import { UnifiedSystemBridge } from '../documents/unified/UnifiedSystemBridge.tsx';
+import { DocumentCategories, LegalCategory } from './DocumentCategories.tsx';
 import { 
   CloudArrowUpIcon,
   FolderOpenIcon,
@@ -68,8 +67,8 @@ export const DocumentManagement: React.FC<DocumentManagementProps> = ({
   // 🌍 GLOBAL MODE: Dynamic patient selection
   const [globalPatientId, setGlobalPatientId] = useState<string | undefined>(initialPatientId);
   
-  // 📂 DOCUMENT CATEGORY SELECTION (now affects filtering!)
-  const [activeCategory, setActiveCategory] = useState<DocumentCategory>(DocumentCategory.MEDICAL);
+  // 📂 DOCUMENT CATEGORY SELECTION (now affects filtering!) - UNIFIED SYSTEM
+  const [activeCategory, setActiveCategory] = useState<LegalCategory>(LegalCategory.MEDICAL);
   
   // 🎯 EFFECTIVE PATIENT ID (initial override or global selection)
   const effectivePatientId = initialPatientId || globalPatientId;
@@ -77,31 +76,10 @@ export const DocumentManagement: React.FC<DocumentManagementProps> = ({
   // 🔄 IS GLOBAL MODE?
   const isGlobalMode = !initialPatientId;
 
-  // 🚀 UNIFIED SYSTEM INTEGRATION - Automatic detection and fallback
-  // For now, always enable unified system since migration is complete
-  const unifiedSystemEnabled = true; // process.env.NODE_ENV === 'development' || true;
-
-  // 🔥 PUNK OPTIMIZATION: Auto-refresh when category or patient changes
+  //  PUNK OPTIMIZATION: Auto-refresh when category or patient changes
   useEffect(() => {
     setRefreshKey(prev => prev + 1);
   }, [activeCategory, effectivePatientId]);
-
-  // If unified system is available, use the bridge component
-  if (unifiedSystemEnabled) {
-    return (
-      <div className={className}>
-        <UnifiedSystemBridge
-          patientId={effectivePatientId || ''}
-          useUnifiedSystem={true}
-          migrationMode={false}
-          onSystemToggle={(useUnified) => {
-            console.log('System toggled:', useUnified);
-            setRefreshKey(prev => prev + 1);
-          }}
-        />
-      </div>
-    );
-  }
 
   // 🔄 REFRESH HANDLER after successful upload
   const handleUploadComplete = (documents: any[]) => {
@@ -187,7 +165,7 @@ export const DocumentManagement: React.FC<DocumentManagementProps> = ({
         ) : (
           <>
             {/* 🔍 ACTIVE FILTER STATUS */}
-            {(effectivePatientId || activeCategory !== DocumentCategory.MEDICAL) && (
+            {(effectivePatientId || activeCategory !== LegalCategory.MEDICAL) && (
               <div className="mb-4 flex items-center space-x-2 text-sm text-gray-600 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
                 <FunnelIcon className="h-4 w-4 text-blue-500" />
                 <span>Filtrando:</span>
@@ -197,10 +175,10 @@ export const DocumentManagement: React.FC<DocumentManagementProps> = ({
                   </span>
                 )}
                 <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-md font-medium">
-                  {activeCategory === DocumentCategory.MEDICAL && 'Médicos'}
-                  {activeCategory === DocumentCategory.ADMINISTRATIVE && 'Administrativos'}
-                  {activeCategory === DocumentCategory.LEGAL && 'Legales'}
-                  {activeCategory === DocumentCategory.BILLING && 'Facturación'}
+                  {activeCategory === LegalCategory.MEDICAL && 'Médicos'}
+                  {activeCategory === LegalCategory.ADMINISTRATIVE && 'Administrativos'}
+                  {activeCategory === LegalCategory.LEGAL && 'Legales'}
+                  {activeCategory === LegalCategory.BILLING && 'Facturación'}
                 </span>
               </div>
             )}

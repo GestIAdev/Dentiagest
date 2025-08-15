@@ -9,6 +9,8 @@ from .auth import router as auth_router
 from .users import router as users_router
 from .patients import router as patients_router
 from .medical_records import router as medical_records_router
+from .document_deletion import router as document_deletion_router
+from .document_deletion import router as document_deletion_router
 
 api_router = APIRouter()
 
@@ -18,6 +20,7 @@ api_router.include_router(auth_router)
 api_router.include_router(users_router)
 api_router.include_router(patients_router)
 api_router.include_router(medical_records_router)
+api_router.include_router(document_deletion_router)
 
 # Status endpoint
 @api_router.get("/status")
@@ -32,6 +35,7 @@ async def api_status():
             "users": "active", 
             "patients": "active",
             "medical_records": "active",
+            "document_deletion": "active - Legal Argentina Compliance",
             "treatments": "planned",
             "ai": "planned"
         }

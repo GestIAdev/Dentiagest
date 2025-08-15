@@ -12,6 +12,7 @@ PLATFORM_PATTERN: Other verticals will have similar "service records" APIs:
 
 from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form, Request
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_, or_, func, desc, asc
 from datetime import date, datetime
@@ -357,12 +358,54 @@ async def list_medical_documents(
     else:
         query = query.order_by(desc(sort_column))
     
-    # Apply pagination
+    # Apply pagination - Using raw SQL to avoid enum reading issues
     offset = (search_params.page - 1) * search_params.size
-    documents = query.offset(offset).limit(search_params.size).all()
     
-    # Convert to response format
-    document_responses = [_convert_document_to_response(doc) for doc in documents]
+    # 🔧 FIX: Use text() to avoid enum reading conflicts
+    from sqlalchemy import text
+    
+    # Get the IDs first to avoid enum reading issues
+    document_ids_query = query.with_entities(MedicalDocument.id).offset(offset).limit(search_params.size)
+    document_ids = [row[0] for row in document_ids_query.all()]
+    
+    if not document_ids:
+        documents = []
+    else:
+        # Now fetch full documents by ID, handling enum conversion manually
+        documents_raw = db.execute(
+            text("""
+                SELECT id, patient_id, medical_record_id, appointment_id, document_type, 
+                       title, description, tooth_numbers, anatomical_region, clinical_notes,
+                       document_date, expiry_date, CAST(access_level AS TEXT) as access_level_str,
+                       is_confidential, image_quality, file_name, file_size, mime_type,
+                       file_extension, image_width, image_height, audio_duration_seconds,
+                       audio_transcription, ai_analyzed, ai_analysis_results, ai_confidence_scores,
+                       ocr_extracted_text, ai_tags, ai_anomalies_detected, 
+                       is_active, is_archived, version,
+                       created_at, updated_at, created_by, updated_by
+                FROM medical_documents 
+                WHERE id = ANY(:document_ids)
+                ORDER BY created_at DESC
+            """),
+            {"document_ids": document_ids}
+        ).fetchall()
+        
+        # Convert raw results to document-like objects
+        documents = []
+        for row in documents_raw:
+            doc_dict = dict(row._mapping)
+            documents.append(doc_dict)
+    
+    # Convert to response format - handling both model objects and raw data
+    document_responses = []
+    for doc in documents:
+        if isinstance(doc, dict):
+            # Raw data from SQL query
+            response = _convert_raw_document_to_response(doc)
+        else:
+            # Model object (fallback)
+            response = _convert_document_to_response(doc)
+        document_responses.append(response)
     
     return PaginatedMedicalDocumentsResponse(
         items=document_responses,
@@ -466,19 +509,48 @@ async def delete_medical_record(
 @require_medical_write("medical_document")
 async def upload_medical_document(
     request: Request,
-    patient_id: str = Form(...),
+    patient_id: Optional[str] = Form(None),  # 🌍 GLOBAL MODE: Optional for administrative docs
     title: str = Form(...),
     document_type: DocumentType = Form(...),
     description: Optional[str] = Form(None),
     medical_record_id: Optional[str] = Form(None),
     appointment_id: Optional[str] = Form(None),
-    access_level: AccessLevel = Form(default=AccessLevel.CLINICAL_STAFF),
+    access_level_str: str = Form(default="administrative"),  # 🔧 FIX: Receive as string first
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
     security_metadata: dict = None
 ) -> Any:
     """Upload a medical document."""
+    
+    # �🚨🚨 SUPER VISIBLE ENDPOINT DETECTION 🚨🚨🚨
+    print("=" * 100)
+    print("🚨 UPLOAD ENDPOINT HIT! 🚨 UPLOAD ENDPOINT HIT! 🚨 UPLOAD ENDPOINT HIT!")
+    print("=" * 100)
+    
+    # �🔍 DEBUG: Log all received parameters
+    print("🔍 DEBUG: upload_medical_document parameters:")
+    print(f"  patient_id: {patient_id}")
+    print(f"  title: {title}")
+    print(f"  document_type: {document_type}")
+    print(f"  access_level_str: {access_level_str}")
+    print(f"  access_level_str type: {type(access_level_str)}")
+    
+    # 🔧 MANUAL ENUM CONVERSION - Fix FastAPI enum conversion bug
+    try:
+        # Convert string to enum by value (not by name)
+        if access_level_str == "medical":
+            access_level = AccessLevel.MEDICAL
+        elif access_level_str == "administrative":
+            access_level = AccessLevel.ADMINISTRATIVE
+        else:
+            print(f"⚠️ Unknown access_level_str: {access_level_str}, using default")
+            access_level = AccessLevel.ADMINISTRATIVE
+            
+        print(f"🔧 Converted to enum: {access_level} (value: {access_level.value})")
+    except Exception as e:
+        print(f"❌ Error converting access_level: {e}")
+        access_level = AccessLevel.ADMINISTRATIVE
     
     # Validate file
     if file.size > MAX_FILE_SIZE:
@@ -500,20 +572,26 @@ async def upload_medical_document(
             detail=f"MIME type not allowed: {file.content_type}"
         )
     
-    # Verify patient exists
-    patient = db.query(Patient).filter(
-        and_(Patient.id == patient_id, Patient.deleted_at.is_(None))
-    ).first()
-    
-    if not patient:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Patient not found"
-        )
+    # Verify patient exists (only if patient_id provided)
+    patient = None
+    if patient_id:
+        patient = db.query(Patient).filter(
+            and_(Patient.id == patient_id, Patient.deleted_at.is_(None))
+        ).first()
+        
+        if not patient:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Patient not found"
+            )
     
     # Generate unique filename
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    unique_filename = f"{patient_id}_{timestamp}_{file.filename}"
+    if patient_id:
+        unique_filename = f"{patient_id}_{timestamp}_{file.filename}"
+    else:
+        # 🌍 GLOBAL MODE: Use 'global' prefix for administrative documents
+        unique_filename = f"global_{timestamp}_{file.filename}"
     file_path = UPLOAD_DIR / unique_filename
     
     # Save file
@@ -527,8 +605,14 @@ async def upload_medical_document(
         )
     
     # Create document record
+    print("🔍 DEBUG: Creating document with access_level:")
+    print(f"  access_level: {access_level}")
+    print(f"  access_level type: {type(access_level)}")
+    print(f"  access_level value: {access_level.value if hasattr(access_level, 'value') else 'NO VALUE'}")
+    print(f"🔧 FINAL: Using access_level.value = '{access_level.value}' for database")
+    
     db_document = MedicalDocument(
-        patient_id=UUID(patient_id),
+        patient_id=UUID(patient_id) if patient_id else None,  # 🌍 GLOBAL MODE: Allow None for administrative docs
         medical_record_id=UUID(medical_record_id) if medical_record_id else None,
         appointment_id=UUID(appointment_id) if appointment_id else None,
         document_type=document_type,
@@ -539,23 +623,151 @@ async def upload_medical_document(
         file_size=file.size,
         mime_type=file.content_type,
         file_extension=file_extension,
-        access_level=access_level,
+        access_level=access_level.value,  # 🔧 USE .value to force lowercase string instead of enum name
         document_date=datetime.utcnow(),
         created_by=current_user.id
     )
     
     db.add(db_document)
+    db.flush()  # This assigns the ID without committing
+    
+    # 🔧 Get the ID immediately after flush while object is clean
+    document_id = db_document.id
+    
     db.commit()
-    db.refresh(db_document)
     
     return FileUploadResponse(
-        document_id=str(db_document.id),
+        document_id=str(document_id),
         file_name=file.filename,
         file_size=file.size,
         file_size_mb=round(file.size / (1024 * 1024), 2),
         mime_type=file.content_type,
         upload_success=True,
         message="File uploaded successfully"
+    )
+
+# ======= DOCUMENT DOWNLOAD ENDPOINT =======
+
+@router.get("/documents/{document_id}/download")
+@require_medical_read("medical_document")
+async def download_medical_document(
+    request: Request,
+    document_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    security_metadata: dict = None
+) -> Any:
+    """Download a medical document."""
+    
+    # Get document
+    document = db.query(MedicalDocument).filter(
+        MedicalDocument.id == UUID(document_id),
+        MedicalDocument.deleted_at.is_(None)
+    ).first()
+    
+    if not document:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Document not found"
+        )
+    
+    # Check if file exists
+    if not os.path.exists(document.file_path):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="File not found on server"
+        )
+    
+    # Return file response
+    return FileResponse(
+        path=document.file_path,
+        filename=document.file_name,
+        media_type=document.mime_type or 'application/octet-stream'
+    )
+
+# ======= DOCUMENT VIEW ENDPOINT (for inline viewing) =======
+
+@router.get("/documents/{document_id}/view")
+@require_medical_read("medical_document")
+async def view_medical_document(
+    request: Request,
+    document_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    security_metadata: dict = None
+) -> Any:
+    """View a medical document inline (for DocumentViewer)."""
+    
+    # Get document
+    document = db.query(MedicalDocument).filter(
+        MedicalDocument.id == UUID(document_id),
+        MedicalDocument.deleted_at.is_(None)
+    ).first()
+    
+    if not document:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Document not found"
+        )
+    
+    # Check if file exists
+    if not os.path.exists(document.file_path):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="File not found on server"
+        )
+    
+    # Return file response with inline disposition
+    return FileResponse(
+        path=document.file_path,
+        media_type=document.mime_type or 'application/octet-stream',
+        headers={"Content-Disposition": "inline"}
+    )
+
+# ======= DOCUMENT THUMBNAIL ENDPOINT (FORTRESS-COMPLIANT) =======
+
+@router.get("/documents/{document_id}/thumbnail")
+@require_medical_read("medical_document")
+async def get_document_thumbnail(
+    request: Request,
+    document_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    security_metadata: dict = None
+) -> Any:
+    """Get document thumbnail (FORTRESS-SECURED)."""
+    
+    # Get document with FORTRESS SECURITY
+    document = db.query(MedicalDocument).filter(
+        MedicalDocument.id == UUID(document_id),
+        MedicalDocument.deleted_at.is_(None)
+    ).first()
+    
+    if not document:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Document not found"
+        )
+    
+    # Only images have thumbnails
+    if not document.is_image:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Thumbnails only available for images"
+        )
+    
+    # Check if file exists
+    if not os.path.exists(document.file_path):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="File not found on server"
+        )
+    
+    # For now, return the original image (future: generate actual thumbnails)
+    return FileResponse(
+        path=document.file_path,
+        media_type=document.mime_type or 'image/jpeg',
+        headers={"Content-Disposition": "inline"}
     )
 
 # MOVED TO BEFORE /{record_id} - See line 247
@@ -736,6 +948,112 @@ def _convert_record_to_response_with_patient(record: MedicalRecord, patient_data
         patient=patient_response
     )
 
+def _convert_raw_document_to_response(doc_dict: dict) -> MedicalDocumentResponse:
+    """Convert raw document data to response schema, handling enum conversion."""
+    from datetime import datetime, timedelta
+    
+    # Calculate file size in MB
+    file_size_mb = round(doc_dict.get('file_size', 0) / (1024 * 1024), 2) if doc_dict.get('file_size') else 0
+    
+    # Convert access_level string back to enum for response
+    access_level_str = doc_dict.get('access_level_str', 'medical')
+    if access_level_str.lower() == 'administrative':
+        access_level = AccessLevel.ADMINISTRATIVE
+    else:
+        access_level = AccessLevel.MEDICAL
+    
+    # Convert document_type to lowercase for enum
+    document_type_str = doc_dict.get('document_type', 'OTHER_DOCUMENT')
+    if document_type_str == 'OTHER_DOCUMENT':
+        document_type = DocumentType.OTHER_DOCUMENT
+    elif document_type_str == 'TREATMENT_PLAN':
+        document_type = DocumentType.TREATMENT_PLAN
+    elif document_type_str == 'REFERRAL_LETTER':
+        document_type = DocumentType.REFERRAL_LETTER
+    elif document_type_str == 'PRESCRIPTION':
+        document_type = DocumentType.PRESCRIPTION
+    else:
+        document_type = DocumentType.OTHER_DOCUMENT
+    
+    # Calculate computed fields
+    created_at = doc_dict.get('created_at') or datetime.utcnow()
+    if isinstance(created_at, str):
+        created_at = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+    
+    age_days = (datetime.utcnow() - created_at).days
+    
+    # Determine if it's an image based on mime_type
+    mime_type = doc_dict.get('mime_type', '')
+    is_image = mime_type.startswith('image/') if mime_type else False
+    is_xray = 'xray' in document_type_str.lower() if document_type_str else False
+    is_voice_note = mime_type.startswith('audio/') if mime_type else False
+    
+    # Check if expired
+    expiry_date = doc_dict.get('expiry_date')
+    is_expired = False
+    if expiry_date:
+        if isinstance(expiry_date, str):
+            expiry_date = datetime.fromisoformat(expiry_date.replace('Z', '+00:00'))
+        is_expired = datetime.utcnow() > expiry_date
+    
+    # Generate download URL
+    download_url = f"/api/v1/medical-records/documents/{doc_dict['id']}/download"
+    
+    return MedicalDocumentResponse(
+        id=str(doc_dict['id']),
+        patient_id=str(doc_dict['patient_id']),
+        medical_record_id=str(doc_dict['medical_record_id']) if doc_dict.get('medical_record_id') else None,
+        appointment_id=str(doc_dict['appointment_id']) if doc_dict.get('appointment_id') else None,
+        document_type=document_type,
+        title=doc_dict.get('title', 'Untitled Document'),
+        description=doc_dict.get('description'),
+        tooth_numbers=doc_dict.get('tooth_numbers'),
+        anatomical_region=doc_dict.get('anatomical_region'),
+        clinical_notes=doc_dict.get('clinical_notes'),
+        document_date=doc_dict.get('document_date'),
+        expiry_date=expiry_date,
+        access_level=access_level,
+        is_confidential=doc_dict.get('is_confidential', False),
+        image_quality=doc_dict.get('image_quality'),
+        file_name=doc_dict.get('file_name', 'unknown'),
+        file_size=doc_dict.get('file_size', 0),
+        file_size_mb=file_size_mb,
+        mime_type=doc_dict.get('mime_type', 'application/octet-stream'),
+        file_extension=doc_dict.get('file_extension', ''),
+        image_width=doc_dict.get('image_width'),
+        image_height=doc_dict.get('image_height'),
+        audio_duration_seconds=doc_dict.get('audio_duration_seconds'),
+        audio_transcription=doc_dict.get('audio_transcription'),
+        ai_analyzed=doc_dict.get('ai_analyzed', False),
+        ai_analysis_results=doc_dict.get('ai_analysis_results'),
+        ai_confidence_scores=doc_dict.get('ai_confidence_scores'),
+        ocr_extracted_text=doc_dict.get('ocr_extracted_text'),
+        ai_tags=doc_dict.get('ai_tags'),
+        ai_anomalies_detected=doc_dict.get('ai_anomalies_detected', False),
+        created_at=created_at,
+        updated_at=doc_dict.get('updated_at', created_at),
+        created_by=str(doc_dict.get('created_by', 'system')),
+        updated_by=str(doc_dict.get('updated_by')) if doc_dict.get('updated_by') else None,
+        # Computed properties
+        age_days=age_days,
+        is_image=is_image,
+        is_xray=is_xray,
+        is_voice_note=is_voice_note,
+        is_expired=is_expired,
+        total_teeth_shown=len(doc_dict.get('tooth_numbers') or []),
+        is_full_mouth=len(doc_dict.get('tooth_numbers') or []) >= 28,  # Full mouth if 28+ teeth
+        requires_ai_analysis=is_image and not doc_dict.get('ai_analyzed', False),
+        download_url=download_url,
+        thumbnail_url=None,  # TODO: Generate thumbnail URLs
+        # Status fields
+        is_active=doc_dict.get('is_active', True),
+        is_archived=doc_dict.get('is_archived', False),
+        version=doc_dict.get('version', '1.0'),
+        views_count=0,  # Default value
+        last_viewed_at=None  # Default value
+    )
+
+
 def _convert_document_to_response(doc: MedicalDocument) -> MedicalDocumentResponse:
     """Convert MedicalDocument model to response schema."""
     return MedicalDocumentResponse(
@@ -783,6 +1101,6 @@ def _convert_document_to_response(doc: MedicalDocument) -> MedicalDocumentRespon
         total_teeth_shown=doc.total_teeth_shown,
         is_full_mouth=doc.is_full_mouth,
         requires_ai_analysis=doc.requires_ai_analysis,
-        download_url=doc.get_download_url(),
-        thumbnail_url=doc.get_thumbnail_url()
+        download_url=doc.get_download_url("http://127.0.0.1:8002"),
+        thumbnail_url=doc.get_thumbnail_url("http://127.0.0.1:8002")
     )

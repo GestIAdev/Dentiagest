@@ -17,20 +17,20 @@ from ..core.database import Base
 # PLATFORM_CORE: User roles enum - configurable per business vertical
 class UserRole(enum.Enum):
     """
-    User roles in the system.
-    These roles are universal but can be customized per business vertical:
+    User roles in the system - SIMPLIFIED FOR LEGAL COMPLIANCE.
     
-    DENTAL: admin, dentist, assistant, receptionist
-    VETERINARY: admin, veterinarian, vet_tech, receptionist  
-    MECHANIC: admin, mechanic, apprentice, service_advisor
+    DENTAL LEGAL FRAMEWORK:
+    - PROFESSIONAL: Has medical data access (doctors, qualified assistants)
+    - ADMIN: System administrator (clinic owner/manager) 
+    - RECEPTIONIST: Front desk, administrative documents only
+    
+    NOTE: If assistant has medical data access by law, they get PROFESSIONAL role.
     """
     admin = "admin"                    # System administrator
-    professional = "professional"     # Main professional (dentist/vet/mechanic)
-    assistant = "assistant"           # Assistant/technician
-    receptionist = "receptionist"     # Front desk/reception
+    professional = "professional"     # Medical professionals (dentist + qualified assistants)
+    receptionist = "receptionist"     # Front desk/reception (admin docs only)
     
-    # PLATFORM_CONFIGURABLE: Additional roles can be added per vertical
-    # DENTAL_SPECIFIC roles could be: orthodontist, surgeon, hygienist
+    # REMOVED: assistant (merged into professional if has medical access)
     # VETERINARY_SPECIFIC roles could be: vet_tech, groomer
     # MECHANIC_SPECIFIC roles could be: diagnostician, parts_manager
 

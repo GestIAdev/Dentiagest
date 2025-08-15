@@ -97,14 +97,14 @@ ROI: 28000% anual (vs 9% Blackrock) 🤯
 
 ### **🗺️ EXPANSION ROADMAP:**
 ```
-🎯 PHASE 1: España (Months 1-12)
+🎯 PHASE 1: Argentina (Months 1-12)
 ├── Market validation
 ├── Feature refinement  
 ├── Customer acquisition
 └── Revenue €50k-100k
 
 🎯 PHASE 2: Latinoamérica (Months 13-24)
-├── Argentina, México, Colombia
+├── España, México, Colombia
 ├── Local payment methods
 ├── Regional marketing
 └── Revenue €200k-500k

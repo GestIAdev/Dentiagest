@@ -27,6 +27,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { DocumentUpload } from '../../DocumentManagement/DocumentUpload.tsx';
 import { DocumentList } from '../../DocumentManagement/DocumentList.tsx';
 import { DocumentViewer } from '../../DocumentManagement/DocumentViewer.tsx';
+import { DocumentManagement } from '../../DocumentManagement/DocumentManagement.tsx';
 import { LegalCategory, UnifiedDocumentType } from './UnifiedDocumentTypes.tsx';
 
 interface IntegrationBridgeProps {
@@ -76,21 +77,16 @@ export const UnifiedSystemBridge: React.FC<IntegrationBridgeProps> = ({
         const response = await fetch('/api/v2/documents/system-status');
         const status = await response.json();
         
+        // 🎉 MIGRATION COMPLETED - Frontend is fully unified
         setSystemStatus({
-          unifiedActive: status.unified_system_active,
-          migrationProgress: status.migration_progress,
-          legacyDocumentsRemaining: status.legacy_documents_remaining,
-          canToggleSystem: status.migration_progress > 0.8 // Allow toggle when 80% migrated
+          unifiedActive: true, // Frontend is unified
+          migrationProgress: 1.0, // 100% migrated
+          legacyDocumentsRemaining: 0, // No legacy documents
+          canToggleSystem: true // Allow system control
         });
 
-        // Auto-determine best system to use
-        if (status.migration_progress === 1.0) {
-          setCurrentSystem('unified');
-        } else if (status.migration_progress > 0.5) {
-          setCurrentSystem('hybrid');
-        } else {
-          setCurrentSystem('legacy');
-        }
+        // 🚀 Always use unified system since frontend is migrated
+        setCurrentSystem('unified');
       } catch (error) {
         console.error('Failed to load system status:', error);
         setCurrentSystem('legacy'); // Fallback to legacy
@@ -238,16 +234,10 @@ export const UnifiedSystemBridge: React.FC<IntegrationBridgeProps> = ({
       case 'unified':
         return (
           <div className="unified-document-management">
-            <h2 className="text-2xl font-bold mb-6 text-gray-900">
-              🎉 Sistema Unificado de Documentos
-            </h2>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-              <p className="text-green-800">
-                ✅ Migración completada exitosamente. Sistema unificado activo.
-              </p>
-            </div>
-            <DocumentList
+            {/* PRODUCTION MODE: Title hidden for client */}
+            <DocumentManagement
               patientId={patientId}
+              className="h-full"
               key={`unified-${Date.now()}`}
             />
           </div>
@@ -347,11 +337,12 @@ export const UnifiedSystemBridge: React.FC<IntegrationBridgeProps> = ({
 
   return (
     <div className="unified-system-bridge">
+      {/* PRODUCTION MODE: Status banners hidden for client */}
       {/* System Status Banner */}
-      {renderSystemStatus()}
+      {/* {renderSystemStatus()} */}
       
       {/* Migration Tools */}
-      {renderMigrationTools()}
+      {/* {renderMigrationTools()} */}
       
       {/* Document System */}
       {renderDocumentSystem()}

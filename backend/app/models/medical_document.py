@@ -46,14 +46,17 @@ class DocumentType(enum.Enum):
     STL_FILE = "stl_file"
     OTHER_DOCUMENT = "other_document"
 
-# DENTAL_SPECIFIC: Document access level
+# DENTAL_SPECIFIC: Document access level - LEGAL COMPLIANCE
 class AccessLevel(enum.Enum):
-    """Access levels for medical documents."""
-    PUBLIC = "public"           # Anyone with patient access
-    CLINICAL_STAFF = "clinical_staff"  # Only clinical staff
-    DOCTOR_ONLY = "doctor_only"        # Only treating doctors
-    CONFIDENTIAL = "confidential"     # Restricted access
-    PATIENT_ACCESSIBLE = "patient_accessible"  # Patient can view
+    """
+    Access levels for medical documents - SIMPLIFIED FOR LEGAL COMPLIANCE.
+    
+    SPANISH MEDICAL DATA LAW:
+    - MEDICAL: Only medical professionals can access (doctors + qualified assistants)  
+    - ADMINISTRATIVE: Non-medical staff can access (receptionists + admins + doctors)
+    """
+    MEDICAL = "medical"                    # Medical professionals only
+    ADMINISTRATIVE = "administrative"     # All staff can access
 
 # DENTAL_SPECIFIC: Image quality enum
 class ImageQuality(enum.Enum):
@@ -88,9 +91,9 @@ class MedicalDocument(Base):
     patient_id = Column(
         UUID(as_uuid=True),
         ForeignKey("patients.id", ondelete="CASCADE"),
-        nullable=False,
+        nullable=True,  # 🌍 GLOBAL MODE: Allow NULL for administrative/global documents
         index=True,
-        comment="Reference to the patient"
+        comment="Reference to the patient (NULL for global/administrative documents)"
     )
     
     medical_record_id = Column(
@@ -214,7 +217,7 @@ class MedicalDocument(Base):
     # PLATFORM_CORE: Access and security
     access_level = Column(
         SQLEnum(AccessLevel),
-        default=AccessLevel.CLINICAL_STAFF,
+        default=AccessLevel.ADMINISTRATIVE,  # 🔧 FIX: Use new simplified access level
         comment="Access level for the document"
     )
     
@@ -505,10 +508,10 @@ class MedicalDocument(Base):
     
     def get_download_url(self, base_url: str = "") -> str:
         """Generate download URL for the document."""
-        return f"{base_url}/api/v1/documents/{self.id}/download"
+        return f"{base_url}/api/v1/medical-records/documents/{self.id}/download"
     
     def get_thumbnail_url(self, base_url: str = "") -> str:
         """Generate thumbnail URL for image documents."""
         if not self.is_image:
             return None
-        return f"{base_url}/api/v1/documents/{self.id}/thumbnail"
+        return f"{base_url}/api/v1/medical-records/documents/{self.id}/thumbnail"

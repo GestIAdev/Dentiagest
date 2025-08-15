@@ -18,6 +18,7 @@ from .patient import Patient, BloodType, Gender, AnxietyLevel
 from .appointment import Appointment, AppointmentStatus, AppointmentType, AppointmentPriority
 from .medical_record import MedicalRecord, TreatmentStatus, TreatmentPriority, ProcedureCategory  # 🔒 MEDICAL RECORDS!
 from .medical_document import MedicalDocument, DocumentType, AccessLevel, ImageQuality  # 🔒 MEDICAL DOCUMENTS!
+from .document_deletion import DeletionRequest, PermanentDeletionRecord, DeletionStatus, DeletionReason  # 🏛️ LEGAL DELETION SYSTEM!
 
 # Export all models and enums for easy importing
 __all__ = [
@@ -27,6 +28,8 @@ __all__ = [
     "Appointment",
     "MedicalRecord",  # 🔒 MEDICAL RECORDS!
     "MedicalDocument",  # 🔒 MEDICAL DOCUMENTS!
+    "DeletionRequest",  # 🏛️ LEGAL DELETION SYSTEM!
+    "PermanentDeletionRecord",  # 🏛️ LEGAL DELETION SYSTEM!
     
     # User enums
     "UserRole",
@@ -50,4 +53,8 @@ __all__ = [
     "DocumentType",
     "AccessLevel",
     "ImageQuality",
+    
+    # Deletion System enums
+    "DeletionStatus",
+    "DeletionReason",
 ]

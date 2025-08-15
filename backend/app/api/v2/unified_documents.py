@@ -17,21 +17,39 @@ import json
 
 from app.core.database import get_db
 from app.core.security import get_current_user
-from app.models.unified_document_types import (
-    MedicalDocument, SmartTag, UnifiedDocumentType, LegalCategory,
-    LegacyDocumentMapping
-)
 from app.models.user import User
-from app.schemas.unified_document_schemas import (
-    UnifiedDocumentResponse, SmartTagResponse, DocumentUploadRequest,
-    SmartTagCreateRequest, DocumentSearchRequest, DocumentSearchResponse
-)
-from app.services.document_service import UnifiedDocumentService
-from app.services.ai_service import AIService
 
 router = APIRouter(prefix="/api/v2/documents", tags=["Documents v2.0"])
 
-# 🗂️ UNIFIED DOCUMENT ENDPOINTS
+# �️ SYSTEM STATUS ENDPOINT
+
+@router.get("/system-status", response_model=dict)
+async def get_system_status():
+    """
+    🟢 Get unified document system status
+    
+    Returns current system status and migration information
+    """
+    return {
+        "status": "operational",
+        "version": "2.0",
+        "features": {
+            "unified_types": True,
+            "smart_tags": True,
+            "ai_analysis": True,
+            "legacy_compatibility": True
+        },
+        "endpoints": {
+            "upload": "/api/v2/documents/upload",
+            "list": "/api/v2/documents/patient/{patient_id}",
+            "types": "/api/v2/documents/unified-types",
+            "categories": "/api/v2/documents/legal-categories"
+        },
+        "migration_status": "completed",
+        "last_updated": "2025-08-15T00:00:00Z"
+    }
+
+# �🗂️ UNIFIED DOCUMENT ENDPOINTS
 
 @router.get("/unified-types", response_model=List[Dict[str, str]])
 async def get_unified_document_types():

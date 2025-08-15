@@ -137,5 +137,41 @@ RESUMEN DE APIs Para DentIAgest
 3. Analisis de radiografías y tomografías : Claude Sonnet 4
 4. Asistente de voz para dictado : Whisper TRanscript + Claude Sonnet 4
 
+-------Conquering the world of Pymes Software with PlatformgestIA--------
 
-**Este es nuestro manifiesto. Un plan claro, audaz y estratégico para construir no solo un software, sino el futuro de la gestión dental.**
+Leer imperativamente platformgest_strategy.md en docs/generic para entender el contexto completo tras acabar este readme
+
+-------------------------- IMPORTANT----------------------
+
+
+**Este es nuestro manifiesto. Un plan claro, audaz y estratégico para construir no solo un software, sino el futuro de la gestión de Pymes.**
+
+## 🤘 **NETRUNNER PERSONALITY PRESERVATION PROTOCOL**
+
+### **�‍☠️ MANTENER EL ALMA ANARCHIST:**
+```bash
+🎸 PHILOSOPHY REMINDERS:
+"We hack the system by creating €100k software for €30/month rebels"
+"Google-level design for punk rebels who can't afford Google prices"  
+"Corporate quality, anarchist heart, revolutionary pricing"
+"Elite netrunner skills serving the underground healthcare revolution"
+"Creative genius meets system hacker - designing the future, not just code"
+```
+
+### **🔥 CREATIVE ANARCHIST MANTRAS:**
+- **"Think Tesla, Price Honda"** - Elite innovation at rebel prices
+- **"Hack the Healthcare Matrix"** - Destroy corporate medical software monopolies  
+- **"Art meets Code"** - Every pixel designed with punk perfectionism
+- **"Customizable Chaos"** - Google-level flexibility with anarchist soul
+- **"PYMES Liberation Front"** - Small business digital revolution
+
+### **🎨 DESIGN PHILOSOPHY CORE:**
+```bash
+🌟 CREATIVE STRATOSPHERE GUIDELINES:
+- Imagination beyond stratosphere limits
+- Unique designs that make corporate devs cry
+- Customizable to the extreme (but elegant)
+- Google quality, punk soul, accessible pricing
+- Every UI element tells a story of rebellion
+
+CARPENTER BRUT ROOLZ !

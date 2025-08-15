@@ -2,19 +2,14 @@
 /**
  * DocumentList Component - Professional Medical Document Management
  * 
- * Features que hacen que los sistemas enterprise lloreen d        if (response.ok) {
-          const data = await response.json();
-          setDocuments(data.items || []);
-          setTotalDocuments(data.total || 0);
-        }
-      } catch (err) {
-        console.error('Error fetching documents:', err);a:
- * ✅ Advanced search & filtering (by patient, type, date)
+ * Features:
+ * ✅ Advanced filtering & search (by patient, type, date)
  * ✅ Document preview & download
  * ✅ AI analysis status & results display
  * ✅ GDPR Article 9 access control
  * ✅ Role-based document visibility
  * ✅ Medical image viewer with zoom
+ * ✅ Legal document deletion system
  * 
  * PLATFORM_PATTERN: Adaptable structure:
  * - VetGest: Pet documents and medical photos
@@ -24,6 +19,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
+// import { buildApiUrl, getDocumentDownloadUrl } from '../../config/api';
 import {
   MagnifyingGlassIcon,
   DocumentIcon,
@@ -40,9 +36,17 @@ import {
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 
-// 🦷 DENTAL_SPECIFIC: Import types from upload component
-import { DocumentType, AccessLevel } from './DocumentUpload.tsx';
-import { DocumentCategory } from './DocumentCategories.tsx';
+// 🦷 UNIFIED SYSTEM: Import types from unified system
+import { AccessLevel } from './DocumentUpload.tsx';
+import { LegalCategory, UnifiedDocumentType } from './DocumentCategories.tsx';
+import { DeleteDocumentButton } from './DeleteDocumentButton.tsx';
+
+// 🔥 HARDCODED API FUNCTIONS - WEBPACK TOCACOJONES SOLUTION
+const buildApiUrl = (endpoint: string): string => {
+  return `/api/v1${endpoint}`;
+};
+
+const getDocumentDownloadUrl = (documentId: string) => buildApiUrl(`/medical-records/documents/${documentId}/download`);
 
 interface MedicalDocument {
   id: string;
@@ -50,7 +54,8 @@ interface MedicalDocument {
   medical_record_id?: string;
   title: string;
   description?: string;
-  document_type: DocumentType;
+  document_type: UnifiedDocumentType;
+  category: string;
   file_name: string;
   file_size: number;
   file_size_mb: number;
@@ -100,7 +105,7 @@ interface SearchFilters {
 interface DocumentListProps {
   patientId?: string; // Si se proporciona, filtrar por paciente específico
   medicalRecordId?: string; // Si se proporciona, filtrar por historial médico
-  categoryFilter?: DocumentCategory; // 🔥 NEW: Category filter from tabs
+  categoryFilter?: LegalCategory; // 🔥 UNIFIED: Category filter from tabs
   className?: string;
   onDocumentSelect?: (document: MedicalDocument) => void;
 }
@@ -137,29 +142,38 @@ export const DocumentList: React.FC<DocumentListProps> = ({
     sort_order: 'desc'
   });
 
-  // 🔥 CATEGORY TO DOCUMENT_TYPE MAPPING (matching backend enum values)
-  const getCategoryDocumentTypes = (category: DocumentCategory): string[] => {
+  // 🔥 UNIFIED CATEGORY TO DOCUMENT_TYPE MAPPING
+  const getCategoryDocumentTypes = (category: LegalCategory): UnifiedDocumentType[] => {
     const categoryMappings = {
-      [DocumentCategory.MEDICAL]: [
-        'XRAY_BITEWING', 'XRAY_PANORAMIC', 'XRAY_PERIAPICAL', 'XRAY_CEPHALOMETRIC',
-        'CT_SCAN', 'CBCT_SCAN', 'INTRAORAL_PHOTO', 'EXTRAORAL_PHOTO', 'CLINICAL_PHOTO',
-        'PROGRESS_PHOTO', 'BEFORE_AFTER_PHOTO', 'LAB_REPORT', 'VOICE_NOTE', 'SCAN_IMPRESSION', 'STL_FILE'
+      [LegalCategory.MEDICAL]: [
+        UnifiedDocumentType.XRAY,
+        UnifiedDocumentType.PHOTO_CLINICAL,
+        UnifiedDocumentType.VOICE_NOTE,
+        UnifiedDocumentType.TREATMENT_PLAN,
+        UnifiedDocumentType.LAB_REPORT,
+        UnifiedDocumentType.PRESCRIPTION,
+        UnifiedDocumentType.SCAN_3D
       ],
-      [DocumentCategory.ADMINISTRATIVE]: [
-        'TREATMENT_PLAN', 'REFERRAL_LETTER', 'PRESCRIPTION', 'OTHER_DOCUMENT'
+      [LegalCategory.ADMINISTRATIVE]: [
+        UnifiedDocumentType.INSURANCE_FORM,
+        UnifiedDocumentType.DOCUMENT_GENERAL
       ],
-      [DocumentCategory.LEGAL]: [
-        'CONSENT_FORM'
+      [LegalCategory.LEGAL]: [
+        UnifiedDocumentType.CONSENT_FORM,
+        UnifiedDocumentType.LEGAL_DOCUMENT,
+        UnifiedDocumentType.REFERRAL_LETTER
       ],
-      [DocumentCategory.BILLING]: [
-        'INSURANCE_FORM'
+      [LegalCategory.BILLING]: [
+        UnifiedDocumentType.INVOICE,
+        UnifiedDocumentType.BUDGET,
+        UnifiedDocumentType.PAYMENT_PROOF
       ]
     };
     return categoryMappings[category] || [];
   };
 
   // 🎯 FILTER DOCUMENTS BY CATEGORY (Frontend filtering)
-  const getFilteredDocuments = (docs: MedicalDocument[], category: DocumentCategory): MedicalDocument[] => {
+  const getFilteredDocuments = (docs: MedicalDocument[], category: LegalCategory): MedicalDocument[] => {
     const allowedTypes = getCategoryDocumentTypes(category);
     
     const filtered = docs.filter(doc => {
@@ -170,52 +184,6 @@ export const DocumentList: React.FC<DocumentListProps> = ({
     return filtered;
   };
 
-  // � BRUTAL DIRECT APPROACH: Fetch immediately when category changes
-  useEffect(() => {
-    const directFetch = async () => {
-      if (!state.accessToken) return;
-      
-      // Build direct params
-      const params = new URLSearchParams({
-        page: '1',
-        size: '12',
-        sort_by: 'created_at',
-        sort_order: 'desc'
-      });
-      
-      if (categoryFilter) {
-        params.append('category', categoryFilter);
-      }
-      
-      if (patientId) {
-        params.append('patient_id', patientId);
-      }
-      
-      try {
-        setLoading(true);
-        
-        const response = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/documents?${params}`, {
-          headers: {
-            'Authorization': `Bearer ${state.accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          setDocuments(data.items || []);
-          setTotalDocuments(data.total || 0);
-          console.log('� DIRECT RESULT:', data.items?.length || 0, 'documents');
-        }
-      } catch (err) {
-        console.error('🔥 DIRECT FETCH ERROR:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    directFetch();
-  }, [categoryFilter, patientId, state.accessToken]);
 
   // 🎨 AINARKLENDAR STYLING: Clean icon mapping
   const getDocumentIcon = (document: MedicalDocument) => {
@@ -224,35 +192,36 @@ export const DocumentList: React.FC<DocumentListProps> = ({
     return <DocumentIcon className="h-6 w-6 text-gray-500" />;
   };
 
-  const getDocumentTypeLabel = (type: DocumentType): string => {
-    const labels: Record<DocumentType, string> = {
-      [DocumentType.XRAY_BITEWING]: 'Rayos X Bitewing',
-      [DocumentType.XRAY_PANORAMIC]: 'Rayos X Panorámica',
-      [DocumentType.XRAY_PERIAPICAL]: 'Rayos X Periapical',
-      [DocumentType.INTRAORAL_PHOTO]: 'Foto Intraoral',
-      [DocumentType.CLINICAL_PHOTO]: 'Foto Clínica',
-      [DocumentType.PROGRESS_PHOTO]: 'Foto Progreso',
-      [DocumentType.CONSENT_FORM]: 'Consentimiento',
-      [DocumentType.TREATMENT_PLAN]: 'Plan Tratamiento',
-      [DocumentType.VOICE_NOTE]: 'Nota de Voz',
-      [DocumentType.PRESCRIPTION]: 'Prescripción',
-      [DocumentType.LAB_REPORT]: 'Reporte Laboratorio',
-      [DocumentType.INSURANCE_DOCUMENT]: 'Documento Seguro'
+  const getDocumentTypeLabel = (type: UnifiedDocumentType): string => {
+    const labels: Record<UnifiedDocumentType, string> = {
+      [UnifiedDocumentType.XRAY]: 'Rayos X',
+      [UnifiedDocumentType.PHOTO_CLINICAL]: 'Foto Clínica',
+      [UnifiedDocumentType.VOICE_NOTE]: 'Nota de Voz',
+      [UnifiedDocumentType.INVOICE]: 'Factura',
+      [UnifiedDocumentType.BUDGET]: 'Presupuesto',
+      [UnifiedDocumentType.CONSENT_FORM]: 'Consentimiento Informado',
+      [UnifiedDocumentType.LEGAL_DOCUMENT]: 'Documento Legal',
+      [UnifiedDocumentType.TREATMENT_PLAN]: 'Plan de Tratamiento',
+      [UnifiedDocumentType.LAB_REPORT]: 'Reporte de Laboratorio',
+      [UnifiedDocumentType.PRESCRIPTION]: 'Receta Médica',
+      [UnifiedDocumentType.INSURANCE_FORM]: 'Formulario de Seguro',
+      [UnifiedDocumentType.SCAN_3D]: 'Escáner 3D',
+      [UnifiedDocumentType.PAYMENT_PROOF]: 'Comprobante de Pago',
+      [UnifiedDocumentType.REFERRAL_LETTER]: 'Carta de Derivación',
+      [UnifiedDocumentType.DOCUMENT_GENERAL]: 'Documento General'
     };
-    return labels[type] || type;
+    return labels[type] || 'Documento';
   };
 
   const getAccessLevelBadge = (level: AccessLevel) => {
     const styles = {
-      [AccessLevel.PUBLIC]: 'bg-green-100 text-green-800',
-      [AccessLevel.RESTRICTED]: 'bg-blue-100 text-blue-800',
-      [AccessLevel.CONFIDENTIAL]: 'bg-red-100 text-red-800'
+      [AccessLevel.MEDICAL]: 'bg-red-100 text-red-800',              // Medical: Red for restricted
+      [AccessLevel.ADMINISTRATIVE]: 'bg-blue-100 text-blue-800'      // Administrative: Blue for general
     };
     
     const labels = {
-      [AccessLevel.PUBLIC]: 'Público',
-      [AccessLevel.RESTRICTED]: 'Restringido',
-      [AccessLevel.CONFIDENTIAL]: 'Confidencial'
+      [AccessLevel.MEDICAL]: 'Solo Médicos',
+      [AccessLevel.ADMINISTRATIVE]: 'Personal Administrativo'
     };
 
     return (
@@ -263,7 +232,30 @@ export const DocumentList: React.FC<DocumentListProps> = ({
     );
   };
 
-  // 📡 FETCH DOCUMENTS from API
+  // � UNIFIED TO LEGACY ENUM MAPPING - Prevent 422 errors
+  const mapUnifiedToLegacyForAPI = (unifiedType: UnifiedDocumentType): string => {
+    const unifiedToLegacyMap: { [key in UnifiedDocumentType]: string } = {
+      [UnifiedDocumentType.XRAY]: 'xray_panoramic',
+      [UnifiedDocumentType.PHOTO_CLINICAL]: 'clinical_photo',
+      [UnifiedDocumentType.VOICE_NOTE]: 'voice_note',
+      [UnifiedDocumentType.TREATMENT_PLAN]: 'treatment_plan',
+      [UnifiedDocumentType.LAB_REPORT]: 'lab_report',
+      [UnifiedDocumentType.PRESCRIPTION]: 'prescription',
+      [UnifiedDocumentType.SCAN_3D]: 'stl_file',
+      [UnifiedDocumentType.CONSENT_FORM]: 'consent_form',
+      [UnifiedDocumentType.INSURANCE_FORM]: 'insurance_form',
+      [UnifiedDocumentType.DOCUMENT_GENERAL]: 'other_document',
+      [UnifiedDocumentType.INVOICE]: 'other_document',
+      [UnifiedDocumentType.BUDGET]: 'other_document',
+      [UnifiedDocumentType.PAYMENT_PROOF]: 'other_document',
+      [UnifiedDocumentType.REFERRAL_LETTER]: 'referral_letter',
+      [UnifiedDocumentType.LEGAL_DOCUMENT]: 'other_document'
+    };
+    
+    return unifiedToLegacyMap[unifiedType] || 'other_document';
+  };
+
+  // �📡 FETCH DOCUMENTS from API
   const fetchDocuments = async () => {
     if (!state.accessToken) return;
 
@@ -271,15 +263,40 @@ export const DocumentList: React.FC<DocumentListProps> = ({
       setLoading(true);
       setError(null);
 
-      // Build query parameters
+      // Build query parameters with enum translation
       const queryParams = new URLSearchParams();
-      Object.entries(filters).forEach(([key, value]) => {
+      
+      // 🔄 TRANSLATE UNIFIED ENUMS TO LEGACY - Prevent 422 errors
+      const translatedFilters = { ...filters };
+      
+      // If filtering by document_type, translate unified enum to legacy
+      if (filters.document_type && typeof filters.document_type === 'string') {
+        // Check if it's a unified enum value
+        const unifiedValues = Object.values(UnifiedDocumentType);
+        if (unifiedValues.includes(filters.document_type as UnifiedDocumentType)) {
+          translatedFilters.document_type = mapUnifiedToLegacyForAPI(filters.document_type as UnifiedDocumentType);
+          console.log('🔄 Translated enum:', filters.document_type, '→', translatedFilters.document_type);
+        }
+      }
+      
+      // Add translated filters from state
+      Object.entries(translatedFilters).forEach(([key, value]) => {
         if (value !== '' && value !== null && value !== undefined) {
           queryParams.append(key, value.toString());
         }
       });
+      
+      // Add category filter from props (PRIORITY FILTER)
+      if (categoryFilter) {
+        queryParams.set('category', categoryFilter); // Use 'set' to override any existing category
+      }
+      
+      // Add patient filter from props
+      if (patientId) {
+        queryParams.set('patient_id', patientId); // Use 'set' to override any existing patient_id
+      }
 
-      const response = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/documents?${queryParams}`, {
+      const response = await fetch(buildApiUrl(`/medical-records/documents?${queryParams}`), {
         headers: {
           'Authorization': `Bearer ${state.accessToken}`,
           'Content-Type': 'application/json',
@@ -308,7 +325,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
   // 🔄 EFFECTS
   useEffect(() => {
     fetchDocuments();
-  }, [filters, state.accessToken]);
+  }, [filters, categoryFilter, patientId, state.accessToken]);
 
   // 🔍 FILTER HELPERS
   const updateFilter = (key: string, value: string | number) => {
@@ -339,7 +356,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
     if (!state.accessToken) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/documents/${document.id}/download`, {
+      const response = await fetch(getDocumentDownloadUrl(document.id), {
         headers: {
           'Authorization': `Bearer ${state.accessToken}`,
         },
@@ -388,10 +405,10 @@ export const DocumentList: React.FC<DocumentListProps> = ({
             {categoryFilter && (
               <span className="ml-2 text-blue-600">
                 • Categoría: {
-                  categoryFilter === DocumentCategory.MEDICAL && 'Médicos' ||
-                  categoryFilter === DocumentCategory.ADMINISTRATIVE && 'Administrativos' ||
-                  categoryFilter === DocumentCategory.LEGAL && 'Legales' ||
-                  categoryFilter === DocumentCategory.BILLING && 'Facturación'
+                  categoryFilter === LegalCategory.MEDICAL && 'Médicos' ||
+                  categoryFilter === LegalCategory.ADMINISTRATIVE && 'Administrativos' ||
+                  categoryFilter === LegalCategory.LEGAL && 'Legales' ||
+                  categoryFilter === LegalCategory.BILLING && 'Facturación'
                 }
               </span>
             )}
@@ -538,6 +555,18 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                     src={document.thumbnail_url}
                     alt={document.title}
                     className="w-full h-32 object-cover"
+                    onError={(e) => {
+                      // 🔧 THUMBNAIL 404 FIX: Hide broken thumbnail and show icon instead
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement!.innerHTML = `
+                        <div class="w-full h-32 flex items-center justify-center">
+                          ${document.is_image 
+                            ? '<svg class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>'
+                            : '<svg class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>'
+                          }
+                        </div>
+                      `;
+                    }}
                   />
                 ) : (
                   <div className="w-full h-32 flex items-center justify-center">
@@ -545,9 +574,9 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                   </div>
                 )}
                 
-                {/* 🏷️ TYPE BADGE */}
-                <div className="absolute top-2 left-2">
-                  <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-white bg-opacity-90">
+                {/* 🏷️ TYPE BADGE - ENHANCED VISIBILITY */}
+                <div className="absolute top-2 left-2 z-10">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-600 text-white shadow-lg">
                     {getDocumentTypeLabel(document.document_type)}
                   </span>
                 </div>
@@ -626,6 +655,16 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                     <ArrowDownTrayIcon className="h-3 w-3 mr-1" />
                     Descargar
                   </button>
+                  
+                  {/* 🗑️ LEGAL DELETION BUTTON */}
+                  <DeleteDocumentButton 
+                    document={document}
+                    onDeletionRequested={() => {
+                      // Refresh document list after deletion request
+                      fetchDocuments();
+                    }}
+                    className="flex-1"
+                  />
                 </div>
               </div>
             </div>

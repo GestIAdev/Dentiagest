@@ -16,6 +16,14 @@ export const usePatients = () => {
   const { state, logout } = useAuth(); // 🚨 ADD LOGOUT FUNCTION
 
   const API_BASE = 'http://localhost:8002/api/v1/patients/';
+  
+  // 🎯 VIRTUAL PATIENT ID - MUST BE HIDDEN FROM NORMAL OPERATIONS
+  const VIRTUAL_PATIENT_ID = 'd76a8a03-1411-4143-85ba-6f064c7b564b';
+
+  // 🔒 FILTER OUT VIRTUAL PATIENT FROM NORMAL OPERATIONS
+  const filterVirtualPatient = (patients: Patient[]): Patient[] => {
+    return patients.filter(patient => patient.id !== VIRTUAL_PATIENT_ID);
+  };
 
   // 🚨 HANDLE 401 ERRORS - FORCE LOGOUT IF TOKEN EXPIRED
   const handle401Error = () => {
@@ -66,7 +74,9 @@ export const usePatients = () => {
       console.log('🔥 fetchPatients - Response data:', data);
       
       // El endpoint devuelve un array de sugerencias
-      return data;
+      // 🔒 FILTER OUT VIRTUAL PATIENT
+      const filteredData = filterVirtualPatient(data);
+      return filteredData;
     } catch (err) {
       console.error('🚨 fetchPatients - Error caught:', err);
       setError(err instanceof Error ? err.message : 'Error desconocido');
@@ -106,12 +116,50 @@ export const usePatients = () => {
       // 🎯 BACKEND RETURNS {items: Array, total, page, size, pages}
       const patientsArray = Array.isArray(data) ? data : (data.items || []);
       
-      setPatients(patientsArray);
-      return patientsArray;
+      // 🔒 FILTER OUT VIRTUAL PATIENT FROM NORMAL OPERATIONS
+      const filteredPatients = filterVirtualPatient(patientsArray);
+      
+      setPatients(filteredPatients);
+      return filteredPatients;
     } catch (err) {
       console.error('🚨 fetchAllPatients - Error caught:', err);
       setError(err instanceof Error ? err.message : 'Error desconocido');
       setPatients([]);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🔓 SPECIAL FUNCTION FOR UPLOADS: INCLUDES VIRTUAL PATIENT
+  const fetchAllPatientsForUpload = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(API_BASE, {
+        headers: {
+          'Authorization': `Bearer ${state.accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.status === 401) {
+        handle401Error();
+        return [];
+      }
+      
+      if (!response.ok) {
+        throw new Error(`Error al cargar pacientes: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const patientsArray = Array.isArray(data) ? data : (data.items || []);
+      
+      // 🔓 DO NOT FILTER - RETURN ALL PATIENTS INCLUDING VIRTUAL
+      return patientsArray;
+    } catch (err) {
+      console.error('🚨 fetchAllPatientsForUpload - Error:', err);
+      setError(err instanceof Error ? err.message : 'Error desconocido');
       return [];
     } finally {
       setLoading(false);
@@ -129,6 +177,7 @@ export const usePatients = () => {
     loading,
     error,
     fetchPatients,
-    fetchAllPatients
+    fetchAllPatients,
+    fetchAllPatientsForUpload  // 🔓 SPECIAL FOR UPLOADS
   };
 };

@@ -1,12 +1,12 @@
 // DOCUMENT_CATEGORIES: Role-Based Document Type Navigation
 /**
- * DocumentCategories - Scherzo Punk Navigation System
+ * DocumentCategories - Unified System Navigation
  * 
- * Role-based document type tabs con neon vibes:
- * ✅ Doctor/Clinical: Medical + Admin + Legal + Billing
- * ✅ Admin/Reception: Admin + Legal + Billing (NO Medical)
- * ✅ Smooth tab transitions with punk aesthetics
- * ✅ Permission-aware navigation
+ * Now uses the UNIFIED SYSTEM with 16 document types:
+ * ✅ Synced with backend unified categories
+ * ✅ Role-based access control maintained
+ * ✅ Legal compliance categorization
+ * ✅ AI-ready document types
  */
 
 import React from 'react';
@@ -18,67 +18,158 @@ import {
   CurrencyDollarIcon
 } from '@heroicons/react/24/outline';
 
-export enum DocumentCategory {
-  MEDICAL = 'medical',
-  ADMINISTRATIVE = 'administrative', 
-  LEGAL = 'legal',
-  BILLING = 'billing'
+// 🗂️ UNIFIED CATEGORIES - Synced with backend
+export enum LegalCategory {
+  MEDICAL = 'medical',           // GDPR Article 9 - Special category data
+  ADMINISTRATIVE = 'administrative', // Standard administrative documents
+  BILLING = 'billing',           // Financial and billing records
+  LEGAL = 'legal'               // Legal documents and contracts
 }
 
+// 🗂️ UNIFIED DOCUMENT TYPES - The 16 unified types
+export enum UnifiedDocumentType {
+  // 🏥 MEDICAL TYPES (GDPR Art. 9 protected)
+  XRAY = "xray",
+  PHOTO_CLINICAL = "photo_clinical",
+  VOICE_NOTE = "voice_note",
+  TREATMENT_PLAN = "treatment_plan",
+  LAB_REPORT = "lab_report",
+  PRESCRIPTION = "prescription",
+  SCAN_3D = "scan_3d",
+  
+  // 📋 ADMINISTRATIVE TYPES
+  CONSENT_FORM = "consent_form",
+  INSURANCE_FORM = "insurance_form",
+  DOCUMENT_GENERAL = "document_general",
+  
+  // 💰 BILLING TYPES
+  INVOICE = "invoice",
+  BUDGET = "budget",
+  PAYMENT_PROOF = "payment_proof",
+  
+  // ⚖️ LEGAL TYPES
+  REFERRAL_LETTER = "referral_letter",
+  LEGAL_DOCUMENT = "legal_document"
+}
+
+// Backward compatibility alias
+export const DocumentCategory = LegalCategory;
+
 interface DocumentCategoryTab {
-  id: DocumentCategory;
+  id: LegalCategory;
   name: string;
   description: string;
   icon: React.ReactNode;
   requiredRoles: string[];
   color: string;
   neonColor: string;
+  documentTypes: UnifiedDocumentType[]; // 🆕 Associated unified types
 }
 
 interface DocumentCategoriesProps {
-  activeCategory: DocumentCategory;
-  onCategoryChange: (category: DocumentCategory) => void;
+  activeCategory: LegalCategory;
+  onCategoryChange: (category: LegalCategory) => void;
   className?: string;
 }
 
 const CATEGORY_TABS: DocumentCategoryTab[] = [
   {
-    id: DocumentCategory.MEDICAL,
+    id: LegalCategory.MEDICAL,
     name: 'Médicos',
     description: 'Historiales, radiografías, diagnósticos',
     icon: <HeartIcon className="h-5 w-5" />,
-    requiredRoles: ['doctor', 'clinical_staff', 'professional'], // ← ADDED professional
+    requiredRoles: ['doctor', 'clinical_staff', 'professional'],
     color: 'red',
-    neonColor: 'shadow-red-500/50'
+    neonColor: 'shadow-red-500/50',
+    documentTypes: [
+      UnifiedDocumentType.XRAY,
+      UnifiedDocumentType.PHOTO_CLINICAL,
+      UnifiedDocumentType.VOICE_NOTE,
+      UnifiedDocumentType.TREATMENT_PLAN,
+      UnifiedDocumentType.LAB_REPORT,
+      UnifiedDocumentType.PRESCRIPTION,
+      UnifiedDocumentType.SCAN_3D
+    ]
   },
   {
-    id: DocumentCategory.ADMINISTRATIVE,
+    id: LegalCategory.ADMINISTRATIVE,
     name: 'Administrativos', 
     description: 'Formularios, certificados, reportes',
     icon: <BuildingOfficeIcon className="h-5 w-5" />,
-    requiredRoles: ['doctor', 'clinical_staff', 'admin', 'receptionist', 'professional'], // ← ADDED professional
+    requiredRoles: ['doctor', 'clinical_staff', 'admin', 'receptionist', 'professional'],
     color: 'blue',
-    neonColor: 'shadow-blue-500/50'
+    neonColor: 'shadow-blue-500/50',
+    documentTypes: [
+      UnifiedDocumentType.INSURANCE_FORM,
+      UnifiedDocumentType.DOCUMENT_GENERAL
+    ]
   },
   {
-    id: DocumentCategory.LEGAL,
+    id: LegalCategory.LEGAL,
     name: 'Legales',
     description: 'Consentimientos, contratos, licencias',
     icon: <ScaleIcon className="h-5 w-5" />,
-    requiredRoles: ['doctor', 'clinical_staff', 'admin', 'receptionist', 'professional'], // ← ADDED professional
+    requiredRoles: ['doctor', 'clinical_staff', 'admin', 'receptionist', 'professional'],
     color: 'purple',
-    neonColor: 'shadow-purple-500/50'
+    neonColor: 'shadow-purple-500/50',
+    documentTypes: [
+      UnifiedDocumentType.CONSENT_FORM,
+      UnifiedDocumentType.REFERRAL_LETTER,
+      UnifiedDocumentType.LEGAL_DOCUMENT
+    ]
   },
   {
-    id: DocumentCategory.BILLING,
+    id: LegalCategory.BILLING,
     name: 'Facturación',
     description: 'Facturas, pagos, presupuestos',
     icon: <CurrencyDollarIcon className="h-5 w-5" />,
-    requiredRoles: ['doctor', 'clinical_staff', 'admin', 'receptionist', 'professional'], // ← ADDED professional
+    requiredRoles: ['doctor', 'clinical_staff', 'admin', 'receptionist', 'professional'],
     color: 'green',
-    neonColor: 'shadow-green-500/50'
+    neonColor: 'shadow-green-500/50',
+    documentTypes: [
+      UnifiedDocumentType.INVOICE,
+      UnifiedDocumentType.BUDGET,
+      UnifiedDocumentType.PAYMENT_PROOF
+    ]
   }
 ];
+
+// 🗂️ UTILITY FUNCTIONS
+
+export const getUnifiedTypesForCategory = (category: LegalCategory): UnifiedDocumentType[] => {
+  const tab = CATEGORY_TABS.find(t => t.id === category);
+  return tab?.documentTypes || [];
+};
+
+export const getCategoryFromUnifiedType = (type: UnifiedDocumentType): LegalCategory => {
+  for (const tab of CATEGORY_TABS) {
+    if (tab.documentTypes.includes(type)) {
+      return tab.id;
+    }
+  }
+  return LegalCategory.ADMINISTRATIVE; // Default fallback
+};
+
+export const getUnifiedTypeLabel = (type: UnifiedDocumentType): string => {
+  const labels: Record<UnifiedDocumentType, string> = {
+    [UnifiedDocumentType.XRAY]: "Radiografía",
+    [UnifiedDocumentType.PHOTO_CLINICAL]: "Fotografía Clínica",
+    [UnifiedDocumentType.VOICE_NOTE]: "Nota de Voz",
+    [UnifiedDocumentType.TREATMENT_PLAN]: "Plan de Tratamiento",
+    [UnifiedDocumentType.LAB_REPORT]: "Reporte de Laboratorio",
+    [UnifiedDocumentType.PRESCRIPTION]: "Prescripción",
+    [UnifiedDocumentType.SCAN_3D]: "Escaneo 3D",
+    [UnifiedDocumentType.CONSENT_FORM]: "Formulario de Consentimiento",
+    [UnifiedDocumentType.INSURANCE_FORM]: "Formulario de Seguro",
+    [UnifiedDocumentType.DOCUMENT_GENERAL]: "Documento General",
+    [UnifiedDocumentType.INVOICE]: "Factura",
+    [UnifiedDocumentType.BUDGET]: "Presupuesto",
+    [UnifiedDocumentType.PAYMENT_PROOF]: "Comprobante de Pago",
+    [UnifiedDocumentType.REFERRAL_LETTER]: "Carta de Derivación",
+    [UnifiedDocumentType.LEGAL_DOCUMENT]: "Documento Legal"
+  };
+  return labels[type] || type;
+};
 
 export const DocumentCategories: React.FC<DocumentCategoriesProps> = ({
   activeCategory,
@@ -86,36 +177,16 @@ export const DocumentCategories: React.FC<DocumentCategoriesProps> = ({
   className = ''
 }) => {
   const { state } = useAuth();
-  const userRole = state.user?.role || 'doctor'; // 🔧 DEFAULT to doctor for now
+  const userRole = state.user?.role || 'doctor';
 
   // 🔐 FILTER TABS BY USER PERMISSIONS
   const availableTabs = CATEGORY_TABS.filter(tab => 
     tab.requiredRoles.includes(userRole)
   );
 
-  // 🎨 GET TAB STYLE (NEON PUNK AESTHETIC)
-  const getTabStyle = (tab: DocumentCategoryTab, isActive: boolean) => {
-    const baseStyle = "group relative flex items-center space-x-3 px-6 py-4 rounded-xl font-medium transition-all duration-300 transform hover:scale-105";
-    
-    if (isActive) {
-      return `${baseStyle} bg-gradient-to-r from-${tab.color}-500 to-${tab.color}-600 text-white shadow-lg ${tab.neonColor} shadow-xl`;
-    }
-    
-    return `${baseStyle} bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 hover:border-${tab.color}-300`;
-  };
-
-  // 🌈 NEON GLOW EFFECT
-  const getNeonGlow = (tab: DocumentCategoryTab, isActive: boolean) => {
-    if (!isActive) return '';
-    
-    return (
-      <div className={`absolute inset-0 rounded-xl bg-gradient-to-r from-${tab.color}-400 to-${tab.color}-600 opacity-20 blur-xl animate-pulse`} />
-    );
-  };
-
   return (
     <div className={`bg-white border-b border-gray-200 ${className}`}>
-      {/* 🎚️ COMPACT CATEGORY TABS - Horizontal Strip */}
+      {/* 🎚️ UNIFIED CATEGORY TABS */}
       <div className="flex items-center space-x-1 p-4">
         {availableTabs.map((tab) => {
           const isActive = activeCategory === tab.id;
@@ -129,6 +200,7 @@ export const DocumentCategories: React.FC<DocumentCategoriesProps> = ({
                   ? `bg-${tab.color}-500 text-white shadow-lg transform scale-105`
                   : `text-gray-600 hover:bg-${tab.color}-50 hover:text-${tab.color}-600`
               }`}
+              title={`${tab.description} (${tab.documentTypes.length} tipos)`}
             >
               {/* 📋 ICON */}
               <div className={isActive ? 'text-white' : `text-${tab.color}-500`}>
@@ -137,6 +209,15 @@ export const DocumentCategories: React.FC<DocumentCategoriesProps> = ({
               
               {/* 📝 NAME */}
               <span className="font-medium">{tab.name}</span>
+              
+              {/* 📊 TYPE COUNT */}
+              <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                isActive 
+                  ? 'bg-white bg-opacity-20 text-white' 
+                  : `bg-${tab.color}-100 text-${tab.color}-600`
+              }`}>
+                {tab.documentTypes.length}
+              </span>
               
               {/* ⚡ ACTIVE INDICATOR */}
               {isActive && (
@@ -149,9 +230,23 @@ export const DocumentCategories: React.FC<DocumentCategoriesProps> = ({
         {/* 📊 INFO BADGE */}
         <div className="ml-auto flex items-center space-x-2 text-xs text-gray-500">
           <span>•</span>
-          <span>{availableTabs.length} categorías</span>
+          <span>Sistema Unificado v2.0</span>
+          <span>•</span>
+          <span>{Object.keys(UnifiedDocumentType).length} tipos</span>
         </div>
       </div>
+      
+      {/* 🔍 ACTIVE CATEGORY DETAILS */}
+      {activeCategory && (
+        <div className="px-4 pb-3">
+          <div className="text-xs text-gray-500">
+            <span className="font-medium">Tipos incluidos:</span>{' '}
+            {getUnifiedTypesForCategory(activeCategory)
+              .map(type => getUnifiedTypeLabel(type))
+              .join(', ')}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

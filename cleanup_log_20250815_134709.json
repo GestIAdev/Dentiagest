@@ -1,0 +1,39 @@
+{
+  "cleanup_date": "2025-08-15T13:47:14.119059",
+  "project_root": ".",
+  "backup_location": "backup_archive\\document_system_legacy_2025_08_15",
+  "dry_run": false,
+  "operations": [
+    {
+      "timestamp": "2025-08-15T13:47:09.270713",
+      "operation": "REMOVE",
+      "file": "backend\\clean_documents.py",
+      "status": "SUCCESS",
+      "details": "One-time migration script",
+      "dry_run": false
+    },
+    {
+      "timestamp": "2025-08-15T13:47:09.270995",
+      "operation": "REMOVE",
+      "file": "backend\\clean_documents_sql.py",
+      "status": "SUCCESS",
+      "details": "One-time migration script",
+      "dry_run": false
+    },
+    {
+      "timestamp": "2025-08-15T13:47:09.271242",
+      "operation": "REMOVE",
+      "file": "backend\\seed_category_documents.py",
+      "status": "SUCCESS",
+      "details": "One-time migration script",
+      "dry_run": false
+    }
+  ],
+  "summary": {
+    "total_operations": 3,
+    "successful": 3,
+    "skipped": 0,
+    "errors": 0,
+    "warnings": 0
+  }
+}

@@ -111,12 +111,24 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
   };
 
   // 📤 DOWNLOAD HANDLER
+  // 🔧 DYNAMIC API URL HELPER - Future v2 compatibility
+  const getDocumentDownloadUrl = (documentId: string): string => {
+    // For now use v1, but ready for v2 migration
+    const useV2Api = false; // Feature flag for future
+    
+    if (useV2Api) {
+      return `http://127.0.0.1:8002/api/v2/documents/${documentId}/download`;
+    } else {
+      return `http://127.0.0.1:8002/api/v1/medical-records/documents/${documentId}/download`;
+    }
+  };
+
   const handleDownload = async () => {
     if (!document || !state.accessToken) return;
 
     try {
       setLoading(true);
-      const response = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/documents/${document.id}/download`, {
+      const response = await fetch(getDocumentDownloadUrl(document.id), {
         headers: {
           'Authorization': `Bearer ${state.accessToken}`,
         },
@@ -147,16 +159,62 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
       setLoading(true);
       setError(null);
       
-      // For now, use the download URL for viewing
-      // In production, you'd have a separate view endpoint
-      setDocumentUrl(document.download_url);
+      // 🔍 DEBUG: Log authentication details
+      console.log('🔐 DocumentViewer Auth Debug:', {
+        documentId: document.id,
+        hasToken: !!state.accessToken,
+        tokenLength: state.accessToken?.length,
+        userRole: state.user?.role
+      });
+      
+      // For images and audio, we need to fetch with auth and create blob URLs
+      if (document.is_image || document.mime_type.includes('audio')) {
+        const response = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/documents/${document.id}/download`, {
+          headers: {
+            'Authorization': `Bearer ${state.accessToken}`,
+          },
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('🚨 DocumentViewer Fetch Error:', {
+            status: response.status,
+            statusText: response.statusText,
+            errorBody: errorText,
+            headers: Object.fromEntries(response.headers.entries())
+          });
+          
+          if (response.status === 401) {
+            throw new Error('Sin autorización - Token expirado o inválido');
+          } else if (response.status === 404) {
+            throw new Error('Documento no encontrado');
+          } else {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+        }
+        
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        setDocumentUrl(blobUrl);
+      } else {
+        // For PDFs, we can use iframe with auth headers (if browser supports it)
+        const viewUrl = `http://127.0.0.1:8002/api/v1/medical-records/documents/${document.id}/download`;
+        setDocumentUrl(viewUrl);
+      }
       
     } catch (error) {
       console.error('Error fetching document:', error);
-      setError('Error loading document');
+      setError(`Error loading document: ${error.message}`);
     } finally {
       setLoading(false);
     }
+  };
+
+  // 🔐 BUILD AUTHENTICATED URL (for PDFs that support it)
+  const getAuthenticatedUrl = (url: string) => {
+    // 🔥 BLOB URLs don't need authentication (they're already local)
+    if (!state.accessToken || !url || url.startsWith('blob:')) return url;
+    return `${url}?authorization=Bearer%20${encodeURIComponent(state.accessToken)}`;
   };
 
   // 🔄 EFFECTS
@@ -300,7 +358,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
                   <div className="flex items-center justify-center min-h-full p-4">
                     <img
                       ref={imageRef}
-                      src={documentUrl}
+                      src={getAuthenticatedUrl(documentUrl)}
                       alt={document.title}
                       style={{ transform: `scale(${zoom})` }}
                       className="max-w-none transition-transform duration-200 cursor-move"
@@ -322,7 +380,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
                         
                         <audio
                           ref={audioRef}
-                          src={documentUrl}
+                          src={getAuthenticatedUrl(documentUrl)}
                           onPlay={() => setIsPlaying(true)}
                           onPause={() => setIsPlaying(false)}
                           onEnded={() => setIsPlaying(false)}
@@ -347,7 +405,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
                 ) : document.mime_type.includes('pdf') ? (
                   /* 📄 PDF VIEWER */
                   <iframe
-                    src={documentUrl}
+                    src={getAuthenticatedUrl(documentUrl)}
                     className="w-full h-full border-0"
                     title={document.title}
                   />
