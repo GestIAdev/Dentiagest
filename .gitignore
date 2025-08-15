@@ -19,8 +19,43 @@ develop-eggs/
 dist/
 downloads/
 eggs/
-.eggs/
-lib/
+.eg# 🔒 INFORMACIÓN PRIVADA DE NEGOCIO (Agregado por RaulVisionario)
+# Documentos estratégicos privados, análisis de mercado, inspiración de negocio
+docs/Dev_diary/private/
+docs/**/private/
+**/private/
+*.private.*
+
+# �️ NETRUNNER SECURITY LEVEL 1 (PunkClaude Protection) 
+# Protección de planes estratégicos y documentación sensible
+docs/miscelaneus/
+docs/IA/private_*
+docs/Generic/confidential_*
+**/strategic_*
+**/plans_*
+**/roadmap_*
+**/MASTER_*
+*.strategic.*
+
+# �💰 BUSINESS SENSITIVE DOCUMENTS (Nueva protección)
+**/PROPUESTA_*
+**/PRESUPUESTO_*
+**/propuesta_*
+**/presupuesto_*
+**/business_*
+**/strategy_*
+**/pricing_*
+**/client_*
+**/confidential_*
+**/CONFIDENTIAL_*
+*.confidential.*
+
+# 🏢 CLIENT & COMMERCIAL INFO
+**/meeting_notes*
+**/call_notes*
+**/client_feedback*
+**/contract_*
+**/CONTRACT_*ib/
 lib64/
 parts/
 sdist/

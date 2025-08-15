@@ -16,6 +16,7 @@ import { DocumentList } from './DocumentList.tsx';
 import { DocumentViewer } from './DocumentViewer.tsx';
 import { PatientSelector } from './PatientSelector.tsx';
 import { DocumentCategories, DocumentCategory } from './DocumentCategories.tsx';
+import { UnifiedSystemBridge } from '../documents/unified/UnifiedSystemBridge.tsx';
 import { 
   CloudArrowUpIcon,
   FolderOpenIcon,
@@ -76,10 +77,31 @@ export const DocumentManagement: React.FC<DocumentManagementProps> = ({
   // 🔄 IS GLOBAL MODE?
   const isGlobalMode = !initialPatientId;
 
+  // 🚀 UNIFIED SYSTEM INTEGRATION - Automatic detection and fallback
+  // For now, always enable unified system since migration is complete
+  const unifiedSystemEnabled = true; // process.env.NODE_ENV === 'development' || true;
+
   // 🔥 PUNK OPTIMIZATION: Auto-refresh when category or patient changes
   useEffect(() => {
     setRefreshKey(prev => prev + 1);
   }, [activeCategory, effectivePatientId]);
+
+  // If unified system is available, use the bridge component
+  if (unifiedSystemEnabled) {
+    return (
+      <div className={className}>
+        <UnifiedSystemBridge
+          patientId={effectivePatientId || ''}
+          useUnifiedSystem={true}
+          migrationMode={false}
+          onSystemToggle={(useUnified) => {
+            console.log('System toggled:', useUnified);
+            setRefreshKey(prev => prev + 1);
+          }}
+        />
+      </div>
+    );
+  }
 
   // 🔄 REFRESH HANDLER after successful upload
   const handleUploadComplete = (documents: any[]) => {
@@ -187,6 +209,7 @@ export const DocumentManagement: React.FC<DocumentManagementProps> = ({
               key={refreshKey}
               patientId={effectivePatientId}
               categoryFilter={activeCategory}
+              onDocumentSelect={handleDocumentSelect}
             />
           </>
         )}
