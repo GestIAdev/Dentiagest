@@ -20,7 +20,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { EnhancedDocumentCard } from './EnhancedDocumentCard';
-import { centralMappingService } from '../../services/mapping/CentralMappingService';
+// APOLLO NUCLEAR: CentralMappingService disabled
 import { 
   LegalCategory, 
   DocumentCardThemes,

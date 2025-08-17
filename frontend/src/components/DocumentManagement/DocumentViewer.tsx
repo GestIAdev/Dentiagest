@@ -19,7 +19,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
-import apollo from '../../services/api'; // 🚀 OPERACIÓN APOLLO - Centralized API Service
+import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 import {
   XMarkIcon,
   MagnifyingGlassMinusIcon,

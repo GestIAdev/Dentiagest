@@ -29,7 +29,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx'; // 🔒 INTEGRACIÓN AUTHCONTEXT
-import apollo from '../../services/api'; // 🚀 OPERACIÓN APOLLO - Centralized API Service
+import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK CAN'T STOP US!
 import { 
   MagnifyingGlassIcon, 
   FunnelIcon, 

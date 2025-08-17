@@ -14,6 +14,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.tsx';
+import apollo from '../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 import { DeletionRequestsDashboard } from '../components/DocumentManagement/DeleteDocumentButton.tsx';
 import {
   TrashIcon,
@@ -28,10 +29,7 @@ import {
   CalendarDaysIcon
 } from '@heroicons/react/24/outline';
 
-// 🔥 HARDCODED API FUNCTIONS - WEBPACK SOLUTION
-const buildApiUrl = (endpoint: string): string => {
-  return `/api/v1${endpoint}`;
-};
+// � APOLLO API ARCHITECTURE - buildApiUrl eliminated, centralized in apollo service
 
 interface DeletionStats {
   total_documents: number;
@@ -81,47 +79,26 @@ export const DocumentDeletionPage: React.FC = () => {
     try {
       setLoading(true);
       
-      // Load statistics
-      const statsResponse = await fetch(buildApiUrl('/documents/deletion-stats'), {
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json();
-        setStats(statsData);
+      // 🚀 APOLLO API - Load statistics
+      const statsResponse = await apollo.api.get('/documents/deletion-stats');
+      if (statsResponse.success && statsResponse.data) {
+        setStats(statsResponse.data as any);
       }
 
-      // Load pending requests
-      const pendingResponse = await fetch(buildApiUrl('/documents/deletion-requests?status=pending_approval'), {
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (pendingResponse.ok) {
-        const pendingData = await pendingResponse.json();
-        setPendingRequests(pendingData);
+      // 🚀 APOLLO API - Load pending requests
+      const pendingResponse = await apollo.api.get('/documents/deletion-requests?status=pending_approval');
+      if (pendingResponse.success && pendingResponse.data) {
+        setPendingRequests(pendingResponse.data as any);
       }
 
-      // Load all requests
-      const allResponse = await fetch(buildApiUrl('/documents/deletion-requests'), {
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (allResponse.ok) {
-        const allData = await allResponse.json();
-        setAllRequests(allData);
+      // 🚀 APOLLO API - Load all requests
+      const allResponse = await apollo.api.get('/documents/deletion-requests');
+      if (allResponse.success && allResponse.data) {
+        setAllRequests(allResponse.data as any);
       }
 
     } catch (error) {
-      console.error('Error loading deletion data:', error);
+      console.error('❌ Apollo API - Error loading deletion data:', error);
     } finally {
       setLoading(false);
     }
@@ -131,23 +108,17 @@ export const DocumentDeletionPage: React.FC = () => {
     if (!state.accessToken) return;
 
     try {
-      const response = await fetch(buildApiUrl(`/documents/deletion-requests/${requestId}/approve`), {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      // 🚀 APOLLO API - Approve deletion request
+      const response = await apollo.api.post(`/documents/deletion-requests/${requestId}/approve`, {});
 
-      if (response.ok) {
+      if (response.success) {
         alert('✅ Solicitud aprobada. Período de gracia iniciado.');
         loadDeletionData();
       } else {
-        const error = await response.json();
-        alert(`❌ Error: ${error.detail}`);
+        alert(`❌ Error: ${response.error?.detail || 'Error al aprobar solicitud'}`);
       }
     } catch (error) {
-      console.error('Error approving request:', error);
+      console.error('❌ Apollo API - Error approving request:', error);
       alert('❌ Error al aprobar solicitud');
     }
   };
@@ -156,24 +127,19 @@ export const DocumentDeletionPage: React.FC = () => {
     if (!state.accessToken || !reason.trim()) return;
 
     try {
-      const response = await fetch(buildApiUrl(`/documents/deletion-requests/${requestId}/reject`), {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ rejection_reason: reason })
+      // 🚀 APOLLO API - Reject deletion request
+      const response = await apollo.api.post(`/documents/deletion-requests/${requestId}/reject`, {
+        rejection_reason: reason
       });
 
-      if (response.ok) {
+      if (response.success) {
         alert('✅ Solicitud rechazada.');
         loadDeletionData();
       } else {
-        const error = await response.json();
-        alert(`❌ Error: ${error.detail}`);
+        alert(`❌ Error: ${response.error?.detail || 'Error al rechazar solicitud'}`);
       }
     } catch (error) {
-      console.error('Error rejecting request:', error);
+      console.error('❌ Apollo API - Error rejecting request:', error);
       alert('❌ Error al rechazar solicitud');
     }
   };

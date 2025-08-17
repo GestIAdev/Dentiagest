@@ -8,7 +8,7 @@ import { es } from 'date-fns/locale';
 import { parseClinicDateTime } from '../../utils/timezone.ts';
 import { AppointmentCard } from './AppointmentCard.tsx';
 import { updateAppointmentTime } from '../../utils/appointmentService.ts';
-import { centralMappingService } from '../../services/mapping/CentralMappingService';
+// APOLLO NUCLEAR: CentralMappingService disabled
 
 interface WeekViewProps {
   currentDate: Date;

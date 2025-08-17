@@ -11,7 +11,7 @@
 
 import React from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
-import { centralMappingService } from '../../services/mapping/CentralMappingService';
+// APOLLO NUCLEAR: Webpack bypass - local functions only
 import { 
   HeartIcon,
   BuildingOfficeIcon,
@@ -26,6 +26,31 @@ export enum LegalCategory {
   BILLING = 'billing',           // Financial and billing records
   LEGAL = 'legal'               // Legal documents and contracts
 }
+
+// 🚀 APOLLO NUCLEAR BYPASS - Local mapping function
+const getUnifiedTypeLabel = (type: string): string => {
+  const labels: Record<string, string> = {
+    'MEDICAL_IMAGE': 'Imagen Médica',
+    'XRAY': 'Radiografía',
+    'DENTAL_PHOTO': 'Foto Dental',
+    'TREATMENT_PLAN': 'Plan de Tratamiento',
+    'PRESCRIPTION': 'Receta',
+    'MEDICAL_REPORT': 'Informe Médico',
+    'LAB_RESULT': 'Resultado Lab',
+    'CONSENT_FORM': 'Formulario Consentimiento',
+    'PATIENT_ID': 'ID Paciente',
+    'INSURANCE_CARD': 'Tarjeta Seguro',
+    'APPOINTMENT_CARD': 'Tarjeta Cita',
+    'REGISTRATION_FORM': 'Formulario Registro',
+    'INVOICE': 'Factura',
+    'PAYMENT_RECEIPT': 'Recibo Pago',
+    'BUDGET_QUOTE': 'Presupuesto',
+    'CONTRACT': 'Contrato',
+    'LEGAL_DOC': 'Documento Legal',
+    'POLICY': 'Política'
+  };
+  return labels[type] || type;
+};
 
 // 🗂️ UNIFIED DOCUMENT TYPES - The 16 unified types
 export enum UnifiedDocumentType {
@@ -223,9 +248,8 @@ export const DocumentCategories: React.FC<DocumentCategoriesProps> = ({
             <span className="font-medium">Tipos incluidos:</span>{' '}
             {getUnifiedTypesForCategory(activeCategory)
               .map(type => {
-                // 🚀 OPERACIÓN UNIFORM - Central Mapping Service for labels
-                const mappingResult = centralMappingService.getUnifiedTypeLabel(type);
-                return mappingResult.success && mappingResult.result ? mappingResult.result : type;
+                // 🚀 APOLLO NUCLEAR BYPASS - Local function instead of service
+                return getUnifiedTypeLabel(type);
               })
               .join(', ')}
           </div>

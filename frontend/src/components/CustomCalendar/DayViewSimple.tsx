@@ -9,7 +9,7 @@ import { es } from 'date-fns/locale';
 import { parseClinicDateTime } from '../../utils/timezone.ts';
 import { AppointmentCard, type AppointmentData } from './AppointmentCard.tsx';
 import { updateAppointmentTime } from '../../utils/appointmentService.ts';
-import { centralMappingService } from '../../services/mapping/CentralMappingService';
+// APOLLO NUCLEAR: CentralMappingService disabled
 
 interface DayViewProps {
   currentDate: Date;

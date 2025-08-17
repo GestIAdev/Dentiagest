@@ -8,9 +8,17 @@
  */
 
 // ============================================================================
+// IMPORTS FOR RE-EXPORTS
+// ============================================================================
+import { MappingValidators } from './MappingValidators';
+import { centralMappingService } from './CentralMappingService';
+import { performanceMonitor } from './MappingPerformanceMonitor';
+import { ALL_UNIFIED_TYPES, ALL_LEGACY_TYPES } from './EnumMappings';
+
+// ============================================================================
 // MAIN SERVICE
 // ============================================================================
-export { CentralMappingService, centralMappingService } from './CentralMappingService';
+export { CentralMappingService, centralMappingService } from './CentralMappingService.ts';
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -38,7 +46,7 @@ export type {
   
   // Audit & Logging
   MappingAuditEntry
-} from './MappingTypes';
+} from './MappingTypes.ts';
 
 // ============================================================================
 // MAPPING DATA
@@ -58,12 +66,12 @@ export {
   // Arrays for iteration
   ALL_UNIFIED_TYPES,
   ALL_LEGACY_TYPES
-} from './EnumMappings';
+} from './EnumMappings.ts';
 
 // ============================================================================
 // VALIDATORS
 // ============================================================================
-export { MappingValidators } from './MappingValidators';
+export { MappingValidators } from './MappingValidators.ts';
 
 // ============================================================================
 // PERFORMANCE MONITORING
@@ -72,14 +80,6 @@ export {
   MappingPerformanceMonitor, 
   performanceMonitor 
 } from './MappingPerformanceMonitor';
-
-// ============================================================================
-// IMPORTS FOR RE-EXPORTS
-// ============================================================================
-import { MappingValidators } from './MappingValidators';
-import { centralMappingService } from './CentralMappingService';
-import { performanceMonitor } from './MappingPerformanceMonitor';
-import { ALL_UNIFIED_TYPES, ALL_LEGACY_TYPES } from './EnumMappings';
 
 // ============================================================================
 // CONVENIENCE RE-EXPORTS

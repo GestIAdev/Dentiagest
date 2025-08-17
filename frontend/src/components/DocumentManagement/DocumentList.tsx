@@ -26,8 +26,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
-import { centralMappingService } from '../../services/mapping'; // 🚀 OPERACIÓN UNIFORM - Central Mapping Service
-import apollo from '../../services/api'; // 🚀 OPERACIÓN APOLLO - Centralized API Service
+// // APOLLO NUCLEAR: CentralMappingService disabled
+import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 // import { buildApiUrl, getDocumentDownloadUrl } from '../../config/api';
 import {
   MagnifyingGlassIcon,
@@ -260,9 +260,9 @@ export const DocumentList: React.FC<DocumentListProps> = ({
         // Check if it's a unified enum value
         const unifiedValues = Object.values(UnifiedDocumentType);
         if (unifiedValues.includes(filters.document_type as UnifiedDocumentType)) {
-          // 🚀 OPERACIÓN UNIFORM - Direct service call
-          const mappingResult = centralMappingService.mapUnifiedToLegacy(filters.document_type as UnifiedDocumentType);
-          translatedFilters.document_type = mappingResult.success ? (mappingResult.result || 'other_document') : 'other_document';
+          // 🚀 APOLLO NUCLEAR - Mapping stub
+          // const mappingResult = centralMappingService.mapUnifiedToLegacy(filters.document_type as UnifiedDocumentType);
+          translatedFilters.document_type = filters.document_type || 'other_document'; // Apollo stub
           console.log('🔄 Translated enum:', filters.document_type, '→', translatedFilters.document_type);
         }
       }

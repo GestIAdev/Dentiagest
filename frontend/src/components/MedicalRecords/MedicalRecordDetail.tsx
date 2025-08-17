@@ -28,6 +28,7 @@ import {
   ArchiveBoxIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext.tsx';  // 🔧 FIXED: Added .tsx extension for webpack
+import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK CAN'T STOP US!
 
 // Types
 interface MedicalRecord {
@@ -110,32 +111,25 @@ const MedicalRecordDetail: React.FC<MedicalRecordDetailProps> = ({
         throw new Error('No hay token de autenticación válido');
       }
       
-      // Obtener historial médico
-      const recordResponse = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/${recordId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      // 🚀 OPERACIÓN APOLLO - Using centralized API service
+      // Replaces hardcoded fetch with apollo.medicalRecords.getById()
+      // Benefits: V1/V2 switching, error handling, performance monitoring
+      const recordResponse = await apollo.medicalRecords.getById(recordId);
+      
+      if (recordResponse.success && recordResponse.data) {
+        const recordData = recordResponse.data;
+        setRecord(recordData as any);
 
-      if (recordResponse.ok) {
-        const recordData = await recordResponse.json();
-        setRecord(recordData);
+        // 🚀 OPERACIÓN APOLLO - Using centralized API service  
+        // Replaces hardcoded fetch with apollo.patients.get()
+        const patientResponse = await apollo.patients.get(recordData.patient_id);
 
-        // Obtener información del paciente
-        const patientResponse = await fetch(`http://127.0.0.1:8002/api/v1/patients/${recordData.patient_id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (patientResponse.ok) {
-          const patientData = await patientResponse.json();
+        if (patientResponse.success && patientResponse.data) {
+          const patientData = patientResponse.data;
           setPatient(patientData);
         }
       } else {
-        throw new Error(`Error ${recordResponse.status}: ${recordResponse.statusText}`);
+        throw new Error(`Error fetching medical record: ${recordResponse.error || 'Unknown error'}`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');

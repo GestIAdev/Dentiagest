@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.tsx';
+import apollo from '../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 
 interface MFASetupData {
   secret: string;
@@ -29,18 +30,14 @@ const MFASetupPage: React.FC = () => {
   // Cargar estado MFA al montar el componente
   const loadMFAStatus = async () => {
     try {
-      const response = await fetch('http://localhost:8002/api/v1/auth/mfa/status', {
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-        },
-      });
+      // 🚀 APOLLO API - Load MFA status
+      const response = await apollo.api.get('/auth/mfa/status');
 
-      if (response.ok) {
-        const status = await response.json();
-        setMfaStatus(status);
+      if (response.success && response.data) {
+        setMfaStatus(response.data as any);
       }
     } catch (err) {
-      console.error('Error loading MFA status:', err);
+      console.error('❌ Apollo API - Error loading MFA status:', err);
     }
   };
 
@@ -60,23 +57,15 @@ const MFASetupPage: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8002/api/v1/auth/mfa/setup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${state.accessToken}`,
-        },
-        body: JSON.stringify({ password }),
-      });
+      // 🚀 APOLLO API - Start MFA setup
+      const response = await apollo.api.post('/auth/mfa/setup', { password });
 
-      if (response.ok) {
-        const data = await response.json();
-        setSetupData(data);
+      if (response.success && response.data) {
+        setSetupData(response.data as any);
         setShowSetup(true);
         setPassword('');
       } else {
-        const errorData = await response.json();
-        setError(errorData.detail || 'Error al configurar 2FA');
+        setError(response.error?.detail || 'Error al configurar 2FA');
       }
     } catch (err) {
       setError('Error de conexión');
@@ -95,24 +84,19 @@ const MFASetupPage: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8002/api/v1/auth/mfa/verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${state.accessToken}`,
-        },
-        body: JSON.stringify({ code: verificationCode }),
+      // 🚀 APOLLO API - Verify and enable MFA
+      const response = await apollo.api.post('/auth/mfa/verify', {
+        code: verificationCode
       });
 
-      if (response.ok) {
+      if (response.success) {
         setSuccess('¡2FA habilitado exitosamente!');
         setShowSetup(false);
         setSetupData(null);
         setVerificationCode('');
         loadMFAStatus();
       } else {
-        const errorData = await response.json();
-        setError(errorData.detail || 'Código inválido');
+        setError(response.error?.detail || 'Código inválido');
       }
     } catch (err) {
       setError('Error de conexión');
@@ -131,24 +115,20 @@ const MFASetupPage: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8002/api/v1/auth/mfa/disable', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${state.accessToken}`,
-        },
-        body: JSON.stringify({ password, code: disableCode }),
+      // 🚀 APOLLO API - Disable MFA
+      const response = await apollo.api.post('/auth/mfa/disable', {
+        password,
+        code: disableCode
       });
 
-      if (response.ok) {
+      if (response.success) {
         setSuccess('2FA deshabilitado exitosamente');
         setShowDisable(false);
         setPassword('');
         setDisableCode('');
         loadMFAStatus();
       } else {
-        const errorData = await response.json();
-        setError(errorData.detail || 'Error al deshabilitar 2FA');
+        setError(response.error?.detail || 'Error al deshabilitar 2FA');
       }
     } catch (err) {
       setError('Error de conexión');

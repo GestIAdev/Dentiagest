@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import apollo from '../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 
 // Tipos según documentación del backend
 interface User {
@@ -75,53 +76,43 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       setState(prev => ({ ...prev, isLoading: true }));
 
-      // Crear FormData para OAuth2PasswordRequestForm
+      // 🚀 APOLLO API - Authentication login with FormData
       const formData = new FormData();
       formData.append('username', email);
       formData.append('password', password);
+      
+      const response = await apollo.api.post('/auth/login', formData);
 
-      const response = await fetch('http://localhost:8002/api/v1/auth/login', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
+      if (!response.success || !response.data) {
         throw new Error('Login failed');
       }
 
-      const data = await response.json();
-      
-      // Obtener info del usuario
-      const userResponse = await fetch('http://localhost:8002/api/v1/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${data.access_token}`,
-        },
-      });
+      // 🚀 APOLLO API - Get user info after login
+      const userResponse = await apollo.api.get('/auth/me');
 
-      if (!userResponse.ok) {
-        throw new Error('Failed to get user info');
+      if (response.success && response.data) {
+        const userData = response.data as any;
+
+        // Mapear rol 'dentist' a 'professional' para backend
+        if (userData.role === 'dentist') {
+          userData.role = 'professional';
+        }
+        
+        // Almacenar en localStorage
+        localStorage.setItem('accessToken', (response.data as any).access_token);
+        localStorage.setItem('refreshToken', (response.data as any).refresh_token || '');
+        localStorage.setItem('user', JSON.stringify(userData));
+
+        setState({
+          isAuthenticated: true,
+          isLoading: false,
+          user: userData as any,
+          accessToken: (response.data as any).access_token,
+          refreshToken: (response.data as any).refresh_token || '',
+        });
+
+        return true;
       }
-
-      const userData = await userResponse.json();
-
-      // Mapear rol 'dentist' a 'professional' para backend
-      if (userData.role === 'dentist') {
-        userData.role = 'professional';
-      }
-      // Almacenar en localStorage
-      localStorage.setItem('accessToken', data.access_token);
-      localStorage.setItem('refreshToken', data.refresh_token || '');
-      localStorage.setItem('user', JSON.stringify(userData));
-
-      setState({
-        isAuthenticated: true,
-        isLoading: false,
-        user: userData,
-        accessToken: data.access_token,
-        refreshToken: data.refresh_token || '',
-      });
-
-      return true;
     } catch (error) {
       console.error('Login error:', error);
       setState(prev => ({ ...prev, isLoading: false }));
@@ -143,25 +134,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return false;
       }
 
-      const response = await fetch('/api/v1/auth/refresh', {
-        method: 'POST',
+      // 🚀 APOLLO API - Refresh access token
+      const response = await apollo.api.post('/auth/refresh', {}, {
+        requiresAuth: false,
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${refreshToken}`,
-        },
+          'Authorization': `Bearer ${refreshToken}`
+        }
       });
 
-      if (!response.ok) {
+      if (!response.success || !response.data) {
         logout();
         return false;
       }
 
-      const data = await response.json();
-      localStorage.setItem('accessToken', data.access_token);
+      localStorage.setItem('accessToken', response.data.access_token);
 
       setState(prev => ({
         ...prev,
-        accessToken: data.access_token,
+        accessToken: response.data.access_token,
       }));
 
       return true;

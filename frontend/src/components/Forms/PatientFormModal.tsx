@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
+import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 
 // PLATFORM_EXTRACTABLE: Universal form validation patterns
 interface FormErrors {
@@ -246,29 +247,22 @@ const PatientFormModal: React.FC<PatientFormModalProps> = ({
 
       // console.log('Sending patient data:', transformedData);
 
-      const url = patient 
-        ? `http://localhost:8002/api/v1/patients/${patient.id}`
-        : 'http://localhost:8002/api/v1/patients';
-      
-      const method = patient ? 'PUT' : 'POST';
-      
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(transformedData)
-      });
+      // 🚀 OPERACIÓN APOLLO - Using centralized API service
+      // Replaces hardcoded fetch with apollo.patients.create/update()
+      // Benefits: V1/V2 switching, error handling, performance monitoring
+      const response = patient 
+        ? await apollo.patients.update(patient.id, transformedData as any)
+        : await apollo.patients.create(transformedData as any);
 
-      if (response.ok) {
+      if (response.success) {
         onSave();
         onClose();
       } else {
-        const errorData = await response.json();
-        console.error('API Error Response:', errorData);
+        console.error('API Error Response:', response.error);
         console.error('Sent Data:', transformedData);
-        console.error('Validation Errors Details:', errorData.errors);
+        
+        // Apollo response format - using response.error instead of response.json()
+        const errorData = response.error || {} as any;
         
         // Show detailed validation errors to user
         if (errorData.errors && Array.isArray(errorData.errors)) {

@@ -18,6 +18,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 import { EnhancedDocumentGrid } from './EnhancedDocumentGrid';
 import { DocumentUpload } from './DocumentUpload';
 import { DocumentViewer } from './DocumentViewer';
@@ -142,21 +143,16 @@ export const EnhancedDocumentManagement: React.FC<EnhancedDocumentManagementProp
         params.append('patient_id', effectivePatientId);
       }
       
-      const response = await fetch(
-        `${getDocumentListUrl()}?${params}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${state.accessToken}`,
-          },
-        }
-      );
+      // 🚀 APOLLO API - Load documents with parameters
+      const response = await apollo.docs.list(params.toString());
       
-      if (response.ok) {
-        const data = await response.json();
-        setDocuments(data.items || []);
+      if (response.success && response.data) {
+        setDocuments(response.data.items || []);
+      } else {
+        console.error('❌ Apollo API - Error loading documents:', response.error);
       }
     } catch (error) {
-      console.error('Error loading documents:', error);
+      console.error('❌ Apollo API - Error loading documents:', error);
     } finally {
       setLoading(false);
     }

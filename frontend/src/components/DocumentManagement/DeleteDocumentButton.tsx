@@ -13,6 +13,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
+import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 import {
   TrashIcon,
   ExclamationTriangleIcon,
@@ -23,10 +24,7 @@ import {
   XCircleIcon
 } from '@heroicons/react/24/outline';
 
-// 🔥 HARDCODED API FUNCTIONS - WEBPACK SOLUTION
-const buildApiUrl = (endpoint: string): string => {
-  return `/api/v1${endpoint}`;
-};
+// � APOLLO API ARCHITECTURE - buildApiUrl eliminated, centralized in apollo service
 
 interface MedicalDocument {
   id: string;
@@ -100,24 +98,16 @@ export const DeleteDocumentButton: React.FC<DeleteDocumentButtonProps> = ({
 
     try {
       setLoading(true);
-      const response = await fetch(
-        buildApiUrl(`/documents/${document.id}/deletion-eligibility`),
-        {
-          headers: {
-            'Authorization': `Bearer ${state.accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      // 🚀 APOLLO API - Centralized eligibility check
+      const response = await apollo.api.get(`/documents/${document.id}/deletion-eligibility`);
 
-      if (response.ok) {
-        const data = await response.json();
-        setEligibility(data);
+      if (response.success && response.data) {
+        setEligibility(response.data as any);
       } else {
-        console.error('Failed to check deletion eligibility');
+        console.error('❌ Apollo API - Failed to check deletion eligibility:', response.error);
       }
     } catch (error) {
-      console.error('Error checking deletion eligibility:', error);
+      console.error('❌ Apollo API - Error checking deletion eligibility:', error);
     } finally {
       setLoading(false);
     }
@@ -137,32 +127,21 @@ export const DeleteDocumentButton: React.FC<DeleteDocumentButtonProps> = ({
 
     try {
       setLoading(true);
-      const response = await fetch(
-        buildApiUrl(`/documents/${document.id}/request-deletion`),
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${state.accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            reason: deletionReason,
-            justification: justification.trim()
-          })
-        }
-      );
+      // 🚀 APOLLO API - Centralized deletion request
+      const response = await apollo.api.post(`/documents/${document.id}/request-deletion`, {
+        reason: deletionReason,
+        justification: justification.trim()
+      });
 
-      if (response.ok) {
-        const request = await response.json();
-        setExistingRequest(request);
+      if (response.success && response.data) {
+        setExistingRequest(response.data as any);
         setShowRequestForm(false);
         onDeletionRequested?.();
         
         // Show success message
         alert('✅ Solicitud de eliminación enviada para aprobación');
       } else {
-        const error = await response.json();
-        alert(`❌ Error: ${error.detail}`);
+        alert(`❌ Error: ${response.error?.detail || 'Error al procesar solicitud'}`);
       }
     } catch (error) {
       console.error('Error requesting deletion:', error);
@@ -423,19 +402,16 @@ export const DeletionRequestsDashboard: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(buildApiUrl('/documents/deletion-requests'), {
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      // 🚀 APOLLO API - Centralized deletion requests load
+      const response = await apollo.api.get('/documents/deletion-requests');
 
-      if (response.ok) {
-        const data = await response.json();
-        setRequests(data);
+      if (response.success && response.data) {
+        setRequests(response.data as any);
+      } else {
+        console.error('❌ Apollo API - Error loading deletion requests:', response.error);
       }
     } catch (error) {
-      console.error('Error loading deletion requests:', error);
+      console.error('❌ Apollo API - Error loading deletion requests:', error);
     } finally {
       setLoading(false);
     }
@@ -445,19 +421,16 @@ export const DeletionRequestsDashboard: React.FC = () => {
     if (!state.accessToken) return;
 
     try {
-      const response = await fetch(buildApiUrl('/documents/compliance-dashboard'), {
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      // 🚀 APOLLO API - Centralized compliance data load
+      const response = await apollo.api.get('/documents/compliance-dashboard');
 
-      if (response.ok) {
-        const data = await response.json();
-        setComplianceData(data);
+      if (response.success && response.data) {
+        setComplianceData(response.data as any);
+      } else {
+        console.error('❌ Apollo API - Error loading compliance data:', response.error);
       }
     } catch (error) {
-      console.error('Error loading compliance data:', error);
+      console.error('❌ Apollo API - Error loading compliance data:', error);
     }
   };
 

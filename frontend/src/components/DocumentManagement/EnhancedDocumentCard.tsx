@@ -32,7 +32,7 @@ import {
   ProstheticTags,
   LegalRetentionPolicies 
 } from '../../types/UnifiedDocumentTypes';
-import { centralMappingService } from '../../services/mapping/CentralMappingService';
+// APOLLO NUCLEAR: CentralMappingService disabled
 import {
   DocumentIcon,
   PhotoIcon,

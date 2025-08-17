@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
+import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 import {
   ArrowLeftIcon,
   PencilIcon,
@@ -42,18 +43,13 @@ const PatientDetailView: React.FC<PatientDetailProps> = ({ patient, onBack, onEd
     
     setLoadingAppointments(true);
     try {
-      const response = await fetch(
-        `http://localhost:8002/api/v1/appointments?patient_id=${patient.id}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${state.accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+      // 🚀 OPERACIÓN APOLLO - Using core API service
+      // TODO: Create AppointmentsApi module for specialized operations
+      // For now using core apollo.api.get() with query params
+      const response = await apollo.api.get(`/api/v1/appointments?patient_id=${patient.id}`);
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response.success && response.data) {
+        const data = response.data;
         setAppointments(data.appointments || []);
       }
     } catch (error) {

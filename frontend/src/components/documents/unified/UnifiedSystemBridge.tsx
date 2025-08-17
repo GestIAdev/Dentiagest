@@ -23,6 +23,7 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
+import apollo from '../../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK CAN'T STOP US!
 // Rutas corregidas para la estructura real - Webpack friendly! 🎯
 import { DocumentUpload } from '../../DocumentManagement/DocumentUpload.tsx';
 import { DocumentList } from '../../DocumentManagement/DocumentList.tsx';
@@ -74,8 +75,13 @@ export const UnifiedSystemBridge: React.FC<IntegrationBridgeProps> = ({
     const loadSystemStatus = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('/api/v2/documents/system-status');
-        const status = await response.json();
+        // 🚀 APOLLO API - Load system status
+        const response = await apollo.api.get('/documents/system-status', { version: 'v2' });
+        
+        if (response.success && response.data) {
+          const status = response.data;
+          // Process status...
+        }
         
         // 🎉 MIGRATION COMPLETED - Frontend is fully unified
         setSystemStatus({
@@ -88,7 +94,7 @@ export const UnifiedSystemBridge: React.FC<IntegrationBridgeProps> = ({
         // 🚀 Always use unified system since frontend is migrated
         setCurrentSystem('unified');
       } catch (error) {
-        console.error('Failed to load system status:', error);
+        console.error('❌ Apollo API - Failed to load system status:', error);
         setCurrentSystem('legacy'); // Fallback to legacy
       } finally {
         setIsLoading(false);
@@ -105,17 +111,15 @@ export const UnifiedSystemBridge: React.FC<IntegrationBridgeProps> = ({
     try {
       setMigrationInProgress(true);
       
-      const response = await fetch('/api/v2/documents/migrate-patient', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          patient_id: patientId,
-          force_migration: force,
-          preserve_metadata: true
-        })
-      });
+      // 🚀 APOLLO API - Migrate patient documents
+      const response = await apollo.api.post('/documents/migrate-patient', {
+        patient_id: patientId,
+        force_migration: force,
+        preserve_metadata: true
+      }, { version: 'v2' });
 
-      const result = await response.json();
+      if (response.success && response.data) {
+        const result = response.data;
       
       if (result.migrated_count > 0) {
         setSystemStatus(prev => ({
@@ -372,17 +376,21 @@ export const useUnifiedSystemDetection = (patientId: string) => {
   useEffect(() => {
     const detectSystem = async () => {
       try {
-        const response = await fetch(`/api/v2/documents/patient/${patientId}/system-status`);
-        const data = await response.json();
+        // 🚀 APOLLO API - Get patient system status
+        const response = await apollo.api.get(`/documents/patient/${patientId}/system-status`, { version: 'v2' });
         
-        setSystemRecommendation({
-          recommended: data.migration_progress === 1.0 ? 'unified' : 
-                     data.migration_progress > 0.5 ? 'hybrid' : 'legacy',
-          migrationProgress: data.migration_progress,
-          canUseBoth: data.migration_progress > 0.3
-        });
+        if (response.success && response.data) {
+          const data = response.data;
+          
+          setSystemRecommendation({
+            recommended: data.migration_progress === 1.0 ? 'unified' : 
+                       data.migration_progress > 0.5 ? 'hybrid' : 'legacy',
+            migrationProgress: data.migration_progress,
+            canUseBoth: data.migration_progress > 0.3
+          });
+        }
       } catch (error) {
-        console.error('System detection failed:', error);
+        console.error('❌ Apollo API - System detection failed:', error);
       }
     };
 

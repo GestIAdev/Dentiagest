@@ -25,12 +25,6 @@ import {
 
 import { LegalCategory } from '../../types/UnifiedDocumentTypes';
 
-// 🔥 ACCESS LEVEL TYPES (For final zombie elimination)
-export enum AccessLevel {
-  MEDICAL = 'medical',
-  ADMINISTRATIVE = 'administrative'
-}
-
 import {
   UNIFIED_TO_LEGACY_MAP,
   LEGACY_TO_UNIFIED_MAP,
@@ -47,6 +41,12 @@ import {
   getTypesByExtension,
   getConsentRequiredTypes
 } from './EnumMappings';
+
+// 🔥 ACCESS LEVEL TYPES (For final zombie elimination)
+export enum AccessLevel {
+  MEDICAL = 'medical',
+  ADMINISTRATIVE = 'administrative'
+}
 
 /**
  * 🎸 CENTRAL MAPPING SERVICE CLASS

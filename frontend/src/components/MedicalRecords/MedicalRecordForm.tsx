@@ -11,6 +11,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
+import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK CAN'T STOP US!
 import { usePatients, Patient } from '../../hooks/usePatients.ts';
 import { 
   XMarkIcon,
@@ -168,15 +169,13 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
     try {
       setLoading(true);
       
-      const response = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/${recordId}`, {
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      // 🚀 OPERACIÓN APOLLO - Using centralized API service
+      // Replaces hardcoded fetch with apollo.medicalRecords.getById()
+      // Benefits: V1/V2 switching, error handling, performance monitoring
+      const response = await apollo.medicalRecords.getById(recordId);
 
-      if (response.ok) {
-        const record = await response.json();
+      if (response.success && response.data) {
+        const record = response.data as any;
         setFormData({
           patient_id: record.patient_id,
           visit_date: record.visit_date.split('T')[0],
@@ -281,25 +280,22 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
         ? `http://127.0.0.1:8002/api/v1/medical-records/${recordId}`
         : 'http://127.0.0.1:8002/api/v1/medical-records/';
 
-      const method = recordId ? 'PUT' : 'POST';
+      // 🚀 OPERACIÓN APOLLO - Using centralized API service
+      // Replaces hardcoded fetch with apollo.medicalRecords.create/update()
+      const response = recordId 
+        ? await apollo.medicalRecords.update(recordId, requestBody as any)
+        : await apollo.medicalRecords.create(requestBody as any);
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      if (response.ok) {
+      if (response.success) {
         onSave();
         onClose();
         resetForm();
       } else {
-        const errorData = await response.json();
-        console.error('❌ Error saving medical record:', errorData);
+        console.error('❌ Error saving medical record:', response.error);
         console.error('❌ Submitted data was:', submitData);
+        
+        // Apollo response format - using response.error instead of response.json()
+        const errorData = response.error || {} as any;
         
         // Manejar errores de validación del servidor
         if (errorData.detail && Array.isArray(errorData.detail)) {

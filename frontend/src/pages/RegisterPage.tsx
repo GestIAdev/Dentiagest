@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
+import apollo from '../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 
 const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -95,24 +96,17 @@ const RegisterPage: React.FC = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:8002/api/v1/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          first_name: formData.first_name.trim(),
-          last_name: formData.last_name.trim(),
-          email: formData.email.trim().toLowerCase(),
-          username: formData.username.trim() || undefined, // Opcional
-          password: formData.password,
-          role: 'PROFESSIONAL' // Por defecto, profesional dental
-        })
+      // 🚀 APOLLO API - User registration
+      const response = await apollo.api.post('/auth/register', {
+        first_name: formData.first_name.trim(),
+        last_name: formData.last_name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        username: formData.username.trim() || undefined, // Opcional
+        password: formData.password,
+        role: 'PROFESSIONAL' // Por defecto, profesional dental
       });
 
-      if (response.ok) {
-        const userData = await response.json();
-        
+      if (response.success && response.data) {
         // Redirigir al login con mensaje de éxito
         navigate('/login', { 
           state: { 
@@ -121,15 +115,15 @@ const RegisterPage: React.FC = () => {
           }
         });
       } else {
-        const errorData = await response.json();
+        const errorDetail = response.error?.detail || 'Error al crear la cuenta';
         
         if (response.status === 400) {
-          if (errorData.detail.includes('email')) {
+          if (errorDetail.includes('email')) {
             setError('Este email ya está registrado. ¿Olvidaste tu contraseña?');
-          } else if (errorData.detail.includes('username')) {
+          } else if (errorDetail.includes('username')) {
             setError('Este nombre de usuario ya está ocupado. Intenta con otro.');
           } else {
-            setError(errorData.detail || 'Error en los datos proporcionados');
+            setError(errorDetail || 'Error en los datos proporcionados');
           }
         } else {
           setError('Error del servidor. Inténtalo más tarde.');
