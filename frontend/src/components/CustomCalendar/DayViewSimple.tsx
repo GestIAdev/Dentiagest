@@ -9,6 +9,7 @@ import { es } from 'date-fns/locale';
 import { parseClinicDateTime } from '../../utils/timezone.ts';
 import { AppointmentCard, type AppointmentData } from './AppointmentCard.tsx';
 import { updateAppointmentTime } from '../../utils/appointmentService.ts';
+import { centralMappingService } from '../../services/mapping/CentralMappingService';
 
 interface DayViewProps {
   currentDate: Date;
@@ -24,43 +25,6 @@ interface TimeSlot {
   quarter: number; // 0, 15, 30, 45
   time: string;
 }
-
-// 🎯 APPOINTMENT TYPE MAPPING - SIMPLIFIED (NO EMERGENCY TYPE)
-const mapAppointmentType = (type: string): 'consultation' | 'cleaning' | 'treatment' => {
-  const typeMap: { [key: string]: 'consultation' | 'cleaning' | 'treatment' } = {
-    'consulta': 'consultation',
-    'consultation': 'consultation',
-    'followup': 'consultation',
-    'follow_up': 'consultation',
-    'checkup': 'consultation',
-    'revision': 'consultation',
-    
-    'limpieza': 'cleaning', 
-    'cleaning': 'cleaning',
-    'hygiene': 'cleaning',
-    'prophylaxis': 'cleaning',
-    
-    'tratamiento': 'treatment',
-    'treatment': 'treatment',
-    'filling': 'treatment',
-    'empaste': 'treatment',
-    'extraction': 'treatment',
-    'extraccion': 'treatment',
-    'root_canal': 'treatment',  
-    'endodoncia': 'treatment',
-    'crown': 'treatment',
-    'corona': 'treatment',
-    'implant': 'treatment',
-    'implante': 'treatment',
-    'surgery': 'treatment',
-    'cirugia': 'treatment',
-    
-    // 🚫 REMOVED: emergency/emergencia - use priority:urgent instead!
-    // Any type can be urgent via priority, no need for emergency type
-  };
-  
-  return typeMap[type?.toLowerCase()] || 'consultation';
-};
 
 export function DayViewSimple({ 
   currentDate, 
@@ -290,7 +254,11 @@ export function DayViewSimple({
       //   originalName: appointment.patient_name 
       // });
       
-      const mappedType = mapAppointmentType(appointmentType);
+      // 🚀 OPERACIÓN UNIFORM - Central Mapping Service (no emergency support for DayView)
+      const mappingResult = centralMappingService.mapAppointmentType(appointmentType, false);
+      const mappedType = (mappingResult.success && mappingResult.result ? 
+        mappingResult.result : 'consultation') as 'consultation' | 'cleaning' | 'treatment';
+      
       const originalPriority = getAppointmentPriority(appointment); // 'low' | 'normal' | 'high' | 'urgent'
       
       // 🚨 CORRECTED PRIORITY MAPPING (No more everything red!): 

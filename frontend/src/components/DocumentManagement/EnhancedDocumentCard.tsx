@@ -32,6 +32,7 @@ import {
   ProstheticTags,
   LegalRetentionPolicies 
 } from '../../types/UnifiedDocumentTypes';
+import { centralMappingService } from '../../services/mapping/CentralMappingService';
 import {
   DocumentIcon,
   PhotoIcon,
@@ -112,8 +113,25 @@ export const EnhancedDocumentCard: React.FC<EnhancedDocumentCardProps> = ({
 }) => {
   
   // 🗂️ DETERMINE LEGAL CATEGORY (unified system)
-  const legalCategory = document.legal_category || mapLegacyToCategory(document.category);
-  const unifiedType = document.unified_type || mapLegacyToUnified(document.document_type);
+  let legalCategory = document.legal_category;
+  if (!legalCategory) {
+    const mappingResult = centralMappingService.mapLegacyToCategory(document.category);
+    legalCategory = mappingResult.success && mappingResult.result ? mappingResult.result : LegalCategory.ADMINISTRATIVE;
+  }
+  
+  // Use centralized mapping with error handling
+  let unifiedType: UnifiedDocumentType = document.unified_type || UnifiedDocumentType.DOCUMENT_GENERAL;
+  if (!document.unified_type) {
+    try {
+      const mappingResult = centralMappingService.mapLegacyToUnified(document.document_type);
+      if (mappingResult.success && mappingResult.result) {
+        // Map from central service enum to local enum
+        unifiedType = mappingResult.result as any;
+      }
+    } catch (error) {
+      console.warn('EnhancedDocumentCard: Mapping failed, using fallback', error);
+    }
+  }
   
   // 🎨 GET THEME AND STYLING
   const theme = DocumentCardThemes[legalCategory];
@@ -350,66 +368,6 @@ export const EnhancedDocumentCard: React.FC<EnhancedDocumentCardProps> = ({
       )}
     </div>
   );
-};
-
-// 🗺️ HELPER FUNCTIONS: Legacy to Unified Mapping
-const mapLegacyToCategory = (legacyCategory: string): LegalCategory => {
-  switch (legacyCategory.toLowerCase()) {
-    case 'medical': return LegalCategory.MEDICAL;
-    case 'administrative': return LegalCategory.ADMINISTRATIVE;
-    case 'legal': return LegalCategory.LEGAL;
-    case 'billing': return LegalCategory.BILLING;
-    default: return LegalCategory.ADMINISTRATIVE;
-  }
-};
-
-const mapLegacyToUnified = (legacyType: string): UnifiedDocumentType => {
-  // Use the mapping from UnifiedDocumentTypes
-  switch (legacyType.toLowerCase()) {
-    case 'xray_bitewing':
-    case 'xray_panoramic':
-    case 'xray_periapical':
-    case 'xray_cephalometric':
-    case 'ct_scan':
-    case 'cbct_scan':
-      return UnifiedDocumentType.XRAY;
-      
-    case 'intraoral_photo':
-    case 'extraoral_photo':
-    case 'clinical_photo':
-    case 'progress_photo':
-    case 'before_after_photo':
-      return UnifiedDocumentType.PHOTO_CLINICAL;
-      
-    case 'voice_note':
-      return UnifiedDocumentType.VOICE_NOTE;
-      
-    case 'treatment_plan':
-      return UnifiedDocumentType.TREATMENT_PLAN;
-      
-    case 'lab_report':
-      return UnifiedDocumentType.LAB_REPORT;
-      
-    case 'prescription':
-      return UnifiedDocumentType.PRESCRIPTION;
-      
-    case 'stl_file':
-    case 'scan_impression':
-      return UnifiedDocumentType.SCAN_3D;
-      
-    case 'consent_form':
-      return UnifiedDocumentType.CONSENT_FORM;
-      
-    case 'insurance_form':
-    case 'insurance_document':
-      return UnifiedDocumentType.INSURANCE_FORM;
-      
-    case 'referral_letter':
-      return UnifiedDocumentType.REFERRAL_LETTER;
-      
-    default:
-      return UnifiedDocumentType.DOCUMENT_GENERAL;
-  }
 };
 
 export default EnhancedDocumentCard;

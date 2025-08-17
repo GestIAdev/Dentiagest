@@ -19,7 +19,18 @@ develop-eggs/
 dist/
 downloads/
 eggs/
-.eg# 🔒 INFORMACIÓN PRIVADA DE NEGOCIO (Agregado por RaulVisionario)
+.eg# 🔒 INFORMACIÓN PRIVADA DE NEGOCIO# 🔒 INFORMACIÓN PRIVADA DE NEGOCIO (Agregado por RaulVisionario)
+# Documentos estratégicos privados, análisis de mercado, inspiración de negocio
+docs/Dev_diary/Private/
+docs/**/Private/
+**/Private/
+*.private.*
+
+# 🕵️‍♂️ GENERIC FOLDER - ULTRASECRETO (Planes de dominación mundial)
+docs/Generic/
+docs/Generic/*
+**/Generic/
+*.generic.*gado por RaulVisionario)
 # Documentos estratégicos privados, análisis de mercado, inspiración de negocio
 docs/Dev_diary/private/
 docs/**/private/

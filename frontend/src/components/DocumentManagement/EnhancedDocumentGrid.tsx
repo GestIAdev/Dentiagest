@@ -20,6 +20,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { EnhancedDocumentCard } from './EnhancedDocumentCard';
+import { centralMappingService } from '../../services/mapping/CentralMappingService';
 import { 
   LegalCategory, 
   DocumentCardThemes,
@@ -119,7 +120,8 @@ export const EnhancedDocumentGrid: React.FC<EnhancedDocumentGridProps> = ({
     // Apply category filter
     if (selectedCategory) {
       filtered = filtered.filter(doc => {
-        const docCategory = mapLegacyToCategory(doc.category);
+        const mappingResult = centralMappingService.mapLegacyToCategory(doc.category);
+        const docCategory = mappingResult.success && mappingResult.result ? mappingResult.result : LegalCategory.ADMINISTRATIVE;
         return docCategory === selectedCategory;
       });
     }
@@ -135,7 +137,8 @@ export const EnhancedDocumentGrid: React.FC<EnhancedDocumentGridProps> = ({
     } as Record<LegalCategory, MedicalDocument[]>;
     
     filtered.forEach(doc => {
-      const category = mapLegacyToCategory(doc.category);
+      const mappingResult = centralMappingService.mapLegacyToCategory(doc.category);
+      const category = mappingResult.success && mappingResult.result ? mappingResult.result : LegalCategory.ADMINISTRATIVE;
       grouped[category].push(doc);
     });
     
@@ -345,16 +348,6 @@ export const EnhancedDocumentGrid: React.FC<EnhancedDocumentGridProps> = ({
 };
 
 // 🗺️ HELPER FUNCTIONS
-const mapLegacyToCategory = (legacyCategory: string): LegalCategory => {
-  switch (legacyCategory.toLowerCase()) {
-    case 'medical': return LegalCategory.MEDICAL;
-    case 'administrative': return LegalCategory.ADMINISTRATIVE;
-    case 'legal': return LegalCategory.LEGAL;
-    case 'billing': return LegalCategory.BILLING;
-    default: return LegalCategory.ADMINISTRATIVE;
-  }
-};
-
 const getCategoryDisplayName = (category: LegalCategory): string => {
   switch (category) {
     case LegalCategory.MEDICAL: return 'Documentos Médicos';

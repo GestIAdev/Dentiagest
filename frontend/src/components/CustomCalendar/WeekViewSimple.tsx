@@ -8,6 +8,7 @@ import { es } from 'date-fns/locale';
 import { parseClinicDateTime } from '../../utils/timezone.ts';
 import { AppointmentCard } from './AppointmentCard.tsx';
 import { updateAppointmentTime } from '../../utils/appointmentService.ts';
+import { centralMappingService } from '../../services/mapping/CentralMappingService';
 
 interface WeekViewProps {
   currentDate: Date;
@@ -119,60 +120,7 @@ export function WeekViewSimple({
       return null;
     }
 
-    // 🛡️ DEFENSIVE TYPE MAPPING - Handle unknown types
-    const mapAppointmentType = (type: string): 'consultation' | 'cleaning' | 'treatment' | 'emergency' => {
-      const typeMap: { [key: string]: 'consultation' | 'cleaning' | 'treatment' | 'emergency' } = {
-        'consulta': 'consultation',
-        'consultation': 'consultation',
-        'limpieza': 'cleaning', 
-        'cleaning': 'cleaning',
-        'tratamiento': 'treatment',
-        'treatment': 'treatment',
-        'filling': 'treatment',
-        'empaste': 'treatment',
-        'extraction': 'treatment', // 🦷 EXTRACCIÓN ES TRATAMIENTO!
-        'extraccion': 'treatment',
-        'extracción': 'treatment',
-        'corona': 'treatment',
-        'crown': 'treatment',
-        'implante': 'treatment',     // ⚡ ADDED!
-        'implant': 'treatment',      // ⚡ ADDED!
-        'endodoncia': 'treatment',
-        'root_canal': 'treatment',
-        'orthodontics': 'treatment',  // ⚡ ADDED!
-        'ortodoncia': 'treatment',
-        'emergencia': 'emergency',
-        'emergency': 'emergency',
-        'urgente': 'emergency'
-      };
-      
-      const mappedType = typeMap[type?.toLowerCase()] || 'consultation';
-      
-      return mappedType; // Default to 'consultation' if unknown
-    };
-
-    // 🛡️ DEFENSIVE STATUS MAPPING - Handle API status values
-    const mapAppointmentStatus = (status: string): 'confirmed' | 'pending' | 'cancelled' | 'completed' => {
-      const statusMap: { [key: string]: 'confirmed' | 'pending' | 'cancelled' | 'completed' } = {
-        'confirmada': 'confirmed',
-        'confirmed': 'confirmed',
-        'scheduled': 'pending',
-        'programada': 'pending',
-        'pendiente': 'pending',
-        'pending': 'pending',
-        'cancelada': 'cancelled',
-        'cancelled': 'cancelled',
-        'canceled': 'cancelled',
-        'completada': 'completed',
-        'completed': 'completed',
-        'finished': 'completed',
-        'done': 'completed'
-      };
-      
-      return statusMap[status?.toLowerCase()] || 'pending'; // Default to 'pending' if unknown
-    };
-
-    // 🚨 HYBRID PRIORITY SYSTEM - Manual OVERRIDES Automatic
+    //  HYBRID PRIORITY SYSTEM - Manual OVERRIDES Automatic
     const determinePriority = (apt: any): 'normal' | 'high' | 'urgent' => {
       // 🎯 RULE 1: Manual priority ALWAYS wins (if valid)
       if (apt.priority && ['normal', 'high', 'urgent'].includes(apt.priority)) {
@@ -180,7 +128,10 @@ export function WeekViewSimple({
       }
       
       // 🤖 RULE 2: Automatic detection as fallback
-      const mappedType = mapAppointmentType(apt.appointment_type);
+      // 🚀 OPERACIÓN UNIFORM - Central Mapping Service (with emergency support for WeekView)
+      const mappingResult = centralMappingService.mapAppointmentType(apt.appointment_type, true);
+      const mappedType = mappingResult.success && mappingResult.result ? 
+        mappingResult.result : 'consultation';
       
       // Auto-detect: Emergency appointments are urgent
       if (mappedType === 'emergency') {
@@ -203,8 +154,18 @@ export function WeekViewSimple({
       startTime: appointmentDate,
       endTime: new Date(appointmentDate.getTime() + (apt.duration || 30) * 60000),
       duration: apt.duration || 30,
-      type: mapAppointmentType(apt.appointment_type), // 🎯 FIXED: Proper mapping with defensive fallback
-      status: mapAppointmentStatus(apt.status), // 🎯 NEW: Proper status mapping
+      // 🚀 OPERACIÓN UNIFORM - Central Mapping Service usage #2
+      type: (() => {
+        const mappingResult = centralMappingService.mapAppointmentType(apt.appointment_type, true);
+        return (mappingResult.success && mappingResult.result ? 
+          mappingResult.result : 'consultation') as 'consultation' | 'cleaning' | 'treatment' | 'emergency';
+      })(),
+      // 🚀 OPERACIÓN UNIFORM - Central status mapping
+      status: (() => {
+        const mappingResult = centralMappingService.mapAppointmentStatus(apt.status);
+        return (mappingResult.success && mappingResult.result ? 
+          mappingResult.result : 'pending') as 'confirmed' | 'pending' | 'cancelled' | 'completed';
+      })(),
       priority: determinePriority(apt), // 🚨 SMART PRIORITY WITH DEBUGGING!
       notes: apt.notes || '',
       phone: apt.patient_phone || '',
