@@ -11,6 +11,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
+import apollo from '../../services/api'; // 🚀 OPERACIÓN APOLLO - Centralized API Service
 import { 
   UserIcon,
   ChevronDownIcon,
@@ -48,29 +49,23 @@ export const PatientSelector: React.FC<PatientSelectorProps> = ({
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await fetch('http://localhost:8002/api/v1/patients/', {
-          headers: {
-            'Authorization': `Bearer ${state.accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          
-          // 🎯 HANDLE DIFFERENT API RESPONSE FORMATS
-          if (Array.isArray(data)) {
-            setPatients(data);
-          } else if (data.items && Array.isArray(data.items)) {
-            setPatients(data.items);
-          } else if (data.patients && Array.isArray(data.patients)) {
-            setPatients(data.patients);
-          } else if (data.data && Array.isArray(data.data)) {
-            setPatients(data.data);
-          } else {
-            console.warn('⚠️ Unexpected API response format:', data);
-            setPatients([]);
-          }
+        // 🚀 OPERACIÓN APOLLO - Using centralized API service
+        // Replaces hardcoded fetch with apollo.patients.list()
+        // Benefits: V1/V2 switching, error handling, performance monitoring
+        const data = await apollo.patients.list();
+        
+        // 🎯 HANDLE DIFFERENT API RESPONSE FORMATS
+        if (Array.isArray(data)) {
+          setPatients(data);
+        } else if (data.items && Array.isArray(data.items)) {
+          setPatients(data.items);
+        } else if (data.patients && Array.isArray(data.patients)) {
+          setPatients(data.patients);
+        } else if (data.data && Array.isArray(data.data)) {
+          setPatients(data.data);
+        } else {
+          console.warn('⚠️ Unexpected API response format:', data);
+          setPatients([]);
         }
       } catch (error) {
         console.error('Error fetching patients:', error);

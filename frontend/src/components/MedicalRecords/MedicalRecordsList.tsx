@@ -1,7 +1,15 @@
 // MEDICAL_RECORDS: Lista principal de historiales médicos
 /**
  * Componente principal para mostrar y filtrar historiales médicos.
- * Incluye búsqueda, filtr      const token = state.accessToken; // 🔒 TOKEN DEL AUTHCONTEXT
+ * Incluye búsqueda, filtr      const tok      // 🚀 OPERACIÓN APOLLO - Using centralized API service
+      // Replaces hardcoded fetch with apollo.medicalRecords.list()
+      // Benefits: V1/V2 switching, error handling, performance monitoring
+      const response = await apollo.medicalRecords.list(
+        Object.fromEntries(queryParams.entries())
+      );
+      
+      setRecords(response.data.items);
+      setTotalRecords(response.data.total);en; // 🔒 TOKEN DEL AUTHCONTEXT
       if (!token) {
         throw new Error('No hay token de autenticación válido');
       }
@@ -21,6 +29,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx'; // 🔒 INTEGRACIÓN AUTHCONTEXT
+import apollo from '../../services/api'; // 🚀 OPERACIÓN APOLLO - Centralized API Service
 import { 
   MagnifyingGlassIcon, 
   FunnelIcon, 
@@ -205,22 +214,18 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
   // Función para eliminar historial médico
   const handleDeleteRecord = async (recordId: string) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/${recordId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      // 🚀 OPERACIÓN APOLLO - Using centralized API service
+      // Replaces hardcoded fetch with apollo.medicalRecords.delete()
+      // Benefits: V1/V2 switching, error handling, performance monitoring
+      const response = await apollo.medicalRecords.delete(recordId);
 
-      if (response.ok) {
+      if (response.data?.success) {
         // Eliminar de la lista local
         setRecords(prev => prev.filter(record => record.id !== recordId));
         setTotalRecords(prev => prev - 1);
       } else {
-        const errorData = await response.json();
-        console.error('❌ Error deleting medical record:', errorData);
-        setError('Error al eliminar el historial médico');
+        console.error('❌ Error deleting medical record:', response.data?.message);
+        setError(response.data?.message || 'Error al eliminar el historial médico');
       }
     } catch (err) {
       console.error('❌ Error deleting medical record:', err);

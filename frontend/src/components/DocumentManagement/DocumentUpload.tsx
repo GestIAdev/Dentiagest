@@ -20,6 +20,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { LegalCategory, UnifiedDocumentType, getCategoryFromUnifiedType } from './DocumentCategories.tsx';
 import { centralMappingService } from '../../services/mapping'; // 🚀 OPERACIÓN UNIFORM - Central Mapping Service
+import apollo from '../../services/api'; // 🚀 OPERACIÓN APOLLO - Centralized API Service
 import { 
   CloudArrowUpIcon, 
   DocumentIcon, 
@@ -459,20 +460,20 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
         if (appointmentId) formData.append('appointment_id', appointmentId);
 
         try {
-          const response = await fetch('http://127.0.0.1:8002/api/v1/medical-records/documents/upload', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${state.accessToken}`,
-            },
-            body: formData,
+          // 🚀 OPERACIÓN APOLLO - Using centralized API service
+          // Replaces hardcoded fetch with apollo.docs.upload()
+          // Benefits: V1/V2 switching, error handling, performance monitoring
+          const result = await apollo.docs.upload({
+            file: uploadFile.file,
+            title: uploadFile.file.name,
+            document_type: backendDocumentType,
+            access_level: backendAccessLevel,
+            // 🎯 CONDITIONAL PARAMETERS: Only include if they exist
+            ...(patientId && { patient_id: patientId }),
+            ...(medicalRecordId && { medical_record_id: medicalRecordId }),
+            ...(appointmentId && { appointment_id: appointmentId })
           });
 
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.detail || 'Error uploading file');
-          }
-
-          const result = await response.json();
           updateFileMetadata(uploadFile.id, { status: 'success', progress: 100 });
           
         } catch (error) {

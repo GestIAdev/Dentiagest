@@ -27,6 +27,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { centralMappingService } from '../../services/mapping'; // 🚀 OPERACIÓN UNIFORM - Central Mapping Service
+import apollo from '../../services/api'; // 🚀 OPERACIÓN APOLLO - Centralized API Service
 // import { buildApiUrl, getDocumentDownloadUrl } from '../../config/api';
 import {
   MagnifyingGlassIcon,
@@ -283,20 +284,13 @@ export const DocumentList: React.FC<DocumentListProps> = ({
         queryParams.set('patient_id', patientId); // Use 'set' to override any existing patient_id
       }
 
-      const response = await fetch(buildApiUrl(`/medical-records/documents?${queryParams}`), {
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json',
-        },
+      // 🚀 OPERACIÓN APOLLO - Using centralized API service
+      // Replaces hardcoded fetch with apollo.docs.list()
+      // Benefits: V1/V2 switching, error handling, performance monitoring
+      const data = await apollo.docs.list({
+        // Convert URLSearchParams to object for Apollo API
+        ...Object.fromEntries(queryParams.entries())
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Backend error:', response.status, errorText);
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
       setDocuments(data.items || []);
       setTotalDocuments(data.total || 0);
       setTotalPages(data.pages || 0);
@@ -343,15 +337,11 @@ export const DocumentList: React.FC<DocumentListProps> = ({
     if (!state.accessToken) return;
 
     try {
-      const response = await fetch(getDocumentDownloadUrl(document.id), {
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-        },
-      });
-
-      if (!response.ok) throw new Error('Download failed');
-
-      const blob = await response.blob();
+      // 🚀 OPERACIÓN APOLLO - Using centralized API service
+      // Replaces hardcoded fetch with apollo.docs.download()
+      // Benefits: V1/V2 switching, blob handling, performance monitoring
+      const blob = await apollo.docs.download(document.id);
+      
       const url = URL.createObjectURL(blob);
       const link = window.document.createElement('a');
       link.href = url;

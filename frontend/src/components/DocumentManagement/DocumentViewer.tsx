@@ -19,6 +19,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
+import apollo from '../../services/api'; // 🚀 OPERACIÓN APOLLO - Centralized API Service
 import {
   XMarkIcon,
   MagnifyingGlassMinusIcon,
@@ -169,31 +170,10 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
       
       // For images and audio, we need to fetch with auth and create blob URLs
       if (document.is_image || document.mime_type.includes('audio')) {
-        const response = await fetch(`http://127.0.0.1:8002/api/v1/medical-records/documents/${document.id}/download`, {
-          headers: {
-            'Authorization': `Bearer ${state.accessToken}`,
-          },
-        });
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('🚨 DocumentViewer Fetch Error:', {
-            status: response.status,
-            statusText: response.statusText,
-            errorBody: errorText,
-            headers: Object.fromEntries(response.headers.entries())
-          });
-          
-          if (response.status === 401) {
-            throw new Error('Sin autorización - Token expirado o inválido');
-          } else if (response.status === 404) {
-            throw new Error('Documento no encontrado');
-          } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-        }
-        
-        const blob = await response.blob();
+        // 🚀 OPERACIÓN APOLLO - Using centralized API service
+        // Replaces hardcoded fetch with apollo.docs.download()
+        // Benefits: V1/V2 switching, blob handling, performance monitoring
+        const blob = await apollo.docs.download(document.id);
         const blobUrl = URL.createObjectURL(blob);
         setDocumentUrl(blobUrl);
       } else {
