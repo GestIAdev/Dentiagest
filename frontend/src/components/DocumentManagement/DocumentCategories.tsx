@@ -11,6 +11,7 @@
 
 import React from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
+import { centralMappingService } from '../../services/mapping/CentralMappingService';
 import { 
   HeartIcon,
   BuildingOfficeIcon,
@@ -150,27 +151,6 @@ export const getCategoryFromUnifiedType = (type: UnifiedDocumentType): LegalCate
   return LegalCategory.ADMINISTRATIVE; // Default fallback
 };
 
-export const getUnifiedTypeLabel = (type: UnifiedDocumentType): string => {
-  const labels: Record<UnifiedDocumentType, string> = {
-    [UnifiedDocumentType.XRAY]: "Radiografía",
-    [UnifiedDocumentType.PHOTO_CLINICAL]: "Fotografía Clínica",
-    [UnifiedDocumentType.VOICE_NOTE]: "Nota de Voz",
-    [UnifiedDocumentType.TREATMENT_PLAN]: "Plan de Tratamiento",
-    [UnifiedDocumentType.LAB_REPORT]: "Reporte de Laboratorio",
-    [UnifiedDocumentType.PRESCRIPTION]: "Prescripción",
-    [UnifiedDocumentType.SCAN_3D]: "Escaneo 3D",
-    [UnifiedDocumentType.CONSENT_FORM]: "Formulario de Consentimiento",
-    [UnifiedDocumentType.INSURANCE_FORM]: "Formulario de Seguro",
-    [UnifiedDocumentType.DOCUMENT_GENERAL]: "Documento General",
-    [UnifiedDocumentType.INVOICE]: "Factura",
-    [UnifiedDocumentType.BUDGET]: "Presupuesto",
-    [UnifiedDocumentType.PAYMENT_PROOF]: "Comprobante de Pago",
-    [UnifiedDocumentType.REFERRAL_LETTER]: "Carta de Derivación",
-    [UnifiedDocumentType.LEGAL_DOCUMENT]: "Documento Legal"
-  };
-  return labels[type] || type;
-};
-
 export const DocumentCategories: React.FC<DocumentCategoriesProps> = ({
   activeCategory,
   onCategoryChange,
@@ -242,7 +222,11 @@ export const DocumentCategories: React.FC<DocumentCategoriesProps> = ({
           <div className="text-xs text-gray-500">
             <span className="font-medium">Tipos incluidos:</span>{' '}
             {getUnifiedTypesForCategory(activeCategory)
-              .map(type => getUnifiedTypeLabel(type))
+              .map(type => {
+                // 🚀 OPERACIÓN UNIFORM - Central Mapping Service for labels
+                const mappingResult = centralMappingService.getUnifiedTypeLabel(type);
+                return mappingResult.success && mappingResult.result ? mappingResult.result : type;
+              })
               .join(', ')}
           </div>
         </div>

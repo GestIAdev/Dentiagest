@@ -4,7 +4,14 @@
  * 
  * Features:
  * ✅ Advanced filtering & search (by patient, type, date)
- * ✅ Document preview & download
+ * ✅ Document preview &  }      // 📡 FETCH DOCUMENTS from API
+  const fetchDocuments = async () => {TCH DOCUMENTS from API
+  const fetchDocuments = async () => {TCH DOCUMENTS from API
+  const fetchDocuments = async () => {FETCH DOCUMENTS from API
+  const fetchDocuments = async () => { � FETCH DOCUMENTS from API
+  const fetchDocuments = async () => {📡 FETCH DOCUMENTS from API
+  const fetchDocuments = async () => {TCH DOCUMENTS from API
+  const fetchDocuments = async () => {
  * ✅ AI analysis status & results display
  * ✅ GDPR Article 9 access control
  * ✅ Role-based document visibility
@@ -19,6 +26,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
+import { centralMappingService } from '../../services/mapping'; // 🚀 OPERACIÓN UNIFORM - Central Mapping Service
 // import { buildApiUrl, getDocumentDownloadUrl } from '../../config/api';
 import {
   MagnifyingGlassIcon,
@@ -232,29 +240,6 @@ export const DocumentList: React.FC<DocumentListProps> = ({
     );
   };
 
-  // � UNIFIED TO LEGACY ENUM MAPPING - Prevent 422 errors
-  const mapUnifiedToLegacyForAPI = (unifiedType: UnifiedDocumentType): string => {
-    const unifiedToLegacyMap: { [key in UnifiedDocumentType]: string } = {
-      [UnifiedDocumentType.XRAY]: 'xray_panoramic',
-      [UnifiedDocumentType.PHOTO_CLINICAL]: 'clinical_photo',
-      [UnifiedDocumentType.VOICE_NOTE]: 'voice_note',
-      [UnifiedDocumentType.TREATMENT_PLAN]: 'treatment_plan',
-      [UnifiedDocumentType.LAB_REPORT]: 'lab_report',
-      [UnifiedDocumentType.PRESCRIPTION]: 'prescription',
-      [UnifiedDocumentType.SCAN_3D]: 'stl_file',
-      [UnifiedDocumentType.CONSENT_FORM]: 'consent_form',
-      [UnifiedDocumentType.INSURANCE_FORM]: 'insurance_form',
-      [UnifiedDocumentType.DOCUMENT_GENERAL]: 'other_document',
-      [UnifiedDocumentType.INVOICE]: 'other_document',
-      [UnifiedDocumentType.BUDGET]: 'other_document',
-      [UnifiedDocumentType.PAYMENT_PROOF]: 'other_document',
-      [UnifiedDocumentType.REFERRAL_LETTER]: 'referral_letter',
-      [UnifiedDocumentType.LEGAL_DOCUMENT]: 'other_document'
-    };
-    
-    return unifiedToLegacyMap[unifiedType] || 'other_document';
-  };
-
   // �📡 FETCH DOCUMENTS from API
   const fetchDocuments = async () => {
     if (!state.accessToken) return;
@@ -274,7 +259,9 @@ export const DocumentList: React.FC<DocumentListProps> = ({
         // Check if it's a unified enum value
         const unifiedValues = Object.values(UnifiedDocumentType);
         if (unifiedValues.includes(filters.document_type as UnifiedDocumentType)) {
-          translatedFilters.document_type = mapUnifiedToLegacyForAPI(filters.document_type as UnifiedDocumentType);
+          // 🚀 OPERACIÓN UNIFORM - Direct service call
+          const mappingResult = centralMappingService.mapUnifiedToLegacy(filters.document_type as UnifiedDocumentType);
+          translatedFilters.document_type = mappingResult.success ? (mappingResult.result || 'other_document') : 'other_document';
           console.log('🔄 Translated enum:', filters.document_type, '→', translatedFilters.document_type);
         }
       }
