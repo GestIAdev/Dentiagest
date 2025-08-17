@@ -18,7 +18,8 @@
 
 import React, { useState, useRef, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
-import { LegalCategory, UnifiedDocumentType, getUnifiedTypeLabel, getCategoryFromUnifiedType } from './DocumentCategories.tsx';
+import { LegalCategory, UnifiedDocumentType, getCategoryFromUnifiedType } from './DocumentCategories.tsx';
+import { centralMappingService } from '../../services/mapping'; // 🚀 OPERACIÓN UNIFORM - Central Mapping Service
 import { 
   CloudArrowUpIcon, 
   DocumentIcon, 
@@ -407,54 +408,40 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
       for (const uploadFile of pendingFiles) {
         updateFileMetadata(uploadFile.id, { status: 'uploading', progress: 0 });
 
-        // 🔄 UNIFIED TO LEGACY MAPPING SYSTEM - Backend v1 compatibility
-        const mapToBackendType = (frontendType: UnifiedDocumentType): string => {
-          // Map unified types to legacy backend types
-          const unifiedToLegacyMap: { [key in UnifiedDocumentType]: string } = {
-            [UnifiedDocumentType.XRAY]: 'xray_panoramic',
-            [UnifiedDocumentType.PHOTO_CLINICAL]: 'clinical_photo',
-            [UnifiedDocumentType.VOICE_NOTE]: 'voice_note',
-            [UnifiedDocumentType.TREATMENT_PLAN]: 'treatment_plan',
-            [UnifiedDocumentType.LAB_REPORT]: 'lab_report',
-            [UnifiedDocumentType.PRESCRIPTION]: 'prescription',
-            [UnifiedDocumentType.SCAN_3D]: 'stl_file',
-            [UnifiedDocumentType.CONSENT_FORM]: 'consent_form',
-            [UnifiedDocumentType.INSURANCE_FORM]: 'insurance_form',
-            [UnifiedDocumentType.DOCUMENT_GENERAL]: 'other_document',
-            [UnifiedDocumentType.INVOICE]: 'other_document',
-            [UnifiedDocumentType.BUDGET]: 'other_document',
-            [UnifiedDocumentType.PAYMENT_PROOF]: 'other_document',
-            [UnifiedDocumentType.REFERRAL_LETTER]: 'referral_letter',
-            [UnifiedDocumentType.LEGAL_DOCUMENT]: 'other_document'
-          };
-          
-          return unifiedToLegacyMap[frontendType] || 'other_document';
-        };
+        // � OPERACIÓN UNIFORM - mapToBackendType() eliminated
+        // Function replaced by centralMappingService.mapUnifiedToLegacy()
+        // This eliminates 25+ lines of duplicated mapping logic!
 
-        const mapToBackendAccessLevel = (frontendAccessLevel: AccessLevel): string => {
-          // Mapear access levels del frontend (MAYÚSCULAS) a backend (minúsculas)
-          console.log('🔍 DEBUG mapToBackendAccessLevel input:', frontendAccessLevel, typeof frontendAccessLevel);
-          
-          // 🔧 EXPLICIT STRING COMPARISON - Fix enum weirdness
-          const accessLevelStr = String(frontendAccessLevel);
-          console.log('🔍 DEBUG accessLevelStr:', accessLevelStr);
-          
-          if (accessLevelStr === 'medical' || accessLevelStr === AccessLevel.MEDICAL) {
-            console.log('✅ Mapping MEDICAL to medical');
-            return 'medical';
-          }
-          if (accessLevelStr === 'administrative' || accessLevelStr === AccessLevel.ADMINISTRATIVE) {
-            console.log('✅ Mapping ADMINISTRATIVE to administrative');
-            return 'administrative';
-          }
-          
-          console.log('⚠️ Using default fallback to administrative');
-          return 'administrative'; // Default fallback
-        };
+        // 🚀 OPERACIÓN UNIFORM - All mapping functions eliminated
+        // mapToBackendType() → centralMappingService.mapUnifiedToLegacy()
+        // mapToBackendAccessLevel() → centralMappingService.mapAccessLevelToBackend()
 
         console.log('🔍 DEBUG uploadFile.accessLevel:', uploadFile.accessLevel);
-        const backendDocumentType = mapToBackendType(uploadFile.documentType || UnifiedDocumentType.PHOTO_CLINICAL);
-        const backendAccessLevel = mapToBackendAccessLevel(uploadFile.accessLevel || AccessLevel.ADMINISTRATIVE);
+        
+        // 🚀 OPERACIÓN UNIFORM - Using Central Mapping Service
+        // Eliminates duplicated mapping logic across 15+ components
+        const mappingResult = centralMappingService.mapUnifiedToLegacy(
+          uploadFile.documentType || UnifiedDocumentType.PHOTO_CLINICAL
+        );
+        
+        if (!mappingResult.success) {
+          console.error('❌ Mapping failed:', mappingResult.validationErrors);
+          updateFileMetadata(uploadFile.id, { 
+            status: 'error', 
+            error: 'Error en tipo de documento. Por favor, inténtalo de nuevo.'
+          });
+          continue; // Skip this file and continue with next one
+        }
+        
+        const backendDocumentType = mappingResult.result || 'other_document';
+        
+        // 🚀 OPERACIÓN UNIFORM - Using Central Mapping Service for Access Level
+        const accessLevelMappingResult = centralMappingService.mapAccessLevelToBackend(
+          uploadFile.accessLevel || AccessLevel.ADMINISTRATIVE
+        );
+        const backendAccessLevel = accessLevelMappingResult.success && accessLevelMappingResult.result ? 
+          accessLevelMappingResult.result : 'administrative';
+        
         console.log('🔍 DEBUG final backendAccessLevel:', backendAccessLevel);
 
         const formData = new FormData();

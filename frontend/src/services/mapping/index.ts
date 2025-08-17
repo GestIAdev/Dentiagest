@@ -101,6 +101,7 @@ export const getDisplayName = centralMappingService.getDisplayName.bind(centralM
 export const isValidExtension = centralMappingService.isValidExtension.bind(centralMappingService);
 export const isValidFileSize = centralMappingService.isValidFileSize.bind(centralMappingService);
 export const requiresConsent = centralMappingService.requiresConsent.bind(centralMappingService);
+export const mapAccessLevelToBackend = centralMappingService.mapAccessLevelToBackend.bind(centralMappingService);
 
 /**
  * 💀 Quick performance functions

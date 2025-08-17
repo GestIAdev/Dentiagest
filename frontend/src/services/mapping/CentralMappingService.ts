@@ -23,6 +23,14 @@ import {
   LogLevel
 } from './MappingTypes';
 
+import { LegalCategory } from '../../types/UnifiedDocumentTypes';
+
+// 🔥 ACCESS LEVEL TYPES (For final zombie elimination)
+export enum AccessLevel {
+  MEDICAL = 'medical',
+  ADMINISTRATIVE = 'administrative'
+}
+
 import {
   UNIFIED_TO_LEGACY_MAP,
   LEGACY_TO_UNIFIED_MAP,
@@ -68,8 +76,17 @@ export class CentralMappingService {
     this.startTime = Date.now();
     
     this.performanceMetrics = {
+      totalOperations: 0,
+      successfulOperations: 0,
+      failedOperations: 0,
       totalMappings: 0,
       averageExecutionTime: 0,
+      maxExecutionTime: 0,
+      minExecutionTime: Infinity,
+      lastOperationTime: 0,
+      operationsPerSecond: 0,
+      memoryUsage: 0,
+      startTime: this.startTime,
       cacheHitRate: 0,
       errorRate: 0,
       lastResetTime: this.startTime
@@ -248,7 +265,266 @@ export class CentralMappingService {
   }
 
   /**
-   * 🚀 GET DISPLAY NAME
+   * 🏛️ MAP LEGACY TO LEGAL CATEGORY
+   * Replaces: mapLegacyToCategory() functions in EnhancedDocumentCard.tsx and EnhancedDocumentGrid.tsx
+   */
+  public mapLegacyToCategory(legacyCategory: string): MappingResult<LegalCategory> {
+    const operation = 'mapLegacyToCategory';
+    const startTime = performance.now();
+
+    try {
+      const normalizedInput = legacyCategory.toLowerCase().trim();
+      
+      let result: LegalCategory;
+      switch (normalizedInput) {
+        case 'medical': 
+          result = LegalCategory.MEDICAL;
+          break;
+        case 'administrative': 
+          result = LegalCategory.ADMINISTRATIVE;
+          break;
+        case 'legal': 
+          result = LegalCategory.LEGAL;
+          break;
+        case 'billing': 
+          result = LegalCategory.BILLING;
+          break;
+        default: 
+          result = LegalCategory.ADMINISTRATIVE; // Safe fallback
+          this.log(LogLevel.WARN, `Unknown legacy category, using fallback: ${legacyCategory} -> ADMINISTRATIVE`);
+          break;
+      }
+
+      this.updatePerformanceMetrics(performance.now() - startTime, false, true);
+      this.recordAudit(operation, legacyCategory, result, true, performance.now() - startTime);
+
+      return {
+        success: true,
+        result,
+        originalValue: legacyCategory,
+        mappedValue: result,
+        performanceMetrics: {
+          executionTimeMs: performance.now() - startTime,
+          cacheHit: false
+        }
+      };
+
+    } catch (error) {
+      const errorMsg = `Failed to map legacy category: ${legacyCategory}`;
+      this.log(LogLevel.ERROR, errorMsg, { legacyCategory, error });
+      this.recordAudit(operation, legacyCategory, null, false, performance.now() - startTime, errorMsg);
+      
+      return {
+        success: false,
+        result: null,
+        originalValue: legacyCategory,
+        mappedValue: null,
+        validationErrors: [errorMsg],
+        performanceMetrics: {
+          executionTimeMs: performance.now() - startTime,
+          cacheHit: false
+        }
+      };
+    }
+  }
+
+  /**
+   * � MAP APPOINTMENT TYPE - UNIFIED CALENDAR MAPPING
+   * Replaces: mapAppointmentType() functions in DayViewSimple.tsx and WeekViewSimple.tsx
+   */
+  public mapAppointmentType(type: string, includeEmergency: boolean = true): MappingResult<string> {
+    const operation = 'mapAppointmentType';
+    const startTime = performance.now();
+
+    try {
+      const normalizedInput = type.toLowerCase().trim();
+      
+      let result: string;
+      
+      // Core appointment type mapping (shared logic)
+      if (['consulta', 'consultation', 'followup', 'follow_up', 'checkup', 'revision'].includes(normalizedInput)) {
+        result = 'consultation';
+      } else if (['limpieza', 'cleaning', 'hygiene', 'prophylaxis'].includes(normalizedInput)) {
+        result = 'cleaning';
+      } else if ([
+        'tratamiento', 'treatment', 'filling', 'empaste', 'extraction', 'extraccion', 'extracción',
+        'corona', 'crown', 'implante', 'implant', 'endodoncia', 'root_canal', 'orthodontics',
+        'ortodoncia', 'bridge', 'puente', 'veneer', 'carilla'
+      ].includes(normalizedInput)) {
+        result = 'treatment';
+      } else if (includeEmergency && ['emergency', 'emergencia', 'urgencia', 'urgent'].includes(normalizedInput)) {
+        result = 'emergency';
+      } else {
+        // Fallback logic
+        result = 'consultation'; // Safe default
+        this.log(LogLevel.WARN, `Unknown appointment type, using fallback: ${type} -> consultation`);
+      }
+
+      this.updatePerformanceMetrics(performance.now() - startTime, false, true);
+      this.recordAudit(operation, type, result, true, performance.now() - startTime);
+
+      return {
+        success: true,
+        result,
+        originalValue: type,
+        mappedValue: result,
+        performanceMetrics: {
+          executionTimeMs: performance.now() - startTime,
+          cacheHit: false
+        }
+      };
+
+    } catch (error) {
+      const errorMsg = `Failed to map appointment type: ${type}`;
+      this.log(LogLevel.ERROR, errorMsg, { type, error });
+      this.recordAudit(operation, type, null, false, performance.now() - startTime, errorMsg);
+      
+      return {
+        success: false,
+        result: null,
+        originalValue: type,
+        mappedValue: null,
+        validationErrors: [errorMsg],
+        performanceMetrics: {
+          executionTimeMs: performance.now() - startTime,
+          cacheHit: false
+        }
+      };
+    }
+  }
+
+  /**
+   * 📊 MAP APPOINTMENT STATUS - UNIFIED CALENDAR STATUS MAPPING
+   * Replaces: mapAppointmentStatus() function in WeekViewSimple.tsx
+   */
+  public mapAppointmentStatus(status: string): MappingResult<string> {
+    const operation = 'mapAppointmentStatus';
+    const startTime = performance.now();
+
+    try {
+      const normalizedInput = status?.toLowerCase().trim() || '';
+      
+      let result: string;
+      
+      // Appointment status mapping
+      if (['confirmada', 'confirmed'].includes(normalizedInput)) {
+        result = 'confirmed';
+      } else if (['scheduled', 'programada', 'pendiente', 'pending'].includes(normalizedInput)) {
+        result = 'pending';
+      } else if (['cancelada', 'cancelled', 'canceled'].includes(normalizedInput)) {
+        result = 'cancelled';
+      } else if (['completada', 'completed', 'finished', 'done'].includes(normalizedInput)) {
+        result = 'completed';
+      } else {
+        // Fallback logic
+        result = 'pending'; // Safe default
+        this.log(LogLevel.WARN, `Unknown appointment status, using fallback: ${status} -> pending`);
+      }
+
+      this.updatePerformanceMetrics(performance.now() - startTime, false, true);
+      this.recordAudit(operation, status, result, true, performance.now() - startTime);
+
+      return {
+        success: true,
+        result,
+        originalValue: status,
+        mappedValue: result,
+        performanceMetrics: {
+          executionTimeMs: performance.now() - startTime,
+          cacheHit: false
+        }
+      };
+
+    } catch (error) {
+      const errorMsg = `Failed to map appointment status: ${status}`;
+      this.log(LogLevel.ERROR, errorMsg, { status, error });
+      this.recordAudit(operation, status, null, false, performance.now() - startTime, errorMsg);
+      
+      return {
+        success: false,
+        result: null,
+        originalValue: status,
+        mappedValue: null,
+        validationErrors: [errorMsg],
+        performanceMetrics: {
+          executionTimeMs: performance.now() - startTime,
+          cacheHit: false
+        }
+      };
+    }
+  }
+
+  /**
+   * 🏷️ GET UNIFIED TYPE LABEL - SPANISH DISPLAY LABELS
+   * Replaces: getUnifiedTypeLabel() function in DocumentCategories.tsx
+   */
+  public getUnifiedTypeLabel(type: string): MappingResult<string> {
+    const operation = 'getUnifiedTypeLabel';
+    const startTime = performance.now();
+
+    try {
+      const normalizedType = type.toUpperCase().trim();
+      
+      let result: string;
+      
+      // Document type label mapping (Spanish)
+      switch (normalizedType) {
+        case 'XRAY': result = 'Radiografía'; break;
+        case 'PHOTO_CLINICAL': result = 'Fotografía Clínica'; break;
+        case 'VOICE_NOTE': result = 'Nota de Voz'; break;
+        case 'TREATMENT_PLAN': result = 'Plan de Tratamiento'; break;
+        case 'LAB_REPORT': result = 'Reporte de Laboratorio'; break;
+        case 'PRESCRIPTION': result = 'Prescripción'; break;
+        case 'SCAN_3D': result = 'Escaneo 3D'; break;
+        case 'CONSENT_FORM': result = 'Formulario de Consentimiento'; break;
+        case 'INSURANCE_FORM': result = 'Formulario de Seguro'; break;
+        case 'DOCUMENT_GENERAL': result = 'Documento General'; break;
+        case 'INVOICE': result = 'Factura'; break;
+        case 'BUDGET': result = 'Presupuesto'; break;
+        case 'PAYMENT_PROOF': result = 'Comprobante de Pago'; break;
+        case 'REFERRAL_LETTER': result = 'Carta de Derivación'; break;
+        case 'LEGAL_DOCUMENT': result = 'Documento Legal'; break;
+        default: 
+          result = type; // Fallback to original type
+          this.log(LogLevel.WARN, `Unknown type for label, using fallback: ${type} -> ${type}`);
+          break;
+      }
+
+      this.updatePerformanceMetrics(performance.now() - startTime, false, true);
+      this.recordAudit(operation, type, result, true, performance.now() - startTime);
+
+      return {
+        success: true,
+        result,
+        originalValue: type,
+        mappedValue: result,
+        performanceMetrics: {
+          executionTimeMs: performance.now() - startTime,
+          cacheHit: false
+        }
+      };
+
+    } catch (error) {
+      const errorMsg = `Failed to get unified type label: ${type}`;
+      this.log(LogLevel.ERROR, errorMsg, { type, error });
+      this.recordAudit(operation, type, null, false, performance.now() - startTime, errorMsg);
+      
+      return {
+        success: false,
+        result: null,
+        originalValue: type,
+        mappedValue: null,
+        validationErrors: [errorMsg],
+        performanceMetrics: {
+          executionTimeMs: performance.now() - startTime,
+          cacheHit: false
+        }
+      };
+    }
+  }
+
+  /**
+   * �🚀 GET DISPLAY NAME
    * Safe display name retrieval with fallback
    */
   public getDisplayName(type: UnifiedDocumentType | LegacyDocumentType): string {
@@ -477,8 +753,17 @@ export class CentralMappingService {
 
   public resetMetrics(): void {
     this.performanceMetrics = {
+      totalOperations: 0,
+      successfulOperations: 0,
+      failedOperations: 0,
       totalMappings: 0,
       averageExecutionTime: 0,
+      maxExecutionTime: 0,
+      minExecutionTime: Infinity,
+      lastOperationTime: 0,
+      operationsPerSecond: 0,
+      memoryUsage: 0,
+      startTime: Date.now(),
       cacheHitRate: 0,
       errorRate: 0,
       lastResetTime: Date.now()
@@ -504,6 +789,43 @@ export class CentralMappingService {
       errorRate: metrics.errorRate,
       cacheHitRate: metrics.cacheHitRate
     };
+  }
+
+  /**
+   * 🚀 ACCESS LEVEL MAPPING - Final zombie elimination
+   * Replaces: mapToBackendAccessLevel() in DocumentUpload.tsx
+   */
+  public mapAccessLevelToBackend(frontendAccessLevel: AccessLevel | string): MappingResult<string> {
+    const startTime = performance.now();
+    
+    try {
+      // Convert to string for comparison (handles enum weirdness)
+      const accessLevelStr = String(frontendAccessLevel);
+      
+      let backendLevel: string;
+      
+      if (accessLevelStr === 'medical' || accessLevelStr === AccessLevel.MEDICAL) {
+        backendLevel = 'medical';
+      } else if (accessLevelStr === 'administrative' || accessLevelStr === AccessLevel.ADMINISTRATIVE) {
+        backendLevel = 'administrative';
+      } else {
+        // Fallback to administrative for safety
+        backendLevel = 'administrative';
+        this.log(LogLevel.WARN, `Unknown access level, using fallback: ${frontendAccessLevel} → administrative`);
+      }
+      
+      return this.createSuccessResult(backendLevel, String(frontendAccessLevel), startTime, false);
+      
+    } catch (error) {
+      const result = this.createErrorResult(
+        String(frontendAccessLevel), 
+        [`Access level mapping failed: ${error}`], 
+        startTime
+      );
+      
+      this.log(LogLevel.ERROR, `Access level mapping error: ${error}`, { source: frontendAccessLevel });
+      return result as MappingResult<string>;
+    }
   }
 }
 
