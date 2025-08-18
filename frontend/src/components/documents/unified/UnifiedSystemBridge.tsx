@@ -25,11 +25,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import apollo from '../../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK CAN'T STOP US!
 // Rutas corregidas para la estructura real - Webpack friendly! 🎯
-import { DocumentUpload } from '../../DocumentManagement/DocumentUpload.tsx';
-import { DocumentList } from '../../DocumentManagement/DocumentList.tsx';
-import { DocumentViewer } from '../../DocumentManagement/DocumentViewer.tsx';
-import { DocumentManagement } from '../../DocumentManagement/DocumentManagement.tsx';
-import { LegalCategory, UnifiedDocumentType } from './UnifiedDocumentTypes.tsx';
+import { DocumentUpload } from '../../DocumentManagement/DocumentUpload';
+import { DocumentList } from '../../DocumentManagement/DocumentList';
+import { DocumentViewer } from '../../DocumentManagement/DocumentViewer';
+import DocumentManagement from '../../DocumentManagement/CyberpunkDocumentTabs';
+import { LegalCategory, UnifiedDocumentType } from './UnifiedDocumentTypes';
 
 interface IntegrationBridgeProps {
   patientId: string;

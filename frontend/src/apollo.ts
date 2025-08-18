@@ -61,7 +61,14 @@ class ApolloEngine {
 
     const fullUrl = `${this.baseUrl}/api/${version}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
     
-    // 🛡️ AUTO AUTHENTICATION
+    // � DEBUG: FormData detection
+    console.log('🔍 Apollo Debug - Body type detection:', {
+      bodyType: typeof body,
+      isFormData: body instanceof FormData,
+      bodyConstructor: body?.constructor?.name
+    });
+    
+    // �🛡️ AUTO AUTHENTICATION
     const requestHeaders: Record<string, string> = {
       'Content-Type': body instanceof FormData ? '' : 'application/json',
       ...headers
@@ -78,17 +85,21 @@ class ApolloEngine {
         requestHeaders['Authorization'] = `Bearer ${token}`;
         console.log('🔑 Auth Header Set:', requestHeaders['Authorization'].substring(0, 50) + '...');
       } else {
-        console.log('⚠️ No token found, redirecting to login...');
-        // Clear any invalid tokens and redirect
-        localStorage.removeItem('accessToken');
-        window.location.href = '/login';
-        throw new Error('No authentication token available');
+        console.log('⚠️ No token found for authenticated request');
+        // Don't auto-redirect here - let the calling component handle it
+        // This prevents the "1 micron flash" when AuthContext is just checking
       }
     }
     
     // Clean Content-Type for FormData
     if (body instanceof FormData) {
       delete requestHeaders['Content-Type'];
+      
+      // 🔍 DEBUG: FormData content inspection
+      console.log('🔍 FormData Debug - Entries:');
+      for (let [key, value] of body.entries()) {
+        console.log(`  ${key}:`, value instanceof File ? `FILE(${value.name})` : value);
+      }
     }
 
     try {
@@ -146,7 +157,26 @@ class ApolloEngine {
     } catch (error) {
       const executionTime = performance.now() - startTime;
       
-      console.error(`❌ Apollo ${method} ${endpoint} failed:`, error);
+      // Enhanced error logging for debugging
+      if (error instanceof Response) {
+        const errorText = await error.text();
+        console.error(`❌ Apollo ${method} ${endpoint} failed (${error.status}):`, {
+          status: error.status,
+          statusText: error.statusText,
+          body: errorText,
+          responseTime: `${executionTime.toFixed(2)}ms`
+        });
+        
+        // 🔍 SPECIAL DEBUG: Parse and log JSON error details
+        try {
+          const errorJson = JSON.parse(errorText);
+          console.error('🔍 Parsed error details:', errorJson);
+        } catch (parseError) {
+          console.error('🔍 Error body (not JSON):', errorText);
+        }
+      } else {
+        console.error(`❌ Apollo ${method} ${endpoint} failed:`, error);
+      }
       
       return {
         success: false,
@@ -343,6 +373,51 @@ class PatientsAPI {
   }
 }
 
+class AppointmentsAPI {
+  constructor(private engine: ApolloEngine) {}
+
+  async list(): Promise<{ appointments: any[] }> {
+    const response = await this.engine.get('/appointments');
+    if (!response.success) throw new Error(response.error?.message || 'List failed');
+    
+    // 🎯 BACKEND RETURNS {appointments: Array} OR direct Array
+    const data = response.data as any;
+    return {
+      appointments: data?.appointments || data || []
+    };
+  }
+
+  async create(appointmentData: any) {
+    const response = await this.engine.post('/appointments', appointmentData);
+    if (!response.success) {
+      // 🚨 PRESERVE HTTP ERROR INFO FOR SPECIFIC HANDLING
+      const error = new Error(response.error?.message || 'Create failed');
+      (error as any).response = { status: response.status };
+      (error as any).data = response.error;
+      throw error;
+    }
+    return response.data;
+  }
+
+  async update(appointmentId: string, appointmentData: any) {
+    const response = await this.engine.put(`/appointments/${appointmentId}`, appointmentData);
+    if (!response.success) throw new Error(response.error?.message || 'Update failed');
+    return response.data;
+  }
+
+  async delete(appointmentId: string) {
+    const response = await this.engine.delete(`/appointments/${appointmentId}`);
+    if (!response.success) {
+      // 🚨 PRESERVE HTTP ERROR INFO FOR SPECIFIC HANDLING
+      const error = new Error(response.error?.message || 'Delete failed');
+      (error as any).response = { status: response.status };
+      (error as any).data = response.error;
+      throw error;
+    }
+    return response.data;
+  }
+}
+
 class MedicalRecordsAPI {
   constructor(private engine: ApolloEngine) {}
 
@@ -407,6 +482,7 @@ class Apollo {
   public api: ApolloEngine;
   public docs: DocumentsAPI;
   public patients: PatientsAPI;
+  public appointments: AppointmentsAPI;
   public medicalRecords: MedicalRecordsAPI;
 
   constructor() {
@@ -414,6 +490,7 @@ class Apollo {
     this.api = this.engine; // Direct access to core engine
     this.docs = new DocumentsAPI(this.engine);
     this.patients = new PatientsAPI(this.engine);
+    this.appointments = new AppointmentsAPI(this.engine);
     this.medicalRecords = new MedicalRecordsAPI(this.engine);
   }
 

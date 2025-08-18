@@ -283,10 +283,8 @@ Arquitectura: Enterprise-grade, zero deuda técnica"
 🎯 SÍ somos "la primera plataforma dental con IA verdadera"
 
 💰 MODELO NEGOCIO:
-   - SaaS: €200-500/mes por clínica
-   - Enterprise: €2,000-5,000/mes multi-clínica
-   - IA Features: €100-300/mes addon
-   - Custom integrations: €5,000-20,000 one-time
+   - SaaS: €30/90 mes por clínica
+   - Y ya, asi de sencillo . Full featuras. Migracion 1 click Free .
 
 📈 MERCADO TARGET:
    - 50,000+ clínicas dentales en España

@@ -10,7 +10,20 @@
  * ✅ Real-time upload progress
  * ✅ File type validation & security
  * 
- * PLATFORM_PATTERN: Adaptable to other verticals:
+ * PLATFORM_PATTERN: Adaptable to other ve        // 🔒 COMPLIANCE CRITICAL: Respect Smart Store access level detection
+        // NEVER downgrade medical to administrative - GDPR/HIPAA violation risk!
+        const backendAccessLevel = uploadFile.accessLevel || 'administrative';
+        
+        // 🚨 COMPLIANCE VALIDATION: Prevent medical documents in virtual patient
+        const VIRTUAL_PATIENT_ID = "d76a8a03-1411-4143-85ba-6f064c7b564b";
+        if (patientId === VIRTUAL_PATIENT_ID && backendAccessLevel === 'medical') {
+          setError('⚠️ COMPLIANCE ERROR: No se pueden subir documentos médicos a "Documentos Clínica". Use un paciente real para fotos clínicas.');
+          setUploading(false);
+          return;
+        }
+        
+        console.log('🔍 DEBUG final backendAccessLevel:', backendAccessLevel);
+        console.log('🔒 COMPLIANCE: Smart detected accessLevel:', uploadFile.accessLevel);s:
  * - VetGest: Pet photos, vaccination certificates
  * - MechaGest: Vehicle photos, repair manuals
  * - RestaurantGest: Food photos, invoices
@@ -226,6 +239,7 @@ interface DocumentUploadProps {
   acceptedTypes?: string[];
   maxFileSize?: number; // MB
   className?: string;
+  disableSmartDetection?: boolean; // 🧠 NEW: Disable smart detection in manual mode
 }
 
 interface UploadFile {
@@ -270,7 +284,8 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
     'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/mpeg', 'audio/mp4'
   ],
   maxFileSize = 50, // 50MB default
-  className = ''
+  className = '',
+  disableSmartDetection = false // 🧠 Default: smart detection enabled
 }) => {
   const { state } = useAuth();
   const [files, setFiles] = useState<UploadFile[]>([]);
@@ -332,9 +347,14 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
     fileArray.forEach(file => {
       const validationError = validateFile(file);
       
-      // 🤖 SMART CATEGORIZATION: Detect document type automatically
-      const detection = detectDocumentCategory(file);
-      console.log('🤖 Smart categorization result:', detection);
+      // 🤖 SMART CATEGORIZATION: Only in Smart Mode (not in manual mode)
+      let detection: ReturnType<typeof detectDocumentCategory> | null = null;
+      if (!disableSmartDetection) {
+        detection = detectDocumentCategory(file);
+        console.log('🤖 Smart categorization result:', detection);
+      } else {
+        console.log('🧠 Manual mode: Smart detection disabled');
+      }
       
       const uploadFile: UploadFile = {
         file,
@@ -343,12 +363,12 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
         status: validationError ? 'error' : 'pending',
         error: validationError || undefined,
         preview: generatePreview(file),
-        // 🎯 AUTO-DETECTED VALUES
-        documentType: detection.documentType,
-        accessLevel: detection.accessLevel,  // 🔧 FIX: Use detected access level
-        detectedCategory: detection.category,
-        detectedConfidence: detection.confidence,
-        categoryOverride: false
+        // 🎯 AUTO-DETECTED VALUES (or defaults when smart detection disabled)
+        documentType: detection?.documentType || UnifiedDocumentType.DOCUMENT_GENERAL,
+        accessLevel: detection?.accessLevel || AccessLevel.ADMINISTRATIVE,  // Default to administrative
+        detectedCategory: detection?.category || LegalCategory.ADMINISTRATIVE,
+        detectedConfidence: detection?.confidence || 0,
+        categoryOverride: !disableSmartDetection ? false : true // Manual mode = override mode
       };
       console.log('📁 Created uploadFile with accessLevel:', uploadFile.accessLevel);
       validFiles.push(uploadFile);
@@ -427,7 +447,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
         // TODO: Implement Apollo direct mapping
         const mappingResult = { 
           success: true,
-          legacy_type: uploadFile.documentType || 'photo_clinical',
+          legacy_type: uploadFile.documentType === 'photo_clinical' ? 'clinical_photo' : (uploadFile.documentType || 'other_document'),
           requires_conversion: false 
         };
         
@@ -442,19 +462,18 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
         
         const backendDocumentType = mappingResult.legacy_type || 'other_document';
         
-        // 🚀 APOLLO NUCLEAR - Access level stub
-        // const accessLevelMappingResult = centralMappingService.mapAccessLevelToBackend(
-        //   uploadFile.accessLevel || AccessLevel.ADMINISTRATIVE
-        // );
-        const backendAccessLevel = 'administrative'; // Apollo stub
+        // � COMPLIANCE CRITICAL: Respect Smart Store access level detection
+        // NEVER downgrade medical to administrative - GDPR/HIPAA violation risk!
+        const backendAccessLevel = uploadFile.accessLevel || 'administrative';
         
         console.log('🔍 DEBUG final backendAccessLevel:', backendAccessLevel);
+        console.log('� COMPLIANCE: Smart detected accessLevel:', uploadFile.accessLevel);
 
         const formData = new FormData();
         formData.append('file', uploadFile.file);
         formData.append('title', uploadFile.file.name); // 🔧 FIX: Add required title
         formData.append('document_type', backendDocumentType);
-        formData.append('access_level', backendAccessLevel); // 🔧 FIX: Mapped to lowercase
+        formData.append('access_level_str', backendAccessLevel); // 🔧 FIX: Backend expects access_level_str
         
         // 🎯 CONDITIONAL PARAMETERS: Only append if they exist
         if (patientId) {
@@ -465,19 +484,9 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
         if (appointmentId) formData.append('appointment_id', appointmentId);
 
         try {
-          // 🚀 OPERACIÓN APOLLO - Using centralized API service
-          // Replaces hardcoded fetch with apollo.docs.upload()
-          // Benefits: V1/V2 switching, error handling, performance monitoring
-          const result = await apollo.docs.upload({
-            file: uploadFile.file,
-            title: uploadFile.file.name,
-            document_type: backendDocumentType,
-            access_level: backendAccessLevel,
-            // 🎯 CONDITIONAL PARAMETERS: Only include if they exist
-            ...(patientId && { patient_id: patientId }),
-            ...(medicalRecordId && { medical_record_id: medicalRecordId }),
-            ...(appointmentId && { appointment_id: appointmentId })
-          });
+          // 🚀 OPERACIÓN APOLLO - Using centralized API service with FormData
+          // Pass the constructed FormData directly to Apollo
+          const result = await apollo.docs.upload(formData);
 
           updateFileMetadata(uploadFile.id, { status: 'success', progress: 100 });
           
@@ -688,31 +697,81 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
                   <p className="text-sm text-red-600 mt-1">{file.error}</p>
                 )}
                 
-                {/* 🎛️ MANUAL CATEGORY OVERRIDE */}
+                {/* 🎛️ MANUAL CATEGORY & DOCUMENT TYPE OVERRIDE */}
                 {file.categoryOverride && (
                   <div className="mt-3 p-3 bg-white rounded border border-gray-200">
-                    <p className="text-sm font-medium text-gray-700 mb-2">
-                      Seleccionar categoría manualmente:
-                    </p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {Object.values(LegalCategory).map((category) => (
-                        <button
-                          key={category}
-                          onClick={() => updateFileMetadata(file.id, { 
-                            detectedCategory: category,
-                            categoryOverride: false 
+                    <div className="space-y-3">
+                      {/* Category Selection */}
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 mb-2">
+                          Seleccionar categoría:
+                        </p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {Object.values(LegalCategory).map((category) => (
+                            <button
+                              key={category}
+                              onClick={() => updateFileMetadata(file.id, { 
+                                detectedCategory: category,
+                                categoryOverride: false 
+                              })}
+                              className={`
+                                text-xs px-3 py-2 rounded border transition-colors
+                                ${file.detectedCategory === category
+                                  ? 'bg-blue-100 border-blue-300 text-blue-800'
+                                  : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
+                                }
+                              `}
+                            >
+                              {getCategoryLabel(category)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Document Type Selection - Same as Smart Mode */}
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 mb-2">
+                          Tipo de documento:
+                        </p>
+                        <select
+                          value={file.documentType}
+                          onChange={(e) => updateFileMetadata(file.id, { 
+                            documentType: e.target.value as UnifiedDocumentType
                           })}
-                          className={`
-                            text-xs px-3 py-2 rounded border transition-colors
-                            ${file.detectedCategory === category
-                              ? 'bg-blue-100 border-blue-300 text-blue-800'
-                              : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
-                            }
-                          `}
+                          className="w-full text-sm border border-gray-300 rounded px-2 py-1"
                         >
-                          {getCategoryLabel(category)}
-                        </button>
-                      ))}
+                          {/* 🏥 MEDICAL OPTIONS */}
+                          <optgroup label="🏥 Médico">
+                            <option value="xray">📻 Radiografía (todos los tipos)</option>
+                            <option value="photo_clinical">📸 Foto clínica</option>
+                            <option value="voice_note">🎤 Nota de voz</option>
+                            <option value="treatment_plan">📋 Plan de tratamiento</option>
+                            <option value="lab_report">🧪 Resultado laboratorio</option>
+                            <option value="prescription">💊 Prescripción</option>
+                            <option value="scan_3d">🔬 Escaneo 3D/STL</option>
+                          </optgroup>
+                          
+                          {/* 📋 ADMINISTRATIVE OPTIONS */}
+                          <optgroup label="📋 Administrativo">
+                            <option value="consent_form">📝 Consentimiento</option>
+                            <option value="insurance_form">🛡️ Formulario seguro</option>
+                            <option value="document_general">📄 Documento general</option>
+                          </optgroup>
+                          
+                          {/* 💰 BILLING OPTIONS */}
+                          <optgroup label="💰 Facturación">
+                            <option value="invoice">💰 Factura</option>
+                            <option value="budget">💸 Presupuesto</option>
+                            <option value="payment_proof">🧾 Comprobante pago</option>
+                          </optgroup>
+                          
+                          {/* ⚖️ LEGAL OPTIONS */}
+                          <optgroup label="⚖️ Legal">
+                            <option value="referral_letter">📄 Carta derivación</option>
+                            <option value="legal_document">⚖️ Documento legal</option>
+                          </optgroup>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 )}

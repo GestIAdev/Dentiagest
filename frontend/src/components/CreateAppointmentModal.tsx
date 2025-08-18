@@ -37,7 +37,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
 }) => {
   // ⚡ MODAL INTEGRATION: Clean appointment creation
   const { createAppointment, loading } = useAppointments();
-  const { patients, fetchPatients, fetchAllPatients } = usePatients();
+  const { patients, fetchPatients } = usePatients();
   const { state } = useAuth();
   
   // 🎯 ESTADO LIMPIO Y PROFESIONAL
@@ -87,12 +87,9 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
       
       // Si no hay resultados locales, buscar en API
       if (localResults.length === 0) {
-        // Try fetchAllPatients first, then search endpoint
-        const allPatientsTest = await fetchAllPatients();
-        
         // Now try the search endpoint
         const apiResults = await fetchPatients({ query: searchTerm });
-        const patients = apiResults?.items || [];
+        const patients = apiResults || [];
         setFilteredPatients(patients);
       } else {
         setFilteredPatients(localResults);

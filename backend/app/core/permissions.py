@@ -153,8 +153,15 @@ class MedicalPermissionValidator:
                     "violation_type": "DELETE_VIOLATION"
                 }
         
+        # 🌍 SPECIAL CASE: Virtual patient "Documentos Clínica" - ALLOW ALL ROLES
+        # This patient stores administrative documents that all staff should access
+        VIRTUAL_PATIENT_ID = "d76a8a03-1411-4143-85ba-6f064c7b564b"
+        if patient_id == VIRTUAL_PATIENT_ID:
+            print(f"🔓 VIRTUAL PATIENT ACCESS: Allowing {user_role.value} to access Documentos Clínica")
+            # Skip normal patient access validation for virtual patient
+            pass
         # Check if user is trying to access records they shouldn't
-        if patient_id and not MedicalPermissionValidator._can_access_patient_data(user, patient_id):
+        elif patient_id and not MedicalPermissionValidator._can_access_patient_data(user, patient_id):
             return {
                 "allowed": False,
                 "reason": "User not authorized to access this patient's data",

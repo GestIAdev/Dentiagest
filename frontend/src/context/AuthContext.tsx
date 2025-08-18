@@ -60,12 +60,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             accessToken,
             refreshToken,
           });
+          
+          // Verify token is still valid with backend
+          apollo.api.get('/auth/me', { requiresAuth: true })
+            .then(response => {
+              if (!response.success) {
+                console.log('🔄 Token expired, clearing session');
+                logout();
+              }
+            })
+            .catch(() => {
+              console.log('🔄 Token validation failed, clearing session');
+              logout();
+            });
+            
         } catch (error) {
           console.error('Error parsing stored user data:', error);
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('user');
         }
+      } else {
+        // No stored credentials - go straight to clean state
+        setState(prev => ({ ...prev, isLoading: false }));
       }
     };
 
@@ -84,35 +101,56 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const response = await apollo.api.post('/auth/login', formData);
 
       if (!response.success || !response.data) {
-        throw new Error('Login failed');
+        setState(prev => ({ ...prev, isLoading: false }));
+        return false;
       }
 
-      // 🚀 APOLLO API - Get user info after login
+      // Extract tokens from login response
+      const loginData = response.data as any;
+      const accessToken = loginData.access_token;
+      const refreshToken = loginData.refresh_token || '';
+
+      if (!accessToken) {
+        setState(prev => ({ ...prev, isLoading: false }));
+        return false;
+      }
+
+      // 🎯 FIRST: Store tokens in localStorage so /auth/me can use them
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+
+      // 🚀 THEN: Get user info with the fresh token
       const userResponse = await apollo.api.get('/auth/me');
 
-      if (response.success && response.data) {
-        const userData = response.data as any;
-
-        // Mapear rol 'dentist' a 'professional' para backend
-        if (userData.role === 'dentist') {
-          userData.role = 'professional';
-        }
-        
-        // Almacenar en localStorage
-        localStorage.setItem('accessToken', (response.data as any).access_token);
-        localStorage.setItem('refreshToken', (response.data as any).refresh_token || '');
-        localStorage.setItem('user', JSON.stringify(userData));
-
-        setState({
-          isAuthenticated: true,
-          isLoading: false,
-          user: userData as any,
-          accessToken: (response.data as any).access_token,
-          refreshToken: (response.data as any).refresh_token || '',
-        });
-
-        return true;
+      if (!userResponse.success || !userResponse.data) {
+        // Clear tokens if user info fails
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setState(prev => ({ ...prev, isLoading: false }));
+        return false;
       }
+
+      const userData = userResponse.data as any;
+
+      // Mapear rol 'dentist' a 'professional' para backend
+      if (userData.role === 'dentist') {
+        userData.role = 'professional';
+      }
+      
+      // Store user data
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      // Update state with authenticated user
+      setState({
+        isAuthenticated: true,
+        isLoading: false,
+        user: userData,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      });
+
+      return true;
+
     } catch (error) {
       console.error('Login error:', error);
       setState(prev => ({ ...prev, isLoading: false }));

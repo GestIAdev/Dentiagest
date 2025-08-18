@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.tsx';
 import { formatLocalDateTime, parseClinicDateTime } from '../utils/timezone.ts';
+import apollo from '../apollo.ts';
 
 export interface Appointment {
   id: string;
@@ -54,8 +55,6 @@ export const useAppointments = () => {
   const [error, setError] = useState<string | null>(null);
   const { state } = useAuth();
 
-  const API_BASE = 'http://localhost:8002/api/v1/appointments';
-
   // Convertir appointment a evento de FullCalendar
   const appointmentToEvent = (appointment: Appointment): CalendarEvent => {
     // 🌍 SOLUCIÓN MUNDIAL: Usar utilidades de timezone
@@ -108,33 +107,15 @@ export const useAppointments = () => {
     setError(null);
     
     try {
-      const response = await fetch(API_BASE, {
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al cargar las citas');
-      }
-
-      const data = await response.json();
+      console.log('🚀 Apollo fetchAppointments - Starting nuclear request');
+      
+      // 🚀 APOLLO NUCLEAR FETCH - Clean and powerful
+      const result = await apollo.appointments.list();
+      
+      console.log('🚀 Apollo fetchAppointments - Response:', result);
+      
       // Si la respuesta es un objeto con appointments, extraer el array
-      let appointmentsArray: Appointment[] = [];
-      if (Array.isArray(data)) {
-        appointmentsArray = data;
-      } else if (Array.isArray(data.appointments)) {
-        appointmentsArray = data.appointments;  // ← ESTRUCTURA CORRECTA DEL BACKEND
-      } else if (data && typeof data === 'object') {
-        // Si la respuesta es un objeto con claves, buscar arrays
-        for (const key of Object.keys(data)) {
-          if (Array.isArray(data[key])) {
-            appointmentsArray = data[key];
-            break;
-          }
-        }
-      }
+      let appointmentsArray: Appointment[] = result.appointments || [];
       
       // 🏥 GUARDAR TODAS LAS CITAS (incluidas canceladas) para filtros
       const allAppointments = appointmentsArray.map((apt: any) => ({
@@ -151,6 +132,7 @@ export const useAppointments = () => {
       setAppointments(allAppointments); // ← TODAS para que filtros funcionen
       return allAppointments;
     } catch (err) {
+      console.error('🚨 Apollo fetchAppointments - Error:', err);
       setError(err instanceof Error ? err.message : 'Error desconocido');
       return [];
     } finally {
@@ -164,36 +146,23 @@ export const useAppointments = () => {
     setError(null);
 
     try {
-      // ✅ CREATE APPOINTMENT: Send to backend
-      const response = await fetch(API_BASE, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(appointmentData)
-      });
-
-      if (!response.ok) {
-        // 🚨 PRESERVAR INFO DEL ERROR HTTP PARA MANEJO ESPECÍFICO
-        const errorData = await response.text();
-        const error = new Error(`Error al crear la cita: ${response.status}`);
-        (error as any).response = { status: response.status };
-        (error as any).data = errorData;
-        throw error;
-      }
-
-      const newAppointment = await response.json();
+      console.log('🚀 Apollo createAppointment - Data:', appointmentData);
       
-      // ✅ Priority values now match backend format
+      // � APOLLO NUCLEAR CREATE - Simple and powerful
+      const newAppointment = await apollo.appointments.create(appointmentData);
+      
+      console.log('🚀 Apollo createAppointment - Created:', newAppointment);
+      
+      // ✅ Priority values now match backend format  
       const mappedAppointment = {
-        ...newAppointment,
-        priority: newAppointment.priority || 'normal'
+        ...(newAppointment as any),
+        priority: (newAppointment as any).priority || 'normal'
       };
       
       setAppointments(prev => [...prev, mappedAppointment]);
       return mappedAppointment;
     } catch (err) {
+      console.error('🚨 Apollo createAppointment - Error:', err);
       setError(err instanceof Error ? err.message : 'Error desconocido');
       throw err;
     } finally {
@@ -207,28 +176,17 @@ export const useAppointments = () => {
     setError(null);
 
     try {
-      // 🔄 UPDATE APPOINTMENT: Send changes to backend  
-      const response = await fetch(`${API_BASE}/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(appointmentData)
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ PUT Error response:', errorText);
-        throw new Error('Error al actualizar la cita');
-      }
-
-      const updatedAppointment = await response.json();
+      console.log('🚀 Apollo updateAppointment - ID:', id, 'Data:', appointmentData);
+      
+      // 🚀 APOLLO NUCLEAR UPDATE - Clean and powerful
+      const updatedAppointment = await apollo.appointments.update(id, appointmentData);
+      
+      console.log('🚀 Apollo updateAppointment - Updated:', updatedAppointment);
       
       // ✅ Priority values now match backend format
       const mappedAppointment = {
-        ...updatedAppointment,
-        priority: updatedAppointment.priority || 'normal'
+        ...(updatedAppointment as any),
+        priority: (updatedAppointment as any).priority || 'normal'
       };
       
       setAppointments(prev => 
@@ -236,6 +194,7 @@ export const useAppointments = () => {
       );
       return mappedAppointment;
     } catch (err) {
+      console.error('🚨 Apollo updateAppointment - Error:', err);
       setError(err instanceof Error ? err.message : 'Error desconocido');
       throw err;
     } finally {
@@ -249,24 +208,16 @@ export const useAppointments = () => {
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE}/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${state.accessToken}`,
-        }
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        // 🚨 PRESERVAR INFO DEL ERROR HTTP PARA MANEJO ESPECÍFICO
-        const error = new Error(`Error al eliminar la cita: ${response.status}`);
-        (error as any).response = { status: response.status };
-        (error as any).data = errorText;
-        throw error;
-      }
-
+      console.log('🚀 Apollo deleteAppointment - ID:', id);
+      
+      // 🚀 APOLLO NUCLEAR DELETE - Clean and powerful
+      await apollo.appointments.delete(id);
+      
+      console.log('🚀 Apollo deleteAppointment - Success for ID:', id);
+      
       setAppointments(prev => prev.filter(apt => apt.id !== id));
     } catch (err) {
+      console.error('🚨 Apollo deleteAppointment - Error:', err);
       setError(err instanceof Error ? err.message : 'Error desconocido');
       throw err;
     } finally {

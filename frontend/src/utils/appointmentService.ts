@@ -3,12 +3,12 @@
  * 
  * Purpose: Appointment API service for real backend integration
  * Created: August 11, 2025 - DRAG & DROP COMPLETION MISSION
- * Status: PRODUCTION READY
+ * Status: PRODUCTION READY - APOLLO NUCLEAR POWERED
  * 
  * Features:
- * - Update appointment datetime via API
+ * - Update appointment datetime via Apollo Nuclear API
  * - Error handling and retry logic
- * - Authentication with JWT tokens
+ * - Authentication automated via Apollo
  * - TypeScript interfaces for safety
  * 
  * This destroys the need for any external appointment libraries!
@@ -16,6 +16,8 @@
  * 
  * @author Punk Claude & Platform Gestia Developer
  */
+
+import apollo from '../apollo.ts';
 
 interface AppointmentUpdateData {
   scheduled_date?: string; // ISO format datetime
@@ -40,32 +42,12 @@ export async function updateAppointment(
   updateData: AppointmentUpdateData
 ): Promise<ApiResponse<any>> {
   try {
-    console.log('🎯 updateAppointment called:', { appointmentId, updateData });
+    console.log('🚀 Apollo updateAppointment called:', { appointmentId, updateData });
     
-    // Get auth token
-    const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-      throw new Error('No authentication token found');
-    }
-
-    // Prepare the API call
-    const response = await fetch(`http://localhost:8002/api/v1/appointments/${appointmentId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify(updateData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
-      throw new Error(errorData.detail || `HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const result = await response.json();
+    // 🚀 APOLLO NUCLEAR UPDATE - Clean and powerful
+    const result = await apollo.appointments.update(appointmentId, updateData);
     
-    console.log('✅ Appointment updated successfully:', result);
+    console.log('✅ Apollo appointment updated successfully:', result);
     
     return {
       success: true,
@@ -73,7 +55,7 @@ export async function updateAppointment(
     };
 
   } catch (error: any) {
-    console.error('❌ Error updating appointment:', error);
+    console.error('❌ Apollo updateAppointment error:', error);
     
     return {
       success: false,

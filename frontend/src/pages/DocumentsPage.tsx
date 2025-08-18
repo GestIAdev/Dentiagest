@@ -11,10 +11,9 @@
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { DocumentManagement } from '../components/DocumentManagement/DocumentManagement.tsx';
+import DocumentManagement from '../components/DocumentManagement/CyberpunkDocumentTabs.tsx';
 import { 
-  FolderIcon,
-  DocumentDuplicateIcon 
+  FolderIcon
 } from '@heroicons/react/24/outline';
 
 export const DocumentsPage: React.FC = () => {

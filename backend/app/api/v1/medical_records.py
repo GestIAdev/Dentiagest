@@ -528,6 +528,15 @@ async def upload_medical_document(
     print("🚨 UPLOAD ENDPOINT HIT! 🚨 UPLOAD ENDPOINT HIT! 🚨 UPLOAD ENDPOINT HIT!")
     print("=" * 100)
     
+    # 🔍 DEBUG: Current user and permissions
+    print("🔍 DEBUG: User and permissions info:")
+    print(f"  user.id: {current_user.id}")
+    print(f"  user.role: {current_user.role}")
+    print(f"  user.role type: {type(current_user.role)}")
+    print(f"  user.role.value: {getattr(current_user.role, 'value', 'NO VALUE')}")
+    print(f"  user.email: {current_user.email}")
+    print(f"  user.is_admin: {current_user.is_admin}")
+    
     # �🔍 DEBUG: Log all received parameters
     print("🔍 DEBUG: upload_medical_document parameters:")
     print(f"  patient_id: {patient_id}")
