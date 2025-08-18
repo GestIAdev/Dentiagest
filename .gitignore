@@ -1,7 +1,18 @@
 # Archivos de entorno
 .env
-.env.local
-.env.development.local
+.env.local# 🕵️‍♂️ NETRUNNER SECURITY LEVEL 1 (PunkClaude Protection) 
+# Protección de planes estratégicos y documentación sensible
+docs/miscelaneus/
+docs/miscelaneus/*
+**/miscelaneus/
+**/miscelaneus/*
+docs/IA/private_*
+docs/Generic/confidential_*
+**/strategic_*
+**/plans_*
+**/roadmap_*
+**/MASTER_*
+*.strategic.*elopment.local
 .env.test.local
 .env.production.local
 
