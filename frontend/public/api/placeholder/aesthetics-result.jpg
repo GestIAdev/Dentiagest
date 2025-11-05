@@ -1,0 +1,19 @@
+# Placeholder para IA Aesthetics Preview
+# Este archivo simula la respuesta de la API de DALL-E 3
+# En producción, sería reemplazado por una imagen real generada por IA
+
+Esta es una simulación del resultado de IA Aesthetics Preview.
+En el modo real, aquí aparecería una imagen generada por DALL-E 3
+mostrando el resultado simulado del tratamiento estético.
+
+Para activar el modo real:
+1. Configurar variable de entorno: REACT_APP_USE_REAL_AI_API=true
+2. Implementar endpoint /ai/aesthetics-preview en el backend
+3. Configurar credenciales de OpenAI/DALL-E 3
+
+Características del resultado simulado:
+- Imagen de alta calidad (2048x2048)
+- Estilo fotorrealista
+- Enfoque en sonrisa y dientes
+- Mantiene características faciales del paciente
+- Resultado estético natural y profesional

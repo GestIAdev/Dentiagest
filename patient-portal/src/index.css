@@ -1,0 +1,252 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   CYBERPUNK MEDICAL THEME - TITAN V3
+   ============================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+
+:root {
+  --cyber-black: #0a0a0a;
+  --cyber-dark: #1a1a1a;
+  --cyber-gray: #2a2a2a;
+  --cyber-light: #3a3a3a;
+  --neon-cyan: #00ffff;
+  --neon-pink: #ff00ff;
+  --neon-green: #00ff00;
+  --neon-blue: #0080ff;
+  --neon-purple: #8000ff;
+  --neon-red: #ff0040;
+  --neon-yellow: #ffff00;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, var(--cyber-black) 0%, var(--cyber-dark) 50%, var(--cyber-gray) 100%);
+  color: white;
+  overflow-x: hidden;
+}
+
+/* Scrollbar Cyberpunk */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cyber-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neon-cyan);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-blue);
+}
+
+/* Animations */
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px currentColor;
+  }
+  100% {
+    box-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
+  }
+}
+
+@keyframes pulse-neon {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes cyber-flicker {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Utility Classes */
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.animate-pulse-neon {
+  animation: pulse-neon 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-cyber-flicker {
+  animation: cyber-flicker 3s ease-in-out infinite;
+}
+
+/* Button Styles */
+.btn-cyber {
+  @apply bg-neon-cyan hover:bg-neon-cyan/80 text-cyber-black font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-neon-cyan;
+}
+
+.btn-cyber-secondary {
+  @apply bg-cyber-gray hover:bg-cyber-light text-cyber-light hover:text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 border border-cyber-light;
+}
+
+/* Card Styles */
+.card-cyber {
+  @apply bg-cyber-gray rounded-lg border border-cyber-light p-6 transition-all duration-300;
+}
+
+.card-cyber:hover {
+  @apply border-neon-cyan shadow-neon-cyan;
+}
+
+/* Input Styles */
+.input-cyber {
+  @apply bg-cyber-dark border border-cyber-light rounded-lg px-4 py-3 text-white placeholder-cyber-light focus:border-neon-cyan focus:outline-none transition-colors;
+}
+
+/* Gradient Text */
+.text-gradient-cyber {
+  @apply bg-gradient-to-r from-neon-cyan to-neon-blue bg-clip-text text-transparent;
+}
+
+/* Background Effects */
+.bg-cyber-gradient {
+  background: linear-gradient(135deg, var(--cyber-black) 0%, var(--cyber-dark) 50%, var(--cyber-gray) 100%);
+}
+
+/* Shadow Effects */
+.shadow-neon-cyan {
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.shadow-neon-pink {
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+}
+
+.shadow-neon-green {
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+}
+
+/* Responsive Design Helpers */
+@media (max-width: 768px) {
+  .mobile-stack {
+    @apply flex-col space-y-4 space-x-0;
+  }
+
+  .mobile-grid {
+    @apply grid-cols-1 gap-4;
+  }
+}
+
+/* Loading States */
+.loading-cyber {
+  @apply animate-spin rounded-full border-b-2 border-neon-cyan;
+}
+
+/* Error States */
+.error-cyber {
+  @apply bg-red-900/20 border border-red-500/50 rounded-lg p-4;
+}
+
+/* Success States */
+.success-cyber {
+  @apply bg-green-900/20 border border-green-500/50 rounded-lg p-4;
+}
+
+/* Focus States */
+.focus-cyber:focus {
+  @apply ring-2 ring-neon-cyan ring-opacity-50 border-neon-cyan;
+}
+
+/* Custom Components */
+.glass-effect {
+  background: rgba(42, 42, 42, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.neon-border {
+  position: relative;
+}
+
+.neon-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink), var(--neon-blue));
+  border-radius: inherit;
+  z-index: -1;
+  animation: glow 3s ease-in-out infinite alternate;
+}
+
+/* Typography */
+.font-cyber {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.text-cyber-title {
+  @apply text-4xl font-bold text-gradient-cyber;
+}
+
+.text-cyber-subtitle {
+  @apply text-xl text-cyber-light;
+}
+
+/* Layout Helpers */
+.container-cyber {
+  @apply max-w-7xl mx-auto px-4 py-8;
+}
+
+.flex-cyber-center {
+  @apply flex items-center justify-center;
+}
+
+.grid-cyber-cards {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+/* Special Effects */
+.matrix-rain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.05;
+}
+
+/* Print Styles (hide cyber effects) */
+@media print {
+  .cyber-hide-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .text-gradient-cyber {
+    background: none !important;
+    color: black !important;
+  }
+}

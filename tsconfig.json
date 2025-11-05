@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "target": "ES2021",
+    "module": "ES2020",
+    "lib": ["ES2021", "dom"],
+    "outDir": "./dist",
+    "rootDir": "./",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "types": ["node"],
+    "downlevelIteration": true,
+    "jsx": "react-jsx",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["*"],
+      "@/Apollo/*": ["apollo-nuclear/Apollo/*"],
+      "@/Core/*": ["apollo-nuclear/Apollo/Core/*"],
+      "@/Reactor/*": ["apollo-nuclear/Apollo/Reactor/*"],
+      "@/Radiation/*": ["apollo-nuclear/Apollo/Radiation/*"],
+      "@/Fusion/*": ["apollo-nuclear/Apollo/Fusion/*"],
+      "@/Containment/*": ["apollo-nuclear/Apollo/Containment/*"]
+    }
+  },
+  "include": [
+    "selene/**/*.ts",
+    "selene/**/*.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "selene/snapshots/**"
+  ]
+}

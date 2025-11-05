@@ -1,0 +1,44 @@
+<svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="syncGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ffff"/>
+      <stop offset="100%" style="stop-color:#00ff00"/>
+    </linearGradient>
+    <filter id="syncGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer circle -->
+  <circle cx="96" cy="96" r="70" fill="none" stroke="url(#syncGradient)" stroke-width="4" stroke-dasharray="10,5" filter="url(#syncGlow)"/>
+
+  <!-- Inner rotating arrows -->
+  <g transform="translate(96,96)">
+    <!-- Clockwise arrow -->
+    <path d="M -20 -20 L -20 -35 L -15 -30 L -20 -35 L -25 -35 Z"
+          fill="url(#syncGradient)"
+          filter="url(#syncGlow)"/>
+    <path d="M -30 -10 Q -45 5, -30 20 Q -15 35, 0 20"
+          fill="none"
+          stroke="url(#syncGradient)"
+          stroke-width="3"
+          filter="url(#syncGlow)"/>
+
+    <!-- Counter-clockwise arrow -->
+    <path d="M 20 -20 L 20 -35 L 15 -30 L 20 -35 L 25 -35 Z"
+          fill="url(#syncGradient)"
+          filter="url(#syncGlow)"/>
+    <path d="M 30 -10 Q 45 5, 30 20 Q 15 35, 0 20"
+          fill="none"
+          stroke="url(#syncGradient)"
+          stroke-width="3"
+          filter="url(#syncGlow)"/>
+  </g>
+
+  <!-- Center dot -->
+  <circle cx="96" cy="96" r="8" fill="url(#syncGradient)" filter="url(#syncGlow)"/>
+</svg>

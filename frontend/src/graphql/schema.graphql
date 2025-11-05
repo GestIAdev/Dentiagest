@@ -1,0 +1,491 @@
+# 🔥 APOLLO NUCLEAR GRAPHQL FEDERATION SCHEMA
+# Date: September 22, 2025
+# Mission: GraphQL Federation for Apollo Nuclear 3.0
+# Target: PatientManagement & AppointmentWizard Integration
+
+"""
+GraphQL Schema Definition for Apollo Nuclear 3.0 Federation
+
+This schema provides a unified GraphQL API that serves both:
+- PatientManagement: Complete patient lifecycle management
+- AppointmentWizard: Intelligent appointment scheduling
+
+Architecture: Apollo Federation with subgraphs for:
+- Patient subgraph (patient data & operations)
+- Appointment subgraph (appointment data & operations)
+- User subgraph (authentication & authorization)
+"""
+
+# ============================================================================
+# SCALARS & ENUMS
+# ============================================================================
+
+scalar DateTime
+scalar UUID
+scalar JSON
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum BloodType {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+}
+
+enum AnxietyLevel {
+  NONE
+  LOW
+  MODERATE
+  HIGH
+  SEVERE
+}
+
+enum InsuranceStatus {
+  NO_INSURANCE
+  PRIVATE
+  PUBLIC
+  MIXED
+  UNKNOWN
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum AppointmentType {
+  CONSULTATION
+  CLEANING
+  CHECKUP
+  FILLING
+  EXTRACTION
+  ROOT_CANAL
+  CROWN
+  BRIDGE
+  IMPLANT
+  ORTHODONTICS
+  WHITENING
+  SURGERY
+  EMERGENCY
+  FOLLOW_UP
+}
+
+enum AppointmentPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+# ============================================================================
+# INPUT TYPES
+# ============================================================================
+
+input PatientSearchFilters {
+  search: String
+  hasMedicalConditions: Boolean
+  hasAllergies: Boolean
+  highAnxietyOnly: Boolean
+  ageMin: Int
+  ageMax: Int
+  createdAfter: DateTime
+  createdBefore: DateTime
+  sortBy: String
+  sortOrder: String
+  page: Int
+  size: Int
+}
+
+input PatientCreateInput {
+  firstName: String!
+  lastName: String!
+  email: String
+  phone: String
+  phoneSecondary: String
+  dateOfBirth: DateTime
+  gender: Gender
+  addressStreet: String
+  addressCity: String
+  addressState: String
+  addressPostalCode: String
+  addressCountry: String
+  emergencyContactName: String
+  emergencyContactPhone: String
+  emergencyContactRelationship: String
+  medicalConditions: String
+  medicationsCurrent: String
+  allergies: String
+  anxietyLevel: AnxietyLevel
+  specialNeeds: String
+  insuranceProvider: String
+  insurancePolicyNumber: String
+  insuranceGroupNumber: String
+  consentToTreatment: Boolean
+  consentToContact: Boolean
+  preferredContactMethod: String
+  notes: String
+}
+
+input PatientUpdateInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  phoneSecondary: String
+  dateOfBirth: DateTime
+  gender: Gender
+  addressStreet: String
+  addressCity: String
+  addressState: String
+  addressPostalCode: String
+  addressCountry: String
+  emergencyContactName: String
+  emergencyContactPhone: String
+  emergencyContactRelationship: String
+  medicalConditions: String
+  medicationsCurrent: String
+  allergies: String
+  anxietyLevel: AnxietyLevel
+  specialNeeds: String
+  insuranceProvider: String
+  insurancePolicyNumber: String
+  insuranceGroupNumber: String
+  consentToTreatment: Boolean
+  consentToContact: Boolean
+  preferredContactMethod: String
+  notes: String
+}
+
+input AppointmentCreateInput {
+  patientId: UUID!
+  dentistId: UUID!
+  scheduledDate: DateTime!
+  durationMinutes: Int!
+  appointmentType: AppointmentType!
+  priority: AppointmentPriority!
+  title: String!
+  description: String
+  notes: String
+  roomNumber: String
+  estimatedCost: String
+  insuranceCoverage: String
+  preparationInstructions: String
+  followUpRequired: Boolean
+  parentAppointmentId: UUID
+}
+
+input AppointmentUpdateInput {
+  patientId: UUID
+  dentistId: UUID
+  scheduledDate: DateTime
+  durationMinutes: Int
+  appointmentType: AppointmentType
+  priority: AppointmentPriority
+  title: String
+  description: String
+  notes: String
+  status: AppointmentStatus
+  roomNumber: String
+  estimatedCost: String
+  insuranceCoverage: String
+  preparationInstructions: String
+  followUpRequired: Boolean
+  confirmationSent: Boolean
+  reminderSent: Boolean
+  cancelledAt: DateTime
+  completedAt: DateTime
+}
+
+input AppointmentSearchFilters {
+  startDate: DateTime
+  endDate: DateTime
+  patientId: UUID
+  dentistId: UUID
+  status: [AppointmentStatus!]
+  appointmentType: [AppointmentType!]
+  priority: [AppointmentPriority!]
+  confirmedOnly: Boolean
+  roomNumber: String
+  page: Int
+  size: Int
+}
+
+input AvailabilityRequestInput {
+  date: DateTime!
+  dentistId: UUID
+  appointmentType: AppointmentType!
+  durationMinutes: Int
+}
+
+# ============================================================================
+# OBJECT TYPES
+# ============================================================================
+
+type Patient @key(fields: "id") {
+  id: UUID!
+  firstName: String!
+  lastName: String!
+  email: String
+  phone: String
+  phoneSecondary: String
+  dateOfBirth: DateTime
+  gender: Gender
+  age: Int
+  fullName: String!
+  addressStreet: String
+  addressCity: String
+  addressState: String
+  addressPostalCode: String
+  addressCountry: String
+  fullAddress: String
+  emergencyContactName: String
+  emergencyContactPhone: String
+  emergencyContactRelationship: String
+  medicalConditions: String
+  medicationsCurrent: String
+  allergies: String
+  anxietyLevel: AnxietyLevel
+  specialNeeds: String
+  insuranceProvider: String
+  insurancePolicyNumber: String
+  insuranceGroupNumber: String
+  insuranceStatus: InsuranceStatus
+  consentToTreatment: Boolean!
+  consentToContact: Boolean!
+  preferredContactMethod: String
+  notes: String
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  createdBy: UUID!
+  hasInsurance: Boolean!
+  requiresSpecialCare: Boolean!
+
+  # Relations
+  appointments: [Appointment!]!
+  medicalHistory: PatientMedicalHistory
+}
+
+type PatientMedicalHistory {
+  patientId: UUID!
+  basicInfo: PatientBasicInfo!
+  medicalConditions: String
+  currentMedications: String
+  allergies: String
+  emergencyContact: EmergencyContact
+  dentalSpecific: DentalSpecificInfo
+  consentStatus: ConsentStatus
+  preferences: PatientPreferences
+}
+
+type PatientBasicInfo {
+  name: String!
+  dateOfBirth: DateTime
+  age: Int
+  gender: Gender
+  bloodType: BloodType
+}
+
+type EmergencyContact {
+  name: String
+  phone: String
+  relationship: String
+}
+
+type DentalSpecificInfo {
+  previousDentist: String
+  anxietyLevel: AnxietyLevel
+  insuranceInfo: JSON
+  insuranceStatus: InsuranceStatus
+}
+
+type ConsentStatus {
+  treatment: Boolean!
+  marketing: Boolean!
+  dataSharing: Boolean!
+}
+
+type PatientPreferences {
+  appointmentTime: String
+  communication: JSON
+}
+
+type Appointment @key(fields: "id") {
+  id: UUID!
+  patientId: UUID!
+  dentistId: UUID!
+  scheduledDate: DateTime!
+  durationMinutes: Int!
+  appointmentType: AppointmentType!
+  priority: AppointmentPriority!
+  title: String!
+  description: String
+  notes: String
+  status: AppointmentStatus!
+  roomNumber: String
+  estimatedCost: String
+  insuranceCoverage: String
+  preparationInstructions: String
+  followUpRequired: Boolean!
+  parentAppointmentId: UUID
+  confirmationSent: Boolean!
+  reminderSent: Boolean!
+  cancelledAt: DateTime
+  completedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  createdBy: UUID!
+
+  # Computed fields
+  patientName: String
+  patientPhone: String
+  dentistName: String
+  endTime: DateTime!
+
+  # Relations
+  patient: Patient!
+  dentist: User!
+  parentAppointment: Appointment
+  childAppointments: [Appointment!]!
+}
+
+type User @key(fields: "id") {
+  id: UUID!
+  email: String!
+  firstName: String!
+  lastName: String!
+  fullName: String!
+  role: String!
+  isActive: Boolean!
+}
+
+type TimeSlot {
+  startTime: DateTime!
+  endTime: DateTime!
+  durationMinutes: Int!
+  isAvailable: Boolean!
+  dentistId: UUID!
+  dentistName: String
+}
+
+type AvailabilityResponse {
+  date: DateTime!
+  availableSlots: [TimeSlot!]!
+  totalSlots: Int!
+  dentistSchedules: JSON!
+}
+
+type AppointmentStats {
+  totalAppointments: Int!
+  byStatus: JSON!
+  byType: JSON!
+  byPriority: JSON!
+  todayAppointments: Int!
+  thisWeekAppointments: Int!
+  thisMonthAppointments: Int!
+  averageDuration: Float!
+  noShowRate: Float!
+  cancellationRate: Float!
+  totalEstimatedRevenue: Int!
+  completedAppointmentsValue: Int!
+}
+
+# ============================================================================
+# PAGINATION TYPES
+# ============================================================================
+
+type PatientConnection {
+  items: [Patient!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type AppointmentConnection {
+  appointments: [Appointment!]!
+  total: Int!
+  page: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type PatientSearchSuggestion {
+  id: UUID!
+  name: String!
+  email: String!
+  phone: String!
+  type: String!
+}
+
+# ============================================================================
+# QUERIES
+# ============================================================================
+
+type Query {
+  # Patient Queries
+  patients(filters: PatientSearchFilters): PatientConnection!
+  patient(id: UUID!): Patient
+  patientMedicalHistory(patientId: UUID!): PatientMedicalHistory
+  patientSearchSuggestions(query: String!, limit: Int): [PatientSearchSuggestion!]!
+
+  # Appointment Queries
+  appointments(filters: AppointmentSearchFilters): AppointmentConnection!
+  appointment(id: UUID!): Appointment
+  appointmentAvailability(request: AvailabilityRequestInput!): AvailabilityResponse!
+  appointmentStats(startDate: DateTime, endDate: DateTime): AppointmentStats!
+
+  # Health Check
+  health: String!
+}
+
+# ============================================================================
+# MUTATIONS
+# ============================================================================
+
+type Mutation {
+  # Patient Mutations
+  createPatient(input: PatientCreateInput!): Patient!
+  updatePatient(id: UUID!, input: PatientUpdateInput!): Patient!
+  deletePatient(id: UUID!): Boolean!
+  activatePatient(id: UUID!): Patient!
+  deactivatePatient(id: UUID!): Patient!
+  updatePatientInsurance(id: UUID!, insuranceData: JSON!): Patient!
+
+  # Appointment Mutations
+  createAppointment(input: AppointmentCreateInput!): Appointment!
+  updateAppointment(id: UUID!, input: AppointmentUpdateInput!): Appointment!
+  deleteAppointment(id: UUID!): Boolean!
+  cancelAppointment(id: UUID!): Appointment!
+  confirmAppointment(id: UUID!): Appointment!
+  completeAppointment(id: UUID!): Appointment!
+}
+
+# ============================================================================
+# SUBSCRIPTION (Future Implementation)
+# ============================================================================
+
+type Subscription {
+  appointmentCreated: Appointment!
+  appointmentUpdated: Appointment!
+  appointmentCancelled: Appointment!
+  patientCreated: Patient!
+  patientUpdated: Patient!
+}

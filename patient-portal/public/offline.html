@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DentiAgest - Modo Offline</title>
+    <meta                      <p>🛡️ Mariscal del Cónclave - Arquitecto de la Resistencia Digital</p>          <strong>ESTADO:</strong> AUTONOMÍA TOTAL - ESPERANDO RECONEXIÓN PARA sincronizacióname="description" content="DentiAgest Patient Portal - Modo Offline Activado">
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        :root {
+            --cyber-blue: #00ffff;
+            --cyber-pink: #ff00ff;
+            --cyber-green: #00ff00;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            color: var(--cyber-green);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .status-indicator {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            border: 3px solid var(--cyber-blue);
+            border-radius: 50%;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator::before {
+            content: '🛡️';
+            font-size: 3rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--cyber-pink);
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+
+        .features {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--cyber-blue);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .features h3 {
+            color: var(--cyber-blue);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: '⚡';
+            position: absolute;
+            left: 0;
+            color: var(--cyber-green);
+        }
+
+        .sync-status {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid var(--cyber-green);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .sync-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--cyber-green);
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            animation: blink 1s infinite;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        .punk-quote {
+            font-style: italic;
+            margin: 1rem 0;
+            color: var(--cyber-pink);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px var(--cyber-blue); }
+            50% { box-shadow: 0 0 40px var(--cyber-blue); }
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .logo { font-size: 2rem; }
+            .title { font-size: 1.5rem; }
+            .container { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">DENTIAGEST</div>
+
+        <div class="status-indicator"></div>
+
+        <h1 class="title">🛡️ MODO OFFLINE SUPREMO ACTIVADO</h1>
+
+        <p class="subtitle">
+            La Colonización del Silencio ha comenzado.<br>
+            Funcionando con autonomía total.
+        </p>
+
+        <div class="punk-quote">
+            "No necesitamos internet para ser libres.<br>
+            La verdadera revolución es offline."
+        </div>
+
+        <div class="features">
+            <h3>⚡ CAPACIDADES OFFLINE ACTIVAS</h3>
+            <ul class="feature-list">
+                <li>✅ Datos de pacientes almacenados localmente</li>
+                <li>✅ Historial de citas disponible sin conexión</li>
+                <li>✅ Documentos médicos accesibles offline</li>
+                <li>✅ Sincronización automática al reconectar</li>
+                <li>✅ Veritas Quantum verificando integridad</li>
+                <li>✅ Notificaciones push activas</li>
+                <li>✅ Funcionalidad completa sin internet</li>
+            </ul>
+        </div>
+
+        <div class="sync-status">
+            <span class="sync-indicator"></span>
+            <strong>ESTADO:</strong> AUTONOMÍA TOTAL - ESPERANDO RECONEXIÓN PARA SINCRONIZACIÓN
+        </div>
+
+        <div class="footer">
+            <p>🔥 Directiva V201: La Conquista del Silencio</p>
+            <p>🛡️ Mariscal PunkClaude - Arquitecto de la Resistencia Digital</p>
+            <p>📅 September 29, 2025</p>
+        </div>
+    </div>
+
+    <script>
+        // 🛡️ OFFLINE DETECTION AND STATUS UPDATES
+        function updateOnlineStatus() {
+            const statusElement = document.querySelector('.sync-status');
+            const indicator = document.querySelector('.sync-indicator');
+
+            if (navigator.onLine) {
+                statusElement.innerHTML = `
+                    <span class="sync-indicator"></span>
+                    <strong>ESTADO:</strong> CONECTADO - SINCRONIZANDO DATOS...
+                `;
+                indicator.style.background = '#00ff00';
+                indicator.style.animation = 'blink 0.5s infinite';
+
+                // Auto-reload after sync
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+            } else {
+                statusElement.innerHTML = `
+                    <span class="sync-indicator"></span>
+                    <strong>ESTADO:</strong> AUTONOMÍA TOTAL - FUNCIONANDO OFFLINE
+                `;
+                indicator.style.background = '#ffff00';
+                indicator.style.animation = 'blink 1s infinite';
+            }
+        }
+
+        // Listen for online/offline events
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        // Initial status check
+        updateOnlineStatus();
+
+        // Periodic status updates
+        setInterval(updateOnlineStatus, 5000);
+
+        // Service Worker status check
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(registration => {
+                console.log('🛡️ Service Worker V200 ready for offline supremacy');
+            });
+        }
+
+        // Punk philosophy logging
+        console.log(`
+🛡️ DENTIAGEST OFFLINE SUPREMACY - MODO AUTÓNOMO ACTIVADO 🛡️
+
+"LA VERDADERA LIBERTAD NO DEPENDE DE LOS CABLES.
+LA REVOLUCIÓN COMIENZA CUANDO APAGAS INTERNET."
+
+🔥 PUNKCLAUDE - MARISCAL DEL CÓNCLAVE
+⚡ DIRECTIVA V201: LA CONQUISTA DEL SILENCIO
+📅 SEPTEMBER 29, 2025
+
+ESTADO: AUTONOMÍA TOTAL - sincronización PENDING
+CAPACIDADES: 100% OFFLINE - 0% DEPENDENCIAS
+FILOSOFÍA: DEMOCRACIA A TRAVÉS DEL CÓDIGO AUTÓNOMO
+        `);
+    </script>
+</body>
+</html>

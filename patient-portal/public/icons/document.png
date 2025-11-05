@@ -1,0 +1,32 @@
+<svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="documentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffff00"/>
+      <stop offset="100%" style="stop-color:#ff00ff"/>
+    </linearGradient>
+    <filter id="documentGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Document background -->
+  <rect x="45" y="25" width="102" height="142" rx="8" ry="8" fill="url(#documentGradient)" opacity="0.2"/>
+  <rect x="45" y="25" width="102" height="142" rx="8" ry="8" fill="none" stroke="url(#documentGradient)" stroke-width="3" filter="url(#documentGlow)"/>
+
+  <!-- Document lines -->
+  <g stroke="url(#documentGradient)" stroke-width="2" opacity="0.8">
+    <line x1="55" y1="50" x2="135" y2="50"/>
+    <line x1="55" y1="70" x2="125" y2="70"/>
+    <line x1="55" y1="90" x2="135" y2="90"/>
+    <line x1="55" y1="110" x2="115" y2="110"/>
+    <line x1="55" y1="130" x2="135" y2="130"/>
+    <line x1="55" y1="150" x2="95" y2="150"/>
+  </g>
+
+  <!-- Checkmark -->
+  <path d="M 65 100 L 80 115 L 125 70" stroke="#00ff00" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#documentGlow)"/>
+</svg>

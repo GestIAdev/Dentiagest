@@ -1,0 +1,3 @@
+@echo off
+echo 🚀 Iniciando logs PM2 en tiempo real con colores...
+pm2 logs --raw %*

@@ -1,0 +1,62 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cyberGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ffff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ff00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00ff00;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="90" fill="url(#cyberGradient)" opacity="0.1"/>
+
+  <!-- Shield outline -->
+  <path d="M100 20 L160 50 L160 120 Q160 150 100 170 Q40 150 40 120 L40 50 Z"
+        fill="none"
+        stroke="url(#cyberGradient)"
+        stroke-width="3"
+        filter="url(#glow)"/>
+
+  <!-- Inner shield -->
+  <path d="M100 30 L150 55 L150 115 Q150 140 100 155 Q50 140 50 115 L50 55 Z"
+        fill="url(#cyberGradient)"
+        opacity="0.2"/>
+
+  <!-- Cyberpunk cross -->
+  <g transform="translate(100,100)">
+    <!-- Horizontal bar -->
+    <rect x="-25" y="-3" width="50" height="6" fill="url(#cyberGradient)" filter="url(#glow)"/>
+    <!-- Vertical bar -->
+    <rect x="-3" y="-25" width="6" height="50" fill="url(#cyberGradient)" filter="url(#glow)"/>
+  </g>
+
+  <!-- Circuit patterns -->
+  <g stroke="url(#cyberGradient)" stroke-width="1" opacity="0.6" fill="none">
+    <!-- Top circuit -->
+    <path d="M70 40 L90 40 L90 35 M110 40 L130 40 L130 35"/>
+    <!-- Bottom circuit -->
+    <path d="M70 160 L90 160 L90 165 M110 160 L130 160 L130 165"/>
+    <!-- Left circuit -->
+    <path d="M40 80 L35 80 L35 100 M40 120 L35 120 L35 140"/>
+    <!-- Right circuit -->
+    <path d="M160 80 L165 80 L165 100 M160 120 L165 120 L165 140"/>
+  </g>
+
+  <!-- Corner nodes -->
+  <circle cx="50" cy="50" r="3" fill="#00ffff" filter="url(#glow)"/>
+  <circle cx="150" cy="50" r="3" fill="#ff00ff" filter="url(#glow)"/>
+  <circle cx="50" cy="150" r="3" fill="#00ff00" filter="url(#glow)"/>
+  <circle cx="150" cy="150" r="3" fill="#ffff00" filter="url(#glow)"/>
+
+  <!-- Text -->
+  <text x="100" y="185" text-anchor="middle" font-family="monospace" font-size="10" fill="url(#cyberGradient)" filter="url(#glow)">
+    OFFLINE SUPREME
+  </text>
+</svg>
