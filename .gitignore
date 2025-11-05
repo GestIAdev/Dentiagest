@@ -37,6 +37,19 @@ docs/**/Private/
 **/Private/
 *.private.*
 
+# 🎭 CONFESIONES PUNK - NO SUBIR A GITHUB (PunkClaude Protection Final)
+# Auditorías, roadmaps, dev diaries - demasiado honest para público
+*.md
+!README.md
+!**/README.md
+AUDITORIA-*.md
+ROADMAP-*.md
+docs/**/*.md
+**/*DIARY*.md
+**/*AUDIT*.md
+**/*PLAN*.md
+**/*ESTRATEGICO*.md
+
 # 🕵️‍♂️ GENERIC FOLDER - ULTRASECRETO (Planes de dominación mundial)
 docs/Generic/
 docs/Generic/*
@@ -290,6 +303,61 @@ alembic/versions/*.py
 *_TEST*
 *.backup.*
 temp_refresh.txt
+
+# 🎸 AURA FORGE - Audio assets y outputs (FASE 6.0)
+# Samples de audio (GB de archivos)
+**/samples/
+**/audio/
+**/music/
+*.wav
+*.mp3
+*.ogg
+*.flac
+*.aif
+*.aiff
+*.m4a
+
+# Test outputs de generación musical
+test-output-*/
+test-output-*/**
+
+# 🔄 BACKUPS Y SNAPSHOTS (Limpieza profesional)
+# Snapshots antiguos (cientos de folders nested)
+snapshots/
+backups/
+**/snapshot*/
+**/backup*/
+*_snapshot_*
+*_backup_*
+
+# 📊 SCRIPTS TEMPORALES DE DEBUG
+# Scripts de análisis y debug temporal
+check_*.js
+check_*.cjs
+check-*.js
+check-*.cjs
+debug_*.js
+debug_*.cjs
+debug-*.js
+debug-*.cjs
+test_*.js
+test_*.cjs
+test-*.js
+test-*.cjs
+analyze_*.js
+analyze-*.js
+audit-*.js
+create_test_*.js
+demo-*.js
+checkpoint-*.js
+clean_*.js
+cleanup_*.json
+convert-*.js
+
+# Archivos de profiling
+*.cpuprofile
+*.heapsnapshot
+profiling/
 
 # Copias de trabajo durante desarrollo intensivo
 **/WeekViewSimple_*
