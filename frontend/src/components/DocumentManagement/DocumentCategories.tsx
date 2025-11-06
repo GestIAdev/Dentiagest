@@ -10,7 +10,7 @@
  */
 
 import React from 'react';
-import { useAuth } from '../../context/AuthContext.tsx';
+import { useAuth } from '../../context/AuthContext';
 // APOLLO NUCLEAR: Webpack bypass - local functions only
 import { 
   HeartIcon,

@@ -18,7 +18,7 @@ import { ALL_UNIFIED_TYPES, ALL_LEGACY_TYPES } from './EnumMappings';
 // ============================================================================
 // MAIN SERVICE
 // ============================================================================
-export { CentralMappingService, centralMappingService } from './CentralMappingService.ts';
+export { CentralMappingService, centralMappingService } from './CentralMappingService';
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -46,7 +46,7 @@ export type {
   
   // Audit & Logging
   MappingAuditEntry
-} from './MappingTypes.ts';
+} from './MappingTypes';
 
 // ============================================================================
 // MAPPING DATA
@@ -66,12 +66,12 @@ export {
   // Arrays for iteration
   ALL_UNIFIED_TYPES,
   ALL_LEGACY_TYPES
-} from './EnumMappings.ts';
+} from './EnumMappings';
 
 // ============================================================================
 // VALIDATORS
 // ============================================================================
-export { MappingValidators } from './MappingValidators.ts';
+export { MappingValidators } from './MappingValidators';
 
 // ============================================================================
 // PERFORMANCE MONITORING

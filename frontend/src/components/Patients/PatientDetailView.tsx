@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext.tsx';
-import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import { useAuth } from '../../context/AuthContext';
+import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 import {
   ArrowLeftIcon,
   PencilIcon,
@@ -38,7 +38,7 @@ const PatientDetailView: React.FC<PatientDetailProps> = ({ patient, onBack, onEd
   ];
 
   // DENTAL_SPECIFIC: Fetch patient appointments
-  const fetchAppointments = async () => {
+  const fetchAppointments = React.useCallback(async () => {
     if (activeTab !== 'appointments') return;
     
     setLoadingAppointments(true);
@@ -48,8 +48,8 @@ const PatientDetailView: React.FC<PatientDetailProps> = ({ patient, onBack, onEd
       // For now using core apollo.api.get() with query params
       const response = await apollo.api.get(`/api/v1/appointments?patient_id=${patient.id}`);
 
-      if (response.success && response.data) {
-        const data = response.data;
+      if (response) {
+        const data = response as any;
         setAppointments(data.appointments || []);
       }
     } catch (error) {
@@ -57,11 +57,11 @@ const PatientDetailView: React.FC<PatientDetailProps> = ({ patient, onBack, onEd
     } finally {
       setLoadingAppointments(false);
     }
-  };
+  }, [activeTab, patient.id]);
 
   useEffect(() => {
     fetchAppointments();
-  }, [activeTab]);
+  }, [fetchAppointments]);
 
   // PLATFORM_EXTRACTABLE: Calculate age utility
   const calculateAge = (dateOfBirth: string) => {

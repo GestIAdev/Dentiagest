@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext.tsx';
-import LegalTransparencyModule from '../Legal/LegalTransparencyModule.tsx';
+import { useAuth } from '../../context/AuthContext';
+import LegalTransparencyModule from '../Legal/LegalTransparencyModule';
 
 const DashboardLayout: React.FC = () => {
   const { state, logout } = useAuth();

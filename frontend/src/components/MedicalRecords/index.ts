@@ -16,25 +16,25 @@ export {
   useMedicalSecurity,
   useMedicalPermissions,
   SensitiveDataWarning 
-} from './MedicalSecurity.tsx';
+} from './MedicalSecurity';
 
 // Router y páginas (NUEVO)
-export { default as MedicalRouter } from './MedicalRouter.tsx';
+export { default as MedicalRouter } from './MedicalRouter';
 export {
   MedicalRecordsListPage,
   NewMedicalRecordPage,
   MedicalRecordDetailPage,
   EditMedicalRecordPage,
   PatientMedicalRecordsPage
-} from './MedicalPages.tsx';
+} from './MedicalPages';
 
 // Componente principal - contenedor
-export { default as MedicalRecordsContainer } from './MedicalRecordsContainer.tsx';
+export { default as MedicalRecordsContainer } from './MedicalRecordsContainer';
 
 // Componentes individuales
-export { default as MedicalRecordsList } from './MedicalRecordsList.tsx';
-export { default as MedicalRecordForm } from './MedicalRecordForm.tsx';
-export { default as MedicalRecordDetail } from './MedicalRecordDetail.tsx';
+export { default as MedicalRecordsList } from './MedicalRecordsList';
+export { default as MedicalRecordForm } from './MedicalRecordForm';
+export { default as MedicalRecordDetail } from './MedicalRecordDetail';
 
 // Exportación por defecto del router (CAMBIADO para la nueva arquitectura)
-export { default } from './MedicalRouter.tsx';
+export { default } from './MedicalRouter';

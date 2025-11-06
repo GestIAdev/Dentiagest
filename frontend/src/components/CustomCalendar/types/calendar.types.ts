@@ -14,7 +14,7 @@
  */
 
 // Import existing appointment type instead of redefining
-import { Appointment } from '../../../hooks/useAppointments.ts';
+import { Appointment } from '../../../hooks/useAppointments';
 
 export type CalendarView = 'month' | 'week' | 'day';
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { usePatients } from '../hooks/usePatients.ts';
+import { usePatients } from '../hooks/usePatients';
 import { XMarkIcon, CalendarIcon, ClockIcon, UserIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { useAppointments } from '../hooks/useAppointments.ts';
-import { useAuth } from '../context/AuthContext.tsx';
+import { useAppointments } from '../hooks/useAppointments';
+import { useAuth } from '../context/AuthContext';
 
 // 🏴‍☠️ AINARKALENDAR TIME SLOTS - FREEDOM EDITION
 const generateTimeSlots = (): Array<{value: string, display: string}> => {

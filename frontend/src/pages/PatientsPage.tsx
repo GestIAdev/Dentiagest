@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext.tsx';
-import apollo from '../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
-import PatientFormModal from '../components/Forms/PatientFormModal.tsx';
-import PatientDetailView from '../components/Patients/PatientDetailView.tsx';
+import { useAuth } from '../context/AuthContext';
+import apollo from '../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import PatientFormModal from '../components/Forms/PatientFormModal';
+import PatientDetailView from '../components/Patients/PatientDetailView';
 import {
   MagnifyingGlassIcon,
   UserPlusIcon,
@@ -75,14 +75,14 @@ const PatientsPage: React.FC = () => {
       // 🚀 APOLLO API - Get patients with pagination
       const response = await apollo.api.get(`/patients?${params}`);
 
-      if (response.success && response.data) {
-        const data: PaginatedResponse = response.data as any;
+      if (response) {
+        const data: PaginatedResponse = response as any;
         setPatients(data.items || []);  // ✅ Corregido: patients -> items
         setTotalPages(data.pages || 1);  // ✅ Corregido: total_pages -> pages
         setTotalPatients(data.total || 0);
         setCurrentPage(data.page || 1);
       } else {
-        console.error('Error fetching patients:', response.statusText);
+        console.error('Error fetching patients: Unknown error');
         setPatients([]); // Asegurar que patients es un array
       }
     } catch (error) {
@@ -128,10 +128,10 @@ const PatientsPage: React.FC = () => {
       // 🚀 APOLLO API - Delete patient
       const response = await apollo.api.delete(`/patients/${patientId}`);
 
-      if (response.success) {
+      if (response) {
         fetchPatients(currentPage, searchQuery);
       } else {
-        console.error('❌ Apollo API - Error deleting patient:', response.error);
+        console.error('❌ Apollo API - Error deleting patient: Unknown error');
       }
     } catch (error) {
       console.error('❌ Apollo API - Error deleting patient:', error);

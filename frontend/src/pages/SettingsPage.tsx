@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import MFASetupPage from './MFASetupPage.tsx';
+import MFASetupPage from './MFASetupPage';
 
 const SettingsPage: React.FC = () => {
   const [activeSection, setActiveSection] = useState('security');

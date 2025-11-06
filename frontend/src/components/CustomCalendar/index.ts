@@ -9,19 +9,19 @@
  */
 
 // Main calendar container (recommended for most use cases)
-export { CalendarContainer as default } from './CalendarContainerSimple.tsx';
-export { CalendarContainer } from './CalendarContainerSimple.tsx';
+export { CalendarContainer as default } from './CalendarContainerSimple';
+export { CalendarContainer } from './CalendarContainerSimple';
 
 // Individual view components (for custom implementations)
-export { WeekViewSimple } from './WeekViewSimple.tsx';
-export { DayViewSimple } from './DayViewSimple.tsx';
+export { WeekViewSimple } from './WeekViewSimple';
+export { DayViewSimple } from './DayViewSimple';
 
 // Drag & Drop components (Phase 2.5)
-export { AppointmentCard } from './AppointmentCard.tsx';
-export { DroppableTimeSlot } from './DroppableTimeSlot.tsx';
+export { AppointmentCard } from './AppointmentCard';
+export { DroppableTimeSlot } from './DroppableTimeSlot';
 
 // Hooks for state management
-export { useCalendarState } from './hooks/useCalendarStateSimple.ts';
+export { useCalendarState } from './hooks/useCalendarStateSimple';
 
 // Utilities and mock data
 export { 
@@ -31,8 +31,8 @@ export {
   hasTimeConflict,
   getAvailableSlots,
   getDailyStats 
-} from './utils/mockAppointments.ts';
+} from './utils/mockAppointments';
 
 // Types for TypeScript users
-export type { CalendarView } from './hooks/useCalendarStateSimple.ts';
-export type { AppointmentData } from './AppointmentCard.tsx';
+export type { CalendarView } from './hooks/useCalendarStateSimple';
+export type { AppointmentData } from './AppointmentCard';

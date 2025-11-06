@@ -146,7 +146,8 @@ class DocumentsApiService {
    */
   public getDownloadUrl(documentId: string, version: 'v1' | 'v2' = 'v1'): string {
     const endpoint = apolloApi.replaceUrlParams(API_ENDPOINTS.DOCUMENTS.DOWNLOAD, { id: documentId });
-    return `http://localhost:8002/api/${version}${endpoint}`;
+    const apiInfo = apolloApi.getApiInfo();
+    return `${apiInfo.baseUrl}/api/${version}${endpoint}`; // 🔥 USE DYNAMIC CONFIG
   }
 
   /**

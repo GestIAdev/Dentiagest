@@ -1,13 +1,13 @@
 /**
  * 🏥 DENTIAGEST CALimport { useState, useEffect, useMemo } from 'react';
-import { CalendarView, CalendarState, CalendarDay } from '../types/calendar.types.ts';
-import { Appointment, useAppointments } from '../../../hooks/useAppointments.ts';
+import { CalendarView, CalendarState, CalendarDay } from '../types/calendar.types';
+import { Appointment, useAppointments } from '../../../hooks/useAppointments';
 import { 
   generateDayTimeSlots, 
   calculateAppointmentSlots,
   getWeekDates,
   getMonthDates 
-} from 'components/CustomCalendar/utils/timeCalculations.ts';
+} from 'components/CustomCalendar/utils/timeCalculations';
 import { format, isSameDay } from 'date-fns';E HOOK
  * 
  * Purpose: Main state management for custom calendar

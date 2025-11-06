@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { usePatients } from '../hooks/usePatients.ts';
+import { usePatients } from '../hooks/usePatients';
 import { XMarkIcon, CalendarIcon, ClockIcon, UserIcon, MagnifyingGlassIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { useAppointments } from '../hooks/useAppointments.ts';
-import { parseClinicDateTime } from '../utils/timezone.ts'; // 🌍 TIMEZONE SOLUTION!
-import { useAuth } from '../context/AuthContext.tsx'; // 🔐 AUTH SOLUTION!
+import { useAppointments } from '../hooks/useAppointments';
+import { parseClinicDateTime } from '../utils/timezone'; // 🌍 TIMEZONE SOLUTION!
+import { useAuth } from '../context/AuthContext'; // 🔐 AUTH SOLUTION!
 
 // 🏴‍☠️ AINARKALENDAR TIME SLOTS - FREEDOM EDITION
 const generateTimeSlots = (): Array<{value: string, display: string}> => {

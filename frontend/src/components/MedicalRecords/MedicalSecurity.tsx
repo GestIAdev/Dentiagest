@@ -11,7 +11,7 @@
  */
 
 import React, { createContext, useContext } from 'react';
-import { useAuth } from '../../context/AuthContext.tsx';
+import { useAuth } from '../../context/AuthContext';
 import { 
   ShieldExclamationIcon,
   LockClosedIcon,

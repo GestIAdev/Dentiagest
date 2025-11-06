@@ -16,8 +16,8 @@
  */
 
 import { addMinutes, setHours, setMinutes } from 'date-fns';
-import { AppointmentData } from '../AppointmentCard.tsx';
-import { parseClinicDateTime } from '../../../utils/timezone.ts'; // 🌍 TIMEZONE SOLUTION!
+import { AppointmentData } from '../AppointmentCard';
+import { parseClinicDateTime } from '../../../utils/timezone'; // 🌍 TIMEZONE SOLUTION!
 
 /**
  * Generate mock appointments for testing
@@ -35,7 +35,7 @@ export function generateMockAppointments(baseDate: Date): AppointmentData[] {
     startMinute: number,
     duration: number,
     type: AppointmentData['type'],
-    status: AppointmentData['status'] = 'confirmada',
+    status: AppointmentData['status'] = 'confirmed',
     priority: AppointmentData['priority'] = 'normal',
     notes?: string,
     doctorName?: string,
@@ -67,27 +67,27 @@ export function generateMockAppointments(baseDate: Date): AppointmentData[] {
 
   // 🌅 MORNING APPOINTMENTS (8:00 - 12:00)
   appointments.push(
-    createAppointment('apt001', 'María García López', 8, 0, 30, 'consulta', 'confirmada', 'normal', 'Revisión rutinaria', 'Martínez', 'CON001', 45),
-    createAppointment('apt002', 'Carlos Rodríguez Ruiz', 8, 45, 60, 'limpieza', 'confirmada', 'normal', 'Limpieza + fluorización', 'Sánchez', 'LIM002', 75),
-    createAppointment('apt003', 'Ana Martínez Sánchez', 9, 30, 45, 'consulta', 'pendiente', 'alta', 'Dolor muela del juicio', 'Martínez', 'CON003', 60),
-    createAppointment('apt004', 'Pedro Fernández Díaz', 10, 30, 90, 'tratamiento', 'confirmada', 'normal', 'Endodoncia molar', 'López', 'TRT004', 280),
-    createAppointment('apt005', 'Laura Jiménez Torres', 11, 45, 30, 'consulta', 'confirmada', 'normal', 'Revisión post-tratamiento', 'Martínez', 'CON005', 35)
+    createAppointment('apt001', 'María García López', 8, 0, 30, 'consultation', 'confirmed', 'normal', 'Revisión rutinaria', 'Martínez', 'CON001', 45),
+    createAppointment('apt002', 'Carlos Rodríguez Ruiz', 8, 45, 60, 'cleaning', 'confirmed', 'normal', 'Limpieza + fluorización', 'Sánchez', 'LIM002', 75),
+    createAppointment('apt003', 'Ana Martínez Sánchez', 9, 30, 45, 'consultation', 'pending', 'high', 'Dolor muela del juicio', 'Martínez', 'CON003', 60),
+    createAppointment('apt004', 'Pedro Fernández Díaz', 10, 30, 90, 'treatment', 'confirmed', 'normal', 'Endodoncia molar', 'López', 'TRT004', 280),
+    createAppointment('apt005', 'Laura Jiménez Torres', 11, 45, 30, 'consultation', 'confirmed', 'normal', 'Revisión post-tratamiento', 'Martínez', 'CON005', 35)
   );
 
   // 🌞 AFTERNOON APPOINTMENTS (14:00 - 18:00)  
   appointments.push(
-    createAppointment('apt006', 'José Luis Gómez', 14, 0, 45, 'limpieza', 'confirmada', 'normal', 'Limpieza profesional', 'Sánchez', 'LIM006', 65),
-    createAppointment('apt007', 'Elena Ruiz Morales', 15, 0, 120, 'tratamiento', 'confirmada', 'alta', 'Implante dental + cirugía', 'López', 'TRT007', 850),
-    createAppointment('apt008', 'Manuel Torres Vega', 16, 15, 30, 'emergencia', 'pendiente', 'urgente', '🚨 Dolor agudo - URGENTE', 'Martínez', 'EMR008', 90),
-    createAppointment('apt009', 'Carmen López Silva', 17, 0, 60, 'tratamiento', 'confirmada', 'normal', 'Blanqueamiento dental', 'Sánchez', 'TRT009', 320),
-    createAppointment('apt010', 'Ricardo Moreno Paz', 17, 30, 30, 'consulta', 'completada', 'normal', 'Entrega de prótesis', 'López', 'CON010', 1200)
+    createAppointment('apt006', 'José Luis Gómez', 14, 0, 45, 'cleaning', 'confirmed', 'normal', 'Limpieza profesional', 'Sánchez', 'LIM006', 65),
+    createAppointment('apt007', 'Elena Ruiz Morales', 15, 0, 120, 'treatment', 'confirmed', 'high', 'Implante dental + cirugía', 'López', 'TRT007', 850),
+    createAppointment('apt008', 'Manuel Torres Vega', 16, 15, 30, 'emergency', 'pending', 'urgent', '🚨 Dolor agudo - URGENTE', 'Martínez', 'EMR008', 90),
+    createAppointment('apt009', 'Carmen López Silva', 17, 0, 60, 'treatment', 'confirmed', 'normal', 'Blanqueamiento dental', 'Sánchez', 'TRT009', 320),
+    createAppointment('apt010', 'Ricardo Moreno Paz', 17, 30, 30, 'consultation', 'completed', 'normal', 'Entrega de prótesis', 'López', 'CON010', 1200)
   );
 
   // 🌆 EVENING APPOINTMENTS (18:30 - 20:00)
   appointments.push(
-    createAppointment('apt011', 'Sofía Herrera Ramos', 18, 30, 45, 'consulta', 'confirmada', 'normal', 'Primera visita - ortodóncia', 'Martínez', 'CON011', 85),
-    createAppointment('apt012', 'Diego Vargas Castro', 19, 15, 30, 'consulta', 'pendiente', 'normal', 'Revisión brackets', 'López', 'CON012', 40),
-    createAppointment('apt013', 'Valentina Cruz Mendoza', 19, 45, 15, 'emergencia', 'cancelada', 'normal', 'Cancelada por paciente', 'Sánchez', 'EMR013', 0)
+    createAppointment('apt011', 'Sofía Herrera Ramos', 18, 30, 45, 'consultation', 'confirmed', 'normal', 'Primera visita - ortodóncia', 'Martínez', 'CON011', 85),
+    createAppointment('apt012', 'Diego Vargas Castro', 19, 15, 30, 'consultation', 'pending', 'normal', 'Revisión brackets', 'López', 'CON012', 40),
+    createAppointment('apt013', 'Valentina Cruz Mendoza', 19, 45, 15, 'emergency', 'cancelled', 'normal', 'Cancelada por paciente', 'Sánchez', 'EMR013', 0)
   );
 
   return appointments;
@@ -247,26 +247,26 @@ export function getAvailableSlots(
 
 // 🎨 APPOINTMENT TYPE STATS FOR DASHBOARD
 export const APPOINTMENT_STATS = {
-  consulta: { count: 6, duration: 30, color: 'green' },
-  limpieza: { count: 3, duration: 50, color: 'blue' },
-  tratamiento: { count: 3, duration: 90, color: 'orange' },
-  emergencia: { count: 3, duration: 25, color: 'red' }
+  consultation: { count: 6, duration: 30, color: 'green' },
+  cleaning: { count: 3, duration: 50, color: 'blue' },
+  treatment: { count: 3, duration: 90, color: 'orange' },
+  emergency: { count: 3, duration: 25, color: 'red' }
 };
 
 // 📊 DAILY SCHEDULE SUMMARY
 export function getDailyStats(appointments: AppointmentData[]) {
   const stats = {
     total: appointments.length,
-    confirmed: appointments.filter(a => a.status === 'confirmada').length,
-    pending: appointments.filter(a => a.status === 'pendiente').length,
-    completed: appointments.filter(a => a.status === 'completada').length,
-    cancelled: appointments.filter(a => a.status === 'cancelada').length,
+    confirmed: appointments.filter(a => a.status === 'confirmed').length,
+    pending: appointments.filter(a => a.status === 'pending').length,
+    completed: appointments.filter(a => a.status === 'completed').length,
+    cancelled: appointments.filter(a => a.status === 'cancelled').length,
     totalDuration: appointments.reduce((sum, a) => sum + a.duration, 0),
     byType: {
-      consulta: appointments.filter(a => a.type === 'consulta').length,
-      limpieza: appointments.filter(a => a.type === 'limpieza').length,
-      tratamiento: appointments.filter(a => a.type === 'tratamiento').length,
-      emergencia: appointments.filter(a => a.type === 'emergencia').length,
+      consultation: appointments.filter(a => a.type === 'consultation').length,
+      cleaning: appointments.filter(a => a.type === 'cleaning').length,
+      treatment: appointments.filter(a => a.type === 'treatment').length,
+      emergency: appointments.filter(a => a.type === 'emergency').length,
     }
   };
 

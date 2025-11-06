@@ -1,385 +1,221 @@
-// 🔥 APOLLO NUCLEAR GRAPHQL QUERIES - PATIENTS
-// Date: September 22, 2025
+﻿//  APOLLO NUCLEAR GRAPHQL QUERIES - PATIENTS (ALIGNED WITH SELENE SCHEMA)
+// Date: 2025-11-06
 // Mission: GraphQL Queries for Patient Management
-// Target: PatientManagement Component Integration
+//  ALINEADO 100% CON SCHEMA REAL DE SELENE - NO FIELDS THAT DON'T EXIST
 
 import { gql } from '@apollo/client';
 
 // ============================================================================
-// PATIENT QUERIES
+// PATIENT QUERIES (SCHEMA REAL)
 // ============================================================================
 
-// 🎯 GET PATIENTS - Main patient listing query
+//  GET PATIENTS - Main patient listing query
 export const GET_PATIENTS = gql`
-  query GetPatients(
-    $filters: PatientSearchFilters
-  ) {
-    patients(filters: $filters) {
-      items {
-        id
-        firstName
-        lastName
-        fullName
-        email
-        phone
-        phoneSecondary
-        dateOfBirth
-        age
-        gender
-        addressStreet
-        addressCity
-        addressState
-        addressPostalCode
-        addressCountry
-        fullAddress
-        emergencyContactName
-        emergencyContactPhone
-        emergencyContactRelationship
-        medicalConditions
-        medicationsCurrent
-        allergies
-        anxietyLevel
-        specialNeeds
-        insuranceProvider
-        insurancePolicyNumber
-        insuranceGroupNumber
-        insuranceStatus
-        consentToTreatment
-        consentToContact
-        preferredContactMethod
-        notes
-        isActive
-        createdAt
-        updatedAt
-        hasInsurance
-        requiresSpecialCare
-        
-        # ⚡ VERITAS FIELDS - Quantum Truth Verification
-        policyNumber_veritas {
-          verified
-          confidence
-          level
-          certificate
-          error
-          verifiedAt
-          algorithm
-        }
-        medicalHistory_veritas {
-          verified
-          confidence
-          level
-          certificate
-          error
-          verifiedAt
-          algorithm
-        }
-      }
-      total
-      page
-      size
-      pages
-      hasNext
-      hasPrev
+  query GetPatients($limit: Int, $offset: Int) {
+    patients(limit: $limit, offset: $offset) {
+      id
+      name
+      firstName
+      lastName
+      email
+      phone
+      dateOfBirth
+      address
+      emergencyContact
+      insuranceProvider
+      policyNumber
+      createdAt
+      updatedAt
     }
   }
 `;
 
-// 🎯 GET PATIENT - Single patient query
+//  GET PATIENT - Single patient query
 export const GET_PATIENT = gql`
-  query GetPatient($id: UUID!) {
+  query GetPatient($id: ID!) {
     patient(id: $id) {
       id
       firstName
       lastName
-      fullName
       email
       phone
-      phoneSecondary
       dateOfBirth
-      age
-      gender
-      addressStreet
-      addressCity
-      addressState
-      addressPostalCode
-      addressCountry
-      fullAddress
-      emergencyContactName
-      emergencyContactPhone
-      emergencyContactRelationship
-      medicalConditions
-      medicationsCurrent
-      allergies
-      anxietyLevel
-      specialNeeds
+      address
+      emergencyContact
       insuranceProvider
-      insurancePolicyNumber
-      insuranceGroupNumber
-        insuranceStatus
-      consentToTreatment
-      consentToContact
-      preferredContactMethod
-      notes
-      isActive
+      policyNumber
+      medicalHistory
+      billingStatus
       createdAt
       updatedAt
-      hasInsurance
-      requiresSpecialCare
-
-      # ⚡ VERITAS FIELDS - Quantum Truth Verification
-      policyNumber_veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
-      medicalHistory_veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
-
-      # Relations
-      appointments {
-        id
-        scheduledDate
-        appointmentType
-        status
-        priority
-        title
-        dentistName
-      }
     }
   }
 `;
 
-// 🎯 GET PATIENT MEDICAL HISTORY - Detailed medical info
-export const GET_PATIENT_MEDICAL_HISTORY = gql`
-  query GetPatientMedicalHistory($patientId: UUID!) {
-    patientMedicalHistory(patientId: $patientId) {
-      patientId
-      basicInfo {
-        name
-        dateOfBirth
-        age
-        gender
-        bloodType
-      }
-      medicalConditions
-      currentMedications
-      allergies
-      emergencyContact {
-        name
-        phone
-        relationship
-      }
-      dentalSpecific {
-        previousDentist
-        anxietyLevel
-        insuranceInfo
-        insuranceStatus
-      }
-      consentStatus {
-        treatment
-        marketing
-        dataSharing
-      }
-      preferences {
-        appointmentTime
-        communication
-      }
-    }
-  }
-`;
-
-// 🎯 PATIENT SEARCH SUGGESTIONS - Autocomplete for forms
-export const GET_PATIENT_SEARCH_SUGGESTIONS = gql`
-  query GetPatientSearchSuggestions($query: String!, $limit: Int) {
-    patientSearchSuggestions(query: $query, limit: $limit) {
+//  SEARCH PATIENTS - Autocomplete search
+export const SEARCH_PATIENTS = gql`
+  query SearchPatients($query: String!) {
+    searchPatients(query: $query) {
       id
-      name
+      firstName
+      lastName
       email
       phone
-      type
     }
   }
 `;
 
 // ============================================================================
-// PATIENT MUTATIONS
+// PATIENT MUTATIONS (SCHEMA REAL)
 // ============================================================================
 
-// 🎯 CREATE PATIENT - Add new patient
+//  CREATE PATIENT - Add new patient
 export const CREATE_PATIENT = gql`
-  mutation CreatePatient($input: PatientCreateInput!) {
+  mutation CreatePatient($input: PatientInput!) {
     createPatient(input: $input) {
       id
       firstName
       lastName
-      fullName
       email
       phone
-      phoneSecondary
       dateOfBirth
-      age
-      gender
-      addressStreet
-      addressCity
-      addressState
-      addressPostalCode
-      addressCountry
-      emergencyContactName
-      emergencyContactPhone
-      emergencyContactRelationship
-      medicalConditions
-      medicationsCurrent
-      allergies
-      anxietyLevel
-      specialNeeds
+      address
+      emergencyContact
       insuranceProvider
-      insurancePolicyNumber
-      insuranceGroupNumber
-      consentToTreatment
-      consentToContact
-      preferredContactMethod
-      notes
-      isActive
+      policyNumber
       createdAt
-      updatedAt
-      hasInsurance
-      requiresSpecialCare
-      
-      # ⚡ VERITAS FIELDS - Quantum Truth Verification
-      policyNumber_veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
-      medicalHistory_veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
     }
   }
 `;
 
-// 🎯 UPDATE PATIENT - Modify existing patient
+//  UPDATE PATIENT - Modify existing patient
 export const UPDATE_PATIENT = gql`
-  mutation UpdatePatient($id: UUID!, $input: PatientUpdateInput!) {
+  mutation UpdatePatient($id: ID!, $input: UpdatePatientInput!) {
     updatePatient(id: $id, input: $input) {
       id
       firstName
       lastName
-      fullName
       email
       phone
-      phoneSecondary
       dateOfBirth
-      age
-      gender
-      addressStreet
-      addressCity
-      addressState
-      addressPostalCode
-      addressCountry
-      emergencyContactName
-      emergencyContactPhone
-      emergencyContactRelationship
-      medicalConditions
-      medicationsCurrent
-      allergies
-      anxietyLevel
-      specialNeeds
+      address
+      emergencyContact
       insuranceProvider
-      insurancePolicyNumber
-      insuranceGroupNumber
-      consentToTreatment
-      consentToContact
-      preferredContactMethod
-      notes
-      isActive
+      policyNumber
+      medicalHistory
+      billingStatus
       updatedAt
-      hasInsurance
-      requiresSpecialCare
-      
-      # ⚡ VERITAS FIELDS - Quantum Truth Verification
-      policyNumber_veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
-      medicalHistory_veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
     }
   }
 `;
 
-// 🎯 DELETE PATIENT - Soft delete patient
+//  DELETE PATIENT - Remove patient
 export const DELETE_PATIENT = gql`
-  mutation DeletePatient($id: UUID!) {
+  mutation DeletePatient($id: ID!) {
     deletePatient(id: $id)
   }
 `;
 
-// 🎯 ACTIVATE PATIENT - Enable patient for appointments
-export const ACTIVATE_PATIENT = gql`
-  mutation ActivatePatient($id: UUID!) {
-    activatePatient(id: $id) {
-      id
-      isActive
-      updatedAt
-    }
-  }
-`;
+// ============================================================================
+// TYPESCRIPT TYPES (ALIGNED WITH SELENE SCHEMA)
+// ============================================================================
 
-// 🎯 DEACTIVATE PATIENT - Disable patient appointments
-export const DEACTIVATE_PATIENT = gql`
-  mutation DeactivatePatient($id: UUID!) {
-    deactivatePatient(id: $id) {
-      id
-      isActive
-      updatedAt
-    }
-  }
-`;
+export interface Patient {
+  id: string;
+  name?: string; // 🔥 Added: Combined name from apollo_patients view
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  dateOfBirth?: string;
+  address?: string;
+  emergencyContact?: string;
+  insuranceProvider?: string;
+  policyNumber?: string;
+  medicalHistory?: string;
+  billingStatus?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
-// 🎯 UPDATE PATIENT INSURANCE - Update insurance info
-export const UPDATE_PATIENT_INSURANCE = gql`
-  mutation UpdatePatientInsurance($id: UUID!, $insuranceData: JSON!) {
-    updatePatientInsurance(id: $id, insuranceData: $insuranceData) {
-      id
-      insuranceProvider
-      insurancePolicyNumber
-      insuranceGroupNumber
-      insuranceStatus
-      updatedAt
-    }
-  }
-`;
+export interface PatientInput {
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  dateOfBirth?: string;
+  address?: string;
+  emergencyContact?: string;
+  insuranceProvider?: string;
+  policyNumber?: string;
+}
+
+export interface UpdatePatientInput {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  dateOfBirth?: string;
+  address?: string;
+  emergencyContact?: string;
+  insuranceProvider?: string;
+  policyNumber?: string;
+  medicalHistory?: string;
+  billingStatus?: string;
+}
+
+export interface GetPatientsData {
+  patients: Patient[];
+}
+
+export interface GetPatientsVariables {
+  limit?: number;
+  offset?: number;
+}
+
+export interface GetPatientData {
+  patient: Patient;
+}
+
+export interface GetPatientVariables {
+  id: string;
+}
+
+export interface SearchPatientsData {
+  searchPatients: Array<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    email?: string;
+    phone?: string;
+  }>;
+}
+
+export interface SearchPatientsVariables {
+  query: string;
+}
+
+export interface CreatePatientData {
+  createPatient: Patient;
+}
+
+export interface CreatePatientVariables {
+  input: PatientInput;
+}
+
+export interface UpdatePatientData {
+  updatePatient: Patient;
+}
+
+export interface UpdatePatientVariables {
+  id: string;
+  input: UpdatePatientInput;
+}
+
+export interface DeletePatientData {
+  deletePatient: boolean;
+}
+
+export interface DeletePatientVariables {
+  id: string;
+}

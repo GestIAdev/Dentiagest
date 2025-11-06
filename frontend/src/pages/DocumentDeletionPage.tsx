@@ -13,9 +13,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext.tsx';
-import apollo from '../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
-import { DeletionRequestsDashboard } from '../components/DocumentManagement/DeleteDocumentButton.tsx';
+import { useAuth } from '../context/AuthContext';
+import apollo from '../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import { DeletionRequestsDashboard } from '../components/DocumentManagement/DeleteDocumentButton';
 import {
   TrashIcon,
   ShieldCheckIcon,

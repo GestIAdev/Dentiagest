@@ -10,8 +10,8 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../../context/AuthContext.tsx';
-import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import { useAuth } from '../../context/AuthContext';
+import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 import { 
   UserIcon,
   ChevronDownIcon,
@@ -59,10 +59,6 @@ export const PatientSelector: React.FC<PatientSelectorProps> = ({
           setPatients(data);
         } else if (data.items && Array.isArray(data.items)) {
           setPatients(data.items);
-        } else if (data.patients && Array.isArray(data.patients)) {
-          setPatients(data.patients);
-        } else if (data.data && Array.isArray(data.data)) {
-          setPatients(data.data);
         } else {
           console.warn('⚠️ Unexpected API response format:', data);
           setPatients([]);

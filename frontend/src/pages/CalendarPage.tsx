@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 // 🔍 TEMP DEBUG: Cambiando a named imports para detectar el problema
-import { default as CreateAppointmentModal } from '../components/CreateAppointmentModal.tsx';
-import { default as EditAppointmentModal } from '../components/EditAppointmentModal.tsx';
-import { useAppointments } from '../hooks/useAppointments.ts';
-import { useAuth } from '../context/AuthContext.tsx';
-import { usePatients } from '../hooks/usePatients.ts';
-import { formatLocalDateTime } from '../utils/timezone.ts';
+import { default as CreateAppointmentModal } from '../components/CreateAppointmentModal';
+import { default as EditAppointmentModal } from '../components/EditAppointmentModal';
+import { useAppointments } from '../hooks/useAppointments';
+import { useAuth } from '../context/AuthContext';
+import { usePatients } from '../hooks/usePatients';
+import { formatLocalDateTime } from '../utils/timezone';
 
 // 🏥 DENTIAGEST CUSTOM CALENDAR IMPORT - NOW THE ONLY CALENDAR!
-import CalendarContainer from '../components/CustomCalendar/CalendarContainerSimple.tsx';
+import CalendarContainer from '../components/CustomCalendar/CalendarContainerSimple';
 import '../components/CustomCalendar/styles/calendar.module.css';
 
 // 🎨 COLORES DE ESTADO PROFESIONALES

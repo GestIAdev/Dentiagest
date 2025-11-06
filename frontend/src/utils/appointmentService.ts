@@ -17,7 +17,7 @@
  * @author Punk Claude & Platform Gestia Developer
  */
 
-import apollo from '../apollo.ts';
+import apollo from '../apollo';
 
 interface AppointmentUpdateData {
   scheduled_date?: string; // ISO format datetime
@@ -175,10 +175,14 @@ export async function bulkUpdateAppointments(
   }
 }
 
-export default {
+// Named aggregate export to avoid anonymous default export (ESLint: import/no-anonymous-default-export)
+export const appointmentService = {
   updateAppointment,
   updateAppointmentTime,
   bulkUpdateAppointments,
   formatDateTimeForBackend,
   calculateNewAppointmentTime,
 };
+
+// Note: individual functions are already exported by name above; consumers may import the specific functions
+// or the aggregated `appointmentService` object.

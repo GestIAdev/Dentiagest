@@ -1,6 +1,5 @@
 // Export all utilities for easy importing
 export { logger, LogLevel, CyberpunkLogger, createModuleLogger, PerformanceMonitor } from './logger';
-export { DebugUtils } from './debugUtils';
 export { CLINIC_TIMEZONE, SUPPORTED_TIMEZONES, formatLocalDateTime, parseClinicDateTime, getUserTimezone, checkTimezoneWarning } from './timezone';
 export { DocumentLogger } from './documentLogger';
 export { AIErrorHandler } from './aiErrorHandler';

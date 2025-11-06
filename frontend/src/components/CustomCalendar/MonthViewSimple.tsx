@@ -1,6 +1,6 @@
 import React from 'react';
 import { format } from 'date-fns';
-import { parseClinicDateTime } from '../../utils/timezone.ts';
+import { parseClinicDateTime } from '../../utils/timezone';
 
 interface MonthViewSimpleProps {
   currentDate: Date;

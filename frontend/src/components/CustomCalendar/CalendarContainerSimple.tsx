@@ -7,12 +7,12 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { useAuth } from '../../context/AuthContext.tsx'; // 🔒 SECURITY INTEGRATION!
-import { useCalendarState } from './hooks/useCalendarStateSimple.ts';
-import { WeekViewSimple } from './WeekViewSimple.tsx';
-import { DayViewSimple } from './DayViewSimple.tsx';
-import MonthViewSimple from './MonthViewSimple.tsx';
-import { parseClinicDateTime } from '../../utils/timezone.ts'; // 🌍 TIMEZONE SOLUTION!
+import { useAuth } from '../../context/AuthContext'; // 🔒 SECURITY INTEGRATION!
+import { useCalendarState } from './hooks/useCalendarStateSimple';
+import { WeekViewSimple } from './WeekViewSimple';
+import { DayViewSimple } from './DayViewSimple';
+import MonthViewSimple from './MonthViewSimple';
+import { parseClinicDateTime } from '../../utils/timezone'; // 🌍 TIMEZONE SOLUTION!
 
 interface CalendarProps {
   view?: 'month' | 'week' | 'day';

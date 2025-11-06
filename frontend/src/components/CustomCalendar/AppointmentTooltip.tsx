@@ -28,7 +28,7 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { AppointmentData } from './AppointmentCard.tsx';
+import { AppointmentData } from './AppointmentCard';
 
 interface AppointmentTooltipProps {
   appointment: AppointmentData;
@@ -237,7 +237,7 @@ export function AppointmentTooltip({
         >
           📅 Reprogramar
         </button>
-        {appointment.status === 'confirmada' && (
+        {appointment.status === 'confirmed' && (
           <button
             onClick={() => handleQuickAction('complete')}
             className="flex-1 px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"

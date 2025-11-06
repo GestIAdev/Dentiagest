@@ -19,6 +19,7 @@
     "date-fns": "^2.30.0",
     "framer-motion": "^10.16.16",
     "graphql": "^16.12.0",
+    "graphql-ws": "^6.0.6",
     "postcss": "^8.4.32",
     "react": "^18.2.0",
     "react-calendar": "^4.7.0",
@@ -56,5 +57,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:8002"
+  "proxy": "http://localhost:8005"
 }

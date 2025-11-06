@@ -9,10 +9,10 @@
  * - RestaurantGest: Formulario de pedido
  */
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext.tsx';
-import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK CAN'T STOP US!
-import { usePatients, Patient } from '../../hooks/usePatients.ts';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK CAN'T STOP US!
+import { usePatients, Patient } from '../../hooks/usePatients';
 import { 
   XMarkIcon,
   DocumentPlusIcon,
@@ -143,27 +143,10 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
     if (isOpen && patients.length === 0) {
       fetchAllPatients();
     }
-  }, [isOpen]);
+  }, [isOpen, patients.length, fetchAllPatients]);
 
   // Cargar medical record después de cargar pacientes
-  useEffect(() => {
-    if (isOpen && recordId && patients.length > 0) {
-      fetchMedicalRecord();
-    }
-  }, [isOpen, recordId, patients.length]);
-
-  // Actualizar patientSearch cuando se carga el record en modo edición
-  useEffect(() => {
-    if (recordId && formData.patient_id && patients.length > 0) {
-      const patient = patients.find(p => p.id === formData.patient_id);
-      if (patient) {
-        setPatientSearch(`${patient.first_name} ${patient.last_name}`);
-      }
-    }
-  }, [recordId, formData.patient_id, patients]);
-
-  // Función para obtener historial médico existente
-  const fetchMedicalRecord = async () => {
+  const fetchMedicalRecord = useCallback(async () => {
     if (!recordId) return;
 
     try {
@@ -174,8 +157,8 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
       // Benefits: V1/V2 switching, error handling, performance monitoring
       const response = await apollo.medicalRecords.getById(recordId);
 
-      if (response.success && response.data) {
-        const record = response.data as any;
+      if (response) {
+        const record = response as any;
         setFormData({
           patient_id: record.patient_id,
           visit_date: record.visit_date.split('T')[0],
@@ -200,7 +183,25 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [recordId]);
+
+  useEffect(() => {
+    if (isOpen && recordId && patients.length > 0) {
+      fetchMedicalRecord();
+    }
+  }, [isOpen, recordId, patients.length, fetchMedicalRecord]);
+
+  // Actualizar patientSearch cuando se carga el record en modo edición
+  useEffect(() => {
+    if (recordId && formData.patient_id && patients.length > 0) {
+      const patient = patients.find(p => p.id === formData.patient_id);
+      if (patient) {
+        setPatientSearch(`${patient.first_name} ${patient.last_name}`);
+      }
+    }
+  }, [recordId, formData.patient_id, patients]);
+
+  
 
   // Función para validar formulario
   const validateForm = (): boolean => {
@@ -286,28 +287,13 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
         ? await apollo.medicalRecords.update(recordId, requestBody as any)
         : await apollo.medicalRecords.create(requestBody as any);
 
-      if (response.success) {
+      if (response) {
         onSave();
         onClose();
         resetForm();
       } else {
-        console.error('❌ Error saving medical record:', response.error);
+        console.error('❌ Error saving medical record: Unknown error');
         console.error('❌ Submitted data was:', submitData);
-        
-        // Apollo response format - using response.error instead of response.json()
-        const errorData = response.error || {} as any;
-        
-        // Manejar errores de validación del servidor
-        if (errorData.detail && Array.isArray(errorData.detail)) {
-          const serverErrors: Record<string, string> = {};
-          errorData.detail.forEach((error: any) => {
-            if (error.loc && error.loc.length > 0) {
-              const field = error.loc[error.loc.length - 1];
-              serverErrors[field] = error.msg;
-            }
-          });
-          setErrors(serverErrors);
-        }
       }
     } catch (error) {
       console.error('Error saving medical record:', error);

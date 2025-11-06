@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import apollo from '../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import { apolloClient } from '../graphql/client';
+import { GET_ME_QUERY } from '../graphql/queries/auth';
+import apollo from '../apollo'; // Para autenticación REST
 
 // Tipos según documentación del backend
 interface User {
@@ -17,14 +19,12 @@ interface AuthState {
   isLoading: boolean;
   user: User | null;
   accessToken: string | null;
-  refreshToken: string | null;
 }
 
 interface AuthContextType {
   state: AuthState;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
-  refreshAccessToken: () => Promise<boolean>;
 }
 
 // Estado inicial
@@ -33,7 +33,6 @@ const initialState: AuthState = {
   isLoading: false,
   user: null,
   accessToken: null,
-  refreshToken: null,
 };
 
 // Context
@@ -47,10 +46,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const restoreSession = () => {
       const accessToken = localStorage.getItem('accessToken');
-      const refreshToken = localStorage.getItem('refreshToken');
       const userStr = localStorage.getItem('user');
 
-      if (accessToken && refreshToken && userStr) {
+      if (accessToken && userStr) {
         try {
           const user = JSON.parse(userStr);
           setState({
@@ -58,13 +56,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             isLoading: false,
             user,
             accessToken,
-            refreshToken,
           });
           
           // Verify token is still valid with backend
-          apollo.api.get('/auth/me', { requiresAuth: true })
-            .then(response => {
-              if (!response.success) {
+          apolloClient.query({ query: GET_ME_QUERY })
+            .then((result: any) => {
+              if (!result.data?.me) {
                 console.log('🔄 Token expired, clearing session');
                 logout();
               }
@@ -93,11 +90,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       setState(prev => ({ ...prev, isLoading: true }));
 
-      // 🚀 APOLLO API - Authentication login with FormData
+      // 🚀 REST AUTHENTICATION - Authentication login with FormData (SELENE NODE 1)
       const formData = new FormData();
       formData.append('username', email);
       formData.append('password', password);
-      
+
       const response = await apollo.api.post('/auth/login', formData);
 
       if (!response.success || !response.data) {
@@ -115,38 +112,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return false;
       }
 
-      // 🎯 FIRST: Store tokens in localStorage so /auth/me can use them
+      // 🎯 Store tokens in localStorage so GraphQL can use them
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
 
-      // 🚀 THEN: Get user info with the fresh token
-      const userResponse = await apollo.api.get('/auth/me');
+      // 🚀 CREATE BASIC USER INFO FROM LOGIN DATA
+      // Since GraphQL schema doesn't have 'me' query, we'll use basic info
+      // and fetch full user data later when needed
+      const basicUser = {
+        id: 'current-user', // Placeholder - will be updated when full data is fetched
+        username: email,
+        email: email,
+        first_name: email.split('@')[0], // Basic name from email
+        last_name: '',
+        role: 'professional', // Default role - will be updated from actual data
+        is_active: true
+      };
 
-      if (!userResponse.success || !userResponse.data) {
-        // Clear tokens if user info fails
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        setState(prev => ({ ...prev, isLoading: false }));
-        return false;
-      }
+      // Store basic user data
+      localStorage.setItem('user', JSON.stringify(basicUser));
 
-      const userData = userResponse.data as any;
-
-      // Mapear rol 'dentist' a 'professional' para backend
-      if (userData.role === 'dentist') {
-        userData.role = 'professional';
-      }
-      
-      // Store user data
-      localStorage.setItem('user', JSON.stringify(userData));
-
-      // Update state with authenticated user
+      // Update state with authenticated user (basic info)
       setState({
         isAuthenticated: true,
         isLoading: false,
-        user: userData,
+        user: basicUser,
         accessToken: accessToken,
-        refreshToken: refreshToken,
       });
 
       return true;
@@ -160,44 +151,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const logout = () => {
     localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
+    // Clear Apollo cache on logout
+    apolloClient.clearStore();
     setState(initialState);
-  };
-
-  const refreshAccessToken = async (): Promise<boolean> => {
-    try {
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (!refreshToken) {
-        return false;
-      }
-
-      // 🚀 APOLLO API - Refresh access token
-      const response = await apollo.api.post('/auth/refresh', {}, {
-        requiresAuth: false,
-        headers: {
-          'Authorization': `Bearer ${refreshToken}`
-        }
-      });
-
-      if (!response.success || !response.data) {
-        logout();
-        return false;
-      }
-
-      localStorage.setItem('accessToken', response.data.access_token);
-
-      setState(prev => ({
-        ...prev,
-        accessToken: response.data.access_token,
-      }));
-
-      return true;
-    } catch (error) {
-      console.error('Token refresh error:', error);
-      logout();
-      return false;
-    }
   };
 
   return (
@@ -206,7 +163,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         state,
         login,
         logout,
-        refreshAccessToken,
       }}
     >
       {children}

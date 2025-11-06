@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext.tsx';
-import apollo from '../apollo.ts';
+import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../context/AuthContext';
+import apollo from '../apollo';
 
 export interface Patient {
   id: string;
@@ -25,7 +25,7 @@ export const usePatients = () => {
   };
 
   // Buscar pacientes por nombre, teléfono o email
-  const fetchPatients = async (search: { query: string }) => {
+  const fetchPatients = useCallback(async (search: { query: string }) => {
     // 🚨 BACKEND REQUIRES MIN 2 CHARACTERS
     if (!search.query || search.query.trim().length < 2) {
       console.log('🔍 Query too short, returning empty results');
@@ -52,10 +52,10 @@ export const usePatients = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Listar todos los pacientes
-  const fetchAllPatients = async () => {
+  const fetchAllPatients = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -79,10 +79,10 @@ export const usePatients = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // 🔓 SPECIAL FUNCTION FOR UPLOADS: INCLUDES VIRTUAL PATIENT
-  const fetchAllPatientsForUpload = async () => {
+  const fetchAllPatientsForUpload = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -102,13 +102,13 @@ export const usePatients = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (state.accessToken) {
       fetchAllPatients();
     }
-  }, [state.accessToken]);
+  }, [state.accessToken, fetchAllPatients]);
 
   return {
     patients,

@@ -299,9 +299,16 @@ export const SmartCategorization = {
     const name = filename.toLowerCase();
     
     // 🏥 MEDICAL DETECTION
-    if (name.includes('rayos') || name.includes('xray') || name.includes('radiografia') ||
-        name.includes('foto') && (name.includes('clinica') || name.includes('intraoral')) ||
-        name.includes('voice') || name.includes('nota') || name.includes('tratamiento')) {
+    // Añadimos paréntesis para evitar mezcla ambigua de operadores lógicos
+    if (
+      name.includes('rayos') ||
+      name.includes('xray') ||
+      name.includes('radiografia') ||
+      (name.includes('foto') && (name.includes('clinica') || name.includes('intraoral'))) ||
+      name.includes('voice') ||
+      name.includes('nota') ||
+      name.includes('tratamiento')
+    ) {
       return LegalCategory.MEDICAL;
     }
     
@@ -400,8 +407,8 @@ export const getAdvancedCardStyle = (
   return style;
 };
 
-// 🏆 EXPORT DEFAULT: Complete Unified System
-export default {
+// 🏆 AGGREGATED NAMED EXPORT: Complete Unified System (avoid anonymous default export)
+export const UnifiedDocumentSystem = {
   LegalCategory,
   UnifiedDocumentType,
   DocumentCardThemes,
@@ -410,5 +417,9 @@ export default {
   SmartCategorization,
   AIFeatureDetection,
   LEGACY_TO_UNIFIED_MAPPING,
-  getAdvancedCardStyle
+  getAdvancedCardStyle,
 };
+
+// Also provide a default-like convenience export for legacy consumers who might have used default import
+// but keep it named to satisfy the linter (do not use anonymous default export).
+// NOTE: We intentionally DO NOT add `export default` here to comply with import/no-anonymous-default-export rule.

@@ -28,8 +28,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext.tsx'; // 🔒 INTEGRACIÓN AUTHCONTEXT
-import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK CAN'T STOP US!
+import { useAuth } from '../../context/AuthContext'; // 🔒 INTEGRACIÓN AUTHCONTEXT
+import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK CAN'T STOP US!
 import { 
   MagnifyingGlassIcon, 
   FunnelIcon, 
@@ -152,7 +152,7 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
   const [recordToDelete, setRecordToDelete] = useState<string | null>(null);
 
   // Función para obtener historiales
-  const fetchMedicalRecords = async () => {
+  const fetchMedicalRecords = React.useCallback(async () => {
     // 🛡️ VERIFICACIÓN DE SEGURIDAD TEMPRANA
     if (!state.isAuthenticated || !state.accessToken) {
       setError('No autenticado - Redirigiendo...');
@@ -209,7 +209,7 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, state.accessToken, state.isAuthenticated, state.user]);
 
   // Función para eliminar historial médico
   const handleDeleteRecord = async (recordId: string) => {
@@ -219,13 +219,13 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
       // Benefits: V1/V2 switching, error handling, performance monitoring
       const response = await apollo.medicalRecords.delete(recordId);
 
-      if (response.data?.success) {
+      if (response) {
         // Eliminar de la lista local
         setRecords(prev => prev.filter(record => record.id !== recordId));
         setTotalRecords(prev => prev - 1);
       } else {
-        console.error('❌ Error deleting medical record:', response.data?.message);
-        setError(response.data?.message || 'Error al eliminar el historial médico');
+        console.error('❌ Error deleting medical record: Unknown error');
+        setError('Error al eliminar el historial médico');
       }
     } catch (err) {
       console.error('❌ Error deleting medical record:', err);
@@ -254,7 +254,7 @@ const MedicalRecordsList: React.FC<MedicalRecordsListProps> = ({
   // Efecto para cargar datos
   useEffect(() => {
     fetchMedicalRecords();
-  }, [filters]);
+  }, [filters, fetchMedicalRecords]);
 
   // Función para actualizar filtros
   const updateFilter = (key: keyof SearchFilters, value: any) => {

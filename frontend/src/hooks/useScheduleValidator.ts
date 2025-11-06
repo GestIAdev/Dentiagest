@@ -4,8 +4,8 @@
  */
 
 import { useState, useCallback } from 'react';
-import { useAppointments } from './useAppointments.ts';
-import { parseClinicDateTime } from '../utils/timezone.ts';
+import { useAppointments } from './useAppointments';
+import { parseClinicDateTime } from '../utils/timezone';
 
 interface TimeSlotConflict {
   hasConflict: boolean;

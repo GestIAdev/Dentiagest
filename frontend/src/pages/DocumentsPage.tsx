@@ -11,7 +11,7 @@
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import DocumentManagement from '../components/DocumentManagement/CyberpunkDocumentTabs.tsx';
+import DocumentManagement from '../components/DocumentManagement/CyberpunkDocumentTabs';
 import { 
   FolderIcon
 } from '@heroicons/react/24/outline';

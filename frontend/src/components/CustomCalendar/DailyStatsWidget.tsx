@@ -27,8 +27,8 @@
  */
 
 import React from 'react';
-import { AppointmentData } from './AppointmentCard.tsx';
-import { getDailyStats } from './utils/mockAppointments.ts';
+import { AppointmentData } from './AppointmentCard';
+import { getDailyStats } from './utils/mockAppointments';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -57,7 +57,7 @@ export function DailyStatsWidget({
 
   const getTotalRevenue = () => {
     return appointments
-      .filter(apt => apt.status === 'confirmada' || apt.status === 'completada')
+      .filter(apt => apt.status === 'confirmed' || apt.status === 'completed')
       .reduce((sum, apt) => sum + (apt.estimatedCost || 0), 0);
   };
 
@@ -151,19 +151,19 @@ export function DailyStatsWidget({
         <div className="grid grid-cols-2 gap-2">
           <div className="flex items-center justify-between bg-green-50 rounded p-2">
             <span className="text-sm text-green-700">🩺 Consultas</span>
-            <span className="font-semibold text-green-800">{stats.byType.consulta}</span>
+            <span className="font-semibold text-green-800">{stats.byType.consultation}</span>
           </div>
           <div className="flex items-center justify-between bg-blue-50 rounded p-2">
             <span className="text-sm text-blue-700">🦷 Limpiezas</span>
-            <span className="font-semibold text-blue-800">{stats.byType.limpieza}</span>
+            <span className="font-semibold text-blue-800">{stats.byType.cleaning}</span>
           </div>
           <div className="flex items-center justify-between bg-orange-50 rounded p-2">
             <span className="text-sm text-orange-700">🔧 Tratamientos</span>
-            <span className="font-semibold text-orange-800">{stats.byType.tratamiento}</span>
+            <span className="font-semibold text-orange-800">{stats.byType.treatment}</span>
           </div>
           <div className="flex items-center justify-between bg-red-50 rounded p-2">
             <span className="text-sm text-red-700">🚨 Emergencias</span>
-            <span className="font-semibold text-red-800">{stats.byType.emergencia}</span>
+            <span className="font-semibold text-red-800">{stats.byType.emergency}</span>
           </div>
         </div>
       </div>

@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { DocumentIcon, PhotoIcon, FilmIcon, MicrophoneIcon, SparklesIcon } from '@heroicons/react/24/outline';
-import { PatientAutocomplete } from './PatientAutocomplete.tsx';
-import apollo from '../../apollo.ts'; // 🚀 Apollo Nuclear Core integration
+import { PatientAutocomplete } from './PatientAutocomplete';
+import apollo from '../../apollo'; // 🚀 Apollo Nuclear Core integration
 
 // 🌌 SMART DOCUMENT FLOW - PURE MAGIC
 // Philosophy: "Documents find their home"
@@ -312,7 +312,7 @@ const SmartDocumentFlow: React.FC<SmartDocumentFlowProps> = ({
       reasoning,
       suggestedPatient
     };
-  }, []);
+  }, [patients, effectivePatientId]);
 
   // 🌊 DROPZONE MAGIC
   const onDrop = useCallback(async (acceptedFiles: File[]) => {

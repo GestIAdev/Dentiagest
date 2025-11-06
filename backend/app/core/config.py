@@ -26,10 +26,16 @@ class Settings(BaseSettings):
     # URLs de base de datos
     @property
     def database_url(self) -> str:
+        # Usar SQLite para desarrollo si el nombre de DB termina en .db
+        if self.db_name.endswith('.db'):
+            return f"sqlite:///./{self.db_name}"
         return f"postgresql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
     
     @property
     def async_database_url(self) -> str:
+        # Usar SQLite para desarrollo si el nombre de DB termina en .db
+        if self.db_name.endswith('.db'):
+            return f"sqlite+aiosqlite:///./{self.db_name}"
         return f"postgresql+asyncpg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
     
     # Redis

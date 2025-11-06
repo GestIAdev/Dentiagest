@@ -28,7 +28,7 @@
 
 import React, { useState, useRef } from 'react';
 import { format, isSameMinute } from 'date-fns';
-import { AppointmentData, AppointmentCard } from './AppointmentCard.tsx';
+import { AppointmentData, AppointmentCard } from './AppointmentCard';
 // import { useMicroInteractions } from './hooks';
 import './styles/animations.css';
 

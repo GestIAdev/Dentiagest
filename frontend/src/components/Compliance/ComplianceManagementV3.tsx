@@ -27,7 +27,7 @@ import {
   CREATE_COMPLIANCE_AUDIT,
   UPDATE_COMPLIANCE_FINDING,
   ACKNOWLEDGE_COMPLIANCE_ALERT
-} from 'graphql/queries/compliance';
+} from '../../graphql/queries/compliance';
 
 // 🎯 SUBCOMPONENTS - Modular Architecture
 import RegulationFormModalV3 from './RegulationFormModalV3';

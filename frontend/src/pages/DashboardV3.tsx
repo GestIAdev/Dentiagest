@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useGraphQLPatients } from '../hooks/useGraphQLPatients';
-import TestGraphQLPatients from '../components/TestGraphQLPatients';
 
 // 🎸 APOLLO NUCLEAR 3.0 - DASHBOARD V3: LIENZO UNIFICADO
 // El trono desde donde se gobierna el imperio unificado
@@ -145,9 +144,7 @@ const DashboardV3: React.FC = () => {
       </div>
 
       {/* 🏴‍☠️ APOLLO NUCLEAR V97: EL PUENTE DE CRISTAL - GraphQL Superautopista Test */}
-      <div className="mb-6">
-        <TestGraphQLPatients />
-      </div>
+      {/* <TestGraphQLPatients /> */}
 
       {/* 🚀 GRID DE PROVINCIAS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

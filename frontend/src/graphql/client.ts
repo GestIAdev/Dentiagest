@@ -21,22 +21,32 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 // 🔗 HTTP link (queries + mutations)
 const httpLink = new HttpLink({
-  uri: import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:8005/graphql', // <-- PUERTO CORREGIDO
-  headers: {
-    authorization: localStorage.getItem('token') 
-      ? `Bearer ${localStorage.getItem('token')}` 
-      : '',
+  uri: process.env.REACT_APP_GRAPHQL_URL || 'http://localhost:8005/graphql', // <-- PUERTO CORREGIDO
+  fetch: (input: RequestInfo | URL, init?: RequestInit) => {
+    // Add auth token to headers dynamically
+    const token = localStorage.getItem('accessToken');
+    const options = init || {};
+
+    if (token) {
+      options.headers = {
+        ...options.headers,
+        authorization: `Bearer ${token}`,
+      };
+    }
+
+    return fetch(input, options);
   },
 });
 
 // 🔔 WebSocket link (subscriptions)
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: import.meta.env.VITE_WS_URL || 'ws://localhost:8005/graphql', // <-- PUERTO CORREGIDO
-    connectionParams: {
-      authorization: localStorage.getItem('token') 
-        ? `Bearer ${localStorage.getItem('token')}` 
-        : '',
+    url: process.env.REACT_APP_WS_URL || 'ws://localhost:8005/graphql', // <-- PUERTO CORREGIDO
+    connectionParams: () => {
+      const token = localStorage.getItem('accessToken');
+      return {
+        authorization: token ? `Bearer ${token}` : '',
+      };
     },
   })
 );
@@ -62,6 +72,20 @@ export const apolloClient = new ApolloClient({
       Query: {
         fields: {
           patients: {
+            // 🔥 FIX: Use keyArgs to cache by pagination params OR replace instead of merge
+            keyArgs: ["limit", "offset"],
+            merge(existing, incoming) {
+              // REPLACE strategy: return incoming data directly (don't merge with existing)
+              return incoming;
+            },
+          },
+          appointments: {
+            keyArgs: false,
+            merge(existing = [], incoming) {
+              return [...existing, ...incoming];
+            },
+          },
+          medicalRecords: {
             keyArgs: false,
             merge(existing = [], incoming) {
               return [...existing, ...incoming];

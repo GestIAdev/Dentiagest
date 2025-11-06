@@ -6,9 +6,10 @@
 import React, { useState } from 'react';
 import { format, setHours, setMinutes } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { parseClinicDateTime } from '../../utils/timezone.ts';
-import { AppointmentCard, type AppointmentData } from './AppointmentCard.tsx';
-import { updateAppointmentTime } from '../../utils/appointmentService.ts';
+import { parseClinicDateTime } from '../../utils/timezone';
+import { AppointmentCard, type AppointmentData } from './AppointmentCard';
+import { updateAppointmentTime } from '../../utils/appointmentService';
+import { centralMappingService } from '../../services/mapping';
 // APOLLO NUCLEAR: CentralMappingService disabled
 
 interface DayViewProps {

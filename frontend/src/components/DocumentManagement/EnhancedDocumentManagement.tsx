@@ -18,7 +18,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 import { EnhancedDocumentGrid } from './EnhancedDocumentGrid';
 import { DocumentUpload } from './DocumentUpload';
 import { DocumentViewer } from './DocumentViewer';
@@ -146,10 +146,10 @@ export const EnhancedDocumentManagement: React.FC<EnhancedDocumentManagementProp
       // 🚀 APOLLO API - Load documents with parameters
       const response = await apollo.docs.list(params.toString());
       
-      if (response.success && response.data) {
-        setDocuments(response.data.items || []);
+      if (response && response.items) {
+        setDocuments(response.items);
       } else {
-        console.error('❌ Apollo API - Error loading documents:', response.error);
+        console.error('❌ Apollo API - Error loading documents:', response);
       }
     } catch (error) {
       console.error('❌ Apollo API - Error loading documents:', error);

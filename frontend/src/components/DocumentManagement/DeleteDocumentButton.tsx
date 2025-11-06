@@ -11,9 +11,9 @@
  * Compliance: Argentina Ley 25.326 + Medical Practice Law
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { useAuth } from '../../context/AuthContext.tsx';
-import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 import {
   TrashIcon,
   ExclamationTriangleIcon,
@@ -89,11 +89,7 @@ export const DeleteDocumentButton: React.FC<DeleteDocumentButtonProps> = ({
   const [existingRequest, setExistingRequest] = useState<DeletionRequest | null>(null);
 
   // 🔍 Check deletion eligibility on component mount
-  useEffect(() => {
-    checkDeletionEligibility();
-  }, [document.id]);
-
-  const checkDeletionEligibility = async () => {
+  const checkDeletionEligibility = useCallback(async () => {
     if (!state.accessToken) return;
 
     try {
@@ -111,7 +107,11 @@ export const DeleteDocumentButton: React.FC<DeleteDocumentButtonProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [document.id, state.accessToken]);
+
+  useEffect(() => {
+    checkDeletionEligibility();
+  }, [checkDeletionEligibility]);
 
   const handleDeleteClick = () => {
     if (!eligibility?.can_request_deletion) {
@@ -390,14 +390,7 @@ export const DeletionRequestsDashboard: React.FC = () => {
   const [complianceData, setComplianceData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (state.user?.role === 'admin' || state.user?.role === 'professional') {
-      loadDeletionRequests();
-      loadComplianceData();
-    }
-  }, [state.user]);
-
-  const loadDeletionRequests = async () => {
+  const loadDeletionRequests = useCallback(async () => {
     if (!state.accessToken) return;
 
     try {
@@ -415,9 +408,9 @@ export const DeletionRequestsDashboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [state.accessToken]);
 
-  const loadComplianceData = async () => {
+  const loadComplianceData = useCallback(async () => {
     if (!state.accessToken) return;
 
     try {
@@ -432,7 +425,16 @@ export const DeletionRequestsDashboard: React.FC = () => {
     } catch (error) {
       console.error('❌ Apollo API - Error loading compliance data:', error);
     }
-  };
+  }, [state.accessToken]);
+
+  useEffect(() => {
+    if (state.user?.role === 'admin' || state.user?.role === 'professional') {
+      loadDeletionRequests();
+      loadComplianceData();
+    }
+  }, [state.user, loadDeletionRequests, loadComplianceData]);
+
+  // (kept memoized versions above)
 
   if (state.user?.role !== 'admin' && state.user?.role !== 'professional') {
     return (

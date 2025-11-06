@@ -9,7 +9,7 @@
  * - RestaurantGest: Vista detallada de pedido
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   XMarkIcon,
   PencilIcon,
@@ -27,8 +27,8 @@ import {
   ShareIcon,
   ArchiveBoxIcon
 } from '@heroicons/react/24/outline';
-import { useAuth } from '../../context/AuthContext.tsx';  // 🔧 FIXED: Added .tsx extension for webpack
-import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK CAN'T STOP US!
+import { useAuth } from '../../context/AuthContext';  // 🔧 FIXED: Added .tsx extension for webpack
+import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK CAN'T STOP US!
 
 // Types
 interface MedicalRecord {
@@ -90,53 +90,53 @@ const MedicalRecordDetail: React.FC<MedicalRecordDetailProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar datos cuando se abre el modal
-  useEffect(() => {
-    if (isOpen && recordId) {
-      fetchMedicalRecord();
-    }
-  }, [isOpen, recordId]);
-
   // Función para obtener el historial médico
-  const fetchMedicalRecord = async () => {
+  const fetchMedicalRecord = useCallback(async () => {
     if (!recordId) return;
 
     try {
       setLoading(true);
       setError(null);
-      
+
       const token = state.accessToken; // 🔧 FIXED: Use AuthContext token instead of localStorage
-      
+
       if (!token) {
         throw new Error('No hay token de autenticación válido');
       }
-      
+
       // 🚀 OPERACIÓN APOLLO - Using centralized API service
       // Replaces hardcoded fetch with apollo.medicalRecords.getById()
       // Benefits: V1/V2 switching, error handling, performance monitoring
       const recordResponse = await apollo.medicalRecords.getById(recordId);
-      
-      if (recordResponse.success && recordResponse.data) {
-        const recordData = recordResponse.data;
-        setRecord(recordData as any);
+
+      if (recordResponse) {
+        const recordData = recordResponse as any;
+        setRecord(recordData);
 
         // 🚀 OPERACIÓN APOLLO - Using centralized API service  
         // Replaces hardcoded fetch with apollo.patients.get()
         const patientResponse = await apollo.patients.get(recordData.patient_id);
 
-        if (patientResponse.success && patientResponse.data) {
-          const patientData = patientResponse.data;
+        if (patientResponse) {
+          const patientData = patientResponse as any;
           setPatient(patientData);
         }
       } else {
-        throw new Error(`Error fetching medical record: ${recordResponse.error || 'Unknown error'}`);
+        throw new Error(`Error fetching medical record: Unknown error`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
       setLoading(false);
     }
-  };
+  }, [recordId, state.accessToken]);
+
+  // Cargar datos cuando se abre el modal
+  useEffect(() => {
+    if (isOpen && recordId) {
+      fetchMedicalRecord();
+    }
+  }, [isOpen, recordId, fetchMedicalRecord]);
 
   // Función para obtener color del badge según estado
   const getStatusColor = (status: string) => {

@@ -26,6 +26,7 @@ import {
   DocumentCardThemes,
   SmartCategorization 
 } from '../../types/UnifiedDocumentTypes';
+import { centralMappingService } from '../../services/mapping';
 import {
   FunnelIcon,
   Squares2X2Icon,

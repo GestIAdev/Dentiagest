@@ -118,20 +118,19 @@ export const UnifiedSystemBridge: React.FC<IntegrationBridgeProps> = ({
         preserve_metadata: true
       }, { version: 'v2' });
 
-      if (response.success && response.data) {
-        const result = response.data;
-      
-      if (result.migrated_count > 0) {
-        setSystemStatus(prev => ({
-          ...prev,
-          migrationProgress: Math.min(1.0, prev.migrationProgress + 0.1),
-          legacyDocumentsRemaining: Math.max(0, prev.legacyDocumentsRemaining - result.migrated_count)
-        }));
+      if (response && (response as any).migrated_count) {
+        if ((response as any).migrated_count > 0) {
+          setSystemStatus(prev => ({
+            ...prev,
+            migrationProgress: Math.min(1.0, prev.migrationProgress + 0.1),
+            legacyDocumentsRemaining: Math.max(0, prev.legacyDocumentsRemaining - (response as any).migrated_count)
+          }));
 
-        // Update current system based on migration progress
-        if (systemStatus.migrationProgress >= 0.8) {
-          setCurrentSystem('unified');
-          onSystemToggle?.(true);
+          // Update current system based on migration progress
+          if (systemStatus.migrationProgress >= 0.8) {
+            setCurrentSystem('unified');
+            onSystemToggle?.(true);
+          }
         }
       }
     } catch (error) {
@@ -380,7 +379,7 @@ export const useUnifiedSystemDetection = (patientId: string) => {
         const response = await apollo.api.get(`/documents/patient/${patientId}/system-status`, { version: 'v2' });
         
         if (response.success && response.data) {
-          const data = response.data;
+          const data = response.data as any;
           
           setSystemRecommendation({
             recommended: data.migration_progress === 1.0 ? 'unified' : 

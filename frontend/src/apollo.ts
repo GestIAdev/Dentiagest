@@ -39,7 +39,7 @@ interface RequestOptions {
 // ============================================================================
 
 class ApolloEngine {
-  private baseUrl: string = 'http://localhost:8002';
+  private baseUrl: string = 'http://localhost:8005'; // 🔥 SELENE NODE 1 - AUTH & API
   private defaultTimeout: number = 10000;
   private performanceMetrics: Map<string, number[]> = new Map();
   

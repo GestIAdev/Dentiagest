@@ -107,7 +107,7 @@ class ApolloApiService {
 
   constructor(config?: Partial<ApiConfig>) {
     this.config = {
-      baseUrl: 'http://localhost:8002',
+      baseUrl: 'http://localhost:8005', // 🔥 SELENE NODE 1 - AUTH & API
       defaultVersion: 'v1',
       timeout: 10000,
       enableLogging: true,

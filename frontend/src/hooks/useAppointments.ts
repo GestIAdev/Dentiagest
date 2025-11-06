@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext.tsx';
-import { formatLocalDateTime, parseClinicDateTime } from '../utils/timezone.ts';
-import apollo from '../apollo.ts';
+import { useAuth } from '../context/AuthContext';
+import { formatLocalDateTime, parseClinicDateTime } from '../utils/timezone';
+import apollo from '../apollo';
 
 export interface Appointment {
   id: string;

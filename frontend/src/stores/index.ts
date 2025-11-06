@@ -666,8 +666,10 @@ export const useDocumentStore = create<DocumentState>()(
           try {
             const apollo = (await import('../apollo')).default;
 
-            const result = await apollo.docs.getUnifiedTypes();
-            return result || [];
+            // TODO: Implement getUnifiedTypes method in apollo.docs API
+            // const result = await apollo.docs.getUnifiedTypes();
+            const result: any[] = []; // Temporary: return empty array until API method is implemented
+            return result;
           } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
             setError(errorMessage);
@@ -685,8 +687,10 @@ export const useDocumentStore = create<DocumentState>()(
           try {
             const apollo = (await import('../apollo')).default;
 
-            const result = await apollo.docs.getLegalCategories();
-            return result || [];
+            // TODO: Implement getLegalCategories method in apollo.docs API
+            // const result = await apollo.docs.getLegalCategories();
+            const result: any[] = []; // Temporary: return empty array until API method is implemented
+            return result;
           } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
             setError(errorMessage);
@@ -704,7 +708,9 @@ export const useDocumentStore = create<DocumentState>()(
           try {
             const apollo = (await import('../apollo')).default;
 
-            const result = await apollo.docs.getSystemStatus();
+            // TODO: Implement getSystemStatus method in apollo.docs API
+            // const result = await apollo.docs.getSystemStatus();
+            const result: any = { status: 'unknown' }; // Temporary: return default status until API method is implemented
             return result;
           } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Error desconocido';

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext.tsx';
-import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import { useAuth } from '../../context/AuthContext';
+import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 
 // PLATFORM_EXTRACTABLE: Universal form validation patterns
 interface FormErrors {
@@ -240,8 +240,8 @@ const PatientFormModal: React.FC<PatientFormModalProps> = ({
 
       // Clean undefined/empty values
       Object.keys(transformedData).forEach(key => {
-        if (transformedData[key] === undefined || transformedData[key] === '') {
-          delete transformedData[key];
+        if ((transformedData as any)[key] === undefined || (transformedData as any)[key] === '') {
+          delete (transformedData as any)[key];
         }
       });
 
@@ -254,15 +254,15 @@ const PatientFormModal: React.FC<PatientFormModalProps> = ({
         ? await apollo.patients.update(patient.id, transformedData as any)
         : await apollo.patients.create(transformedData as any);
 
-      if (response.success) {
+      if (response) {
         onSave();
         onClose();
       } else {
-        console.error('API Error Response:', response.error);
+        console.error('API Error Response:', response);
         console.error('Sent Data:', transformedData);
         
         // Apollo response format - using response.error instead of response.json()
-        const errorData = response.error || {} as any;
+        const errorData = (response as any)?.error || {} as any;
         
         // Show detailed validation errors to user
         if (errorData.errors && Array.isArray(errorData.errors)) {

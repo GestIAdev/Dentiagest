@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { usePatients } from '../hooks/usePatients.ts';
+import { usePatients } from '../hooks/usePatients';
 import { XMarkIcon, CalendarIcon, ClockIcon, UserIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { useAppointments } from '../hooks/useAppointments.ts';
-import { useAuth } from '../context/AuthContext.tsx';
-import { useScheduleValidator } from '../hooks/useScheduleValidator.ts'; // 🕐 SCHEDULE VALIDATION!
+import { useAppointments } from '../hooks/useAppointments';
+import { useAuth } from '../context/AuthContext';
+import { useScheduleValidator } from '../hooks/useScheduleValidator'; // 🕐 SCHEDULE VALIDATION!
 
 // 🏴‍☠️ AINARKALENDAR TIME SLOTS - FREEDOM EDITION
 const generateTimeSlots = (): Array<{value: string, display: string}> => {
@@ -130,7 +130,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
         
         // Now try the search endpoint
         const apiResults = await fetchPatients({ query: searchTerm });
-        const patients = apiResults?.items || [];
+        const patients = apiResults || [];
         setFilteredPatients(patients);
       } else {
         setFilteredPatients(localResults);

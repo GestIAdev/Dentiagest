@@ -32,7 +32,7 @@ import {
   setHours,
   setMinutes
 } from 'date-fns';
-import { TimeSlot, CalendarDay } from '../types/calendar.types.ts';
+import { TimeSlot, CalendarDay } from '../types/calendar.types';
 
 // 🏥 DENTIAGEST WORKING HOURS CONSTANTS
 export const WORKING_HOURS = {

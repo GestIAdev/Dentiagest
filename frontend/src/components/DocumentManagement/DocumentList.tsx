@@ -24,10 +24,10 @@
  * - RestaurantGest: Food photos and supplier documents
  */
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext.tsx';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../../context/AuthContext';
 // // APOLLO NUCLEAR: CentralMappingService disabled
-import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 // import { buildApiUrl, getDocumentDownloadUrl } from '../../config/api';
 import {
   MagnifyingGlassIcon,
@@ -46,9 +46,9 @@ import {
 } from '@heroicons/react/24/outline';
 
 // 🦷 UNIFIED SYSTEM: Import types from unified system
-import { AccessLevel } from './DocumentUpload.tsx';
-import { LegalCategory, UnifiedDocumentType } from './DocumentCategories.tsx';
-import { DeleteDocumentButton } from './DeleteDocumentButton.tsx';
+import { AccessLevel } from './DocumentUpload';
+import { LegalCategory, UnifiedDocumentType } from './DocumentCategories';
+import { DeleteDocumentButton } from './DeleteDocumentButton';
 
 // 🔥 HARDCODED API FUNCTIONS - WEBPACK TOCACOJONES SOLUTION
 const buildApiUrl = (endpoint: string): string => {
@@ -241,8 +241,8 @@ export const DocumentList: React.FC<DocumentListProps> = ({
     );
   };
 
-  // �📡 FETCH DOCUMENTS from API
-  const fetchDocuments = async () => {
+  // �📡 FETCH DOCUMENTS from API - wrapped in useCallback so it can be safely used in effects
+  const fetchDocuments = useCallback(async () => {
     if (!state.accessToken) return;
 
     try {
@@ -301,12 +301,12 @@ export const DocumentList: React.FC<DocumentListProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, categoryFilter, patientId, state.accessToken]);
 
   // 🔄 EFFECTS
   useEffect(() => {
     fetchDocuments();
-  }, [filters, categoryFilter, patientId, state.accessToken]);
+  }, [fetchDocuments]);
 
   // 🔍 FILTER HELPERS
   const updateFilter = (key: string, value: string | number) => {

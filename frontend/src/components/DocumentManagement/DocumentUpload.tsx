@@ -23,17 +23,17 @@
         }
         
         console.log('🔍 DEBUG final backendAccessLevel:', backendAccessLevel);
-        console.log('🔒 COMPLIANCE: Smart detected accessLevel:', uploadFile.accessLevel);s:
+        console.log('🔒 COMPLIANCE: Smart detected accessLevel:', uploadFile.accessLevel);
  * - VetGest: Pet photos, vaccination certificates
  * - MechaGest: Vehicle photos, repair manuals
  * - RestaurantGest: Food photos, invoices
  */
 
 import React, { useState, useRef, useCallback } from 'react';
-import { useAuth } from '../../context/AuthContext.tsx';
-import { LegalCategory, UnifiedDocumentType, getCategoryFromUnifiedType } from './DocumentCategories.tsx';
+import { useAuth } from '../../context/AuthContext';
+import { LegalCategory, UnifiedDocumentType, getCategoryFromUnifiedType } from './DocumentCategories';
 // // APOLLO NUCLEAR: CentralMappingService disabled
-import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 import { 
   CloudArrowUpIcon, 
   DocumentIcon, 
@@ -51,6 +51,9 @@ export enum AccessLevel {
   MEDICAL = 'medical',                    // Medical professionals only (doctors + qualified assistants)
   ADMINISTRATIVE = 'administrative'      // All staff can access (receptionists + admins + doctors)
 }
+
+// Re-export UnifiedDocumentType for backward compatibility
+export { UnifiedDocumentType };
 
 // 🤖 SMART CATEGORIZATION ENGINE - UNIFIED SYSTEM
 const detectDocumentCategory = (file: File): { 
@@ -327,17 +330,17 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
   };
 
   // 🧹 FILE VALIDATION: Type and size checks
-  const validateFile = (file: File): string | null => {
+  const validateFile = useCallback((file: File): string | null => {
     if (!acceptedTypes.includes(file.type)) {
       return `Tipo de archivo no soportado: ${file.type}`;
     }
-    
+
     if (file.size > maxFileSize * 1024 * 1024) {
       return `Archivo muy grande: ${(file.size / 1024 / 1024).toFixed(1)}MB (máximo: ${maxFileSize}MB)`;
     }
-    
+
     return null;
-  };
+  }, [acceptedTypes, maxFileSize]);
 
   // 📁 ADD FILES: Process selected files
   const addFiles = useCallback((newFiles: FileList | File[]) => {
@@ -375,7 +378,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
     });
 
     setFiles(prev => [...prev, ...validFiles]);
-  }, [acceptedTypes, maxFileSize]);
+  }, [disableSmartDetection, validateFile]);
 
   // 🖱️ DRAG & DROP HANDLERS
   const handleDragOver = useCallback((e: React.DragEvent) => {

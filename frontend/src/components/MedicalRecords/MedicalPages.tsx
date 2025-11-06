@@ -25,10 +25,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import MedicalRecordsList from './MedicalRecordsList.tsx';
-import MedicalRecordForm from './MedicalRecordForm.tsx';
-import MedicalRecordDetail from './MedicalRecordDetail.tsx';
-import { SensitiveDataWarning } from './MedicalSecurity.tsx';
+import MedicalRecordsList from './MedicalRecordsList';
+import MedicalRecordForm from './MedicalRecordForm';
+import MedicalRecordDetail from './MedicalRecordDetail';
+import { SensitiveDataWarning } from './MedicalSecurity';
 
 // Página principal de lista de historiales
 export const MedicalRecordsListPage: React.FC = () => {

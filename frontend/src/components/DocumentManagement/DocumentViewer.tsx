@@ -17,9 +17,9 @@
  * - RestaurantGest: Food safety photos and documents
  */
 
-import React, { useState, useRef, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext.tsx';
-import apollo from '../../apollo.ts'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
 import {
   XMarkIcon,
   MagnifyingGlassMinusIcon,
@@ -152,14 +152,14 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
     }
   };
 
-  // 🌐 FETCH DOCUMENT URL for viewing
-  const fetchDocumentUrl = async () => {
+  // 🌐 FETCH DOCUMENT URL for viewing (memoized)
+  const fetchDocumentUrl = useCallback(async () => {
     if (!document || !state.accessToken) return;
 
     try {
       setLoading(true);
       setError(null);
-      
+
       // 🔍 DEBUG: Log authentication details
       console.log('🔐 DocumentViewer Auth Debug:', {
         documentId: document.id,
@@ -167,7 +167,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
         tokenLength: state.accessToken?.length,
         userRole: state.user?.role
       });
-      
+
       // For images and audio, we need to fetch with auth and create blob URLs
       if (document.is_image || document.mime_type.includes('audio')) {
         // 🚀 OPERACIÓN APOLLO - Using centralized API service
@@ -181,14 +181,14 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
         const viewUrl = `http://127.0.0.1:8002/api/v1/medical-records/documents/${document.id}/download`;
         setDocumentUrl(viewUrl);
       }
-      
+
     } catch (error) {
       console.error('Error fetching document:', error);
-      setError(`Error loading document: ${error.message}`);
+      setError(`Error loading document: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
-  };
+  }, [document, state.accessToken, state.user?.role]);
 
   // 🔐 BUILD AUTHENTICATED URL (for PDFs that support it)
   const getAuthenticatedUrl = (url: string) => {
@@ -207,7 +207,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
       setDocumentUrl(null);
       setError(null);
     }
-  }, [isOpen, document]);
+  }, [isOpen, document, fetchDocumentUrl]);
 
   // 📅 FORMAT DATE
   const formatDate = (dateString: string) => {

@@ -10,10 +10,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { DocumentList } from './DocumentList.tsx';
-import { DocumentViewer } from './DocumentViewer.tsx';
-import SmartDocumentFlow from './SmartDocumentFlow.tsx';
-import { usePatients } from '../../hooks/usePatients.ts';
+import { DocumentList } from './DocumentList';
+import { DocumentViewer } from './DocumentViewer';
+import SmartDocumentFlow from './SmartDocumentFlow';
+import { usePatients } from '../../hooks/usePatients';
 import { 
   CloudArrowUpIcon,
   CogIcon
