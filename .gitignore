@@ -415,3 +415,8 @@ docs/Dev_diary/Private/
 docs/**/Private/
 **/Private/
 *.private.*
+
+# 🚫 APOLLO-NUCLEAR-OLD - EXCLUIDO COMPLETAMENTE (PunkClaude)
+# Carpeta legacy que ya no pertenece a Dentiagest
+_apollo-nuclear-old/
+_apollo-nuclear-old/**
