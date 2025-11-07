@@ -21,7 +21,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 // 🔗 HTTP link (queries + mutations)
 const httpLink = new HttpLink({
-  uri: process.env.REACT_APP_GRAPHQL_URL || 'http://localhost:8005/graphql', // <-- PUERTO CORREGIDO
+  uri: process.env.REACT_APP_GRAPHQL_URL || 'http://localhost:8005/graphql',
   fetch: (input: RequestInfo | URL, init?: RequestInit) => {
     // Add auth token to headers dynamically
     const token = localStorage.getItem('accessToken');
@@ -80,15 +80,27 @@ export const apolloClient = new ApolloClient({
             },
           },
           appointments: {
-            keyArgs: false,
-            merge(existing = [], incoming) {
-              return [...existing, ...incoming];
+            keyArgs: ["limit", "offset", "patientId"], // Cache separado por paginación
+            merge(existing, incoming) {
+              return incoming; // ✅ REEMPLAZA, no acumula
             },
           },
           medicalRecords: {
-            keyArgs: false,
-            merge(existing = [], incoming) {
-              return [...existing, ...incoming];
+            keyArgs: ["limit", "offset", "patientId"], // Cache separado por paginación
+            merge(existing, incoming) {
+              return incoming; // ✅ REEMPLAZA, no acumula
+            },
+          },
+          treatments: {
+            keyArgs: ["limit", "offset", "patientId"],
+            merge(existing, incoming) {
+              return incoming; // ✅ REEMPLAZA, no acumula
+            },
+          },
+          documents: {
+            keyArgs: ["limit", "offset", "patientId", "documentType"], // Cache separado por paginación + filtros
+            merge(existing, incoming) {
+              return incoming; // ✅ REEMPLAZA, no acumula
             },
           },
         },

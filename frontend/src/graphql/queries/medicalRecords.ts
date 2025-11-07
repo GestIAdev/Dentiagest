@@ -1,288 +1,112 @@
-// 🎯 MEDICAL RECORDS GRAPHQL QUERIES
-// Date: September 22, 2025
-// Mission: GraphQL queries for medical records management
-// Status: V3.0 - Apollo Nuclear integration
+﻿//  GRAPHQL QUERIES - MEDICAL RECORDS (ALINEADO CON SELENE)
+// Date: November 6, 2025 - GraphQL Migration v1.0
+// Schema: MedicalRecord { id, patientId, patient, practitionerId, recordType, title, content, diagnosis, treatment, medications, attachments, createdAt, updatedAt }
 
 import { gql } from '@apollo/client';
 
-// ============================================================================
-// MEDICAL RECORDS QUERIES
-// ============================================================================
-
 export const GET_MEDICAL_RECORDS = gql`
-  query GetMedicalRecords($filters: MedicalRecordFilters) {
-    medicalRecordsV3(filters: $filters) {
-      items {
-        id
-        patientId
-        recordType
-        title
-        title_veritas
-        description
-        description_veritas
-        diagnosis
-        diagnosis_veritas
-        treatmentPlan
-        treatmentPlan_veritas
-        medications
-        medications_veritas
-        notes
-        notes_veritas
-        vitalSigns {
-          bloodPressure
-          heartRate
-          temperature
-          weight
-          height
-        }
-        attachments {
-          id
-          filename
-          url
-          contentType
-          size
-        }
-        createdBy
-        createdAt
-        updatedAt
-        tags
-        priority
-        status
-        status_veritas
-
-        # V3.0 @veritas QUANTUM TRUTH VERIFICATION
-        _veritas {
-          verified
-          confidence
-          level
-          certificate
-          error
-          verifiedAt
-          algorithm
-        }
+  query GetMedicalRecords($patientId: ID, $limit: Int, $offset: Int) {
+    medicalRecords(patientId: $patientId, limit: $limit, offset: $offset) {
+      id
+      patientId
+      patient {
+        firstName
+        lastName
       }
-      total
-      page
-      size
-      pages
-      hasNext
-      hasPrev
+      practitionerId
+      recordType
+      title
+      content
+      diagnosis
+      treatment
+      medications
+      createdAt
     }
   }
 `;
 
 export const GET_MEDICAL_RECORD = gql`
   query GetMedicalRecord($id: ID!) {
-    medicalRecordV3(id: $id) {
+    medicalRecord(id: $id) {
       id
       patientId
+      patient {
+        firstName
+        lastName
+        email
+        phone
+      }
+      practitionerId
       recordType
       title
-      title_veritas
-      description
-      description_veritas
+      content
       diagnosis
-      diagnosis_veritas
-      treatmentPlan
-      treatmentPlan_veritas
+      treatment
       medications
-      medications_veritas
-      notes
-      notes_veritas
-      vitalSigns {
-        bloodPressure
-        heartRate
-        temperature
-        weight
-        height
-      }
-      attachments {
-        id
-        filename
-        url
-        contentType
-        size
-      }
-      createdBy
+      attachments
       createdAt
       updatedAt
-      tags
-      priority
-      status
-      status_veritas
-
-      # V3.0 @veritas QUANTUM TRUTH VERIFICATION
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
     }
   }
 `;
 
 export const CREATE_MEDICAL_RECORD = gql`
-  mutation CreateMedicalRecord($input: CreateMedicalRecordInput!) {
-    createMedicalRecordV3(input: $input) {
+  mutation CreateMedicalRecord($input: MedicalRecordInput!) {
+    createMedicalRecord(input: $input) {
       id
-      patientId
-      recordType
       title
-      title_veritas
-      description
-      description_veritas
       diagnosis
-      diagnosis_veritas
-      treatmentPlan
-      treatmentPlan_veritas
-      medications
-      medications_veritas
-      notes
-      notes_veritas
-      vitalSigns {
-        bloodPressure
-        heartRate
-        temperature
-        weight
-        height
-      }
-      attachments {
-        id
-        filename
-        url
-        contentType
-        size
-      }
-      createdBy
       createdAt
-      updatedAt
-      tags
-      priority
-      status
-      status_veritas
-
-      # V3.0 @veritas QUANTUM TRUTH VERIFICATION
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
     }
   }
 `;
 
 export const UPDATE_MEDICAL_RECORD = gql`
-  mutation UpdateMedicalRecord($id: ID!, $input: UpdateMedicalRecordInput!) {
-    updateMedicalRecordV3(id: $id, input: $input) {
+  mutation UpdateMedicalRecord($id: ID!, $input: MedicalRecordInput!) {
+    updateMedicalRecord(id: $id, input: $input) {
       id
-      patientId
-      recordType
       title
-      title_veritas
-      description
-      description_veritas
       diagnosis
-      diagnosis_veritas
-      treatmentPlan
-      treatmentPlan_veritas
-      medications
-      medications_veritas
-      notes
-      notes_veritas
-      vitalSigns {
-        bloodPressure
-        heartRate
-        temperature
-        weight
-        height
-      }
-      attachments {
-        id
-        filename
-        url
-        contentType
-        size
-      }
-      createdBy
-      createdAt
       updatedAt
-      tags
-      priority
-      status
-      status_veritas
-
-      # V3.0 @veritas QUANTUM TRUTH VERIFICATION
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
     }
   }
 `;
 
 export const DELETE_MEDICAL_RECORD = gql`
   mutation DeleteMedicalRecord($id: ID!) {
-    deleteMedicalRecordV3(id: $id) {
-      id
-      patientId
-      recordType
-      title
-      title_veritas
-      description
-      description_veritas
-      diagnosis
-      diagnosis_veritas
-      treatmentPlan
-      treatmentPlan_veritas
-      medications
-      medications_veritas
-      notes
-      notes_veritas
-      vitalSigns {
-        bloodPressure
-        heartRate
-        temperature
-        weight
-        height
-      }
-      attachments {
-        id
-        filename
-        url
-        contentType
-        size
-      }
-      createdBy
-      createdAt
-      updatedAt
-      tags
-      priority
-      status
-      status_veritas
-
-      # V3.0 @veritas QUANTUM TRUTH VERIFICATION
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
-    }
+    deleteMedicalRecord(id: $id)
   }
 `;
+
+export interface MedicalRecord {
+  id: string;
+  patientId: string;
+  patient?: {
+    firstName: string;
+    lastName: string;
+    email?: string;
+    phone?: string;
+  };
+  practitionerId?: string;
+  recordType: string;
+  title: string;
+  content: string;
+  diagnosis: string;
+  treatment: string;
+  medications: string[];
+  attachments?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MedicalRecordInput {
+  patientId: string;
+  practitionerId?: string;
+  recordType: string;
+  title?: string;
+  content?: string;
+  diagnosis: string;
+  treatment?: string;
+  medications?: string[];
+  attachments?: string[];
+}
