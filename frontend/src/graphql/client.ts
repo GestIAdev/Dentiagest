@@ -68,6 +68,7 @@ const splitLink = split(
 export const apolloClient = new ApolloClient({
   link: from([errorLink, splitLink]),
   cache: new InMemoryCache({
+    possibleTypes: {}, // ✅ Empty but defined for fragment matching tests
     typePolicies: {
       Query: {
         fields: {
