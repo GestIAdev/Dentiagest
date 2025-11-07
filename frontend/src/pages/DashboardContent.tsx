@@ -178,6 +178,66 @@ const DashboardContent: React.FC = () => {
           </div>
         </div>
 
+        {/* 🔥 V3 MODULES QUICK ACCESS - ARSENAL ACTIVATED */}
+        <div className="bg-white rounded-lg shadow-soft p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">⚡ Módulos V3 Activados</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <button 
+              onClick={() => navigate('/dashboard/inventory')}
+              className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg transition-all transform hover:scale-105 shadow-md"
+            >
+              <div className="text-2xl mb-1">📦</div>
+              <div className="text-xs font-medium">Inventario</div>
+              <div className="text-xs opacity-75">AI Insights</div>
+            </button>
+            
+            <button 
+              onClick={() => navigate('/dashboard/marketplace')}
+              className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg transition-all transform hover:scale-105 shadow-md"
+            >
+              <div className="text-2xl mb-1">🛒</div>
+              <div className="text-xs font-medium">Marketplace</div>
+              <div className="text-xs opacity-75">B2B Network</div>
+            </button>
+            
+            <button 
+              onClick={() => navigate('/dashboard/compliance')}
+              className="p-3 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg transition-all transform hover:scale-105 shadow-md"
+            >
+              <div className="text-2xl mb-1">🛡️</div>
+              <div className="text-xs font-medium">Compliance</div>
+              <div className="text-xs opacity-75">GDPR Ready</div>
+            </button>
+            
+            <button 
+              onClick={() => navigate('/dashboard/treatments')}
+              className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all transform hover:scale-105 shadow-md"
+            >
+              <div className="text-2xl mb-1">🦷</div>
+              <div className="text-xs font-medium">Tratamientos</div>
+              <div className="text-xs opacity-75">Odontogram 3D</div>
+            </button>
+            
+            <button 
+              onClick={() => navigate('/dashboard/appointments-v3')}
+              className="p-3 bg-gradient-to-br from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-lg transition-all transform hover:scale-105 shadow-md"
+            >
+              <div className="text-2xl mb-1">📅</div>
+              <div className="text-xs font-medium">Citas V3</div>
+              <div className="text-xs opacity-75">AinarkLendar</div>
+            </button>
+            
+            <button 
+              onClick={() => navigate('/dashboard/subscriptions')}
+              className="p-3 bg-gradient-to-br from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-lg transition-all transform hover:scale-105 shadow-md"
+            >
+              <div className="text-2xl mb-1">🎬</div>
+              <div className="text-xs font-medium">Subscriptions</div>
+              <div className="text-xs opacity-75">Netflix-Dental</div>
+            </button>
+          </div>
+        </div>
+
         {/* Widget IA - Específico para dentistas */}
         <div className="bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg shadow-soft p-6 text-white">
           <h3 className="text-lg font-medium mb-2">🤖 Asistente IA Dental</h3>
