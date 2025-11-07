@@ -14,3 +14,4 @@ export { DocumentCategories, DocumentCategory } from './DocumentCategories';
 
 // Re-export types for external usage
 export type { UnifiedDocumentType as DocumentTypeEnum, AccessLevel as AccessLevelEnum } from './DocumentUpload';
+

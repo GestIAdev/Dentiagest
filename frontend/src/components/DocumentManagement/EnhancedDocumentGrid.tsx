@@ -360,3 +360,4 @@ const getCategoryDisplayName = (category: LegalCategory): string => {
 };
 
 export default EnhancedDocumentGrid;
+

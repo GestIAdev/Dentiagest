@@ -1,4 +1,4 @@
-ï»¿import React, { useState } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
 import {
   GET_TREATMENTS,
@@ -122,7 +122,7 @@ const TreatmentsPageGraphQL: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Â¿Eliminar este tratamiento?")) return;
+    if (!confirm("¿Eliminar este tratamiento?")) return;
 
     try {
       await deleteTreatmentMutation({ variables: { id } });
@@ -234,7 +234,7 @@ const TreatmentsPageGraphQL: React.FC = () => {
         </table>
       </div>
 
-      {/* PaginaciÃ³n */}
+      {/* Paginación */}
       <div className="flex justify-center gap-2 mt-4">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
@@ -381,3 +381,4 @@ const TreatmentsPageGraphQL: React.FC = () => {
 };
 
 export default TreatmentsPageGraphQL;
+

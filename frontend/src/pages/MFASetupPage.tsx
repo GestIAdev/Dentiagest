@@ -367,3 +367,4 @@ const MFASetupPage: React.FC = () => {
 };
 
 export default MFASetupPage;
+

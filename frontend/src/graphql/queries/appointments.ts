@@ -1,4 +1,4 @@
-﻿//  GRAPHQL QUERIES - APPOINTMENTS (ALINEADO CON SELENE)
+//  GRAPHQL QUERIES - APPOINTMENTS (ALINEADO CON SELENE)
 // Date: November 6, 2025 - GraphQL Migration v1.0
 // Schema: Appointment { id, patientId, patient, practitionerId, date, time, appointmentDate, appointmentTime, duration, type, status, notes, createdAt, updatedAt }
 
@@ -95,6 +95,36 @@ export const DELETE_APPOINTMENT = gql`
   }
 `;
 
+export const CANCEL_APPOINTMENT = gql`
+  mutation CancelAppointment($id: ID!) {
+    updateAppointment(id: $id, input: { status: "cancelled" }) {
+      id
+      status
+      updatedAt
+    }
+  }
+`;
+
+export const CONFIRM_APPOINTMENT = gql`
+  mutation ConfirmAppointment($id: ID!) {
+    updateAppointment(id: $id, input: { status: "confirmed" }) {
+      id
+      status
+      updatedAt
+    }
+  }
+`;
+
+export const COMPLETE_APPOINTMENT = gql`
+  mutation CompleteAppointment($id: ID!) {
+    updateAppointment(id: $id, input: { status: "completed" }) {
+      id
+      status
+      updatedAt
+    }
+  }
+`;
+
 export interface Appointment {
   id: string;
   patientId: string;
@@ -137,3 +167,4 @@ export interface UpdateAppointmentInput {
   status?: string;
   notes?: string;
 }
+

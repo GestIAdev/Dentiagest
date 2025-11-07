@@ -265,3 +265,4 @@ export const isLegacyDocumentType = (value: string): value is LegacyDocumentType
  * 
  * "Fuck duplicated mapping functions, long live centralized architecture!" 🎸⚡💀
  */
+

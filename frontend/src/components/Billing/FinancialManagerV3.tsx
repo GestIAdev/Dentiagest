@@ -7,8 +7,10 @@
 // 🔒 SECURITY: @veritas quantum truth verification on financial transactions
 
 import React, { useState, useMemo } from 'react';
-// 🔥 APOLLO CLIENT HOOKS - Real GraphQL integration ✅
-import { useQuery, useMutation } from '@apollo/client';
+// 🔥 APOLLO CLIENT V4 ESM HOOKS - VITE NATIVE ✅
+// No webpack hacks, no re-exports, pure ESM imports
+// Vite resolves @apollo/client exports field perfectly
+import { useQuery, useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
 import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../atoms';

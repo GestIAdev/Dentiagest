@@ -1,4 +1,4 @@
-﻿//  APOLLO NUCLEAR GRAPHQL QUERIES - PATIENTS (ALIGNED WITH SELENE SCHEMA)
+//  APOLLO NUCLEAR GRAPHQL QUERIES - PATIENTS (ALIGNED WITH SELENE SCHEMA)
 // Date: 2025-11-06
 // Mission: GraphQL Queries for Patient Management
 //  ALINEADO 100% CON SCHEMA REAL DE SELENE - NO FIELDS THAT DON'T EXIST
@@ -116,13 +116,39 @@ export const DELETE_PATIENT = gql`
   }
 `;
 
+//  ACTIVATE PATIENT - Reactivate deactivated patient
+export const ACTIVATE_PATIENT = gql`
+  mutation ActivatePatient($id: ID!) {
+    activatePatient(id: $id) {
+      id
+      firstName
+      lastName
+      isActive
+      updatedAt
+    }
+  }
+`;
+
+//  DEACTIVATE PATIENT - Soft delete patient
+export const DEACTIVATE_PATIENT = gql`
+  mutation DeactivatePatient($id: ID!) {
+    deactivatePatient(id: $id) {
+      id
+      firstName
+      lastName
+      isActive
+      updatedAt
+    }
+  }
+`;
+
 // ============================================================================
 // TYPESCRIPT TYPES (ALIGNED WITH SELENE SCHEMA)
 // ============================================================================
 
 export interface Patient {
   id: string;
-  name?: string; // 🔥 Added: Combined name from apollo_patients view
+  name?: string; // ?? Added: Combined name from apollo_patients view
   firstName: string;
   lastName: string;
   email?: string;
@@ -219,3 +245,4 @@ export interface DeletePatientData {
 export interface DeletePatientVariables {
   id: string;
 }
+

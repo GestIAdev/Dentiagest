@@ -123,3 +123,4 @@ export const checkTimezoneWarning = (clinicTimezone: string = CLINIC_TIMEZONE): 
   
   return { showWarning: false, message: '' };
 };
+

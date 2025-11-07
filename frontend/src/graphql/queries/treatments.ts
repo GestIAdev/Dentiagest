@@ -1,4 +1,4 @@
-﻿import { gql } from "@apollo/client";
+import { gql } from "@apollo/client";
 
 // TypeScript Interfaces
 export interface Treatment {
@@ -132,3 +132,4 @@ export const DELETE_TREATMENT = gql`
     deleteTreatment(id: $id)
   }
 `;
+

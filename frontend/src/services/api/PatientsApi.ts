@@ -250,3 +250,4 @@ export default patientsApi;
  * 
  * "Patient management made bulletproof!" 👥⚡
  */
+

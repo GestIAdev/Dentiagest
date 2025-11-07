@@ -584,3 +584,4 @@ export function AppointmentCard({
 }
 
 export default AppointmentCard;
+

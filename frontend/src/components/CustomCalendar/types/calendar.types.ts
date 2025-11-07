@@ -80,3 +80,4 @@ export interface CalendarProps {
   onSlotClick?: (slot: TimeSlot) => void;
   className?: string;
 }
+

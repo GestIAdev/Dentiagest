@@ -500,3 +500,4 @@ export function WeekViewSimple({
 }
 
 export default WeekViewSimple;
+

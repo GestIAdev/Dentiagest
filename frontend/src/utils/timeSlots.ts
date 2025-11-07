@@ -65,3 +65,4 @@ export function getSlotsForHour(hour: number): TimeSlot[] {
 export function getWorkingHours(): number[] {
   return Array.from({ length: 14 }, (_, i) => i + 7);
 }
+

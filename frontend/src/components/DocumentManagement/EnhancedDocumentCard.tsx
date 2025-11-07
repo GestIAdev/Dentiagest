@@ -372,3 +372,4 @@ export const EnhancedDocumentCard: React.FC<EnhancedDocumentCardProps> = ({
 };
 
 export default EnhancedDocumentCard;
+

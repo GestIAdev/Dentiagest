@@ -57,3 +57,4 @@ const MedicalRecordsPage: React.FC = () => {
 };
 
 export default MedicalRecordsPage;
+

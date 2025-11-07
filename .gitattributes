@@ -1,0 +1,5 @@
+# Disable auto-restore for deleted directories
+# If we delete something, it's for a reason - RaulVisionario & PunkClaude
+
+backend/** -merge
+backend/** -diff

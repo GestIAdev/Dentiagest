@@ -797,3 +797,4 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
 };
 
 export default MedicalRecordForm;
+

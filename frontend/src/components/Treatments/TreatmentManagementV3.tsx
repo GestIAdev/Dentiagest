@@ -7,7 +7,7 @@
  */
 
 import React, { useState } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 // Removed unused UI helper components (TreatmentFilters, TreatmentStats, AITreatmentInsights)
 
 // GraphQL Operations

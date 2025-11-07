@@ -317,3 +317,4 @@ export function MedicalRecordsPageGraphQL() {
     </div>
   );
 }
+

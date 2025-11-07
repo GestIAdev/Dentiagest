@@ -7,7 +7,7 @@
 // 🔒 SECURITY: @veritas quantum truth verification on cart transactions
 
 import React, { useState, useMemo } from 'react';
-import { useQuery, useMutation, useSubscription } from '@apollo/client';
+import { useQuery, useMutation, useSubscription } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
 import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../atoms';

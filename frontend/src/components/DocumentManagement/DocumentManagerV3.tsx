@@ -19,7 +19,7 @@ import { VeritasProofViewer } from './VeritasProofViewer';
 import DocumentViewerV3 from './DocumentViewerV3';
 
 // 🎯 GRAPHQL OPERATIONS - Apollo Nuclear Integration
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 import {
   GET_UNIFIED_DOCUMENTS,
   DELETE_DOCUMENT

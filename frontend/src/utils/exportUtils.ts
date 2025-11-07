@@ -429,3 +429,4 @@ export const exportMultipleDocuments = async (
     throw new Error(`Error en exportación múltiple: ${error}`);
   }
 };
+

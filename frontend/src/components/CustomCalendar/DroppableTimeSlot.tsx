@@ -272,3 +272,4 @@ export function DroppableTimeSlot({
 }
 
 export default DroppableTimeSlot;
+

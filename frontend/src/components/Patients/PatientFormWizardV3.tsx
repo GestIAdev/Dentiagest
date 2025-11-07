@@ -11,7 +11,7 @@ import { createModuleLogger } from '../../utils/logger';
 import { useDocumentLogger } from '../../utils/documentLogger';
 
 // 🎯 GRAPHQL OPERATIONS - Apollo Nuclear Integration
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import {
   CREATE_PATIENT,
   UPDATE_PATIENT

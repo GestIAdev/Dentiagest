@@ -179,3 +179,4 @@ export const useTreatmentGraphQL = (options: UseTreatmentGraphQLOptions = {}) =>
     clearError: () => setError(null)
   };
 };
+

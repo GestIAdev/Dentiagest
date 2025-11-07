@@ -1,4 +1,4 @@
-﻿//  GRAPHQL QUERIES - MEDICAL RECORDS (ALINEADO CON SELENE)
+//  GRAPHQL QUERIES - MEDICAL RECORDS (ALINEADO CON SELENE)
 // Date: November 6, 2025 - GraphQL Migration v1.0
 // Schema: MedicalRecord { id, patientId, patient, practitionerId, recordType, title, content, diagnosis, treatment, medications, attachments, createdAt, updatedAt }
 
@@ -110,3 +110,4 @@ export interface MedicalRecordInput {
   medications?: string[];
   attachments?: string[];
 }
+

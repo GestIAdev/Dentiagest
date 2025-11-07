@@ -11,7 +11,7 @@ import { createModuleLogger } from '../../utils/logger';
 import { useDocumentLogger } from '../../utils/documentLogger';
 
 //  GRAPHQL OPERATIONS - Apollo Nuclear Integration
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 import {
   GET_APPOINTMENTS,
   GET_TODAY_APPOINTMENTS,
@@ -990,3 +990,4 @@ export default AppointmentManagementV3;
  * Status: Appointments Province - CONQUERED WITH @veritas
  * Protocol: Guerra Relámpago - Continue mass migration
  */
+

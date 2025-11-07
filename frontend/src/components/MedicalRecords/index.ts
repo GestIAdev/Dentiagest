@@ -38,3 +38,4 @@ export { default as MedicalRecordDetail } from './MedicalRecordDetail';
 
 // Exportación por defecto del router (CAMBIADO para la nueva arquitectura)
 export { default } from './MedicalRouter';
+

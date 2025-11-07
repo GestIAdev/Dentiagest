@@ -120,3 +120,4 @@ const MedicalRouter: React.FC = () => {
 };
 
 export default MedicalRouter;
+

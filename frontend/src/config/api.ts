@@ -44,3 +44,4 @@ export const API_ENDPOINTS = {
 export const getPatientUrl = (patientId: string) => buildApiUrl(`/patients/${patientId}`);
 export const getAppointmentUrl = (appointmentId: string) => buildApiUrl(`/appointments/${appointmentId}`);
 export const getDocumentDownloadUrl = (documentId: string) => buildApiUrl(`/medical-records/documents/${documentId}/download`);
+

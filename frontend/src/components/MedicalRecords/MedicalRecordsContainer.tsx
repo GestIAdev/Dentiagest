@@ -141,3 +141,4 @@ const MedicalRecordsContainer: React.FC = () => {
 };
 
 export default MedicalRecordsContainer;
+

@@ -7,7 +7,7 @@
 // 🔒 SECURITY: @veritas quantum truth verification on regulation data
 
 import React, { useState, useEffect } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
 import { Button, Card, CardHeader, CardTitle, CardContent, Input, Spinner } from '../atoms/index';

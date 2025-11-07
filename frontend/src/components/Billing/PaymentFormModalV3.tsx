@@ -39,7 +39,7 @@ import {
 } from '../atoms';
 
 // GraphQL Hooks
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { CREATE_PAYMENT } from '../../graphql/queries/billing';
 
 // Zustand Store

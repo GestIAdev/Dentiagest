@@ -602,3 +602,4 @@ const MedicalRecordDetail: React.FC<MedicalRecordDetailProps> = ({
 };
 
 export default MedicalRecordDetail;
+

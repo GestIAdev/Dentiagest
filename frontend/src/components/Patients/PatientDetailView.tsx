@@ -436,3 +436,4 @@ const PatientDetailView: React.FC<PatientDetailProps> = ({ patient, onBack, onEd
 };
 
 export default PatientDetailView;
+

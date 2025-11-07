@@ -3,7 +3,7 @@
  * 🔗 PHASE 4: GRAPHQL INTEGRATION - Real-time Calendar Data
  */
 
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { useMemo, useEffect } from 'react';
 import { GET_APPOINTMENTS_FOR_WEEK } from '../../../graphql/queries/appointments';
 import { useAppointmentUpdates } from '../../../graphql/subscriptions';

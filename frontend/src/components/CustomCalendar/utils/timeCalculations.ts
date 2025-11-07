@@ -149,3 +149,4 @@ export function formatTimeSlot(slot: TimeSlot): string {
 export function isWorkingHour(hour: number): boolean {
   return hour >= WORKING_HOURS.START && hour < WORKING_HOURS.END;
 }
+

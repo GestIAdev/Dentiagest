@@ -450,3 +450,4 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
 };
 
 export default CreateAppointmentModal;
+

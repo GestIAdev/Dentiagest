@@ -186,3 +186,4 @@ export const appointmentService = {
 
 // Note: individual functions are already exported by name above; consumers may import the specific functions
 // or the aggregated `appointmentService` object.
+

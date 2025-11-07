@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stealth Wrapper Test</title>
+</head>
+<body>
+    <h1>🔥 STEALTH WRAPPER TEST</h1>
+    <div id="results"></div>
+    
+    <script>
+        // Test del stealth wrapper desde el navegador
+        console.log('🎸 PUNK TEST: Probando stealth wrapper...');
+        
+        // Simular lo que hace EditAppointmentModal.tsx
+        const testStealthWrapper = async () => {
+            try {
+                // Esto debería funcionar si el stealth wrapper está bien implementado
+                const response = await fetch('/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: `query GetPatients { 
+                            patients { 
+                                id 
+                                name 
+                                email 
+                                phone 
+                            } 
+                        }`
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('✅ GraphQL Response:', data);
+                
+                document.getElementById('results').innerHTML = `
+                    <h2>✅ SUCCESS!</h2>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                console.error('💥 Error:', error);
+                document.getElementById('results').innerHTML = `
+                    <h2>💥 ERROR</h2>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        };
+        
+        // Auto-ejecutar test
+        window.onload = () => {
+            testStealthWrapper();
+        };
+    </script>
+</body>
+</html>

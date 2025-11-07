@@ -4,7 +4,8 @@
 // Target: Migrate from REST v1 to GraphQL for patients province
 
 import { useState, useEffect, useCallback } from 'react';
-import { useQuery, useMutation, useApolloClient } from '@apollo/client';
+// 🔥 Apollo v4 React hooks from /react export (ESM + Vite native)
+import { useQuery, useMutation, useApolloClient } from '@apollo/client/react';
 import { 
   GET_PATIENTS, 
   GET_PATIENT,

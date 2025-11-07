@@ -298,3 +298,4 @@ export const getTypesByRetention = (ascending: boolean = true): DocumentTypeMapp
  * 
  * "One mapping to rule them all!" 🎸⚡💀
  */
+

@@ -6,7 +6,7 @@
 // Dependencies: @apollo/client, @veritas/directives, ultra-anonymizer, zustand, three
 
 import React, { useState, useRef, Suspense } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Text, Sphere, Box } from '@react-three/drei';
 import * as THREE from 'three';

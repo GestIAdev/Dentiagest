@@ -532,3 +532,4 @@ const PatientsPageGraphQL: React.FC = () => {
 };
 
 export default PatientsPageGraphQL;
+

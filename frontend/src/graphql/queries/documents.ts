@@ -1,4 +1,4 @@
-﻿import { gql } from "@apollo/client";
+import { gql } from "@apollo/client";
 
 // TypeScript Interfaces
 export interface Document {
@@ -137,3 +137,4 @@ export const DELETE_DOCUMENT = gql`
     deleteDocument(id: $id)
   }
 `;
+

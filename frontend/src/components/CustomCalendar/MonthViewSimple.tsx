@@ -225,3 +225,4 @@ const MonthViewSimple: React.FC<MonthViewSimpleProps> = ({
 };
 
 export default MonthViewSimple;
+

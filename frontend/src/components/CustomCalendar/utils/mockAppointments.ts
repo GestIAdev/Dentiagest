@@ -272,3 +272,4 @@ export function getDailyStats(appointments: AppointmentData[]) {
 
   return stats;
 }
+

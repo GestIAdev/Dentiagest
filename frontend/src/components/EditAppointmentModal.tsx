@@ -578,3 +578,4 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
 };
 
 export default EditAppointmentModal;
+

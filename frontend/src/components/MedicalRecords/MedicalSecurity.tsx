@@ -266,3 +266,4 @@ export const SensitiveDataWarning: React.FC = () => {
 };
 
 export default MedicalSecurityProvider;
+

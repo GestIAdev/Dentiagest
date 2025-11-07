@@ -36,3 +36,4 @@ export {
 // Types for TypeScript users
 export type { CalendarView } from './hooks/useCalendarStateSimple';
 export type { AppointmentData } from './AppointmentCard';
+

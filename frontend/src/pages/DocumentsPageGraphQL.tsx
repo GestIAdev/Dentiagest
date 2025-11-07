@@ -1,4 +1,4 @@
-ï»¿import React, { useState } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
 import {
   GET_DOCUMENTS,
@@ -131,7 +131,7 @@ const DocumentsPageGraphQL: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Â¿Eliminar este documento?")) return;
+    if (!confirm("¿Eliminar este documento?")) return;
 
     try {
       await deleteDocumentMutation({ variables: { id } });
@@ -238,7 +238,7 @@ const DocumentsPageGraphQL: React.FC = () => {
         </table>
       </div>
 
-      {/* PaginaciÃ³n */}
+      {/* Paginación */}
       <div className="flex justify-center gap-2 mt-4">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
@@ -407,3 +407,4 @@ const DocumentsPageGraphQL: React.FC = () => {
 };
 
 export default DocumentsPageGraphQL;
+

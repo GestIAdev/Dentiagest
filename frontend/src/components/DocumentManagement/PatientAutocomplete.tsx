@@ -221,3 +221,4 @@ export const PatientAutocomplete: React.FC<PatientAutocompleteProps> = ({
     </div>
   );
 };
+

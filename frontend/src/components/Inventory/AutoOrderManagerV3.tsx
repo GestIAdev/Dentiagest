@@ -5,7 +5,7 @@
 // Challenge: AI-driven inventory optimization with multi-supplier management
 
 import React, { useState, useMemo } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
 import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner, Input } from '../atoms';

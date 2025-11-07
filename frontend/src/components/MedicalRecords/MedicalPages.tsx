@@ -238,3 +238,4 @@ export const PatientMedicalRecordsPage: React.FC = () => {
     </div>
   );
 };
+
