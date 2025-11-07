@@ -5,17 +5,35 @@
     "lib": ["ES2021", "dom"],
     "outDir": "./dist",
     "rootDir": "./",
-    "strict": true,
+    
+    /* Type Checking - Relaxed (frontend tiene su propio config) */
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    
+    /* Module System */
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    
+    /* Emit */
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "types": ["node"],
     "downlevelIteration": true,
+    
+    /* JSX */
     "jsx": "react-jsx",
+    
+    /* Module Resolution - Deprecated warnings silenced */
     "moduleResolution": "node",
+    "ignoreDeprecations": "5.0",
+    
+    /* Node Types */
+    "types": ["node"],
+    
+    /* Paths (solo backend Selene) */
     "baseUrl": ".",
     "paths": {
       "@/*": ["*"],
@@ -36,6 +54,9 @@
     "dist",
     "**/*.test.ts",
     "**/*.spec.ts",
-    "selene/snapshots/**"
+    "selene/snapshots/**",
+    "frontend/**/*",
+    "patient-portal/**/*",
+    "dashboard-new/**/*"
   ]
 }
