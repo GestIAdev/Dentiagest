@@ -24,14 +24,8 @@ export {
 // ============================================================================
 // SPECIALIZED MODULES
 // ============================================================================
-export { 
-  documentsApi, 
-  docs,
-  type Document,
-  type DocumentUploadData,
-  type DocumentListFilters,
-  type DocumentStats
-} from './DocumentsApi';
+// 🧟‍♂️💀 ZOMBIE API FILES ELIMINATED - DocumentsApi.ts, MedicalRecordsApi.ts DELETED
+// 🥷 STEALTH MODE: All functionality migrated to apolloGraphQL.ts
 
 export { 
   patientsApi, 
@@ -43,22 +37,12 @@ export {
   type PatientSuggestion
 } from './PatientsApi';
 
-export { 
-  medicalRecords,
-  type MedicalRecord,
-  type MedicalRecordCreateRequest,
-  type MedicalRecordUpdateRequest,
-  type MedicalRecordListParams,
-  type MedicalRecordListResponse
-} from './MedicalRecordsApi';
-
 // ============================================================================
 // IMPORTS FOR APOLLO OBJECT
 // ============================================================================
 import { api, API_ENDPOINTS } from './ApiService';
-import { docs } from './DocumentsApi';
 import { patients } from './PatientsApi';
-import { medicalRecords } from './MedicalRecordsApi';
+// 🧟‍♂️💀 ZOMBIE IMPORTS ELIMINATED: docs, medicalRecords → apolloGraphQL.ts
 
 // ============================================================================
 // QUICK ACCESS OBJECT
@@ -69,10 +53,9 @@ export const apollo = {
   api,
   endpoints: API_ENDPOINTS,
   
-  // Specialized services
-  docs,
+  // Specialized services (ZOMBIE-FREE)
   patients,
-  medicalRecords,
+  // 🧟‍♂️💀 docs & medicalRecords → apolloGraphQL.ts (STEALTH MIGRATED)
   
   // Utilities
   setVersion: api.setVersion,
@@ -89,15 +72,12 @@ export default apollo;
 /**
  * 🎸 APOLLO USAGE EXAMPLES:
  * 
- * // Option 1: Import everything
+ * // Option 1: Import everything (ZOMBIE-FREE)
  * import apollo from '@/services/api';
- * const documents = await apollo.docs.list();
  * const patients = await apollo.patients.list();
  * 
  * // Option 2: Import specific services
- * import { docs, patients } from '@/services/api';
- * const documents = await docs.list();
- * const patientList = await patients.list();
+ * import { patients } from '@/services/api';
  * 
  * // Option 3: Import core API
  * import { api, API_ENDPOINTS } from '@/services/api';
