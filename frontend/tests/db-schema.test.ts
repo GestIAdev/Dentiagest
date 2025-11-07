@@ -14,12 +14,17 @@ import { describe, test, expect, beforeAll, afterAll } from 'vitest';
 import pkg from 'pg';
 const { Client } = pkg;
 
+// Load .env.test for DB credentials
+import { config } from 'dotenv';
+import path from 'path';
+config({ path: path.resolve(__dirname, '../.env.test') });
+
 const DB_CONFIG = {
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432'),
   database: process.env.DB_NAME || 'dentiagest',
   user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres'
+  password: process.env.DB_PASSWORD || '11111111'
 };
 
 describe('Database Schema Validation', () => {
