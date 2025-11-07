@@ -12,6 +12,8 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './tests/setup.ts',
+    include: ['tests/**/*.{test,spec}.{ts,tsx}'], // Only unit tests
+    exclude: ['tests/e2e/**', 'node_modules/', 'build/'], // Exclude E2E Playwright tests
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

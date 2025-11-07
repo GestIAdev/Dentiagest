@@ -13,7 +13,7 @@
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import DashboardContent from '../src/components/Dashboard/DashboardContent';
+import DashboardContent from '../src/pages/DashboardContent';
 
 // Mock react-router-dom navigate
 const mockNavigate = vi.fn();
