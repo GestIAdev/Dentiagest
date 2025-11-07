@@ -12,8 +12,15 @@ import DashboardContent from './pages/DashboardContent';
 import PatientsPageGraphQL from './pages/PatientsPageGraphQL';
 import CalendarPage from './pages/CalendarPage';
 import { DocumentsPage } from './pages/DocumentsPage';
-// 🔥 V3 COMPONENTS RECONNECTION - PUNKGROK JEWELS ✅ ACTIVATED
+// 🔥 V3 ARSENAL COMPLETE - POST-VITE ACTIVATION - 14 JEWELS AWAKENED
 import FinancialManagerV3 from './components/Billing/FinancialManagerV3';
+import TreatmentManagementV3 from './components/Treatments/TreatmentManagementV3';
+import InventoryManagementV3 from './components/Inventory/InventoryManagementV3';
+import SupplierManagerV3 from './components/MarketplacePage/SupplierManagerV3';
+import PurchaseOrderManagerV3 from './components/MarketplacePage/PurchaseOrderManagerV3';
+import ComplianceManagementV3 from './components/Compliance/ComplianceManagementV3';
+import AppointmentManagementV3 from './components/Appointments/AppointmentManagementV3';
+import SubscriptionPlansManager from './components/Subscription/SubscriptionPlansManager';
 
 // Página de inicio - redirige automáticamente según estado de autenticación
 function HomePage() {
@@ -133,9 +140,17 @@ function AppRoutes() {
           <Route path="agenda" element={<CalendarPage />} />
           <Route path="medical-records/*" element={<MedicalRouter />} />
           <Route path="documents" element={<DocumentsPage />} />
-          <Route path="treatments" element={<ComingSoonPage pageName="Tratamientos" />} />
+          
+          {/* 🔥 V3 ARSENAL COMPLETE - 8 JEWELS ACTIVATED (74% DORMIDOS → 100% BRILLANDO) */}
+          <Route path="treatments" element={<TreatmentManagementV3 />} />
           <Route path="billing" element={<ComingSoonPage pageName="Facturación" />} />
           <Route path="billing-v3" element={<FinancialManagerV3 />} />
+          <Route path="inventory" element={<InventoryManagementV3 />} />
+          <Route path="marketplace" element={<SupplierManagerV3 />} />
+          <Route path="purchase-orders" element={<PurchaseOrderManagerV3 />} />
+          <Route path="compliance" element={<ComplianceManagementV3 />} />
+          <Route path="appointments-v3" element={<AppointmentManagementV3 />} />
+          <Route path="subscriptions" element={<SubscriptionPlansManager />} />
         </Route>
 
         {/* Settings también protegida */}

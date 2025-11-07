@@ -6,8 +6,8 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { apolloClient } from '../apollo/graphql-client';
 import {
-  GET_UNIFIED_DOCUMENTS,
-  UPLOAD_DOCUMENT_MUTATION,
+  GET_DOCUMENTS,
+  CREATE_DOCUMENT,
   DELETE_DOCUMENT
 } from '../graphql/queries/documents';
 
@@ -535,14 +535,14 @@ export const useDocumentStore = create<DocumentState>()(
           try {
             // Use GraphQL query instead of REST
             const { data, error } = await apolloClient.query({
-              query: GET_UNIFIED_DOCUMENTS,
+              query: GET_DOCUMENTS,
               variables: filters,
               fetchPolicy: 'network-only'
             });
 
             if (error) throw error;
 
-            const documentsArray: Document[] = (data as any)?.unifiedDocuments || [];
+            const documentsArray: Document[] = (data as any)?.documents || [];
             setDocuments(documentsArray);
             return documentsArray;
           } catch (err) {
@@ -584,7 +584,7 @@ export const useDocumentStore = create<DocumentState>()(
           try {
             // Use GraphQL mutation instead of REST
             const result = await apolloClient.mutate({
-              mutation: UPLOAD_DOCUMENT_MUTATION,
+              mutation: CREATE_DOCUMENT,
               variables: {
                 file: documentData.get('file'),
                 patientId: documentData.get('patientId'),
@@ -594,7 +594,7 @@ export const useDocumentStore = create<DocumentState>()(
               }
             });
 
-            const newDocument = (result.data as any)?.uploadDocument;
+            const newDocument = (result.data as any)?.createDocument;
 
             const mappedDocument = {
               ...(newDocument as any),
