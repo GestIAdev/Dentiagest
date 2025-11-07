@@ -282,8 +282,8 @@ export const INVENTORY_V3_DELETED = gql`
 `;
 
 export const STOCK_LEVEL_CHANGED = gql`
-  subscription StockLevelChanged($itemId: ID!, $threshold: Int!) {
-    stockLevelChanged(itemId: $itemId, newQuantity: Int!, threshold: $threshold) {
+  subscription StockLevelChanged($itemId: ID!, $newQuantity: Int!, $threshold: Int!) {
+    stockLevelChanged(itemId: $itemId, newQuantity: $newQuantity, threshold: $threshold) {
       id
       itemName
       itemCode

@@ -1,17 +1,19 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { apolloClient } from '../graphql/client';
-import { GET_ME_QUERY } from '../graphql/queries/auth';
-import apollo from '../apollo'; // Para autenticación REST
+import { LOGIN_MUTATION, LOGOUT_MUTATION, ME_QUERY } from '../graphql/mutations/auth';
 
-// Tipos según documentación del backend
+// 🔥 V3 AUTH TYPES - VERITAS INTEGRATED
+// Updated to match GraphQL schema UserRole enum
 interface User {
   id: string;
   username: string;
   email: string;
-  first_name: string;
-  last_name: string;
-  role: 'admin' | 'professional' | 'assistant' | 'receptionist'; // 🔧 ROLES CORRECTOS DEL BACKEND
-  is_active: boolean;
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
+  role: 'ADMIN' | 'DENTIST' | 'RECEPTIONIST' | 'PATIENT';
+  isActive: boolean;
+  lastLoginAt?: string;
 }
 
 interface AuthState {
@@ -24,7 +26,7 @@ interface AuthState {
 interface AuthContextType {
   state: AuthState;
   login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 // Estado inicial
@@ -38,13 +40,13 @@ const initialState: AuthState = {
 // Context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Provider simple
+// Provider V3 - Pure GraphQL
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, setState] = useState<AuthState>(initialState);
 
-  // Restaurar sesión desde localStorage al cargar
+  // 🔄 Restore session from localStorage on mount
   useEffect(() => {
-    const restoreSession = () => {
+    const restoreSession = async () => {
       const accessToken = localStorage.getItem('accessToken');
       const userStr = localStorage.getItem('user');
 
@@ -58,27 +60,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             accessToken,
           });
           
-          // Verify token is still valid with backend
-          apolloClient.query({ query: GET_ME_QUERY })
-            .then((result: any) => {
-              if (!result.data?.me) {
-                console.log('🔄 Token expired, clearing session');
-                logout();
-              }
-            })
-            .catch(() => {
-              console.log('🔄 Token validation failed, clearing session');
-              logout();
+          // 🎯 Verify token with ME query (V3)
+          try {
+            const result = await apolloClient.query({ 
+              query: ME_QUERY,
+              fetchPolicy: 'network-only' // Always check server
             });
             
+            if (!result.data?.me) {
+              console.log('🔄 Token expired, clearing session');
+              await logout();
+            } else {
+              // Update user data with fresh data from server
+              const freshUser = result.data.me;
+              localStorage.setItem('user', JSON.stringify(freshUser));
+              setState(prev => ({ ...prev, user: freshUser }));
+            }
+          } catch (error) {
+            console.log('🔄 Token validation failed, clearing session');
+            await logout();
+          }
+            
         } catch (error) {
-          console.error('Error parsing stored user data:', error);
+          console.error('❌ Error parsing stored user data:', error);
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('user');
         }
       } else {
-        // No stored credentials - go straight to clean state
         setState(prev => ({ ...prev, isLoading: false }));
       }
     };
@@ -86,75 +95,96 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     restoreSession();
   }, []);
 
+  // 🚀 V3 LOGIN - GraphQL Mutation with Veritas validation
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setState(prev => ({ ...prev, isLoading: true }));
 
-      // 🚀 REST AUTHENTICATION - Authentication login with FormData (SELENE NODE 1)
-      const formData = new FormData();
-      formData.append('username', email);
-      formData.append('password', password);
+      // Execute LOGIN mutation (V3)
+      const result = await apolloClient.mutate({
+        mutation: LOGIN_MUTATION,
+        variables: {
+          input: {
+            email,
+            password
+          }
+        }
+      });
 
-      const response = await apollo.api.post('/auth/login', formData);
-
-      if (!response.success || !response.data) {
+      if (!result.data?.login) {
+        console.error('❌ Login mutation returned no data');
         setState(prev => ({ ...prev, isLoading: false }));
         return false;
       }
 
-      // Extract tokens from login response
-      const loginData = response.data as any;
-      const accessToken = loginData.access_token;
-      const refreshToken = loginData.refresh_token || '';
+      const { accessToken, refreshToken, user, expiresIn } = result.data.login;
 
-      if (!accessToken) {
+      if (!accessToken || !user) {
+        console.error('❌ Login response missing tokens or user');
         setState(prev => ({ ...prev, isLoading: false }));
         return false;
       }
 
-      // 🎯 Store tokens in localStorage so GraphQL can use them
+      // 🎯 Store tokens in localStorage
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('user', JSON.stringify(user));
 
-      // 🚀 CREATE BASIC USER INFO FROM LOGIN DATA
-      // Since GraphQL schema doesn't have 'me' query, we'll use basic info
-      // and fetch full user data later when needed
-      const basicUser = {
-        id: 'current-user', // Placeholder - will be updated when full data is fetched
-        username: email,
-        email: email,
-        first_name: email.split('@')[0], // Basic name from email
-        last_name: '',
-        role: 'professional', // Default role - will be updated from actual data
-        is_active: true
-      };
+      console.log('✅ Login successful:', {
+        userId: user.id,
+        role: user.role,
+        expiresIn: `${expiresIn}s`
+      });
 
-      // Store basic user data
-      localStorage.setItem('user', JSON.stringify(basicUser));
-
-      // Update state with authenticated user (basic info)
+      // Update state with authenticated user
       setState({
         isAuthenticated: true,
         isLoading: false,
-        user: basicUser,
-        accessToken: accessToken,
+        user,
+        accessToken,
       });
 
       return true;
 
-    } catch (error) {
-      console.error('Login error:', error);
+    } catch (error: any) {
+      console.error('❌ Login error:', error);
+      
+      // GraphQL errors contain useful info
+      if (error.graphQLErrors) {
+        error.graphQLErrors.forEach((err: any) => {
+          console.error('GraphQL Error:', err.message);
+        });
+      }
+      
       setState(prev => ({ ...prev, isLoading: false }));
       return false;
     }
   };
 
-  const logout = () => {
+  // 🔥 V3 LOGOUT - GraphQL Mutation with server-side token invalidation
+  const logout = async (): Promise<void> => {
+    try {
+      // Call logout mutation to invalidate tokens server-side
+      await apolloClient.mutate({
+        mutation: LOGOUT_MUTATION
+      });
+    } catch (error) {
+      console.error('❌ Logout mutation error:', error);
+      // Continue with client-side cleanup even if server fails
+    }
+
+    // Clear localStorage
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
-    // Clear Apollo cache on logout
-    apolloClient.clearStore();
+    
+    // Clear Apollo cache
+    await apolloClient.clearStore();
+    
+    // Reset state
     setState(initialState);
+    
+    console.log('✅ Logged out successfully');
   };
 
   return (
@@ -180,4 +210,5 @@ export const useAuth = (): AuthContextType => {
 };
 
 export default AuthContext;
+
 

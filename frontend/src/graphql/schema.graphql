@@ -440,6 +440,9 @@ type PatientSearchSuggestion {
 # ============================================================================
 
 type Query {
+  # Authentication Queries (V3 - VERITAS)
+  me: User
+  
   # Patient Queries
   patients(filters: PatientSearchFilters): PatientConnection!
   patient(id: UUID!): Patient
@@ -457,10 +460,73 @@ type Query {
 }
 
 # ============================================================================
+# AUTHENTICATION & AUTHORIZATION (V3 - VERITAS INTEGRATION)
+# ============================================================================
+
+"""
+User type represents an authenticated user in the system.
+Supports multiple roles: Admin, Dentist, Receptionist.
+"""
+type User @key(fields: "id") {
+  id: UUID!
+  username: String!
+  email: String!
+  role: UserRole!
+  firstName: String
+  lastName: String
+  fullName: String
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  lastLoginAt: DateTime
+}
+
+"""
+Authentication response containing access tokens and user data.
+Access token (JWT) expires in 15 minutes, refresh token in 7 days.
+"""
+type AuthResponse {
+  accessToken: String!
+  refreshToken: String!
+  user: User!
+  expiresIn: Int!
+}
+
+enum UserRole {
+  ADMIN
+  DENTIST
+  RECEPTIONIST
+  PATIENT
+}
+
+"""
+Input for user login mutation.
+Validates email format and password strength using @veritas directive.
+"""
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+"""
+Input for token refresh mutation.
+Requires valid refresh token from previous authentication.
+"""
+input RefreshTokenInput {
+  refreshToken: String!
+}
+
+# ============================================================================
 # MUTATIONS
 # ============================================================================
 
 type Mutation {
+  # Authentication Mutations (V3 - VERITAS)
+  login(input: LoginInput!): AuthResponse!
+  logout: Boolean!
+  refreshToken(input: RefreshTokenInput!): AuthResponse!
+  
+  # Patient Mutations
   # Patient Mutations
   createPatient(input: PatientCreateInput!): Patient!
   updatePatient(id: UUID!, input: PatientUpdateInput!): Patient!

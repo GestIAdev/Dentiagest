@@ -121,8 +121,8 @@ export const APPOINTMENT_STATS_FRAGMENT = gql`
 // ============================================================================
 
 export const GET_APPOINTMENTS = gql`
-  query GetAppointments($filters: AppointmentFiltersInput, $pagination: PaginationInput) {
-    appointmentsV3(limit: $pagination?.limit, offset: $pagination?.offset, patientId: $filters?.patient_id) {
+  query GetAppointments($limit: Int, $offset: Int, $patientId: ID) {
+    appointmentsV3(limit: $limit, offset: $offset, patientId: $patientId) {
       ...AppointmentFragment
     }
   }
