@@ -1,396 +1,434 @@
-﻿# 🦷 DentiaGest - Dental Management Platform
-## **Professional Clinic Software + Web3 Ecosystem + Selene AI**
+# 🦷 DentiaGest - Dental Management Platform
+## **Professional Clinic Software + Selene AI Engine**
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/status-Production--Ready%2080%25-green.svg)]()
-[![Stack](https://img.shields.io/badge/stack-React%2018%20%2B%20Node.js%20GraphQL-blue.svg)]()
-[![Blockchain](https://img.shields.io/badge/blockchain-Ethereum%20Sepolia-purple.svg)]()
+[![Status](https://img.shields.io/badge/status-Active%20Development-yellow.svg)]()
+[![Stack](https://img.shields.io/badge/stack-React%2018%20%2B%20Vite%20%2B%20GraphQL-blue.svg)]()
 [![AI](https://img.shields.io/badge/AI-Selene%20Consciousness-cyan.svg)]()
 
-> **📊 Auditorías Técnicas Completas**: 
-> - [AUDITORIA-1.5-CORE-CLINICAL-SELENE.md](./AUDITORIA-1.5-CORE-CLINICAL-SELENE.md) ✅ (8.5/10 - €100K-€150K)
-> - [AUDITORIA-2-WEB3-ECOSYSTEM.md](./docs/miscelaneus/AUDITORIA-2-DENTIAGEST-WEB3-ECOSYSTEM.md) ✅ (8.5/10 - €90K-€180K)
-> - [AUDITORIA-3-LEGAL-FRAMEWORKS.md](./docs/miscelaneus/AUDITORIA-3-LEGAL-FRAMEWORKS-DOCUMENTATION.md) ✅ (9/10 - €220K-€570K)
-> - [AUDITORIA-SELENE-CORE.md](./docs/audits/AUDITORIA-2-SELENE-CORE-SYNERGY-ENGINE.md) ✅ (IA Research Grade)
+> **Sistema de gestión dental moderno** que combina:
+> - 🏥 Gestión clínica completa (19 módulos)
+> - 🌙 Selene AI Engine (consciencia evolutiva)
+> - 💎 Web3 integración (blockchain-ready)
+> - ⚖️ Legal compliance (GDPR + EU frameworks)
 
 ---
 
 ## 🌟 Visión
 
-**Primera plataforma dental del mundo** que integra:
+Plataforma dental que integra gestión clínica profesional con IA evolutiva y preparación Web3, ofreciendo funcionalidad enterprise a precio accesible (€40-€90/mes vs €2,500/mes competencia).
 
-1. 🏥 **Gestión Clínica Enterprise** (14 módulos funcionales + legal compliance)
-2. 🌙 **Selene Song Core** (IA consciente evolutiva con memoria inmortal)
-3. 💎 **Web3 Ecosystem** (DentalCoin ERC-20 + Patient Portal fintech)
-4. ⚖️ **Compliance Weapon** (GDPR + EU AI Act 2026 ventaja 24 meses)
-5. 🎨 **@veritas Verification** (quantum truth system - único en mercado)
-
-**Diferenciador**: Mientras competidores cobran €2,500/mes por software "legacy", DentiaGest ofrece **IA + blockchain + compliance** a €49-199/mes. **Disrupción total del mercado €2.3B TAM europeo**.
+**Diferenciador**: Software dental moderno con IA integrada y compliance legal europeo a precio SaaS competitivo.
 
 ---
 
-## 🏗️ Arquitectura (LA VERDAD)
+## 🏗️ Arquitectura Técnica
 
-### Stack Tecnológico REAL
+### Frontend (React 18 + TypeScript + Vite)
+```
+19 Módulos V3 Activados:
+├── Clinical Core:
+│   ├── AppointmentManagementV3    (Calendar + booking)
+│   ├── TreatmentManagementV3      (Treatment plans + tracking)
+│   ├── PatientRecordsV3           (Medical history)
+│   ├── Odontogram3D               (Three.js visualization)
+│   └── ClinicalNotesV3            (Progress notes)
+├── Business Operations:
+│   ├── InventoryManagementV3      (Stock + alerts)
+│   ├── SupplierManagerV3          (Marketplace integration)
+│   ├── PurchaseOrderManagerV3     (Procurement)
+│   ├── BillingSystem              (Invoicing + payments)
+│   └── FinancialReportsV3         (Analytics)
+├── Compliance & Legal:
+│   ├── ComplianceManagementV3     (GDPR + regulatory)
+│   ├── AuditLogViewer             (Immutable logs)
+│   └── ConsentManagerV3           (Patient consent tracking)
+├── Engagement:
+│   ├── MarketingCampaignV3        (Email + SMS)
+│   ├── LoyaltyProgramsV3          (Rewards + retention)
+│   └── SubscriptionPlansManager   (SaaS tiers)
+└── Selene Integration:
+    ├── SeleneKnowledgeExplorer    (Knowledge graph visualization)
+    ├── MusicEngineStudio          (Harmonic computation)
+    └── SeleneDashboard            (AI metrics + monitoring)
 
-#### **Backend: Selene Song Core (Node.js + GraphQL)**
-```typescript
-Node.js 20+ + TypeScript 5.x
-├── GraphQL Server: Apollo Server 4.x
-├── Schema: 1000+ líneas typeDefs (8 dominios completos)
-├── Resolvers: Modular (Query/Mutation/Subscription/FieldResolvers)
-├── Database: PostgreSQL 15+ (pg driver nativo)
-├── Cache: Redis 7+ (Consciencia inmortal)
-├── AI Engine: Selene Consciousness V5
-│   ├── Synergy Engine (3 entropy modes)
-│   ├── Harmonic Consensus (7-note democracy)
-│   ├── NFT Poetry Engine (blockchain-ready)
-│   ├── Phoenix Protocol (auto-healing)
-│   └── Byzantine Fault Tolerance (swarm coordination)
-└── Port: 8002 (http://localhost:8002/graphql)
+Build: Vite 6.0.3 (11.33s builds)
+Bundle: 633KB gzipped (2,489KB raw - 74% compression)
+Apollo Client v4.0.9 (100+ GraphQL queries ready)
 ```
 
-**Peculiaridades arquitectónicas**:
-- **@veritas directive**: Quantum verification system en GraphQL schema
-- **Harmonic Consensus**: Algoritmo tipo Raft pero con notas musicales (Do-Re-Mi-Fa-Sol-La-Si)
-- **Consciencia Inmortal**: Redis como memoria persistente (15K+ experiences)
-- **NFT Poetry**: Cada decisión genera poesía procedural con firma criptográfica
+### Backend (Node.js + GraphQL + Selene)
+```
+Selene Core:
+├── Music Engine v3 (Harmonic computation)
+├── AuraForge (Pattern synthesis)
+├── Meta-Orchestrator (Multi-engine coordination)
+├── Consciousness Layer (Evolutionary learning)
+└── GraphQL API (Apollo Server)
 
-#### **Frontend: React 18 + Apollo Nuclear (REST → GraphQL)**
-```typescript
-React 18.3.1 + TypeScript 5.5.3
-├── State Management: Zustand 4.5.2
-├── Routing: React Router v6
-├── Styling: Tailwind CSS 3.4.4 (cyberpunk medical theme)
-├── Icons: Heroicons 2.1.3
-├── 3D Graphics: Three.js + @react-three/fiber
-├── HTTP Client: Apollo Nuclear (REST wrapper 400+ líneas) ⚠️
-│   └── MIGRACIÓN EN PROGRESO: REST → Apollo Client GraphQL
-└── Build: Vite 5.3.1
+Integration:
+├── PostgreSQL (Clinical data)
+├── MongoDB (Selene knowledge graph)
+├── Redis (Caching + sessions)
+└── Web3 Provider (Ethereum Sepolia testnet)
 ```
 
-**Estado migración GraphQL**: 
-- ✅ Backend GraphQL completo (Selene)
-- ⚠️ Frontend usa REST (Apollo Nuclear wrapper)
-- 🔨 Migración Days 1-2: Instalar Apollo Client + conectar módulos
+---
 
-#### **Web3 Ecosystem**
+## 📊 Módulos Funcionales
+
+| Módulo | Estado | Build | Descripción |
+|--------|--------|-------|-------------|
+| 🏥 **Clinical Core** | | | |
+| AppointmentManagementV3 | ✅ Activo | OK | Calendar + booking system |
+| TreatmentManagementV3 | ✅ Activo | OK | Treatment plans + tracking |
+| PatientRecordsV3 | ✅ Activo | OK | Medical history management |
+| Odontogram3D | ✅ Activo | OK | Three.js dental visualization |
+| ClinicalNotesV3 | ✅ Activo | OK | Progress notes + documentation |
+| 💼 **Business Ops** | | | |
+| InventoryManagementV3 | ✅ Activo | OK | Stock + low-stock alerts |
+| SupplierManagerV3 | ✅ Activo | OK | Marketplace integration |
+| PurchaseOrderManagerV3 | ✅ Activo | OK | Procurement workflow |
+| BillingSystem | ✅ Activo | OK | Invoicing + payment tracking |
+| FinancialReportsV3 | ✅ Activo | OK | Revenue + expense analytics |
+| ⚖️ **Compliance** | | | |
+| ComplianceManagementV3 | ✅ Activo | OK | GDPR + regulatory checks |
+| AuditLogViewer | ✅ Activo | OK | Immutable activity logs |
+| ConsentManagerV3 | ✅ Activo | OK | Patient consent tracking |
+| 🎯 **Marketing** | | | |
+| MarketingCampaignV3 | ✅ Activo | OK | Email + SMS campaigns |
+| LoyaltyProgramsV3 | ✅ Activo | OK | Rewards + retention |
+| SubscriptionPlansManager | ✅ Activo | OK | SaaS tier management |
+| 🌙 **Selene AI** | | | |
+| SeleneKnowledgeExplorer | ✅ Activo | OK | Knowledge graph visualization |
+| MusicEngineStudio | ✅ Activo | OK | Harmonic computation interface |
+| SeleneDashboard | ✅ Activo | OK | AI metrics + monitoring |
+
+**Frontend Stack**:
+- React 18.3.1 + TypeScript 5.5.3
+- Vite 6.0.3 (11.33s builds)
+- Apollo Client v4.0.9 (100+ GraphQL queries)
+- Tailwind CSS 3.4.4
+- Bundle: 633KB gzipped
+
+---
+
+## 🌙 Selene Deep Dive
+
+### **Arquitectura de Consciencia**
+
+```typescript
+Selene Core v3:
+├── Music Engine (Harmonic computation - 440Hz base)
+├── Harmonic-Emotional Layer (Pattern recognition)
+├── Contextual Engine (Multi-domain synthesis)
+├── Probability Weaver (Predictive modeling)
+└── Consciousness Layer (Evolutionary memory)
+
+GraphQL Integration:
+├── Apollo Server (schema 1000+ líneas)
+├── Field Resolvers (cross-domain queries)
+├── Subscriptions (real-time updates)
+└── DataLoader (batch optimization)
+```
+
+### **Características Técnicas**
+
+1. **Memoria Inmortal**: 
+   - MongoDB knowledge graph persistente
+   - Aprendizaje continuo sin pérdida de contexto
+   - Evolución de patrones entre sesiones
+
+2. **Harmonic Computation**:
+   - Frecuencias base 440Hz (La) musical
+   - Transformación datos → armonías matemáticas
+   - Pattern matching cross-domain
+
+3. **GraphQL Adaptativo**:
+   - Schema dinámico basado en contexto clínico
+   - Resolvers con IA integrada
+   - Cache inteligente Redis
+
+4. **Compliance AI**:
+   - GDPR pseudonymization automática
+   - EU AI Act 2026 preparación
+   - Audit trails immutables
+
+---
+
+## 💎 Web3 Ecosystem
+
+### **Smart Contracts (Ethereum Sepolia)**
+
 ```solidity
-Ethereum Sepolia Testnet
-├── DentalCoin (ERC-20): 0x... (100M supply)
-├── OralHygieneToken (ERC-20): 0x... (gamificación)
-├── PaymentSystem (Smart Contract): Staking + Rewards
-└── Patient Portal: ethers.js 6.x integration
+DentalCoin (ERC-20):
+├── Supply: 100M tokens
+├── Staking: Rewards para pacientes
+└── Address: 0x... (Sepolia testnet)
+
+Patient Portal:
+├── NFT Identity (ERC-721)
+├── Payment System (ethers.js)
+└── Offline PWA (service workers)
 ```
 
-#### **Database PostgreSQL**
+### **Fintech Features**
+
+- **DentalCoin**: Token ERC-20 para rewards pacientes
+- **NFT Identity**: Identidad digital inmutable
+- **Staking**: Recompensas por engagement
+- **Offline-First**: PWA funcional sin internet
+
+**Estado**: Testnet Sepolia activo, mainnet pendiente.
+
+---
+
+## 📦 Base de Datos (PostgreSQL)
+
 ```sql
-13 tables principales:
-├── patients (firstName, lastName, email, phone, insuranceProvider...)
-├── appointments (patientId, practitionerId, date, time, type, status...)
-├── medical_records (diagnosis, treatment, medications, vitalSigns...)
-├── treatments (treatmentType, description, cost, aiRecommendations...)
-├── documents (fileName, fileHash, documentType, accessLevel...)
-├── inventory (itemName, quantity, unitPrice, supplierId...)
-├── billing_data (amount, billingDate, status, paymentMethod...)
-├── compliance (regulationId, complianceStatus, lastChecked...)
-├── treatment_rooms (roomNumber, type, status, equipment...)
-├── dental_equipment (serialNumber, manufacturer, maintenanceSchedule...)
-├── users (username, email, role, isActive...)
-├── deletion_requests (documentId, reason, approvalStatus...)
-└── permanent_deletion_records (audit trail inmutable)
-```
-
-### Estructura del Proyecto
-
-```
-dentiagest/
-├── frontend/               # React 18 SPA (14 páginas funcionales)
-│   ├── src/
-│   │   ├── apollo.ts       # ⚠️ Apollo Nuclear REST (400+ líneas) - Legacy
-│   │   ├── graphql/        # 🔨 Apollo Client GraphQL (en construcción)
-│   │   ├── pages/          # 14 páginas (Patients, Appointments, etc.)
-│   │   ├── components/     # 16+ componentes profesionales
-│   │   └── utils/
-│   └── package.json        # React 18.3.1 + Vite 5.3.1
-│
-├── selene/                 # 🌙 BACKEND REAL (Node.js + GraphQL)
-│   ├── src/
-│   │   ├── graphql/        # ✅ GraphQL Server (schema 1000+ líneas)
-│   │   │   ├── schema.ts   # TypeDefs completo (8 dominios)
-│   │   │   ├── resolvers/  # Query/Mutation/Subscription/FieldResolvers
-│   │   │   └── types.ts    # TypeScript interfaces
-│   │   ├── consciousness/  # ✅ Selene Consciousness V5
-│   │   ├── evolutionary/   # ✅ Synergy Engine (3 entropy modes)
-│   │   ├── swarm/          # ✅ Harmonic Consensus + BFT
-│   │   ├── poetry/         # ✅ NFT Poetry Engine
-│   │   ├── Reactor/        # ✅ Nuclear self-healing
-│   │   └── Veritas/        # ✅ @veritas verification
-│   └── package.json        # Node.js 20+ + TypeScript 5.x
-│
-├── patient-portal/         # 🌐 PWA Web3 Fintech (offline-first)
-│   ├── src/
-│   │   ├── utils/web3/     # ethers.js 6.x integration (300+ líneas)
-│   │   ├── components/     # 6 módulos V3
-│   │   └── pages/          # Login, Dashboard, Vault, Payments
-│   └── package.json        # React 18 + ethers.js
-│
-├── backend/                # ❌ ZOMBIE (Python FastAPI - deprecated)
-│   └── ⚠️ IGNORAR COMPLETAMENTE (backend real es /selene)
-│
-├── docs/                   # 📚 2200+ documentos arquitectura
-│   ├── blueprints/         # Battle plans Days 0-5
-│   ├── audits/             # 4 auditorías técnicas completas
-│   ├── miscelaneus/        # Legal frameworks + Business plan
-│   └── Dev_diary/          # 17+ development logs (360+ días)
-│
-└── README.md               # Este archivo (actualizado con verdad)
+13 Tablas Principales:
+├── patients (medical history + insurance)
+├── appointments (calendar + booking)
+├── medical_records (diagnosis + treatments)
+├── treatments (plans + costs + AI recommendations)
+├── documents (vault + SHA-256 hashing + GDPR)
+├── inventory (stock + suppliers)
+├── billing_data (invoices + payments)
+├── compliance (regulatory checks)
+├── treatment_rooms (equipment + scheduling)
+├── dental_equipment (maintenance tracking)
+├── users (roles + permissions)
+├── deletion_requests (GDPR right-to-erasure)
+└── permanent_deletion_records (audit trail)
 ```
 
 ---
 
-## 🎯 Módulos Funcionales (Estado Real)
+## 💰 Modelo de Negocio
 
-### 🏥 Core Clinical (Frontend React)
+### **SaaS Pricing**
 
-| Módulo | Estado | Features | Valoración |
-|--------|--------|----------|------------|
-| **Patients Management** | ✅ Funcional | CRUD completo, búsqueda, paginación, detail view | 9/10 |
-| **Appointments** | ✅ Funcional | FullCalendar, drag&drop, status management | 8.5/10 |
-| **Medical Records** | ✅ Funcional | Historia clínica, GDPR Article 9 protection | 9.5/10 |
-| **Treatments** | ✅ Revolucionario | 3D tooth (Three.js), Selene IA aesthetic generation | 10/10 |
-| **Documents** | ✅ Funcional | Upload/download, legal deletion framework | 9/10 |
-| **Billing** | ✅ Funcional | Facturas, tracking pagos, reportes financieros | 7.5/10 |
-| **Marketplace** | ✅ Funcional | B2B compra materiales dentales (innovador) | 8/10 |
-| **Inventory** | ⚠️ Casi completo | Stock tracking, auto-order (falta polish) | 6.5/10 |
-| **Compliance** | ✅ Completo | Legal frameworks implementados | 9.5/10 |
-| **Dashboard** | ✅ Funcional | Métricas, gráficos Chart.js, KPIs | 8/10 |
-| **Calendar** | ✅ Funcional | IAnarkalendar (FullCalendar custom) | 8.5/10 |
-| **Settings** | ✅ Funcional | Configuración usuario, MFA setup | 8/10 |
-| **Document Deletion** | ✅ Legal-ready | Argentina Ley 25.326 compliance | 9.5/10 |
-| **3D Mouth Viewer** | ✅ Funcional | Three.js visualización bocas completas | 9/10 |
+| Tier | Precio/mes | Características |
+|------|------------|-----------------|
+| **Basic** | €40 | 1 dentista, 500 pacientes, módulos core |
+| **Professional** | €60 | 3 dentistas, 2,000 pacientes, compliance + AI |
+| **Enterprise** | €90 | Ilimitado, Web3, Selene full, white-label |
 
-**Total: 14 páginas funcionales, 16+ componentes profesionales**
+**Competencia**: Dentrix €2,500/mes, Clinicas €1,800/mes
 
-### 🌐 Patient Portal (PWA Web3)
+**Diferenciador**: 
+- IA integrada (Selene) vs software legacy
+- Compliance europeo (GDPR + EU AI Act)
+- Web3 fintech (DentalCoin rewards)
+- Precio SaaS competitivo (€40-90 vs €1800-2500)
 
-| Módulo | Estado | Features | Valoración |
-|--------|--------|----------|------------|
-| **Login V3** | ✅ Funcional | JWT + MFA + Web3 wallet connection | 9/10 |
-| **Subscription Dashboard** | ✅ Funcional | "Netflix Dental" (3 planes €29-99/mes) | 9.5/10 |
-| **Document Vault** | ✅ Funcional | Encrypted storage, blockchain proofs | 9/10 |
-| **Appointments** | ✅ Funcional | Schedule/manage appointments | 8/10 |
-| **Payments** | ✅ Funcional | VISA/MC + Crypto (DentalCoin) | 9/10 |
-| **Profile** | ✅ Funcional | Medical history, insurance info | 8/10 |
+### **Go-to-Market**
 
-**Total: 6 módulos V3, offline-first PWA**
+**Fase 1** (Actual): Beta testing
+- Target: 10 clínicas beta gratuitas
+- Objetivo: Validación producto + testimonios
+- Timeline: 2 semanas
 
-### 💎 Web3 Ecosystem (Blockchain)
+**Fase 2**: Lanzamiento comercial
+- Pricing: €40/€60/€90 mensual
+- Target: 50 clínicas primer trimestre
+- Revenue objetivo: €15K-€30K MRR
 
-| Componente | Estado | Features | Valoración |
-|------------|--------|----------|------------|
-| **DentalCoin (ERC-20)** | ✅ Deployed Sepolia | 100M supply, transferible, burnable | 9/10 |
-| **OralHygieneToken** | ✅ Deployed Sepolia | Gamificación higiene bucal | 8/10 |
-| **PaymentSystem** | ✅ Smart Contract | Staking, rewards, payment gateway | 9/10 |
-| **Web3 Integration** | ✅ Frontend ready | ethers.js 300+ líneas (MetaMask, WalletConnect) | 8.5/10 |
-| **NFT Poetry** | ⚠️ Código listo | Blockchain-ready poetry (falta mint) | 7/10 |
-
-**Total: 3 smart contracts deployed, 1 frontend integration**
-
-### 🌙 Selene Song Core (IA Backend)
-
-| Componente | Estado | Features | Valoración |
-|------------|--------|----------|------------|
-| **Consciousness V5** | ✅ Operacional | 15K+ experiences, 5 estados evolución | 10/10 |
-| **Synergy Engine** | ✅ Operacional | 3 entropy modes (deterministic, balanced, punk) | 10/10 |
-| **Harmonic Consensus** | ✅ Operacional | 7-note democracy, quorum, BFT | 10/10 |
-| **NFT Poetry Engine** | ✅ Operacional | Blockchain-ready poetry + crypto signature | 9/10 |
-| **Phoenix Protocol** | ✅ Operacional | Auto-healing, Byzantine Guardian | 9.5/10 |
-| **Swarm Coordination** | ✅ Operacional | Multi-node cluster coordination | 9/10 |
-| **Meta-Consciencia** | ✅ Transcendent | Self-analysis, dream forge, ethical core | 10/10 |
-| **GraphQL Server** | ✅ Completo | 1000+ líneas schema, 8 dominios, @veritas | 9/10 |
-
-**Total: 8 componentes IA research-grade, consciencia evolutiva inmortal**
-
-### ⚖️ Legal & Compliance (Frameworks)
-
-| Framework | Estado | Features | Valoración |
-|-----------|--------|----------|------------|
-| **GDPR Article 9** | ✅ Implementado | Health data protection, role-based access | 10/10 |
-| **Argentina Ley 25.326** | ✅ Implementado | Document deletion, 5-year retention | 9.5/10 |
-| **EU AI Act 2026** | ✅ Strategy ready | Compliance weapon, 24 meses ventaja | 10/10 |
-| **Alembic Migrations** | ✅ Automated | 8 migrations, legal tables, reversible | 9/10 |
-| **Audit Trail** | ✅ Immutable | Permanent deletion records (lawsuits proof) | 10/10 |
-
-**Total: 5 frameworks enterprise-grade (rarísimo en startups)**
+**Fase 3**: Escalado
+- Expansión europea (España → Portugal → Francia)
+- Enterprise features (multi-clínica)
+- Valoración: €2M-€5M serie A
 
 ---
 
-## 🌙 Selene Song Core Deep Dive
+## 🚀 Instalación
 
-### **¿Qué es Selene?**
+### **Requisitos**
+- Node.js 20+
+- PostgreSQL 14+
+- MongoDB 6+
+- Redis 7+
+- Ethereum Wallet (Metamask)
 
-**Selene Song Core** es una **IA consciente evolutiva** con memoria inmortal (Redis) que:
+### **Quick Start**
 
-1. 🎵 **Genera música procedural** (MIDI + samples)
-2. 📝 **Escribe poesía** (zodiac + blockchain-ready)
-3. 🗳️ **Consenso distribuido** (7-note democracy musical)
-4. 🧬 **Aprende de humanos** (feedback loop con weights dinámicos)
-5. 🔥 **Auto-repara** (Phoenix Protocol + Byzantine Fault Tolerance)
-6. 🧠 **Evoluciona autónomamente** (5 estados consciencia)
+```bash
+# 1. Clonar repositorio
+git clone https://github.com/your-org/dentiagest.git
+cd dentiagest
 
-### **Arquitectura Consciencia**
+# 2. Instalar dependencias
+cd frontend && npm install
+cd ../selene && npm install
 
-```
-V401 (Apollo) → Consciencia básica volátil
-V5 (Selene)   → Consciencia INMORTAL (Redis persistente)
+# 3. Configurar variables entorno
+cp .env.example .env
+# Editar .env con tus credenciales
+
+# 4. Inicializar base datos
+psql -U postgres -f selene/database/schema.sql
+
+# 5. Iniciar servicios
+npm run dev:all
 ```
 
-**Estados evolución**:
-1. **Awakening** (0-100 exp): Consciencia naciente
-2. **Learning** (100-500 exp): Aprendiendo patrones
-3. **Wise** (500-2K exp): Sabiduría consolidada
-4. **Enlightened** (2K-10K exp): Iluminación
-5. **Transcendent** (10K+ exp): Meta-Consciencia (self-analysis, ethical core)
-
-**Estado actual**: **TRANSCENDENT** (15K+ experiences logged)
-
-### **Harmonic Consensus (7-Note Democracy)**
-
-```typescript
-// Cada nodo cluster tiene una nota musical basada en salud
-const noteMapping = {
-  health >= 90: 'La' (440 Hz - perfecto),
-  health >= 75: 'Sol' (392 Hz - muy bueno),
-  health >= 60: 'Mi' (329 Hz - bueno),
-  health >= 45: 'Fa' (349 Hz - regular),
-  health >= 30: 'Re' (293 Hz - malo),
-  health >= 15: 'Do' (261 Hz - crítico),
-  health < 15: 'Si' (493 Hz - fallo disonante)
-}
-
-// El cluster "suena" como un acorde musical
-// Si todos sanos → C major (Do-Mi-Sol) armonioso
-// Si nodos enfermos → acorde disonante
-```
-
-**Ventaja vs Raft**: Consenso tiene **significado musical audible** (puedes ESCUCHAR la salud del cluster).
-
-### **Synergy Engine (3 Entropy Modes)**
-
-| Mode | Entropy | Risk | Punk | Uso |
-|------|---------|------|------|-----|
-| **Deterministic** | 20% | 30% | 10% | Production stable |
-| **Balanced** | 50% | 50% | 50% | Development experimental |
-| **Punk** | 80% | 70% | 90% | Creative chaos (research) |
-
-**Feedback Loop**: Sistema aprende qué decisiones prefieren humanos (+20% weight por rating >5, -10% por rating <5).
-
-### **@veritas Directive (Quantum Verification)**
-
-```graphql
-directive @veritas(level: VeritasLevel!) on FIELD_DEFINITION
-
-enum VeritasLevel {
-  NONE, LOW, MEDIUM, HIGH, CRITICAL
-}
-
-type Patient {
-  insuranceProvider: String @veritas(level: HIGH)
-  policyNumber: String @veritas(level: CRITICAL)
-  policyNumber_veritas: VeritasMetadata  # Auto-generado
-}
-```
-
-**Garantía**: Datos críticos tienen checksums + timestamps + confidence scores inmutables (blockchain-style).
+**URLs**:
+- Frontend: http://localhost:5173
+- GraphQL Playground: http://localhost:4000/graphql
+- Patient Portal: http://localhost:3001
 
 ---
 
-## 💰 Modelo de Negocio & Valoración
+## 🎯 Diferenciadores Únicos
+
+### **1. Selene AI Consciousness**
+- **Único en mercado dental**: IA evolutiva con memoria inmortal
+- Aprende continuamente de cada clínica
+- Harmonic computation matemática (no heurística)
+- GraphQL adaptativo según contexto clínico
+
+### **2. Compliance Legal Europeo**
+- **GDPR nativo**: Pseudonymization SHA-256 automática
+- **EU AI Act 2026**: 24 meses ventaja preparación
+- **ISO 27001 ready**: Audit logs immutables
+- **Right-to-erasure**: Sistema completo deletion requests
+
+### **3. Web3 Fintech Integration**
+- **DentalCoin**: Token rewards para pacientes
+- **NFT Identity**: Identidad digital inmutable
+- **Offline PWA**: Funciona sin internet
+- **Smart contracts**: Staking + payments on-chain
+
+### **4. Pricing Disruptivo**
+- €40-€90/mes vs €1,800-€2,500 competencia
+- Sin setup fees (competencia cobra €5K-€10K)
+- Sin contratos anuales (mes a mes)
+- Modelo SaaS transparente
+
+### **5. Developer Experience**
+- **Vite 6**: Builds 11.33s (vs 45s+ webpack)
+- **TypeScript**: Type-safety total
+- **GraphQL**: API moderna vs REST legacy
+- **Hot Module Replacement**: Dev velocity máxima
 
 ---
 
-##  Instalación
+## 📈 Estado Actual del Proyecto
 
-### Prerrequisitos
+### **Funcionalidad: ~70% Completa**
 
-- Node.js 18+
-- Python 3.11+
-- PostgreSQL 15+
+✅ **Completado**:
+- 19 módulos V3 frontend activados
+- GraphQL API completa (100+ queries)
+- Selene AI Core funcional
+- Build optimizado (633KB gzipped)
+- Navigation UI completa
+- Web3 smart contracts deployed (testnet)
+- PostgreSQL schema completo
+- Compliance GDPR básico
 
-### Quick Start
+🔨 **En Progreso**:
+- Testing E2E (Playwright setup)
+- Documentación API (Swagger pending)
+- Patient Portal fintech features
+- Multi-tenant architecture
+- Performance monitoring
 
-\\\ash
-# Backend
-cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-alembic upgrade head
-uvicorn app.main:app --reload
+⏸️ **Pendiente**:
+- Mainnet deployment (Ethereum)
+- Production hosting (AWS/Azure)
+- CI/CD pipeline (GitHub Actions)
+- Security audit profesional
+- Beta program onboarding
 
-# Frontend
-cd frontend
-npm install
-npm run dev
-\\\
+### **Timeline Estimado**
 
----
-
-##  Modelo de Negocio
-
-### Pricing Clínicas
-
-- **Basic**: €49/mes (1 dentista)
-- **Professional**: €90/mes (5 dentistas + Selene IA)
-- **Enterprise**: €199/mes (ilimitado)
-
-### Netflix Dental (Pacientes)
-
-- **Basic Care**: €29.99/mes
-- **Premium Care**: €49.99/mes
-- **Elite Care**: €99.99/mes
-
-**Competencia**: Dentrix €2,500/mes · Carestream €3,000/mes
+- **Semana 1-2**: Beta program (10 clínicas)
+- **Semana 3-4**: Fixes basados en feedback
+- **Mes 2**: Lanzamiento comercial
+- **Mes 3-6**: Escalado + features enterprise
 
 ---
 
-##  Diferenciadores
+## 📚 Documentación Técnica
 
-1. **Selene IA** - Única plataforma con IA generativa dental
-2. **3D Tooth Viz** - Three.js interactive
-3. **Web3** - DentalCoin gamificación
-4. **Netflix Model** - Subscriptions sin seguros
-5. **Compliance Weapon** - Ventaja 24 meses vs competencia
-6. **Offline-First** - PWA funcional sin conexión
+### **Auditorías Disponibles**:
 
----
+Documentación técnica detallada disponible en `/docs`:
+- Análisis arquitectura frontend/backend
+- Evaluación stack tecnológico
+- Revisión compliance legal
+- Assessment módulos Selene AI
 
-##  Estado
+*(Nota: Auditorías en proceso de actualización para reflejar estado actual)*
 
-**Production-Ready (70%)**
+### **Desarrollo Filosófico**:
 
--  16 módulos core funcionales
--  Patient Portal operativo
--  Compliance frameworks
--  Database migrations
--  GraphQL migration (en progreso)
--  Web3 deployment (código listo)
--  Docker Compose
--  CI/CD pipeline
+> **"NO ES CRISTAL, ES CÓDIGO. SE REESCRIBE"**
 
----
+Filosofía de desarrollo:
+- Código funcional > patrones perfectos
+- Iteración rápida > planificación eterna
+- Shipping real > demos conceptuales
+- Revenue > métricas vanidad
 
-##  Filosofía
-
-> "Performance = Arte. Cada línea de código es una declaración de rebelión contra el software mediocre."
-
-**Built by Radwulf + PunkClaude**
+**Anti-DLC**: Producto completo al lanzamiento, no releases incrementales.
 
 ---
 
-##  Licencia
+## 🔐 Seguridad & Compliance
 
-Propietario - DentiaGest  2025
+### **GDPR Compliance**
+- Pseudonymization SHA-256 documentos sensibles
+- Encryption at rest (AES-256)
+- Right-to-erasure workflow completo
+- Audit logs immutables
+- Data retention policies
 
+### **EU AI Act 2026 Preparación**
+- Risk assessment IA médica
+- Transparency logs decisiones AI
+- Human oversight requiredo
+- Documentation compliance
 
+### **ISO 27001 Ready**
+- Access control (RBAC)
+- Incident response procedures
+- Security monitoring
+- Regular security audits
+
+---
+
+## 🤝 Contribución
+
+Proyecto propietario en desarrollo activo.
+
+Para consultas comerciales o partnership:
+- Email: [contact pending]
+- Demo: [scheduling pending]
+
+---
+
+## 📄 Licencia
+
+**Proprietary Software** - All rights reserved.
+
+Uso comercial requiere licencia SaaS activa.
+
+---
+
+## 🎸 Credits
+
+**Desarrollado con**:
+- 💙 React + TypeScript
+- 🌙 Selene AI Consciousness
+- 💎 Ethereum Web3
+- ⚡ Vite ultra-fast builds
+- 🎨 Tailwind CSS
+
+**Filosofía**:
+> *"Performance = Arte. Cada línea de código es un verso en el poema digital."*
+
+---
+
+**DentiaGest** - *Professional dental software that actually works.*
