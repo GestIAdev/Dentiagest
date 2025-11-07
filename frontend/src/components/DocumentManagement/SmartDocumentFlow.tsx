@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { DocumentIcon, PhotoIcon, FilmIcon, MicrophoneIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import { PatientAutocomplete } from './PatientAutocomplete';
-import apollo from '../../apollo'; // 🚀 Apollo Nuclear Core integration
+import apolloGraphQL from '../../services/apolloGraphQL'; // 🥷 STEALTH GRAPHQL NINJA MODE
 
 // 🌌 SMART DOCUMENT FLOW - PURE MAGIC
 // Philosophy: "Documents find their home"
@@ -444,7 +444,7 @@ const SmartDocumentFlow: React.FC<SmartDocumentFlowProps> = ({
         console.log('🔮 Smart uploading:', smartDoc.file.name, 'as', unifiedType);
         
         // Use Apollo for upload - correct method access
-        return apollo.api.post('/medical-records/documents/upload', formData);
+        return apolloGraphQL.api.post('/medical-records/documents/upload', formData);
       });
       
       // Wait for all uploads

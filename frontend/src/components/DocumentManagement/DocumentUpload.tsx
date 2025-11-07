@@ -33,7 +33,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { LegalCategory, UnifiedDocumentType, getCategoryFromUnifiedType } from './DocumentCategories';
 // // APOLLO NUCLEAR: CentralMappingService disabled
-import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import apolloGraphQL from '../../services/apolloGraphQL'; // 🥷 STEALTH GRAPHQL NINJA MODE
 import { 
   CloudArrowUpIcon, 
   DocumentIcon, 
@@ -489,7 +489,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
         try {
           // 🚀 OPERACIÓN APOLLO - Using centralized API service with FormData
           // Pass the constructed FormData directly to Apollo
-          const result = await apollo.docs.upload(formData);
+          const result = await apolloGraphQL.docs.upload(formData);
 
           updateFileMetadata(uploadFile.id, { status: 'success', progress: 100 });
           

@@ -18,7 +18,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import apolloGraphQL from '../../services/apolloGraphQL'; // 🥷 STEALTH GRAPHQL NINJA MODE
 import { EnhancedDocumentGrid } from './EnhancedDocumentGrid';
 import { DocumentUpload } from './DocumentUpload';
 import { DocumentViewer } from './DocumentViewer';
@@ -118,9 +118,9 @@ export const EnhancedDocumentManagement: React.FC<EnhancedDocumentManagementProp
     const useV2Api = false; // Feature flag for future
     
     if (useV2Api) {
-      return 'http://127.0.0.1:8002/api/v2/documents/list';
+      return '/graphql/documents/list'; // 🥷 STEALTH GraphQL route
     } else {
-      return 'http://127.0.0.1:8002/api/v1/medical-records/documents/list';
+      return '/graphql/medical-records/documents/list'; // 🥷 STEALTH GraphQL route
     }
   };
 
@@ -144,10 +144,10 @@ export const EnhancedDocumentManagement: React.FC<EnhancedDocumentManagementProp
       }
       
       // 🚀 APOLLO API - Load documents with parameters
-      const response = await apollo.docs.list(params.toString());
+      const response = await apolloGraphQL.docs.list(params.toString());
       
-      if (response && response.items) {
-        setDocuments(response.items);
+      if (response && response.success && response.data) {
+        setDocuments(response.data);
       } else {
         console.error('❌ Apollo API - Error loading documents:', response);
       }

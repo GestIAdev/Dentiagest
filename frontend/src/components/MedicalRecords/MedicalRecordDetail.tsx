@@ -28,7 +28,7 @@ import {
   ArchiveBoxIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';  // 🔧 FIXED: Added .tsx extension for webpack
-import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK CAN'T STOP US!
+import apolloGraphQL from '../../services/apolloGraphQL'; // 🥷 STEALTH GRAPHQL NINJA MODE
 
 // Types
 interface MedicalRecord {
@@ -107,7 +107,7 @@ const MedicalRecordDetail: React.FC<MedicalRecordDetailProps> = ({
       // 🚀 OPERACIÓN APOLLO - Using centralized API service
       // Replaces hardcoded fetch with apollo.medicalRecords.getById()
       // Benefits: V1/V2 switching, error handling, performance monitoring
-      const recordResponse = await apollo.medicalRecords.getById(recordId);
+      const recordResponse = await apolloGraphQL.medicalRecords.getById(recordId);
 
       if (recordResponse) {
         const recordData = recordResponse as any;
@@ -115,7 +115,7 @@ const MedicalRecordDetail: React.FC<MedicalRecordDetailProps> = ({
 
         // 🚀 OPERACIÓN APOLLO - Using centralized API service  
         // Replaces hardcoded fetch with apollo.patients.get()
-        const patientResponse = await apollo.patients.get(recordData.patient_id);
+        const patientResponse = await apolloGraphQL.patients.get(recordData.patient_id);
 
         if (patientResponse) {
           const patientData = patientResponse as any;

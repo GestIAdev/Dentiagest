@@ -19,7 +19,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import apolloGraphQL from '../../services/apolloGraphQL'; // 🥷 STEALTH GRAPHQL NINJA MODE
 import {
   XMarkIcon,
   MagnifyingGlassMinusIcon,
@@ -118,9 +118,9 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
     const useV2Api = false; // Feature flag for future
     
     if (useV2Api) {
-      return `http://127.0.0.1:8002/api/v2/documents/${documentId}/download`;
+      return `/graphql/documents/${documentId}/download`; // 🥷 STEALTH GraphQL route
     } else {
-      return `http://127.0.0.1:8002/api/v1/medical-records/documents/${documentId}/download`;
+      return `/graphql/medical-records/documents/${documentId}/download`; // 🥷 STEALTH GraphQL route
     }
   };
 
@@ -173,12 +173,12 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
         // 🚀 OPERACIÓN APOLLO - Using centralized API service
         // Replaces hardcoded fetch with apollo.docs.download()
         // Benefits: V1/V2 switching, blob handling, performance monitoring
-        const blob = await apollo.docs.download(document.id);
+        const blob = await apolloGraphQL.docs.download(document.id);
         const blobUrl = URL.createObjectURL(blob);
         setDocumentUrl(blobUrl);
       } else {
         // For PDFs, we can use iframe with auth headers (if browser supports it)
-        const viewUrl = `http://127.0.0.1:8002/api/v1/medical-records/documents/${document.id}/download`;
+        const viewUrl = `/graphql/medical-records/documents/${document.id}/download`; // 🥷 STEALTH GraphQL route
         setDocumentUrl(viewUrl);
       }
 

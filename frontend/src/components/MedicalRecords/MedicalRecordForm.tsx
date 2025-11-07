@@ -11,7 +11,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK CAN'T STOP US!
+import apolloGraphQL from '../../services/apolloGraphQL'; // 🥷 STEALTH GRAPHQL NINJA MODE
 import { usePatients, Patient } from '../../hooks/usePatients';
 import { 
   XMarkIcon,
@@ -155,7 +155,7 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
       // 🚀 OPERACIÓN APOLLO - Using centralized API service
       // Replaces hardcoded fetch with apollo.medicalRecords.getById()
       // Benefits: V1/V2 switching, error handling, performance monitoring
-      const response = await apollo.medicalRecords.getById(recordId);
+      const response = await apolloGraphQL.medicalRecords.getById(recordId);
 
       if (response) {
         const record = response as any;
@@ -277,15 +277,12 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({
       // Envolver datos en record_data para el backend
       const requestBody = recordId ? submitData : { record_data: submitData };
 
-      const url = recordId 
-        ? `http://127.0.0.1:8002/api/v1/medical-records/${recordId}`
-        : 'http://127.0.0.1:8002/api/v1/medical-records/';
-
-      // 🚀 OPERACIÓN APOLLO - Using centralized API service
-      // Replaces hardcoded fetch with apollo.medicalRecords.create/update()
+      // 🥷 STEALTH MODE: URLs replaced by GraphQL calls
+      // Legacy zombie URLs eliminated - using apolloGraphQL.medicalRecords.create/update()
+      const url = recordId ? `/graphql/medical-records/${recordId}` : '/graphql/medical-records/'; // 🥷 STEALTH routes
       const response = recordId 
-        ? await apollo.medicalRecords.update(recordId, requestBody as any)
-        : await apollo.medicalRecords.create(requestBody as any);
+        ? await apolloGraphQL.medicalRecords.update(recordId, requestBody as any)
+        : await apolloGraphQL.medicalRecords.create(requestBody as any);
 
       if (response) {
         onSave();

@@ -26,8 +26,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
-// // APOLLO NUCLEAR: CentralMappingService disabled
-import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+// 🥷 STEALTH MODE: Documents management via GraphQL
+import apolloGraphQL from '../../services/apolloGraphQL'; // 🥷 STEALTH GRAPHQL NINJA MODE
 // import { buildApiUrl, getDocumentDownloadUrl } from '../../config/api';
 import {
   MagnifyingGlassIcon,
@@ -287,7 +287,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
       // 🚀 OPERACIÓN APOLLO - Using centralized API service
       // Replaces hardcoded fetch with apollo.docs.list()
       // Benefits: V1/V2 switching, error handling, performance monitoring
-      const data = await apollo.docs.list({
+      const data = await apolloGraphQL.docs.list({
         // Convert URLSearchParams to object for Apollo API
         ...Object.fromEntries(queryParams.entries())
       });
@@ -340,7 +340,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
       // 🚀 OPERACIÓN APOLLO - Using centralized API service
       // Replaces hardcoded fetch with apollo.docs.download()
       // Benefits: V1/V2 switching, blob handling, performance monitoring
-      const blob = await apollo.docs.download(document.id);
+      const blob = await apolloGraphQL.docs.download(document.id);
       
       const url = URL.createObjectURL(blob);
       const link = window.document.createElement('a');

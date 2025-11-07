@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import apollo from '../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import apolloGraphQL from '../services/apolloGraphQL'; // 🥷 STEALTH GRAPHQL NINJA MODE
 import PatientFormModal from '../components/Forms/PatientFormModal';
 import PatientDetailView from '../components/Patients/PatientDetailView';
 import {
@@ -72,8 +72,8 @@ const PatientsPage: React.FC = () => {
         ...(search && { search })
       });
 
-      // 🚀 APOLLO API - Get patients with pagination
-      const response = await apollo.api.get(`/patients?${params}`);
+      // 🥷 STEALTH MODE - Get patients with pagination via GraphQL
+      const response = await apolloGraphQL.api.get(`/patients?${params}`);
 
       if (response) {
         const data: PaginatedResponse = response as any;
@@ -125,8 +125,8 @@ const PatientsPage: React.FC = () => {
     }
 
     try {
-      // 🚀 APOLLO API - Delete patient
-      const response = await apollo.api.delete(`/patients/${patientId}`);
+      // 🥷 STEALTH MODE - Delete patient via GraphQL
+      const response = await apolloGraphQL.api.delete(`/patients/${patientId}`);
 
       if (response) {
         fetchPatients(currentPage, searchQuery);

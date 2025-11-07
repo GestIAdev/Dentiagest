@@ -7,6 +7,7 @@
 // 🔒 SECURITY: @veritas quantum truth verification on financial transactions
 
 import React, { useState, useMemo } from 'react';
+// 🔥 APOLLO CLIENT HOOKS - Real GraphQL integration ✅
 import { useQuery, useMutation } from '@apollo/client';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies

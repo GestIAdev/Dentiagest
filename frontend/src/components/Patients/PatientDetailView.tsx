@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import apolloGraphQL from '../../services/apolloGraphQL'; // � APOLLO NUCLEAR STEALTH GRAPHQL
 import {
   ArrowLeftIcon,
   PencilIcon,
@@ -43,15 +43,11 @@ const PatientDetailView: React.FC<PatientDetailProps> = ({ patient, onBack, onEd
     
     setLoadingAppointments(true);
     try {
-      // 🚀 OPERACIÓN APOLLO - Using core API service
-      // TODO: Create AppointmentsApi module for specialized operations
-      // For now using core apollo.api.get() with query params
-      const response = await apollo.api.get(`/api/v1/appointments?patient_id=${patient.id}`);
-
-      if (response) {
-        const data = response as any;
-        setAppointments(data.appointments || []);
-      }
+      // � APOLLO NUCLEAR STEALTH - Using GraphQL that looks like REST!
+      console.log('🔥 Fetching appointments via GraphQL stealth wrapper for patient:', patient.id);
+      const data = await apolloGraphQL.appointments.list(patient.id);
+      
+      setAppointments(data.appointments || []);
     } catch (error) {
       console.error('Error fetching appointments:', error);
     } finally {

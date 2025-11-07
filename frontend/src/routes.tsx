@@ -12,6 +12,8 @@ import DashboardContent from './pages/DashboardContent';
 import PatientsPageGraphQL from './pages/PatientsPageGraphQL';
 import CalendarPage from './pages/CalendarPage';
 import { DocumentsPage } from './pages/DocumentsPage';
+// 🔥 V3 COMPONENTS RECONNECTION - PUNKGROK JEWELS ✅ ACTIVATED
+import FinancialManagerV3 from './components/Billing/FinancialManagerV3';
 
 // Página de inicio - redirige automáticamente según estado de autenticación
 function HomePage() {
@@ -133,6 +135,7 @@ function AppRoutes() {
           <Route path="documents" element={<DocumentsPage />} />
           <Route path="treatments" element={<ComingSoonPage pageName="Tratamientos" />} />
           <Route path="billing" element={<ComingSoonPage pageName="Facturación" />} />
+          <Route path="billing-v3" element={<FinancialManagerV3 />} />
         </Route>
 
         {/* Settings también protegida */}

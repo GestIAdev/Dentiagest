@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import apollo from '../../apollo';
+import apolloGraphQL from '../../services/apolloGraphQL'; // 🔥 STEALTH GRAPHQL NUCLEAR
 import { XMarkIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 // 🎸 APOLLO NUCLEAR - EDIT APPOINTMENT MODAL
@@ -55,7 +55,7 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
   const loadPatients = async () => {
     setLoadingPatients(true);
     try {
-      const response = await apollo.api.get('/patients?limit=100');
+      const response = await apolloGraphQL.api.get('/patients?limit=100');
       if (response.success && response.data) {
         // Handle both paginated and direct array responses
         const patientsData = Array.isArray(response.data) ? response.data : (response.data as any).items || [];
@@ -95,7 +95,7 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
         duration: Number(formData.duration)
       };
 
-      const response = await apollo.api.put(`/appointments/${appointment.id}`, appointmentData);
+      const response = await apolloGraphQL.api.put(`/appointments/${appointment.id}`, appointmentData);
 
       if (response.success) {
         onUpdate(response.data);
@@ -129,7 +129,7 @@ const EditAppointmentModal: React.FC<EditAppointmentModalProps> = ({
     setLoading(true);
 
     try {
-      const response = await apollo.api.delete(`/appointments/${appointment.id}`);
+      const response = await apolloGraphQL.api.delete(`/appointments/${appointment.id}`);
 
       if (response.success) {
         onDelete(appointment.id);

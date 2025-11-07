@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import apollo from '../../apollo';
+import apolloGraphQL from '../../services/apolloGraphQL'; // 🥷 STEALTH GRAPHQL NINJA MODE
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 // 🎸 APOLLO NUCLEAR - CREATE APPOINTMENT MODAL
@@ -55,10 +55,10 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
   const loadPatients = async () => {
     setLoadingPatients(true);
     try {
-      const response = await apollo.api.get('/patients?limit=100');
-      if (response.success && response.data) {
-        // Handle both paginated and direct array responses
-        const patientsData = Array.isArray(response.data) ? response.data : (response.data as any).items || [];
+      const response = await apolloGraphQL.api.get('/patients?limit=100');
+      if (response.success) {
+        // 🥷 STEALTH WRAPPER: Core API returns paginated format with 'items'
+        const patientsData = (response as any).items || [];
         setPatients(patientsData);
       }
     } catch (error) {
@@ -95,7 +95,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
         duration: Number(formData.duration)
       };
 
-      const response = await apollo.api.post('/appointments', appointmentData);
+      const response = await apolloGraphQL.api.post('/appointments', appointmentData);
 
       if (response.success) {
         onCreate(response.data);

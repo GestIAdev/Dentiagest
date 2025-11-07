@@ -13,7 +13,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import apollo from '../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK EXTENSION EXPLICIT!
+import apolloGraphQL from '../../services/apolloGraphQL'; // 🥷 STEALTH GRAPHQL NINJA MODE
 import {
   TrashIcon,
   ExclamationTriangleIcon,
@@ -95,7 +95,7 @@ export const DeleteDocumentButton: React.FC<DeleteDocumentButtonProps> = ({
     try {
       setLoading(true);
       // 🚀 APOLLO API - Centralized eligibility check
-      const response = await apollo.api.get(`/documents/${document.id}/deletion-eligibility`);
+      const response = await apolloGraphQL.api.get(`/documents/${document.id}/deletion-eligibility`);
 
       if (response.success && response.data) {
         setEligibility(response.data as any);
@@ -128,20 +128,22 @@ export const DeleteDocumentButton: React.FC<DeleteDocumentButtonProps> = ({
     try {
       setLoading(true);
       // 🚀 APOLLO API - Centralized deletion request
-      const response = await apollo.api.post(`/documents/${document.id}/request-deletion`, {
+      const response = await apolloGraphQL.api.post(`/documents/${document.id}/request-deletion`, {
         reason: deletionReason,
         justification: justification.trim()
       });
 
-      if (response.success && response.data) {
-        setExistingRequest(response.data as any);
+      if (response.success) {
+        if (response.data) {
+          setExistingRequest(response.data as any);
+        }
         setShowRequestForm(false);
         onDeletionRequested?.();
         
         // Show success message
         alert('✅ Solicitud de eliminación enviada para aprobación');
       } else {
-        alert(`❌ Error: ${response.error?.detail || 'Error al procesar solicitud'}`);
+        alert(`❌ Error: Error al procesar solicitud`);
       }
     } catch (error) {
       console.error('Error requesting deletion:', error);
@@ -396,7 +398,7 @@ export const DeletionRequestsDashboard: React.FC = () => {
     try {
       setLoading(true);
       // 🚀 APOLLO API - Centralized deletion requests load
-      const response = await apollo.api.get('/documents/deletion-requests');
+      const response = await apolloGraphQL.api.get('/documents/deletion-requests');
 
       if (response.success && response.data) {
         setRequests(response.data as any);
@@ -415,7 +417,7 @@ export const DeletionRequestsDashboard: React.FC = () => {
 
     try {
       // 🚀 APOLLO API - Centralized compliance data load
-      const response = await apollo.api.get('/documents/compliance-dashboard');
+      const response = await apolloGraphQL.api.get('/documents/compliance-dashboard');
 
       if (response.success && response.data) {
         setComplianceData(response.data as any);

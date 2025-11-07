@@ -23,7 +23,7 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import apollo from '../../../apollo'; // 🚀 APOLLO NUCLEAR - WEBPACK CAN'T STOP US!
+import apolloGraphQL from '../../../services/apolloGraphQL'; // 🥷 STEALTH GRAPHQL NINJA MODE
 // Rutas corregidas para la estructura real - Webpack friendly! 🎯
 import { DocumentUpload } from '../../DocumentManagement/DocumentUpload';
 import { DocumentList } from '../../DocumentManagement/DocumentList';
@@ -76,10 +76,10 @@ export const UnifiedSystemBridge: React.FC<IntegrationBridgeProps> = ({
       try {
         setIsLoading(true);
         // 🚀 APOLLO API - Load system status
-        const response = await apollo.api.get('/documents/system-status', { version: 'v2' });
+        const response = await apolloGraphQL.api.get('/documents/system-status?version=v2');
         
-        if (response.success && response.data) {
-          const status = response.data;
+        if (response.success) {
+          const status = (response as any).data || {};
           // Process status...
         }
         
@@ -112,11 +112,11 @@ export const UnifiedSystemBridge: React.FC<IntegrationBridgeProps> = ({
       setMigrationInProgress(true);
       
       // 🚀 APOLLO API - Migrate patient documents
-      const response = await apollo.api.post('/documents/migrate-patient', {
+      const response = await apolloGraphQL.api.post('/documents/migrate-patient?version=v2', {
         patient_id: patientId,
         force_migration: force,
         preserve_metadata: true
-      }, { version: 'v2' });
+      });
 
       if (response && (response as any).migrated_count) {
         if ((response as any).migrated_count > 0) {
@@ -376,10 +376,10 @@ export const useUnifiedSystemDetection = (patientId: string) => {
     const detectSystem = async () => {
       try {
         // 🚀 APOLLO API - Get patient system status
-        const response = await apollo.api.get(`/documents/patient/${patientId}/system-status`, { version: 'v2' });
+        const response = await apolloGraphQL.api.get(`/documents/patient/${patientId}/system-status?version=v2`);
         
-        if (response.success && response.data) {
-          const data = response.data as any;
+        if (response.success) {
+          const data = (response as any).data || {};
           
           setSystemRecommendation({
             recommended: data.migration_progress === 1.0 ? 'unified' : 
