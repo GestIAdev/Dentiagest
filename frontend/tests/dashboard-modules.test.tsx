@@ -40,8 +40,8 @@ const PATIENTS_QUERY = gql`
       firstName
       lastName
       email
-      phone_primary
-      date_of_birth
+      phone
+      dateOfBirth
     }
   }
 `;
@@ -50,11 +50,12 @@ const APPOINTMENTS_QUERY = gql`
   query TestAppointmentsQuery {
     appointmentsV3(limit: 10, offset: 0) {
       id
-      scheduled_date
-      duration_minutes
-      appointment_type
+      appointmentDate
+      appointmentTime
+      duration
+      type
       status
-      patient_id
+      patientId
     }
   }
 `;
@@ -63,10 +64,10 @@ const TREATMENTS_QUERY = gql`
   query TestTreatmentsQuery {
     treatmentsV3(limit: 10, offset: 0) {
       id
-      name
+      treatmentType
       description
-      duration_minutes
-      price
+      cost
+      status
     }
   }
 `;
@@ -75,10 +76,10 @@ const MEDICAL_RECORDS_QUERY = gql`
   query TestMedicalRecordsQuery {
     medicalRecordsV3(limit: 10, offset: 0) {
       id
-      patient_id
-      record_type
-      created_at
-      notes
+      patientId
+      recordType
+      createdAt
+      content
     }
   }
 `;
@@ -87,34 +88,34 @@ const DOCUMENTS_QUERY = gql`
   query TestDocumentsQuery {
     documentsV3(limit: 10, offset: 0) {
       id
-      name
-      file_type
-      file_size
-      uploaded_at
+      fileName
+      mimeType
+      fileSize
+      updatedAt
     }
   }
 `;
 
 const INVENTORY_QUERY = gql`
-  query TestInventoryQuery {
-    inventoryV3 {
+  query TestInventoryQuery($id: ID!) {
+    inventoryV3(id: $id) {
       id
-      name
+      itemName
       quantity
-      unit_price
-      supplier
+      unitPrice
+      supplierId
     }
   }
 `;
 
 const COMPLIANCE_QUERY = gql`
-  query TestComplianceQuery {
-    complianceV3 {
+  query TestComplianceQuery($id: ID!) {
+    complianceV3(id: $id) {
       id
-      regulation_name
-      status
-      last_audit_date
-      next_audit_date
+      regulationId
+      complianceStatus
+      lastChecked
+      nextCheck
     }
   }
 `;
@@ -199,7 +200,7 @@ describe('🤖 Dashboard Modules - Robot Army GraphQL Testing', () => {
         if (data.appointmentsV3.length > 0) {
           const appointment = data.appointmentsV3[0];
           expect(appointment).toHaveProperty('id');
-          expect(appointment).toHaveProperty('scheduled_date');
+          expect(appointment).toHaveProperty('appointmentDate');
           expect(appointment).toHaveProperty('status');
         }
 
@@ -245,8 +246,8 @@ describe('🤖 Dashboard Modules - Robot Army GraphQL Testing', () => {
         if (data.treatmentsV3.length > 0) {
           const treatment = data.treatmentsV3[0];
           expect(treatment).toHaveProperty('id');
-          expect(treatment).toHaveProperty('name');
-          expect(treatment).toHaveProperty('price');
+          expect(treatment).toHaveProperty('treatmentType');
+          expect(treatment).toHaveProperty('cost');
         }
 
         console.log(`✅ Treatments query successful (${data.treatmentsV3.length} treatments, ${queryTime}ms)`);
@@ -291,8 +292,8 @@ describe('🤖 Dashboard Modules - Robot Army GraphQL Testing', () => {
         if (data.medicalRecordsV3.length > 0) {
           const record = data.medicalRecordsV3[0];
           expect(record).toHaveProperty('id');
-          expect(record).toHaveProperty('patient_id');
-          expect(record).toHaveProperty('record_type');
+          expect(record).toHaveProperty('patientId');
+          expect(record).toHaveProperty('recordType');
         }
 
         console.log(`✅ Medical Records query successful (${data.medicalRecordsV3.length} records, ${queryTime}ms)`);
@@ -337,8 +338,8 @@ describe('🤖 Dashboard Modules - Robot Army GraphQL Testing', () => {
         if (data.documentsV3.length > 0) {
           const document = data.documentsV3[0];
           expect(document).toHaveProperty('id');
-          expect(document).toHaveProperty('name');
-          expect(document).toHaveProperty('file_type');
+          expect(document).toHaveProperty('fileName');
+          expect(document).toHaveProperty('mimeType');
         }
 
         console.log(`✅ Documents query successful (${data.documentsV3.length} documents, ${queryTime}ms)`);
@@ -371,6 +372,7 @@ describe('🤖 Dashboard Modules - Robot Army GraphQL Testing', () => {
       try {
         const { data, errors } = await testClient.query({
           query: INVENTORY_QUERY,
+          variables: { id: 'test-inventory-1' }, // Test ID
         });
 
         const queryTime = Date.now() - startTime;
@@ -378,16 +380,15 @@ describe('🤖 Dashboard Modules - Robot Army GraphQL Testing', () => {
         expect(errors).toBeUndefined();
         expect(data).toBeDefined();
         expect(data.inventoryV3).toBeDefined();
-        expect(Array.isArray(data.inventoryV3)).toBe(true);
 
-        if (data.inventoryV3.length > 0) {
-          const item = data.inventoryV3[0];
+        if (data.inventoryV3) {
+          const item = data.inventoryV3;
           expect(item).toHaveProperty('id');
-          expect(item).toHaveProperty('name');
+          expect(item).toHaveProperty('itemName');
           expect(item).toHaveProperty('quantity');
         }
 
-        console.log(`✅ Inventory query successful (${data.inventoryV3.length} items, ${queryTime}ms)`);
+        console.log(`✅ Inventory query successful (${queryTime}ms)`);
       } catch (error: any) {
         console.log(`⚠️ Inventory query error: ${error.message}`);
         expect(error).toBeDefined();
@@ -398,7 +399,10 @@ describe('🤖 Dashboard Modules - Robot Army GraphQL Testing', () => {
       const startTime = Date.now();
       
       try {
-        await testClient.query({ query: INVENTORY_QUERY });
+        await testClient.query({ 
+          query: INVENTORY_QUERY,
+          variables: { id: 'test-inventory-1' }
+        });
         const queryTime = Date.now() - startTime;
         
         expect(queryTime).toBeLessThan(3000);
@@ -415,8 +419,9 @@ describe('🤖 Dashboard Modules - Robot Army GraphQL Testing', () => {
       const startTime = Date.now();
       
       try {
-        const { data, errors } = await testClient.query({
+        const { data, errors} = await testClient.query({
           query: COMPLIANCE_QUERY,
+          variables: { id: 'test-compliance-1' }, // Test ID
         });
 
         const queryTime = Date.now() - startTime;
@@ -424,16 +429,15 @@ describe('🤖 Dashboard Modules - Robot Army GraphQL Testing', () => {
         expect(errors).toBeUndefined();
         expect(data).toBeDefined();
         expect(data.complianceV3).toBeDefined();
-        expect(Array.isArray(data.complianceV3)).toBe(true);
 
-        if (data.complianceV3.length > 0) {
-          const item = data.complianceV3[0];
+        if (data.complianceV3) {
+          const item = data.complianceV3;
           expect(item).toHaveProperty('id');
-          expect(item).toHaveProperty('regulation_name');
-          expect(item).toHaveProperty('status');
+          expect(item).toHaveProperty('regulationId');
+          expect(item).toHaveProperty('complianceStatus');
         }
 
-        console.log(`✅ Compliance query successful (${data.complianceV3.length} items, ${queryTime}ms)`);
+        console.log(`✅ Compliance query successful (${queryTime}ms)`);
       } catch (error: any) {
         console.log(`⚠️ Compliance query error: ${error.message}`);
         expect(error).toBeDefined();
@@ -444,7 +448,10 @@ describe('🤖 Dashboard Modules - Robot Army GraphQL Testing', () => {
       const startTime = Date.now();
       
       try {
-        await testClient.query({ query: COMPLIANCE_QUERY });
+        await testClient.query({ 
+          query: COMPLIANCE_QUERY,
+          variables: { id: 'test-compliance-1' }
+        });
         const queryTime = Date.now() - startTime;
         
         expect(queryTime).toBeLessThan(3000);
