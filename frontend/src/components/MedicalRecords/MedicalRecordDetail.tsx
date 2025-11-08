@@ -28,7 +28,6 @@ import {
   ArchiveBoxIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';  // 🔧 FIXED: Added .tsx extension for webpack
-import apolloGraphQL from '../../services/apolloGraphQL'; // 🥷 STEALTH GRAPHQL NINJA MODE
 
 // Types
 interface MedicalRecord {
