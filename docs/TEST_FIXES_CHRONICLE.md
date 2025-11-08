@@ -1099,5 +1099,496 @@ LogCategory enum for 90% of legacy logs (340 logs silenced waiting categorizatio
 
 ---
 
-**Last updated:** 7 Nov 2025 19:20  
-**Next update:** After Robot Army Phase 2 expansion
+---
+
+## 🎯 FIX #15: Robot Army Phase 2 - CRUD Bug Discovery 🤖
+**Priority:** P0 - CRITICAL (SURVIVAL MODE)  
+**Impact:** 4 critical bugs discovered in 1.7s - would have taken 4-6 hours manual testing  
+**Context:** User has 2 weeks to finish Dentiagest (real deadline, not demo)  
+**Date:** 8 Nov 2025 00:00
+
+### Background - The Real Stakes:
+```
+💔 SITUATION:
+- $700 debt + 2 week eviction notice
+- 3 weeks lost in Aura Forge Engine (creative distraction)
+- Dentiagest = Real product that can save situation
+- Need: Fast deployment, not perfect code
+
+🎯 STRATEGY:
+Robot Army automation > Manual clicking
+90% bugs auto-detected > 100% manual validation
+Ship working product > Theoretical perfection
+```
+
+### Test Execution Results:
+```bash
+Test Files:  1 failed (1)
+Tests:       8 failed | 6 skipped (14 total)
+Duration:    1.70s
+
+🔍 BUGS DISCOVERED: 4 critical issues
+```
+
+---
+
+### 🐛 BUG #15.1: Patient dateOfBirth - Timestamp vs String Format
+
+**Error:**
+```
+AssertionError: expected '631159200000' to be '1990-01-01'
+Expected: "1990-01-01" (ISO date string)
+Received: "631159200000" (Unix timestamp)
+```
+
+**Root Cause:**
+Backend resolver returns Unix timestamp, schema declares String type.
+
+**Test that discovered it:**
+```typescript
+test('CREATE Patient with valid data succeeds', async () => {
+  const input = {
+    dateOfBirth: '1990-01-01', // Send ISO string
+  };
+  
+  const { data } = await testClient.mutate({
+    mutation: CREATE_PATIENT_MUTATION,
+    variables: { input },
+  });
+  
+  // ❌ FAILS: Resolver returns 631159200000 (timestamp)
+  expect(data.createPatient.dateOfBirth).toBe('1990-01-01');
+});
+```
+
+**Discovery time:** 0.201s (test #1)
+
+**Fix needed:** 
+- Check `selene/src/graphql/resolvers/Mutation/patient.ts` (createPatient resolver)
+- Convert timestamp to ISO date string before returning
+- OR: Update schema to accept Int (timestamp) type
+
+**Status:** ⏳ PENDING FIX
+
+---
+
+### 🐛 BUG #15.2: @veritas Validations NOT Enforced
+
+**Error:**
+```
+AssertionError: expected undefined to be defined
+// Duplicate email test
+expect(errors).toBeDefined(); // ❌ FAILS - no error returned
+
+// Invalid email test  
+expect(errors).toBeDefined(); // ❌ FAILS - no error returned
+```
+
+**Root Cause:**
+@veritas directives defined in schema but validation middleware NOT implemented in resolvers.
+
+**Tests that discovered it:**
+```typescript
+test('CREATE Patient with duplicate email fails', async () => {
+  const input = {
+    email: 'doctor@dentiagest.com', // Already exists in DB
+  };
+  
+  // ❌ EXPECTED: GraphQL error "duplicate email"
+  // ✅ ACTUAL: Patient created successfully (BUG!)
+  const { errors } = await testClient.mutate({ ... });
+  expect(errors).toBeDefined(); // FAILS
+});
+
+test('CREATE Patient with invalid email fails', async () => {
+  const input = {
+    email: 'not-an-email', // Invalid format
+  };
+  
+  // ❌ EXPECTED: Validation error
+  // ✅ ACTUAL: Patient created with invalid email (BUG!)
+  const { errors } = await testClient.mutate({ ... });
+  expect(errors).toBeDefined(); // FAILS
+});
+```
+
+**Discovery time:** 0.009s + 0.008s (tests #2, #3)
+
+**Impact:** 
+- Users can create duplicate patients (data integrity issue)
+- Invalid emails accepted (email system will fail)
+- @veritas directives are decorative, not functional
+
+**Fix needed:**
+- Implement validation middleware in `createPatient` mutation
+- Check email uniqueness before INSERT
+- Validate email format with regex
+- Return GraphQL UserInputError on validation failure
+
+**Status:** ⏳ PENDING FIX
+
+---
+
+### 🐛 BUG #15.3: Appointment Mutation - Field 'date' Doesn't Exist
+
+**Error:**
+```
+CombinedGraphQLErrors: no existe la columna «date» en la relación «appointments»
+```
+
+**Root Cause:**
+Test mutation uses field `date`, but PostgreSQL table has `scheduled_date`.
+
+**Test that discovered it:**
+```typescript
+const CREATE_APPOINTMENT_MUTATION = gql`
+  mutation CreateAppointment($input: AppointmentInput!) {
+    createAppointment(input: $input) {
+      appointmentDate  # ✅ Read works (GraphQL field)
+      # Backend tries to INSERT with 'date' column ❌
+    }
+  }
+`;
+```
+
+**Discovery time:** 0.022s (test #4)
+
+**Database reality:**
+```sql
+-- appointments table has:
+scheduled_date  # PostgreSQL column
+-- NOT:
+date  # This field doesn't exist
+```
+
+**Fix needed:**
+- Check `selene/src/graphql/resolvers/Mutation/appointment.ts`
+- Ensure input mapping: `appointmentDate` → `scheduled_date` (DB column)
+- OR: Check AppointmentInput schema definition for correct field names
+
+**Status:** ⏳ PENDING FIX
+
+---
+
+### 🐛 BUG #15.4: TreatmentInput Schema Mismatch
+
+**Error:**
+```
+CombinedGraphQLErrors:
+- Field "patientId" of required type "ID!" was not provided
+- Field "practitionerId" of required type "ID!" was not provided
+- Field "startDate" of required type "String!" was not provided
+- Field "status" is not defined by type "TreatmentInput"
+```
+
+**Root Cause:**
+Test assumed TreatmentInput schema, but real schema is completely different.
+
+**Test assumption (WRONG):**
+```typescript
+const input = {
+  treatmentType: 'CLEANING',    # ❌ Maybe wrong field name
+  description: 'Regular clean', # ❌ Maybe not in input
+  cost: 75.00,                  # ❌ Maybe wrong field name
+  status: 'ACTIVE',             # ❌ Definitely not in input type
+};
+```
+
+**Real schema (UNKNOWN - need to discover):**
+```typescript
+input TreatmentInput {
+  patientId: ID!        # ✅ Required, missing in test
+  practitionerId: ID!   # ✅ Required, missing in test
+  startDate: String!    # ✅ Required, missing in test
+  # status: ???         # ❌ Doesn't exist in input
+  # ...other fields unknown
+}
+```
+
+**Discovery time:** 0.010s + 0.007s (tests #7, #8)
+
+**Fix needed:**
+- Read `selene/src/graphql/schema.ts` to find real TreatmentInput definition
+- Update CREATE_TREATMENT_MUTATION with correct fields
+- Update test input data to match real schema
+- Add patientId, practitionerId, startDate to test data
+
+**Status:** ⏳ PENDING FIX
+
+---
+
+### 📊 Robot Army Phase 2 - Summary Statistics
+
+**Automation Efficiency:**
+```
+Manual testing estimate: 4-6 hours (clicking all forms, trying edge cases)
+Robot Army execution:    1.70 seconds
+Speed improvement:       8,470x - 12,706x faster
+
+Bugs discovered:         4 critical issues
+Discovery rate:          2.35 bugs per second
+Time to first bug:       0.201s (dateOfBirth format)
+```
+
+**Bug Categories:**
+- 🔴 Data format mismatches: 1 bug (dateOfBirth timestamp)
+- 🔴 Validation not enforced: 1 bug (@veritas directives)
+- 🔴 Schema field mismatches: 2 bugs (Appointment date, Treatment input)
+
+**Tests Skipped (need bug fixes first):**
+- UPDATE operations: 3 tests (require successful CREATE first)
+- DELETE operations: 3 tests (require successful CREATE first)
+
+**Next Phase:**
+1. Fix 4 critical bugs
+2. Re-run Robot Army CRUD tests
+3. Target: 90%+ passing (accept 10% edge cases for manual validation)
+4. Ship working product
+
+---
+
+### 💡 LESSONS LEARNED - Survival Mode Edition
+
+**1. "Ojala se pudieran testear TODOS los errores de manera automatica"**
+Robot Army found 4 critical bugs in 1.7s that would have taken HOURS manually.  
+**Reality:** 90% auto-testable, 10% need human eyes. That's GOOD ENOUGH to ship.
+
+**2. Creative Distractions vs Real Deadlines**
+Aura Forge Engine = Fun, interesting, future potential  
+Dentiagest CRUD bugs = Boring, but pays rent  
+**Priority:** Survival > Perfection
+
+**3. Tests Are Insurance**
+Without Robot Army: Deploy → Users report bugs → Fix live → Reputation damage  
+With Robot Army: Fix bugs BEFORE deploy → Smooth launch → User trust  
+**ROI:** 1.7s of testing saves days of fire-fighting
+
+**4. Real vs Theoretical Schema**
+Assumed schema (what tests expected) ≠ Real schema (what backend has)  
+**Solution:** Discover truth via automated tests, not assumptions
+
+---
+
+**Status:** 🔧 FIXING BUGS (in progress)  
+**Time spent:** 1.7s discovery + ~30min documentation  
+**Bugs fixed:** 0/4 (next: dateOfBirth format)  
+**Target:** 90% CRUD tests passing before manual validation
+
+**Last updated:** 8 Nov 2025 00:15  
+**Next update:** After bug fixes + re-test
+
+---
+
+## 🎯 FIX #16: Robot Army Phase 2 - Session 2 Bug Hunt 🤖
+**Priority:** P0 - CRITICAL  
+**Impact:** 3/14 tests passing → 8 failing, 3 skipped  
+**Date:** 8 Nov 2025 02:25
+
+### Test Execution Results:
+```bash
+Test Files:  1 failed (1)
+Tests:       3 passed | 8 failed | 3 skipped (14)
+Duration:    1.67s
+
+✅ PASSING: Patient CREATE, Appointment CREATE, Treatment CREATE
+❌ FAILING: 8 tests (4 categories)
+⏭️ SKIPPED: 3 DELETE tests
+```
+
+---
+
+### 🐛 BUG ANALYSIS - 4 Categories Discovered
+
+#### **CATEGORY 1: @VERITAS VALIDATION PHANTOM** (3 tests - P1)
+```
+❌ Patient duplicate email → Created successfully (should fail)
+❌ Patient invalid email → Created successfully (should fail)
+❌ Treatment negative cost → Created successfully (should fail)
+```
+
+**Root Cause:** @veritas directives exist in schema but NO validation middleware in resolvers
+
+**Symptoms:**
+```typescript
+// Test expectation:
+const { errors } = await mutate({ email: 'duplicate@test.com' });
+expect(errors).toBeDefined(); // ❌ FAILS - errors = undefined
+
+// Reality:
+Patient created with duplicate email ✅ (BUG - should reject)
+```
+
+**Fix Strategy:** 15 min
+- Add validation in `createPatientV3` resolver (email uniqueness + regex)
+- Add validation in `createTreatmentV3` resolver (cost > 0)
+- Return `UserInputError` on validation failure
+
+---
+
+#### **CATEGORY 2: UUID HARDCODED IN TEST DATA** (2 tests - P0)
+```
+❌ Appointment time conflict: patientId: '1' → "invalid UUID syntax"
+❌ Appointment non-existent patient: patientId: '999999' → "invalid UUID syntax"
+```
+
+**Root Cause:** Tests use fake IDs instead of creating real entities
+
+**Symptoms:**
+```typescript
+const input = {
+  patientId: '1',  // ❌ PostgreSQL expects UUID format
+};
+
+// Error: la sintaxis de entrada no es válida para tipo uuid: «1»
+```
+
+**Fix Strategy:** 10 min
+- Apply dynamic creation pattern (like we did for Appointment CREATE)
+- Create Patient first, use returned UUID
+- Tests become self-contained
+
+---
+
+#### **CATEGORY 3: UPDATE MUTATIONS DON'T EXIST** (3 tests - P2)
+```
+❌ UPDATE Patient email → "PatientInput expecting UpdatePatientInput!"
+❌ UPDATE Patient duplicate email → Same error
+❌ UPDATE Appointment status → "AppointmentInput expecting UpdateAppointmentInput!"
+```
+
+**Root Cause:** GraphQL schema missing UPDATE input types + mutations
+
+**Symptoms:**
+```graphql
+# Schema has:
+mutation createPatientV3(input: PatientInput!)
+
+# Schema MISSING:
+mutation updatePatientV3(id: ID!, input: UpdatePatientInput!)
+# UpdatePatientInput type doesn't exist
+```
+
+**Fix Strategy:** 30 min
+- Create `UpdatePatientInput` type (all fields optional except ID)
+- Create `UpdateAppointmentInput` type (all fields optional except ID)
+- Create mutations: `updatePatientV3`, `updateAppointmentV3`
+- Implement resolvers with partial update logic
+
+---
+
+#### **CATEGORY 4: ENUM VALUE TYPO** (1 test - P0)
+```
+❌ DELETE suite initialization → "invalid enum appointmenttype: 'FOLLOWUP'"
+```
+
+**Root Cause:** Typo in test setup - missing underscore
+
+**Symptoms:**
+```typescript
+// Test has:
+type: 'FOLLOWUP'  // ❌ Wrong
+
+// PostgreSQL enum expects:
+type: 'FOLLOW_UP' // ✅ Correct (from earlier session)
+```
+
+**Fix Strategy:** 2 min
+- Find test setup in DELETE suite (beforeAll or test data)
+- Replace `FOLLOWUP` → `FOLLOW_UP`
+- Should be in `dashboard-crud.test.tsx` around DELETE tests
+
+---
+
+### 📊 Bug Priority Matrix
+
+| Bug | Category | Priority | Complexity | Time | Impact |
+|-----|----------|----------|------------|------|--------|
+| FOLLOWUP typo | Enum typo | P0 | Trivial | 2min | Unblocks 3 DELETE tests |
+| UUID hardcoded | Test data | P0 | Easy | 10min | Fixes 2 Appointment tests |
+| @veritas validation | Validation | P1 | Medium | 15min | Data integrity critical |
+| UPDATE mutations | Schema | P2 | Complex | 30min | Feature completeness |
+
+**Total estimated time:** ~57 minutes to fix all bugs
+
+---
+
+### 🎯 Proposed Fix Order (Complexity Ascending)
+
+**Phase 1 - Quick Wins (12 min):**
+1. ✅ Fix FOLLOWUP typo → 2 min → Unblocks DELETE tests
+2. ✅ Fix UUID hardcoded → 10 min → Fixes 2 Appointment validation tests
+
+**Expected result:** 5/14 tests passing (35.7%)
+
+**Phase 2 - Validation (15 min):**
+3. ✅ Implement @veritas validation → 15 min → Fixes 3 validation tests
+
+**Expected result:** 8/14 tests passing (57.1%)
+
+**Phase 3 - Feature Complete (30 min):**
+4. ✅ Create UPDATE mutations + input types → 30 min → Fixes 3 UPDATE tests
+
+**Expected result:** 11/14 tests passing (78.5%)
+
+**DELETE tests:** Likely work once CREATE bugs fixed (no new issues expected)
+
+**Final target:** 11-14/14 tests passing (78.5% - 100%)
+
+---
+
+### 💡 Context Refresh - What We Learned
+
+**VICTORY #1:** Dual Database.ts eliminated ✅
+- User's VSCode refactor in 15 seconds
+- Agent was editing 2 files thinking they were 1
+- Import paths auto-updated across 20+ files
+
+**VICTORY #2:** Appointment CREATE working ✅
+- PostgreSQL enum values discovered (UPPERCASE)
+- All NOT NULL fields handled (priority, title, dentist_id, created_by)
+- COALESCE fallback for optional fields
+- Combined date + time into single timestamp
+
+**VICTORY #3:** DateString scalar working ✅
+- Prevents Apollo auto-conversion of dates to timestamps
+- Patient dateOfBirth returns `"1990-01-01"` format
+- Custom GraphQL scalar in production
+
+**CURRENT STATE:**
+- Backend: PM2 running, TypeScript compiled, 0 syntax errors
+- Tests: 3/14 passing (21.4%) - Patient, Appointment, Treatment CREATE
+- Database: PostgreSQL with real data, enum values confirmed
+- Schema: Single Database.ts source of truth
+
+---
+
+### 🚀 Next Steps (Post Tactical Pause)
+
+**IMMEDIATE (after commit):**
+1. Read full test file to understand structure
+2. Fix FOLLOWUP typo (2 min)
+3. Fix UUID hardcoded tests (10 min)
+4. Re-run suite, celebrate 5/14 passing
+
+**THEN:**
+5. Implement @veritas validation (15 min)
+6. Re-run suite, celebrate 8/14 passing
+
+**FINALLY:**
+7. Decide: Ship at 57% passing OR build UPDATE mutations for 78%
+8. User deadline context: 2 weeks to finish Dentiagest
+
+**Philosophy:**
+- 🎯 Ship working product > 100% test coverage
+- 🚀 90% automated bugs caught > 100% manual validation
+- 💪 Survival mode > Perfectionism
+
+---
+
+**Status:** ⏸️ TACTICAL PAUSE  
+**Time spent:** 2+ hours debugging Appointment (Session 1) + 30 min test run analysis (Session 2)  
+**Bugs documented:** 4 categories, 8 tests failing, clear fix path  
+**Next action:** Commit progress, refresh context, attack bugs in order
+
+**Last updated:** 8 Nov 2025 02:40  
+**Next update:** After FOLLOWUP typo fix + UUID fixes

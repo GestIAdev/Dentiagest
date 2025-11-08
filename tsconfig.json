@@ -48,7 +48,7 @@
   "include": [
     "selene/**/*.ts",
     "selene/**/*.js"
-  ],
+, "selene/src/core/Database.ts.deprecated"  ],
   "exclude": [
     "node_modules",
     "dist",
