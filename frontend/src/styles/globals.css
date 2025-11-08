@@ -1,9 +1,9 @@
+/* Importar fuente Inter de Google Fonts - MUST BE FIRST */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Importar fuente Inter de Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* 🔥 AINARKLENDAR NUCLEAR ANTI-BLUE ZONE */
 @layer base {
