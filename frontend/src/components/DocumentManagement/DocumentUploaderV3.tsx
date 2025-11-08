@@ -233,41 +233,81 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
         appointmentId
       });
 
-      // Simulate upload progress (in real implementation, this would come from the upload API)
-      const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
-          if (!prev) return null;
-          const newLoaded = Math.min(prev.loaded + (prev.total * 0.1), prev.total);
-          const newPercentage = (newLoaded / prev.total) * 100;
-          return { ...prev, loaded: newLoaded, percentage: newPercentage };
+      // 🔥 REAL FILE UPLOAD - NO MORE MOCKS!
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', selectedFile);
+      uploadFormData.append('patientId', patientId || '');
+      uploadFormData.append('uploaderId', 'current-user-id'); // TODO: Get from auth context
+      uploadFormData.append('documentType', formData.category.toUpperCase());
+      uploadFormData.append('description', formData.description || '');
+      uploadFormData.append('category', formData.category);
+      uploadFormData.append('tags', JSON.stringify(formData.tags));
+      
+      if (medicalRecordId) {
+        uploadFormData.append('medicalRecordId', medicalRecordId);
+      }
+      if (appointmentId) {
+        uploadFormData.append('appointmentId', appointmentId);
+      }
+
+      // Upload with progress tracking
+      const xhr = new XMLHttpRequest();
+      
+      // Progress handler
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+          const percentage = (e.loaded / e.total) * 100;
+          setUploadProgress({
+            loaded: e.loaded,
+            total: e.total,
+            percentage
+          });
+        }
+      });
+
+      // Create promise for XHR
+      const uploadPromise = new Promise<any>((resolve, reject) => {
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            const response = JSON.parse(xhr.responseText);
+            resolve(response);
+          } else {
+            reject(new Error(`Upload failed: ${xhr.statusText}`));
+          }
         });
-      }, 200);
+        
+        xhr.addEventListener('error', () => {
+          reject(new Error('Network error during upload'));
+        });
+        
+        xhr.addEventListener('abort', () => {
+          reject(new Error('Upload aborted'));
+        });
+      });
 
-      // Here you would call the actual upload mutation
-      // For now, we'll simulate a successful upload
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Send request
+      const apiUrl = 'http://localhost:4000'; // TODO: Move to config/environment
+      xhr.open('POST', `${apiUrl}/api/documents/upload`);
+      xhr.send(uploadFormData);
 
-      clearInterval(progressInterval);
-      setUploadProgress({ loaded: selectedFile.size, total: selectedFile.size, percentage: 100 });
+      // Wait for completion
+      const response = await uploadPromise;
 
-      // Simulate successful upload response
-      const mockDocument = {
-        id: `doc_${Date.now()}`,
-        title: formData.title,
-        description: formData.description,
-        file_name: selectedFile.name,
-        file_size_mb: selectedFile.size / (1024 * 1024),
-        mime_type: selectedFile.type,
-        created_at: new Date().toISOString(),
-        unified_type: formData.category,
-        compliance_status: 'compliant'
-      };
+      if (response.success) {
+        setUploadProgress({ 
+          loaded: selectedFile.size, 
+          total: selectedFile.size, 
+          percentage: 100 
+        });
 
-      l.info('Document upload successful', { documentId: mockDocument.id });
-      onUploadSuccess?.(mockDocument);
+        l.info('Document upload successful', { documentId: response.document.id });
+        onUploadSuccess?.(response.document);
 
-      // Reset form
-      resetForm();
+        // Reset form
+        resetForm();
+      } else {
+        throw new Error(response.error || 'Upload failed');
+      }
 
     } catch (error: any) {
       l.error('Document upload failed', error);

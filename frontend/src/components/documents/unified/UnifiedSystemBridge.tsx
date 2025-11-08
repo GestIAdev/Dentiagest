@@ -24,11 +24,11 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import apolloGraphQL from '../../../services/apolloGraphQL'; // 🥷 STEALTH GRAPHQL NINJA MODE
-// Rutas corregidas para la estructura real - Webpack friendly! 🎯
-import { DocumentUpload } from '../../DocumentManagement/DocumentUpload';
-import { DocumentList } from '../../DocumentManagement/DocumentList';
-import { DocumentViewer } from '../../DocumentManagement/DocumentViewer';
-import DocumentManagement from '../../DocumentManagement/CyberpunkDocumentTabs';
+// 🔥 MIGRATED TO V3 COMPONENTS - Legacy eliminated
+import DocumentManagerV3 from '../../DocumentManagement/DocumentManagerV3';
+import { DocumentUploaderV3 } from '../../DocumentManagement/DocumentUploaderV3';
+import { DocumentListV3 } from '../../DocumentManagement/DocumentListV3';
+import DocumentViewerV3 from '../../DocumentManagement/DocumentViewerV3';
 import { LegalCategory, UnifiedDocumentType } from './UnifiedDocumentTypes';
 
 interface IntegrationBridgeProps {
@@ -237,8 +237,8 @@ export const UnifiedSystemBridge: React.FC<IntegrationBridgeProps> = ({
       case 'unified':
         return (
           <div className="unified-document-management">
-            {/* PRODUCTION MODE: Title hidden for client */}
-            <DocumentManagement
+            {/* PRODUCTION MODE: Using V3 Components */}
+            <DocumentManagerV3
               patientId={patientId}
               className="h-full"
               key={`unified-${Date.now()}`}
@@ -253,7 +253,7 @@ export const UnifiedSystemBridge: React.FC<IntegrationBridgeProps> = ({
             <div className="border-2 border-dashed border-blue-300 rounded-lg p-4 bg-blue-50">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-blue-800">
-                  🚀 Sistema Unificado (Previsualización)
+                  🚀 Sistema Unificado V3 (Previsualización)
                 </h3>
                 <button
                   onClick={() => setCurrentSystem('unified')}
@@ -262,25 +262,24 @@ export const UnifiedSystemBridge: React.FC<IntegrationBridgeProps> = ({
                   Activar Sistema Unificado
                 </button>
               </div>
-              <DocumentList 
+              <DocumentManagerV3 
                 patientId={patientId}
-                key={`legacy-${Date.now()}`}
+                key={`preview-${Date.now()}`}
               />
             </div>
 
-            {/* Legacy System */}
+            {/* Legacy System - DEPRECATED, use V3 instead */}
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-700">
-                  📂 Sistema Legacy (Activo)
+                  📂 Sistema Legacy (Deprecado)
                 </h3>
                 <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
-                  En Migración
+                  Use V3 Instead
                 </span>
               </div>
-              <div className="space-y-4">
-                <DocumentUpload patientId={patientId} />
-                <DocumentList patientId={patientId} />
+              <div className="space-y-4 text-gray-500">
+                <p>Legacy components removed. Please use DocumentManagerV3 instead.</p>
               </div>
             </div>
           </div>
@@ -290,8 +289,8 @@ export const UnifiedSystemBridge: React.FC<IntegrationBridgeProps> = ({
       default:
         return (
           <div className="space-y-4">
-            <DocumentUpload patientId={patientId} />
-            <DocumentList patientId={patientId} />
+            {/* Redirect to V3 */}
+            <DocumentManagerV3 patientId={patientId} />
           </div>
         );
     }

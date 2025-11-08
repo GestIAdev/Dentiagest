@@ -284,7 +284,13 @@ settings.local.py
 *.crt
 
 # Uploads y archivos temporales
-uploads/
+uploads/*
+!uploads/.gitkeep
+!uploads/xrays/.gitkeep
+!uploads/photos/.gitkeep
+!uploads/pdfs/.gitkeep
+!uploads/dicom/.gitkeep
+!uploads/other/.gitkeep
 temp_files/
 *.tmp
 

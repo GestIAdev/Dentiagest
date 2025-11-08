@@ -1,0 +1,12 @@
+# Uploads Directory - Local File Storage
+
+This directory stores uploaded medical documents.
+
+Structure:
+- /xrays/ - Radiographic images
+- /photos/ - Clinical photos
+- /pdfs/ - Treatment plans, reports, documents
+- /dicom/ - DICOM medical images
+- /other/ - Other file types
+
+DO NOT commit actual files to git - only this .gitkeep placeholder.

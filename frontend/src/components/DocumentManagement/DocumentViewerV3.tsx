@@ -61,8 +61,11 @@ interface DocumentData {
   };
 }
 
-// Configure PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+// 🔧 Configure PDF.js worker - LOCAL BUNDLE (no CDN dependency)
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).toString();
 
 interface DocumentViewerV3Props {
   doc: DocumentData;

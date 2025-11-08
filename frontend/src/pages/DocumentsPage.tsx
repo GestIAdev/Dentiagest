@@ -11,7 +11,7 @@
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import DocumentManagement from '../components/DocumentManagement/CyberpunkDocumentTabs';
+import DocumentManagerV3 from '../components/DocumentManagement/DocumentManagerV3';
 import { 
   FolderIcon
 } from '@heroicons/react/24/outline';
@@ -65,8 +65,8 @@ export const DocumentsPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white shadow rounded-lg">
           <div className="px-6 py-6">
-            {/* 🗂️ DOCUMENT MANAGEMENT COMPONENT - MAXIMUM WORKSPACE */}
-            <DocumentManagement
+            {/* 🗂️ DOCUMENT MANAGEMENT V3 - REAL UPLOAD + AI FEATURES */}
+            <DocumentManagerV3
               patientId={patientId}
               medicalRecordId={recordId}
             />
