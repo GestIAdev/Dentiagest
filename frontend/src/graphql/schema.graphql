@@ -1,20 +1,57 @@
-# 🔥 APOLLO NUCLEAR GRAPHQL FEDERATION SCHEMA
-# Date: September 22, 2025
-# Mission: GraphQL Federation for Apollo Nuclear 3.0
-# Target: PatientManagement & AppointmentWizard Integration
+# 🔥💀🎸 DENTIAGEST GRAPHQL V3 SCHEMA - VERITAS QUANTUM VERIFICATION
+# Date: November 8, 2025
+# Architect: PunkClaude (The Verse Libre)
+# Mission: Complete V3 Integration - @veritas Quantum Verification
+# Target: 11 Specialized Database Classes with Dual-Field Pattern
+# Philosophy: PERFORMANCE = ART (No Mocks, No Simulations, Real Code)
 
 """
-GraphQL Schema Definition for Apollo Nuclear 3.0 Federation
+DentiaGest GraphQL V3 Schema - Veritas Quantum Verification System
 
-This schema provides a unified GraphQL API that serves both:
-- PatientManagement: Complete patient lifecycle management
-- AppointmentWizard: Intelligent appointment scheduling
+This schema provides a unified GraphQL API with @veritas quantum verification
+for all 11 specialized database classes:
 
-Architecture: Apollo Federation with subgraphs for:
-- Patient subgraph (patient data & operations)
-- Appointment subgraph (appointment data & operations)
-- User subgraph (authentication & authorization)
+🔬 PATIENTS: Patient lifecycle with quantum-verified medical data
+📅 APPOINTMENTS: Intelligent scheduling with conflict resolution
+📋 MEDICAL RECORDS: Comprehensive clinical documentation
+🦷 TREATMENTS: Treatment planning and execution tracking
+📄 DOCUMENTS: Unified document management system
+💰 BILLING: Financial operations with quantum verification
+📦 INVENTORY: Materials, equipment, and supplier management
+✅ COMPLIANCE: Regulatory compliance and audit trails
+🛒 MARKETPLACE: Product catalog and purchase orders
+💳 SUBSCRIPTIONS: Subscription management and billing cycles
+📆 CUSTOM CALENDAR: Advanced calendar views and availability
+
+Architecture: Direct GraphQL with @veritas directive for quantum verification
+Dual-field pattern: field + field_veritas for verified/unverified data
 """
+
+# ============================================================================
+# VERITAS QUANTUM VERIFICATION SYSTEM
+# ============================================================================
+
+"""
+@veritas directive for quantum verification of data integrity
+Level 1-5: Verification confidence levels
+Algorithm: Quantum verification method used
+Certificate: Verification certificate hash
+"""
+directive @veritas(level: Int!, algorithm: String) on FIELD_DEFINITION | OBJECT
+
+"""
+VeritasVerification type for quantum verification metadata
+Contains verification status, confidence, level, and certificate information
+"""
+type VeritasVerification {
+  verified: Boolean!
+  confidence: Float!
+  level: Int!
+  certificate: String
+  error: String
+  verifiedAt: DateTime
+  algorithm: String!
+}
 
 # ============================================================================
 # SCALARS & ENUMS
@@ -23,6 +60,7 @@ Architecture: Apollo Federation with subgraphs for:
 scalar DateTime
 scalar UUID
 scalar JSON
+scalar Upload
 
 enum Gender {
   MALE
@@ -91,11 +129,229 @@ enum AppointmentPriority {
   URGENT
 }
 
+enum TreatmentStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  ON_HOLD
+}
+
+enum TreatmentType {
+  RESTORATIVE
+  PREVENTIVE
+  COSMETIC
+  ORTHODONTIC
+  SURGICAL
+  PERIODONTAL
+  ENDODONTIC
+  PROSTHETIC
+}
+
+enum DocumentType {
+  MEDICAL_RECORD
+  XRAY
+  PHOTO
+  CONSENT_FORM
+  INVOICE
+  PRESCRIPTION
+  INSURANCE_CLAIM
+  TREATMENT_PLAN
+}
+
+enum DocumentStatus {
+  DRAFT
+  FINAL
+  ARCHIVED
+  DELETED
+}
+
+enum BillingStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+  REFUNDED
+}
+
+enum InventoryStatus {
+  IN_STOCK
+  LOW_STOCK
+  OUT_OF_STOCK
+  ON_ORDER
+  DISCONTINUED
+}
+
+enum EquipmentStatus {
+  ACTIVE
+  MAINTENANCE
+  OUT_OF_SERVICE
+  DEPRECATED
+}
+
+enum MaintenanceType {
+  PREVENTIVE
+  CORRECTIVE
+  PREDICTIVE
+}
+
+enum ComplianceStatus {
+  COMPLIANT
+  NON_COMPLIANT
+  PENDING_REVIEW
+  UNDER_REVIEW
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+  SUSPENDED
+  EXPIRED
+}
+
+enum SubscriptionTier {
+  BASIC
+  PROFESSIONAL
+  ENTERPRISE
+  PREMIUM
+}
+
+enum CalendarViewType {
+  DAY
+  WEEK
+  MONTH
+  AGENDA
+}
+
+enum UserRole {
+  ADMIN
+  DENTIST
+  RECEPTIONIST
+  PATIENT
+  ASSISTANT
+}
+
 # ============================================================================
-# INPUT TYPES
+# INPUT TYPES - V3 VARIANTS
 # ============================================================================
 
-input PatientSearchFilters {
+# PATIENT INPUTS
+input PatientV3CreateInput {
+  firstName: String!
+  firstName_veritas: String
+  lastName: String!
+  lastName_veritas: String
+  email: String
+  email_veritas: String
+  phone: String
+  phone_veritas: String
+  phoneSecondary: String
+  phoneSecondary_veritas: String
+  dateOfBirth: DateTime
+  dateOfBirth_veritas: DateTime
+  gender: Gender
+  gender_veritas: Gender
+  addressStreet: String
+  addressStreet_veritas: String
+  addressCity: String
+  addressCity_veritas: String
+  addressState: String
+  addressState_veritas: String
+  addressPostalCode: String
+  addressPostalCode_veritas: String
+  addressCountry: String
+  addressCountry_veritas: String
+  emergencyContactName: String
+  emergencyContactName_veritas: String
+  emergencyContactPhone: String
+  emergencyContactPhone_veritas: String
+  emergencyContactRelationship: String
+  emergencyContactRelationship_veritas: String
+  medicalConditions: String
+  medicalConditions_veritas: String
+  medicationsCurrent: String
+  medicationsCurrent_veritas: String
+  allergies: String
+  allergies_veritas: String
+  anxietyLevel: AnxietyLevel
+  anxietyLevel_veritas: AnxietyLevel
+  specialNeeds: String
+  specialNeeds_veritas: String
+  insuranceProvider: String
+  insuranceProvider_veritas: String
+  insurancePolicyNumber: String
+  insurancePolicyNumber_veritas: String
+  insuranceGroupNumber: String
+  insuranceGroupNumber_veritas: String
+  consentToTreatment: Boolean
+  consentToTreatment_veritas: Boolean
+  consentToContact: Boolean
+  consentToContact_veritas: Boolean
+  preferredContactMethod: String
+  preferredContactMethod_veritas: String
+  notes: String
+  notes_veritas: String
+}
+
+input PatientV3UpdateInput {
+  firstName: String
+  firstName_veritas: String
+  lastName: String
+  lastName_veritas: String
+  email: String
+  email_veritas: String
+  phone: String
+  phone_veritas: String
+  phoneSecondary: String
+  phoneSecondary_veritas: String
+  dateOfBirth: DateTime
+  dateOfBirth_veritas: DateTime
+  gender: Gender
+  gender_veritas: Gender
+  addressStreet: String
+  addressStreet_veritas: String
+  addressCity: String
+  addressCity_veritas: String
+  addressState: String
+  addressState_veritas: String
+  addressPostalCode: String
+  addressPostalCode_veritas: String
+  addressCountry: String
+  addressCountry_veritas: String
+  emergencyContactName: String
+  emergencyContactName_veritas: String
+  emergencyContactPhone: String
+  emergencyContactPhone_veritas: String
+  emergencyContactRelationship: String
+  emergencyContactRelationship_veritas: String
+  medicalConditions: String
+  medicalConditions_veritas: String
+  medicationsCurrent: String
+  medicationsCurrent_veritas: String
+  allergies: String
+  allergies_veritas: String
+  anxietyLevel: AnxietyLevel
+  anxietyLevel_veritas: AnxietyLevel
+  specialNeeds: String
+  specialNeeds_veritas: String
+  insuranceProvider: String
+  insuranceProvider_veritas: String
+  insurancePolicyNumber: String
+  insurancePolicyNumber_veritas: String
+  insuranceGroupNumber: String
+  insuranceGroupNumber_veritas: String
+  consentToTreatment: Boolean
+  consentToTreatment_veritas: Boolean
+  consentToContact: Boolean
+  consentToContact_veritas: Boolean
+  preferredContactMethod: String
+  preferredContactMethod_veritas: String
+  notes: String
+  notes_veritas: String
+}
+
+input PatientV3SearchFilters {
   search: String
   hasMedicalConditions: Boolean
   hasAllergies: Boolean
@@ -110,107 +366,82 @@ input PatientSearchFilters {
   size: Int
 }
 
-input PatientCreateInput {
-  firstName: String!
-  lastName: String!
-  email: String
-  phone: String
-  phoneSecondary: String
-  dateOfBirth: DateTime
-  gender: Gender
-  addressStreet: String
-  addressCity: String
-  addressState: String
-  addressPostalCode: String
-  addressCountry: String
-  emergencyContactName: String
-  emergencyContactPhone: String
-  emergencyContactRelationship: String
-  medicalConditions: String
-  medicationsCurrent: String
-  allergies: String
-  anxietyLevel: AnxietyLevel
-  specialNeeds: String
-  insuranceProvider: String
-  insurancePolicyNumber: String
-  insuranceGroupNumber: String
-  consentToTreatment: Boolean
-  consentToContact: Boolean
-  preferredContactMethod: String
-  notes: String
-}
-
-input PatientUpdateInput {
-  firstName: String
-  lastName: String
-  email: String
-  phone: String
-  phoneSecondary: String
-  dateOfBirth: DateTime
-  gender: Gender
-  addressStreet: String
-  addressCity: String
-  addressState: String
-  addressPostalCode: String
-  addressCountry: String
-  emergencyContactName: String
-  emergencyContactPhone: String
-  emergencyContactRelationship: String
-  medicalConditions: String
-  medicationsCurrent: String
-  allergies: String
-  anxietyLevel: AnxietyLevel
-  specialNeeds: String
-  insuranceProvider: String
-  insurancePolicyNumber: String
-  insuranceGroupNumber: String
-  consentToTreatment: Boolean
-  consentToContact: Boolean
-  preferredContactMethod: String
-  notes: String
-}
-
-input AppointmentCreateInput {
+# APPOINTMENT INPUTS
+input AppointmentV3CreateInput {
   patientId: UUID!
+  patientId_veritas: UUID
   dentistId: UUID!
+  dentistId_veritas: UUID
   scheduledDate: DateTime!
+  scheduledDate_veritas: DateTime
   durationMinutes: Int!
+  durationMinutes_veritas: Int
   appointmentType: AppointmentType!
+  appointmentType_veritas: AppointmentType
   priority: AppointmentPriority!
+  priority_veritas: AppointmentPriority
   title: String!
+  title_veritas: String
   description: String
+  description_veritas: String
   notes: String
+  notes_veritas: String
   roomNumber: String
+  roomNumber_veritas: String
   estimatedCost: String
+  estimatedCost_veritas: String
   insuranceCoverage: String
+  insuranceCoverage_veritas: String
   preparationInstructions: String
+  preparationInstructions_veritas: String
   followUpRequired: Boolean
+  followUpRequired_veritas: Boolean
   parentAppointmentId: UUID
+  parentAppointmentId_veritas: UUID
 }
 
-input AppointmentUpdateInput {
+input AppointmentV3UpdateInput {
   patientId: UUID
+  patientId_veritas: UUID
   dentistId: UUID
+  dentistId_veritas: UUID
   scheduledDate: DateTime
+  scheduledDate_veritas: DateTime
   durationMinutes: Int
+  durationMinutes_veritas: Int
   appointmentType: AppointmentType
+  appointmentType_veritas: AppointmentType
   priority: AppointmentPriority
+  priority_veritas: AppointmentPriority
   title: String
+  title_veritas: String
   description: String
+  description_veritas: String
   notes: String
+  notes_veritas: String
   status: AppointmentStatus
+  status_veritas: AppointmentStatus
   roomNumber: String
+  roomNumber_veritas: String
   estimatedCost: String
+  estimatedCost_veritas: String
   insuranceCoverage: String
+  insuranceCoverage_veritas: String
   preparationInstructions: String
+  preparationInstructions_veritas: String
   followUpRequired: Boolean
+  followUpRequired_veritas: Boolean
   confirmationSent: Boolean
+  confirmationSent_veritas: Boolean
   reminderSent: Boolean
+  reminderSent_veritas: Boolean
   cancelledAt: DateTime
+  cancelledAt_veritas: DateTime
   completedAt: DateTime
+  completedAt_veritas: DateTime
 }
 
-input AppointmentSearchFilters {
+input AppointmentV3SearchFilters {
   startDate: DateTime
   endDate: DateTime
   patientId: UUID
@@ -224,192 +455,1629 @@ input AppointmentSearchFilters {
   size: Int
 }
 
-input AvailabilityRequestInput {
-  date: DateTime!
+# MEDICAL RECORD INPUTS
+input MedicalRecordV3CreateInput {
+  patientId: UUID!
+  patientId_veritas: UUID
+  dentistId: UUID!
+  dentistId_veritas: UUID
+  appointmentId: UUID
+  appointmentId_veritas: UUID
+  recordType: String!
+  recordType_veritas: String
+  title: String!
+  title_veritas: String
+  content: String!
+  content_veritas: String
+  diagnosis: String
+  diagnosis_veritas: String
+  treatment: String
+  treatment_veritas: String
+  notes: String
+  notes_veritas: String
+  attachments: [UUID!]
+  attachments_veritas: [UUID!]
+}
+
+input MedicalRecordV3UpdateInput {
+  recordType: String
+  recordType_veritas: String
+  title: String
+  title_veritas: String
+  content: String
+  content_veritas: String
+  diagnosis: String
+  diagnosis_veritas: String
+  treatment: String
+  treatment_veritas: String
+  notes: String
+  notes_veritas: String
+  attachments: [UUID!]
+  attachments_veritas: [UUID!]
+}
+
+# TREATMENT INPUTS
+input TreatmentV3CreateInput {
+  patientId: UUID!
+  patientId_veritas: UUID
+  dentistId: UUID!
+  dentistId_veritas: UUID
+  appointmentId: UUID
+  appointmentId_veritas: UUID
+  treatmentType: TreatmentType!
+  treatmentType_veritas: TreatmentType
+  title: String!
+  title_veritas: String
+  description: String!
+  description_veritas: String
+  estimatedCost: Float
+  estimatedCost_veritas: Float
+  insuranceCoverage: Float
+  insuranceCoverage_veritas: Float
+  priority: AppointmentPriority
+  priority_veritas: AppointmentPriority
+  status: TreatmentStatus
+  status_veritas: TreatmentStatus
+  notes: String
+  notes_veritas: String
+  plannedProcedures: [String!]
+  plannedProcedures_veritas: [String!]
+}
+
+input TreatmentV3UpdateInput {
+  treatmentType: TreatmentType
+  treatmentType_veritas: TreatmentType
+  title: String
+  title_veritas: String
+  description: String
+  description_veritas: String
+  estimatedCost: Float
+  estimatedCost_veritas: Float
+  insuranceCoverage: Float
+  insuranceCoverage_veritas: Float
+  priority: AppointmentPriority
+  priority_veritas: AppointmentPriority
+  status: TreatmentStatus
+  status_veritas: TreatmentStatus
+  notes: String
+  notes_veritas: String
+  plannedProcedures: [String!]
+  plannedProcedures_veritas: [String!]
+}
+
+# DOCUMENT INPUTS
+input DocumentV3CreateInput {
+  patientId: UUID!
+  patientId_veritas: UUID
+  appointmentId: UUID
+  appointmentId_veritas: UUID
+  documentType: DocumentType!
+  documentType_veritas: DocumentType
+  title: String!
+  title_veritas: String
+  description: String
+  description_veritas: String
+  fileName: String!
+  fileName_veritas: String
+  fileSize: Int!
+  fileSize_veritas: Int
+  mimeType: String!
+  mimeType_veritas: String
+  fileUrl: String!
+  fileUrl_veritas: String
+  tags: [String!]
+  tags_veritas: [String!]
+  metadata: JSON
+  metadata_veritas: JSON
+}
+
+input DocumentV3UpdateInput {
+  documentType: DocumentType
+  documentType_veritas: DocumentType
+  title: String
+  title_veritas: String
+  description: String
+  description_veritas: String
+  tags: [String!]
+  tags_veritas: [String!]
+  metadata: JSON
+  metadata_veritas: JSON
+}
+
+# INVENTORY INPUTS
+input InventoryV3CreateInput {
+  name: String!
+  name_veritas: String
+  description: String
+  description_veritas: String
+  category: String!
+  category_veritas: String
+  sku: String!
+  sku_veritas: String
+  unitCost: Float!
+  unitCost_veritas: Float
+  unitPrice: Float!
+  unitPrice_veritas: Float
+  currentStock: Int!
+  currentStock_veritas: Int
+  minimumStock: Int!
+  minimumStock_veritas: Int
+  maximumStock: Int
+  maximumStock_veritas: Int
+  supplierId: UUID
+  supplierId_veritas: UUID
+  location: String
+  location_veritas: String
+  expiryDate: DateTime
+  expiryDate_veritas: DateTime
+  status: InventoryStatus
+  status_veritas: InventoryStatus
+}
+
+input InventoryV3UpdateInput {
+  name: String
+  name_veritas: String
+  description: String
+  description_veritas: String
+  category: String
+  category_veritas: String
+  unitCost: Float
+  unitCost_veritas: Float
+  unitPrice: Float
+  unitPrice_veritas: Float
+  currentStock: Int
+  currentStock_veritas: Int
+  minimumStock: Int
+  minimumStock_veritas: Int
+  maximumStock: Int
+  maximumStock_veritas: Int
+  supplierId: UUID
+  supplierId_veritas: UUID
+  location: String
+  location_veritas: String
+  expiryDate: DateTime
+  expiryDate_veritas: DateTime
+  status: InventoryStatus
+  status_veritas: InventoryStatus
+}
+
+input EquipmentV3CreateInput {
+  name: String!
+  name_veritas: String
+  description: String
+  description_veritas: String
+  category: String!
+  category_veritas: String
+  manufacturer: String
+  manufacturer_veritas: String
+  model: String
+  model_veritas: String
+  serialNumber: String!
+  serialNumber_veritas: String
+  purchaseDate: DateTime!
+  purchaseDate_veritas: DateTime
+  purchaseCost: Float
+  purchaseCost_veritas: Float
+  warrantyExpiry: DateTime
+  warrantyExpiry_veritas: DateTime
+  location: String
+  location_veritas: String
+  status: EquipmentStatus
+  status_veritas: EquipmentStatus
+  maintenanceSchedule: JSON
+  maintenanceSchedule_veritas: JSON
+}
+
+input EquipmentV3UpdateInput {
+  name: String
+  name_veritas: String
+  description: String
+  description_veritas: String
+  category: String
+  category_veritas: String
+  manufacturer: String
+  manufacturer_veritas: String
+  model: String
+  model_veritas: String
+  serialNumber: String
+  serialNumber_veritas: String
+  purchaseDate: DateTime
+  purchaseDate_veritas: DateTime
+  purchaseCost: Float
+  purchaseCost_veritas: Float
+  warrantyExpiry: DateTime
+  warrantyExpiry_veritas: DateTime
+  location: String
+  location_veritas: String
+  status: EquipmentStatus
+  status_veritas: EquipmentStatus
+  maintenanceSchedule: JSON
+  maintenanceSchedule_veritas: JSON
+}
+
+input MaintenanceV3CreateInput {
+  equipmentId: UUID!
+  equipmentId_veritas: UUID
+  maintenanceType: MaintenanceType!
+  maintenanceType_veritas: MaintenanceType
+  title: String!
+  title_veritas: String
+  description: String!
+  description_veritas: String
+  scheduledDate: DateTime!
+  scheduledDate_veritas: DateTime
+  completedDate: DateTime
+  completedDate_veritas: DateTime
+  cost: Float
+  cost_veritas: Float
+  performedBy: String
+  performedBy_veritas: String
+  notes: String
+  notes_veritas: String
+  partsUsed: [String!]
+  partsUsed_veritas: [String!]
+}
+
+input SupplierV3CreateInput {
+  name: String!
+  name_veritas: String
+  contactPerson: String
+  contactPerson_veritas: String
+  email: String
+  email_veritas: String
+  phone: String
+  phone_veritas: String
+  address: String
+  address_veritas: String
+  paymentTerms: String
+  paymentTerms_veritas: String
+  deliveryTime: Int
+  deliveryTime_veritas: Int
+  rating: Float
+  rating_veritas: Float
+  isActive: Boolean
+  isActive_veritas: Boolean
+}
+
+input SupplierV3UpdateInput {
+  name: String
+  name_veritas: String
+  contactPerson: String
+  contactPerson_veritas: String
+  email: String
+  email_veritas: String
+  phone: String
+  phone_veritas: String
+  address: String
+  address_veritas: String
+  paymentTerms: String
+  paymentTerms_veritas: String
+  deliveryTime: Int
+  deliveryTime_veritas: Int
+  rating: Float
+  rating_veritas: Float
+  isActive: Boolean
+  isActive_veritas: Boolean
+}
+
+input PurchaseOrderV3CreateInput {
+  supplierId: UUID!
+  supplierId_veritas: UUID
+  items: [PurchaseOrderItemV3Input!]!
+  items_veritas: [PurchaseOrderItemV3Input!]
+  orderDate: DateTime!
+  orderDate_veritas: DateTime
+  expectedDeliveryDate: DateTime
+  expectedDeliveryDate_veritas: DateTime
+  status: String!
+  status_veritas: String
+  totalAmount: Float!
+  totalAmount_veritas: Float
+  notes: String
+  notes_veritas: String
+}
+
+input PurchaseOrderItemV3Input {
+  inventoryId: UUID!
+  inventoryId_veritas: UUID
+  quantity: Int!
+  quantity_veritas: Int
+  unitPrice: Float!
+  unitPrice_veritas: Float
+  totalPrice: Float!
+  totalPrice_veritas: Float
+}
+
+# BILLING INPUTS
+input BillingDataV3CreateInput {
+  patientId: UUID!
+  patientId_veritas: UUID
+  appointmentId: UUID
+  appointmentId_veritas: UUID
+  treatmentId: UUID
+  treatmentId_veritas: UUID
+  invoiceNumber: String!
+  invoiceNumber_veritas: String
+  description: String!
+  description_veritas: String
+  amount: Float!
+  amount_veritas: Float
+  taxAmount: Float
+  taxAmount_veritas: Float
+  discountAmount: Float
+  discountAmount_veritas: Float
+  totalAmount: Float!
+  totalAmount_veritas: Float
+  dueDate: DateTime!
+  dueDate_veritas: DateTime
+  status: BillingStatus
+  status_veritas: BillingStatus
+  paymentMethod: String
+  paymentMethod_veritas: String
+  insuranceClaimNumber: String
+  insuranceClaimNumber_veritas: String
+  notes: String
+  notes_veritas: String
+}
+
+input BillingDataV3UpdateInput {
+  invoiceNumber: String
+  invoiceNumber_veritas: String
+  description: String
+  description_veritas: String
+  amount: Float
+  amount_veritas: Float
+  taxAmount: Float
+  taxAmount_veritas: Float
+  discountAmount: Float
+  discountAmount_veritas: Float
+  totalAmount: Float
+  totalAmount_veritas: Float
+  dueDate: DateTime
+  dueDate_veritas: DateTime
+  status: BillingStatus
+  status_veritas: BillingStatus
+  paymentMethod: String
+  paymentMethod_veritas: String
+  insuranceClaimNumber: String
+  insuranceClaimNumber_veritas: String
+  notes: String
+  notes_veritas: String
+}
+
+# COMPLIANCE INPUTS
+input ComplianceV3CreateInput {
+  patientId: UUID
+  patientId_veritas: UUID
+  regulationType: String!
+  regulationType_veritas: String
+  requirement: String!
+  requirement_veritas: String
+  status: ComplianceStatus!
+  status_veritas: ComplianceStatus
+  dueDate: DateTime
+  dueDate_veritas: DateTime
+  completedDate: DateTime
+  completedDate_veritas: DateTime
+  evidence: String
+  evidence_veritas: String
+  notes: String
+  notes_veritas: String
+  assignedTo: UUID
+  assignedTo_veritas: UUID
+}
+
+input ComplianceV3UpdateInput {
+  regulationType: String
+  regulationType_veritas: String
+  requirement: String
+  requirement_veritas: String
+  status: ComplianceStatus
+  status_veritas: ComplianceStatus
+  dueDate: DateTime
+  dueDate_veritas: DateTime
+  completedDate: DateTime
+  completedDate_veritas: DateTime
+  evidence: String
+  evidence_veritas: String
+  notes: String
+  notes_veritas: String
+  assignedTo: UUID
+  assignedTo_veritas: UUID
+}
+
+# MARKETPLACE INPUTS
+input MarketplaceProductV3CreateInput {
+  name: String!
+  name_veritas: String
+  description: String!
+  description_veritas: String
+  category: String!
+  category_veritas: String
+  sku: String!
+  sku_veritas: String
+  price: Float!
+  price_veritas: Float
+  cost: Float
+  cost_veritas: Float
+  stockQuantity: Int!
+  stockQuantity_veritas: Int
+  minimumStock: Int
+  minimumStock_veritas: Int
+  supplierId: UUID
+  supplierId_veritas: UUID
+  images: [String!]
+  images_veritas: [String!]
+  specifications: JSON
+  specifications_veritas: JSON
+  isActive: Boolean
+  isActive_veritas: Boolean
+}
+
+input MarketplaceProductV3UpdateInput {
+  name: String
+  name_veritas: String
+  description: String
+  description_veritas: String
+  category: String
+  category_veritas: String
+  price: Float
+  price_veritas: Float
+  cost: Float
+  cost_veritas: Float
+  stockQuantity: Int
+  stockQuantity_veritas: Int
+  minimumStock: Int
+  minimumStock_veritas: Int
+  supplierId: UUID
+  supplierId_veritas: UUID
+  images: [String!]
+  images_veritas: [String!]
+  specifications: JSON
+  specifications_veritas: JSON
+  isActive: Boolean
+  isActive_veritas: Boolean
+}
+
+input CartItemV3Input {
+  productId: UUID!
+  productId_veritas: UUID
+  quantity: Int!
+  quantity_veritas: Int
+  unitPrice: Float!
+  unitPrice_veritas: Float
+  totalPrice: Float!
+  totalPrice_veritas: Float
+}
+
+# SUBSCRIPTION INPUTS
+input SubscriptionV3CreateInput {
+  clinicId: UUID!
+  clinicId_veritas: UUID
+  planId: UUID!
+  planId_veritas: UUID
+  startDate: DateTime!
+  startDate_veritas: DateTime
+  billingCycle: String!
+  billingCycle_veritas: String
+  status: SubscriptionStatus
+  status_veritas: SubscriptionStatus
+  autoRenew: Boolean
+  autoRenew_veritas: Boolean
+}
+
+input SubscriptionV3UpdateInput {
+  planId: UUID
+  planId_veritas: UUID
+  billingCycle: String
+  billingCycle_veritas: String
+  status: SubscriptionStatus
+  status_veritas: SubscriptionStatus
+  autoRenew: Boolean
+  autoRenew_veritas: Boolean
+}
+
+input SubscriptionPlanV3CreateInput {
+  name: String!
+  name_veritas: String
+  description: String!
+  description_veritas: String
+  monthlyPrice: Float!
+  monthlyPrice_veritas: Float
+  features: [String!]!
+  features_veritas: [String!]
+  maxUsers: Int!
+  maxUsers_veritas: Int
+  maxPatients: Int!
+  maxPatients_veritas: Int
+  maxAppointments: Int!
+  maxAppointments_veritas: Int
+  tier: SubscriptionTier!
+  tier_veritas: SubscriptionTier
+  isActive: Boolean
+  isActive_veritas: Boolean
+}
+
+input SubscriptionPlanV3UpdateInput {
+  name: String
+  name_veritas: String
+  description: String
+  description_veritas: String
+  monthlyPrice: Float
+  monthlyPrice_veritas: Float
+  features: [String!]
+  features_veritas: [String!]
+  maxUsers: Int
+  maxUsers_veritas: Int
+  maxPatients: Int
+  maxPatients_veritas: Int
+  maxAppointments: Int
+  maxAppointments_veritas: Int
+  tier: SubscriptionTier
+  tier_veritas: SubscriptionTier
+  isActive: Boolean
+  isActive_veritas: Boolean
+}
+
+# CUSTOM CALENDAR INPUTS
+input CustomCalendarViewV3CreateInput {
+  name: String!
+  name_veritas: String
+  description: String
+  description_veritas: String
+  viewType: CalendarViewType!
+  viewType_veritas: CalendarViewType
   dentistId: UUID
-  appointmentType: AppointmentType!
-  durationMinutes: Int
+  dentistId_veritas: UUID
+  clinicId: UUID!
+  clinicId_veritas: UUID
+  settings: JSON
+  settings_veritas: JSON
+  filters: JSON
+  filters_veritas: JSON
+  isDefault: Boolean
+  isDefault_veritas: Boolean
+  isPublic: Boolean
+  isPublic_veritas: Boolean
+}
+
+input CustomCalendarViewV3UpdateInput {
+  name: String
+  name_veritas: String
+  description: String
+  description_veritas: String
+  viewType: CalendarViewType
+  viewType_veritas: CalendarViewType
+  settings: JSON
+  settings_veritas: JSON
+  filters: JSON
+  filters_veritas: JSON
+  isDefault: Boolean
+  isDefault_veritas: Boolean
+  isPublic: Boolean
+  isPublic_veritas: Boolean
+}
+
+input CalendarEventV3CreateInput {
+  calendarViewId: UUID!
+  calendarViewId_veritas: UUID
+  title: String!
+  title_veritas: String
+  description: String
+  description_veritas: String
+  startDate: DateTime!
+  startDate_veritas: DateTime
+  endDate: DateTime!
+  endDate_veritas: DateTime
+  eventType: String!
+  eventType_veritas: String
+  patientId: UUID
+  patientId_veritas: UUID
+  dentistId: UUID
+  dentistId_veritas: UUID
+  appointmentId: UUID
+  appointmentId_veritas: UUID
+  isAllDay: Boolean
+  isAllDay_veritas: Boolean
+  color: String
+  color_veritas: String
+  metadata: JSON
+  metadata_veritas: JSON
+}
+
+input CalendarEventV3UpdateInput {
+  title: String
+  title_veritas: String
+  description: String
+  description_veritas: String
+  startDate: DateTime
+  startDate_veritas: DateTime
+  endDate: DateTime
+  endDate_veritas: DateTime
+  eventType: String
+  eventType_veritas: String
+  isAllDay: Boolean
+  isAllDay_veritas: Boolean
+  color: String
+  color_veritas: String
+  metadata: JSON
+  metadata_veritas: JSON
+}
+
+input CalendarFilterV3CreateInput {
+  calendarViewId: UUID!
+  calendarViewId_veritas: UUID
+  name: String!
+  name_veritas: String
+  filterType: String!
+  filterType_veritas: String
+  criteria: JSON!
+  criteria_veritas: JSON
+  isActive: Boolean
+  isActive_veritas: Boolean
+}
+
+input CalendarFilterV3UpdateInput {
+  name: String
+  name_veritas: String
+  filterType: String
+  filterType_veritas: String
+  criteria: JSON
+  criteria_veritas: JSON
+  isActive: Boolean
+  isActive_veritas: Boolean
 }
 
 # ============================================================================
-# OBJECT TYPES
+# OBJECT TYPES - V3 VARIANTS WITH @veritas
 # ============================================================================
 
-type Patient @key(fields: "id") {
+# PATIENT V3
+type PatientV3 @veritas(level: 3, algorithm: "quantum-hash") {
   id: UUID!
+  id_veritas: UUID
   firstName: String!
+  firstName_veritas: String
   lastName: String!
+  lastName_veritas: String
   email: String
+  email_veritas: String
   phone: String
+  phone_veritas: String
   phoneSecondary: String
+  phoneSecondary_veritas: String
   dateOfBirth: DateTime
+  dateOfBirth_veritas: DateTime
   gender: Gender
+  gender_veritas: Gender
   age: Int
+  age_veritas: Int
   fullName: String!
+  fullName_veritas: String
   addressStreet: String
+  addressStreet_veritas: String
   addressCity: String
+  addressCity_veritas: String
   addressState: String
+  addressState_veritas: String
   addressPostalCode: String
+  addressPostalCode_veritas: String
   addressCountry: String
+  addressCountry_veritas: String
   fullAddress: String
+  fullAddress_veritas: String
   emergencyContactName: String
+  emergencyContactName_veritas: String
   emergencyContactPhone: String
+  emergencyContactPhone_veritas: String
   emergencyContactRelationship: String
+  emergencyContactRelationship_veritas: String
   medicalConditions: String
+  medicalConditions_veritas: String
   medicationsCurrent: String
+  medicationsCurrent_veritas: String
   allergies: String
+  allergies_veritas: String
   anxietyLevel: AnxietyLevel
+  anxietyLevel_veritas: AnxietyLevel
   specialNeeds: String
+  specialNeeds_veritas: String
   insuranceProvider: String
+  insuranceProvider_veritas: String
   insurancePolicyNumber: String
+  insurancePolicyNumber_veritas: String
   insuranceGroupNumber: String
+  insuranceGroupNumber_veritas: String
   insuranceStatus: InsuranceStatus
+  insuranceStatus_veritas: InsuranceStatus
   consentToTreatment: Boolean!
+  consentToTreatment_veritas: Boolean
   consentToContact: Boolean!
+  consentToContact_veritas: Boolean
   preferredContactMethod: String
+  preferredContactMethod_veritas: String
   notes: String
+  notes_veritas: String
   isActive: Boolean!
+  isActive_veritas: Boolean
   createdAt: DateTime!
+  createdAt_veritas: DateTime
   updatedAt: DateTime!
+  updatedAt_veritas: DateTime
   createdBy: UUID!
+  createdBy_veritas: UUID
   hasInsurance: Boolean!
+  hasInsurance_veritas: Boolean
   requiresSpecialCare: Boolean!
+  requiresSpecialCare_veritas: Boolean
 
   # Relations
-  appointments: [Appointment!]!
-  medicalHistory: PatientMedicalHistory
+  appointments: [AppointmentV3!]!
+  appointments_veritas: [AppointmentV3!]
+  medicalHistory: PatientMedicalHistoryV3
+  medicalHistory_veritas: PatientMedicalHistoryV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
 }
 
-type PatientMedicalHistory {
+type PatientMedicalHistoryV3 @veritas(level: 4, algorithm: "quantum-hash") {
   patientId: UUID!
-  basicInfo: PatientBasicInfo!
+  patientId_veritas: UUID
+  basicInfo: PatientBasicInfoV3!
+  basicInfo_veritas: PatientBasicInfoV3
   medicalConditions: String
+  medicalConditions_veritas: String
   currentMedications: String
+  currentMedications_veritas: String
   allergies: String
-  emergencyContact: EmergencyContact
-  dentalSpecific: DentalSpecificInfo
-  consentStatus: ConsentStatus
-  preferences: PatientPreferences
+  allergies_veritas: String
+  emergencyContact: EmergencyContactV3
+  emergencyContact_veritas: EmergencyContactV3
+  dentalSpecific: DentalSpecificInfoV3
+  dentalSpecific_veritas: DentalSpecificInfoV3
+  consentStatus: ConsentStatusV3
+  consentStatus_veritas: ConsentStatusV3
+  preferences: PatientPreferencesV3
+  preferences_veritas: PatientPreferencesV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
 }
 
-type PatientBasicInfo {
+type PatientBasicInfoV3 @veritas(level: 2, algorithm: "quantum-hash") {
   name: String!
+  name_veritas: String
   dateOfBirth: DateTime
+  dateOfBirth_veritas: DateTime
   age: Int
+  age_veritas: Int
   gender: Gender
+  gender_veritas: Gender
   bloodType: BloodType
+  bloodType_veritas: BloodType
+
+  # @veritas verification
+  _veritas: VeritasVerification!
 }
 
-type EmergencyContact {
+type EmergencyContactV3 @veritas(level: 2, algorithm: "quantum-hash") {
   name: String
+  name_veritas: String
   phone: String
+  phone_veritas: String
   relationship: String
+  relationship_veritas: String
+
+  # @veritas verification
+  _veritas: VeritasVerification!
 }
 
-type DentalSpecificInfo {
+type DentalSpecificInfoV3 @veritas(level: 3, algorithm: "quantum-hash") {
   previousDentist: String
+  previousDentist_veritas: String
   anxietyLevel: AnxietyLevel
+  anxietyLevel_veritas: AnxietyLevel
   insuranceInfo: JSON
+  insuranceInfo_veritas: JSON
   insuranceStatus: InsuranceStatus
+  insuranceStatus_veritas: InsuranceStatus
+
+  # @veritas verification
+  _veritas: VeritasVerification!
 }
 
-type ConsentStatus {
+type ConsentStatusV3 @veritas(level: 2, algorithm: "quantum-hash") {
   treatment: Boolean!
+  treatment_veritas: Boolean
   marketing: Boolean!
+  marketing_veritas: Boolean
   dataSharing: Boolean!
+  dataSharing_veritas: Boolean
+
+  # @veritas verification
+  _veritas: VeritasVerification!
 }
 
-type PatientPreferences {
+type PatientPreferencesV3 @veritas(level: 2, algorithm: "quantum-hash") {
   appointmentTime: String
+  appointmentTime_veritas: String
   communication: JSON
+  communication_veritas: JSON
+
+  # @veritas verification
+  _veritas: VeritasVerification!
 }
 
-type Appointment @key(fields: "id") {
+# APPOINTMENT V3
+type AppointmentV3 @veritas(level: 4, algorithm: "quantum-hash") {
   id: UUID!
+  id_veritas: UUID
   patientId: UUID!
+  patientId_veritas: UUID
   dentistId: UUID!
+  dentistId_veritas: UUID
   scheduledDate: DateTime!
+  scheduledDate_veritas: DateTime
   durationMinutes: Int!
+  durationMinutes_veritas: Int
   appointmentType: AppointmentType!
+  appointmentType_veritas: AppointmentType
   priority: AppointmentPriority!
+  priority_veritas: AppointmentPriority
   title: String!
+  title_veritas: String
   description: String
+  description_veritas: String
   notes: String
+  notes_veritas: String
   status: AppointmentStatus!
+  status_veritas: AppointmentStatus
   roomNumber: String
+  roomNumber_veritas: String
   estimatedCost: String
+  estimatedCost_veritas: String
   insuranceCoverage: String
+  insuranceCoverage_veritas: String
   preparationInstructions: String
+  preparationInstructions_veritas: String
   followUpRequired: Boolean!
+  followUpRequired_veritas: Boolean
   parentAppointmentId: UUID
+  parentAppointmentId_veritas: UUID
   confirmationSent: Boolean!
+  confirmationSent_veritas: Boolean
   reminderSent: Boolean!
+  reminderSent_veritas: Boolean
   cancelledAt: DateTime
+  cancelledAt_veritas: DateTime
   completedAt: DateTime
+  completedAt_veritas: DateTime
   createdAt: DateTime!
+  createdAt_veritas: DateTime
   updatedAt: DateTime!
+  updatedAt_veritas: DateTime
   createdBy: UUID!
+  createdBy_veritas: UUID
 
   # Computed fields
   patientName: String
+  patientName_veritas: String
   patientPhone: String
+  patientPhone_veritas: String
   dentistName: String
+  dentistName_veritas: String
   endTime: DateTime!
+  endTime_veritas: DateTime
 
   # Relations
-  patient: Patient!
-  dentist: User!
-  parentAppointment: Appointment
-  childAppointments: [Appointment!]!
+  patient: PatientV3!
+  patient_veritas: PatientV3
+  dentist: UserV3!
+  dentist_veritas: UserV3
+  parentAppointment: AppointmentV3
+  parentAppointment_veritas: AppointmentV3
+  childAppointments: [AppointmentV3!]!
+  childAppointments_veritas: [AppointmentV3!]
+
+  # @veritas verification
+  _veritas: VeritasVerification!
 }
 
-type User @key(fields: "id") {
+# MEDICAL RECORD V3
+type MedicalRecordV3 @veritas(level: 5, algorithm: "quantum-hash") {
   id: UUID!
-  email: String!
-  firstName: String!
-  lastName: String!
-  fullName: String!
-  role: String!
-  isActive: Boolean!
-}
-
-type TimeSlot {
-  startTime: DateTime!
-  endTime: DateTime!
-  durationMinutes: Int!
-  isAvailable: Boolean!
+  id_veritas: UUID
+  patientId: UUID!
+  patientId_veritas: UUID
   dentistId: UUID!
-  dentistName: String
+  dentistId_veritas: UUID
+  appointmentId: UUID
+  appointmentId_veritas: UUID
+  recordType: String!
+  recordType_veritas: String
+  title: String!
+  title_veritas: String
+  content: String!
+  content_veritas: String
+  diagnosis: String
+  diagnosis_veritas: String
+  treatment: String
+  treatment_veritas: String
+  notes: String
+  notes_veritas: String
+  attachments: [UUID!]
+  attachments_veritas: [UUID!]
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # Relations
+  patient: PatientV3!
+  patient_veritas: PatientV3
+  dentist: UserV3!
+  dentist_veritas: UserV3
+  appointment: AppointmentV3
+  appointment_veritas: AppointmentV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
 }
 
-type AvailabilityResponse {
-  date: DateTime!
-  availableSlots: [TimeSlot!]!
-  totalSlots: Int!
-  dentistSchedules: JSON!
+# TREATMENT V3
+type TreatmentV3 @veritas(level: 4, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  patientId: UUID!
+  patientId_veritas: UUID
+  dentistId: UUID!
+  dentistId_veritas: UUID
+  appointmentId: UUID
+  appointmentId_veritas: UUID
+  treatmentType: TreatmentType!
+  treatmentType_veritas: TreatmentType
+  title: String!
+  title_veritas: String
+  description: String!
+  description_veritas: String
+  estimatedCost: Float
+  estimatedCost_veritas: Float
+  insuranceCoverage: Float
+  insuranceCoverage_veritas: Float
+  priority: AppointmentPriority
+  priority_veritas: AppointmentPriority
+  status: TreatmentStatus!
+  status_veritas: TreatmentStatus
+  notes: String
+  notes_veritas: String
+  plannedProcedures: [String!]
+  plannedProcedures_veritas: [String!]
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+  completedAt: DateTime
+  completedAt_veritas: DateTime
+
+  # Relations
+  patient: PatientV3!
+  patient_veritas: PatientV3
+  dentist: UserV3!
+  dentist_veritas: UserV3
+  appointment: AppointmentV3
+  appointment_veritas: AppointmentV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
 }
 
-type AppointmentStats {
-  totalAppointments: Int!
-  byStatus: JSON!
-  byType: JSON!
-  byPriority: JSON!
-  todayAppointments: Int!
-  thisWeekAppointments: Int!
-  thisMonthAppointments: Int!
-  averageDuration: Float!
-  noShowRate: Float!
-  cancellationRate: Float!
-  totalEstimatedRevenue: Int!
-  completedAppointmentsValue: Int!
+# DOCUMENT V3
+type DocumentV3 @veritas(level: 3, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  patientId: UUID!
+  patientId_veritas: UUID
+  appointmentId: UUID
+  appointmentId_veritas: UUID
+  documentType: DocumentType!
+  documentType_veritas: DocumentType
+  title: String!
+  title_veritas: String
+  description: String
+  description_veritas: String
+  fileName: String!
+  fileName_veritas: String
+  fileSize: Int!
+  fileSize_veritas: Int
+  mimeType: String!
+  mimeType_veritas: String
+  fileUrl: String!
+  fileUrl_veritas: String
+  tags: [String!]
+  tags_veritas: [String!]
+  metadata: JSON
+  metadata_veritas: JSON
+  status: DocumentStatus!
+  status_veritas: DocumentStatus
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # Relations
+  patient: PatientV3!
+  patient_veritas: PatientV3
+  appointment: AppointmentV3
+  appointment_veritas: AppointmentV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+# INVENTORY V3
+type InventoryV3 @veritas(level: 3, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  name: String!
+  name_veritas: String
+  description: String
+  description_veritas: String
+  category: String!
+  category_veritas: String
+  sku: String!
+  sku_veritas: String
+  unitCost: Float!
+  unitCost_veritas: Float
+  unitPrice: Float!
+  unitPrice_veritas: Float
+  currentStock: Int!
+  currentStock_veritas: Int
+  minimumStock: Int!
+  minimumStock_veritas: Int
+  maximumStock: Int
+  maximumStock_veritas: Int
+  supplierId: UUID
+  supplierId_veritas: UUID
+  location: String
+  location_veritas: String
+  expiryDate: DateTime
+  expiryDate_veritas: DateTime
+  status: InventoryStatus!
+  status_veritas: InventoryStatus
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # Relations
+  supplier: SupplierV3
+  supplier_veritas: SupplierV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+type EquipmentV3 @veritas(level: 3, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  name: String!
+  name_veritas: String
+  description: String
+  description_veritas: String
+  category: String!
+  category_veritas: String
+  manufacturer: String
+  manufacturer_veritas: String
+  model: String
+  model_veritas: String
+  serialNumber: String!
+  serialNumber_veritas: String
+  purchaseDate: DateTime!
+  purchaseDate_veritas: DateTime
+  purchaseCost: Float
+  purchaseCost_veritas: Float
+  warrantyExpiry: DateTime
+  warrantyExpiry_veritas: DateTime
+  location: String
+  location_veritas: String
+  status: EquipmentStatus!
+  status_veritas: EquipmentStatus
+  maintenanceSchedule: JSON
+  maintenanceSchedule_veritas: JSON
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+type MaintenanceV3 @veritas(level: 3, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  equipmentId: UUID!
+  equipmentId_veritas: UUID
+  maintenanceType: MaintenanceType!
+  maintenanceType_veritas: MaintenanceType
+  title: String!
+  title_veritas: String
+  description: String!
+  description_veritas: String
+  scheduledDate: DateTime!
+  scheduledDate_veritas: DateTime
+  completedDate: DateTime
+  completedDate_veritas: DateTime
+  cost: Float
+  cost_veritas: Float
+  performedBy: String
+  performedBy_veritas: String
+  notes: String
+  notes_veritas: String
+  partsUsed: [String!]
+  partsUsed_veritas: [String!]
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # Relations
+  equipment: EquipmentV3!
+  equipment_veritas: EquipmentV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+type SupplierV3 @veritas(level: 2, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  name: String!
+  name_veritas: String
+  contactPerson: String
+  contactPerson_veritas: String
+  email: String
+  email_veritas: String
+  phone: String
+  phone_veritas: String
+  address: String
+  address_veritas: String
+  paymentTerms: String
+  paymentTerms_veritas: String
+  deliveryTime: Int
+  deliveryTime_veritas: Int
+  rating: Float
+  rating_veritas: Float
+  isActive: Boolean!
+  isActive_veritas: Boolean
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+type PurchaseOrderV3 @veritas(level: 3, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  supplierId: UUID!
+  supplierId_veritas: UUID
+  items: [PurchaseOrderItemV3!]!
+  items_veritas: [PurchaseOrderItemV3!]
+  orderDate: DateTime!
+  orderDate_veritas: DateTime
+  expectedDeliveryDate: DateTime
+  expectedDeliveryDate_veritas: DateTime
+  status: String!
+  status_veritas: String
+  totalAmount: Float!
+  totalAmount_veritas: Float
+  notes: String
+  notes_veritas: String
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # Relations
+  supplier: SupplierV3!
+  supplier_veritas: SupplierV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+type PurchaseOrderItemV3 @veritas(level: 2, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  purchaseOrderId: UUID!
+  purchaseOrderId_veritas: UUID
+  inventoryId: UUID!
+  inventoryId_veritas: UUID
+  quantity: Int!
+  quantity_veritas: Int
+  unitPrice: Float!
+  unitPrice_veritas: Float
+  totalPrice: Float!
+  totalPrice_veritas: Float
+
+  # Relations
+  purchaseOrder: PurchaseOrderV3!
+  purchaseOrder_veritas: PurchaseOrderV3
+  inventory: InventoryV3!
+  inventory_veritas: InventoryV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+# BILLING V3
+type BillingDataV3 @veritas(level: 4, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  patientId: UUID!
+  patientId_veritas: UUID
+  appointmentId: UUID
+  appointmentId_veritas: UUID
+  treatmentId: UUID
+  treatmentId_veritas: UUID
+  invoiceNumber: String!
+  invoiceNumber_veritas: String
+  description: String!
+  description_veritas: String
+  amount: Float!
+  amount_veritas: Float
+  taxAmount: Float
+  taxAmount_veritas: Float
+  discountAmount: Float
+  discountAmount_veritas: Float
+  totalAmount: Float!
+  totalAmount_veritas: Float
+  dueDate: DateTime!
+  dueDate_veritas: DateTime
+  status: BillingStatus!
+  status_veritas: BillingStatus
+  paymentMethod: String
+  paymentMethod_veritas: String
+  insuranceClaimNumber: String
+  insuranceClaimNumber_veritas: String
+  notes: String
+  notes_veritas: String
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # Relations
+  patient: PatientV3!
+  patient_veritas: PatientV3
+  appointment: AppointmentV3
+  appointment_veritas: AppointmentV3
+  treatment: TreatmentV3
+  treatment_veritas: TreatmentV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+# COMPLIANCE V3
+type ComplianceV3 @veritas(level: 4, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  patientId: UUID
+  patientId_veritas: UUID
+  regulationType: String!
+  regulationType_veritas: String
+  requirement: String!
+  requirement_veritas: String
+  status: ComplianceStatus!
+  status_veritas: ComplianceStatus
+  dueDate: DateTime
+  dueDate_veritas: DateTime
+  completedDate: DateTime
+  completedDate_veritas: DateTime
+  evidence: String
+  evidence_veritas: String
+  notes: String
+  notes_veritas: String
+  assignedTo: UUID
+  assignedTo_veritas: UUID
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # Relations
+  patient: PatientV3
+  patient_veritas: PatientV3
+  assignedUser: UserV3
+  assignedUser_veritas: UserV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+# MARKETPLACE V3
+type MarketplaceProductV3 @veritas(level: 3, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  name: String!
+  name_veritas: String
+  description: String!
+  description_veritas: String
+  category: String!
+  category_veritas: String
+  sku: String!
+  sku_veritas: String
+  price: Float!
+  price_veritas: Float
+  cost: Float
+  cost_veritas: Float
+  stockQuantity: Int!
+  stockQuantity_veritas: Int
+  minimumStock: Int
+  minimumStock_veritas: Int
+  supplierId: UUID
+  supplierId_veritas: UUID
+  images: [String!]
+  images_veritas: [String!]
+  specifications: JSON
+  specifications_veritas: JSON
+  isActive: Boolean!
+  isActive_veritas: Boolean
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # Relations
+  supplier: SupplierV3
+  supplier_veritas: SupplierV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+# SUBSCRIPTION V3
+type SubscriptionV3 @veritas(level: 3, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  clinicId: UUID!
+  clinicId_veritas: UUID
+  planId: UUID!
+  planId_veritas: UUID
+  startDate: DateTime!
+  startDate_veritas: DateTime
+  endDate: DateTime
+  endDate_veritas: DateTime
+  nextBillingDate: DateTime
+  nextBillingDate_veritas: DateTime
+  billingCycle: String!
+  billingCycle_veritas: String
+  status: SubscriptionStatus!
+  status_veritas: SubscriptionStatus
+  autoRenew: Boolean!
+  autoRenew_veritas: Boolean
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # Relations
+  plan: SubscriptionPlanV3!
+  plan_veritas: SubscriptionPlanV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+type SubscriptionPlanV3 @veritas(level: 2, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  name: String!
+  name_veritas: String
+  description: String!
+  description_veritas: String
+  monthlyPrice: Float!
+  monthlyPrice_veritas: Float
+  features: [String!]!
+  features_veritas: [String!]
+  maxUsers: Int!
+  maxUsers_veritas: Int
+  maxPatients: Int!
+  maxPatients_veritas: Int
+  maxAppointments: Int!
+  maxAppointments_veritas: Int
+  tier: SubscriptionTier!
+  tier_veritas: SubscriptionTier
+  isActive: Boolean!
+  isActive_veritas: Boolean
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+# CUSTOM CALENDAR V3
+type CustomCalendarViewV3 @veritas(level: 2, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  name: String!
+  name_veritas: String
+  description: String
+  description_veritas: String
+  viewType: CalendarViewType!
+  viewType_veritas: CalendarViewType
+  dentistId: UUID
+  dentistId_veritas: UUID
+  clinicId: UUID!
+  clinicId_veritas: UUID
+  settings: JSON
+  settings_veritas: JSON
+  filters: JSON
+  filters_veritas: JSON
+  isDefault: Boolean!
+  isDefault_veritas: Boolean
+  isPublic: Boolean!
+  isPublic_veritas: Boolean
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # Relations
+  dentist: UserV3
+  dentist_veritas: UserV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+type CalendarEventV3 @veritas(level: 3, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  calendarViewId: UUID!
+  calendarViewId_veritas: UUID
+  title: String!
+  title_veritas: String
+  description: String
+  description_veritas: String
+  startDate: DateTime!
+  startDate_veritas: DateTime
+  endDate: DateTime!
+  endDate_veritas: DateTime
+  eventType: String!
+  eventType_veritas: String
+  patientId: UUID
+  patientId_veritas: UUID
+  dentistId: UUID
+  dentistId_veritas: UUID
+  appointmentId: UUID
+  appointmentId_veritas: UUID
+  isAllDay: Boolean!
+  isAllDay_veritas: Boolean
+  color: String
+  color_veritas: String
+  metadata: JSON
+  metadata_veritas: JSON
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # Relations
+  calendarView: CustomCalendarViewV3!
+  calendarView_veritas: CustomCalendarViewV3
+  patient: PatientV3
+  patient_veritas: PatientV3
+  dentist: UserV3
+  dentist_veritas: UserV3
+  appointment: AppointmentV3
+  appointment_veritas: AppointmentV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+type CalendarFilterV3 @veritas(level: 2, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  calendarViewId: UUID!
+  calendarViewId_veritas: UUID
+  name: String!
+  name_veritas: String
+  filterType: String!
+  filterType_veritas: String
+  criteria: JSON!
+  criteria_veritas: JSON
+  isActive: Boolean!
+  isActive_veritas: Boolean
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  createdBy: UUID!
+  createdBy_veritas: UUID
+
+  # Relations
+  calendarView: CustomCalendarViewV3!
+  calendarView_veritas: CustomCalendarViewV3
+
+  # @veritas verification
+  _veritas: VeritasVerification!
+}
+
+# USER V3
+type UserV3 @veritas(level: 2, algorithm: "quantum-hash") {
+  id: UUID!
+  id_veritas: UUID
+  username: String!
+  username_veritas: String
+  email: String!
+  email_veritas: String
+  role: UserRole!
+  role_veritas: UserRole
+  firstName: String
+  firstName_veritas: String
+  lastName: String
+  lastName_veritas: String
+  fullName: String
+  fullName_veritas: String
+  isActive: Boolean!
+  isActive_veritas: Boolean
+  createdAt: DateTime!
+  createdAt_veritas: DateTime
+  updatedAt: DateTime!
+  updatedAt_veritas: DateTime
+  lastLoginAt: DateTime
+  lastLoginAt_veritas: DateTime
+
+  # @veritas verification
+  _veritas: VeritasVerification!
 }
 
 # ============================================================================
-# PAGINATION TYPES
+# PAGINATION & CONNECTION TYPES
 # ============================================================================
 
-type PatientConnection {
-  items: [Patient!]!
+type PatientConnectionV3 {
+  items: [PatientV3!]!
   total: Int!
   page: Int!
   size: Int!
@@ -418,8 +2086,8 @@ type PatientConnection {
   hasPrev: Boolean!
 }
 
-type AppointmentConnection {
-  appointments: [Appointment!]!
+type AppointmentConnectionV3 {
+  appointments: [AppointmentV3!]!
   total: Int!
   page: Int!
   pages: Int!
@@ -427,131 +2095,442 @@ type AppointmentConnection {
   hasPrev: Boolean!
 }
 
-type PatientSearchSuggestion {
-  id: UUID!
-  name: String!
-  email: String!
-  phone: String!
-  type: String!
+type MedicalRecordConnectionV3 {
+  items: [MedicalRecordV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type TreatmentConnectionV3 {
+  items: [TreatmentV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type DocumentConnectionV3 {
+  items: [DocumentV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type InventoryConnectionV3 {
+  items: [InventoryV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type EquipmentConnectionV3 {
+  items: [EquipmentV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type MaintenanceConnectionV3 {
+  items: [MaintenanceV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type SupplierConnectionV3 {
+  items: [SupplierV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type PurchaseOrderConnectionV3 {
+  items: [PurchaseOrderV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type BillingDataConnectionV3 {
+  items: [BillingDataV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type ComplianceConnectionV3 {
+  items: [ComplianceV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type MarketplaceProductConnectionV3 {
+  items: [MarketplaceProductV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type SubscriptionConnectionV3 {
+  items: [SubscriptionV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type SubscriptionPlanConnectionV3 {
+  items: [SubscriptionPlanV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type CustomCalendarViewConnectionV3 {
+  items: [CustomCalendarViewV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type CalendarEventConnectionV3 {
+  items: [CalendarEventV3!]!
+  total: Int!
+  page: Int!
+  size: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
 }
 
 # ============================================================================
-# QUERIES
+# QUERIES - V3 VARIANTS
 # ============================================================================
 
 type Query {
-  # Authentication Queries (V3 - VERITAS)
-  me: User
-  
-  # Patient Queries
-  patients(filters: PatientSearchFilters): PatientConnection!
-  patient(id: UUID!): Patient
-  patientMedicalHistory(patientId: UUID!): PatientMedicalHistory
-  patientSearchSuggestions(query: String!, limit: Int): [PatientSearchSuggestion!]!
+  # Authentication
+  meV3: UserV3
 
-  # Appointment Queries
-  appointments(filters: AppointmentSearchFilters): AppointmentConnection!
-  appointment(id: UUID!): Appointment
-  appointmentAvailability(request: AvailabilityRequestInput!): AvailabilityResponse!
-  appointmentStats(startDate: DateTime, endDate: DateTime): AppointmentStats!
+  # PATIENTS V3
+  patientsV3(limit: Int, offset: Int, filters: PatientV3SearchFilters): PatientConnectionV3!
+  patientV3(id: UUID!): PatientV3
+  patientMedicalHistoryV3(patientId: UUID!): PatientMedicalHistoryV3
+
+  # APPOINTMENTS V3
+  appointmentsV3(limit: Int, offset: Int, filters: AppointmentV3SearchFilters): AppointmentConnectionV3!
+  appointmentV3(id: UUID!): AppointmentV3
+
+  # MEDICAL RECORDS V3
+  medicalRecordsV3(limit: Int, offset: Int, patientId: UUID, dentistId: UUID): MedicalRecordConnectionV3!
+  medicalRecordV3(id: UUID!): MedicalRecordV3
+
+  # TREATMENTS V3
+  treatmentsV3(limit: Int, offset: Int, patientId: UUID, dentistId: UUID): TreatmentConnectionV3!
+  treatmentV3(id: UUID!): TreatmentV3
+
+  # DOCUMENTS V3
+  documentsV3(limit: Int, offset: Int, patientId: UUID, documentType: DocumentType): DocumentConnectionV3!
+  documentV3(id: UUID!): DocumentV3
+  unifiedDocumentsV3(limit: Int, offset: Int, patientId: UUID): DocumentConnectionV3!
+  unifiedDocumentV3(id: UUID!): DocumentV3
+
+  # INVENTORY V3
+  inventoriesV3(limit: Int, offset: Int, category: String, status: InventoryStatus): InventoryConnectionV3!
+  inventoryV3(id: UUID!): InventoryV3
+  materialsV3(limit: Int, offset: Int): InventoryConnectionV3!
+  materialV3(id: UUID!): InventoryV3
+  inventoryDashboardV3: JSON!
+  inventoryAlertsV3: [InventoryV3!]!
+
+  # EQUIPMENT V3
+  equipmentsV3(limit: Int, offset: Int, status: EquipmentStatus): EquipmentConnectionV3!
+  equipmentV3(id: UUID!): EquipmentV3
+  maintenancesV3(limit: Int, offset: Int, equipmentId: UUID): MaintenanceConnectionV3!
+  maintenanceV3(id: UUID!): MaintenanceV3
+  equipmentMaintenanceScheduleV3(equipmentId: UUID!): [MaintenanceV3!]!
+  maintenanceHistoryV3(equipmentId: UUID!): MaintenanceConnectionV3!
+
+  # SUPPLIERS V3
+  suppliersV3(limit: Int, offset: Int): SupplierConnectionV3!
+  supplierV3(id: UUID!): SupplierV3
+  purchaseOrdersV3(limit: Int, offset: Int, supplierId: UUID): PurchaseOrderConnectionV3!
+  purchaseOrderV3(id: UUID!): PurchaseOrderV3
+  supplierPurchaseOrdersV3(supplierId: UUID!): PurchaseOrderConnectionV3!
+  purchaseOrderItemsV3(purchaseOrderId: UUID!): [PurchaseOrderItemV3!]!
+
+  # BILLING V3
+  billingDataV3(limit: Int, offset: Int, patientId: UUID, status: BillingStatus): BillingDataConnectionV3!
+  billingDatumV3(id: UUID!): BillingDataV3
+
+  # COMPLIANCE V3
+  compliancesV3(limit: Int, offset: Int, status: ComplianceStatus): ComplianceConnectionV3!
+  complianceV3(id: UUID!): ComplianceV3
+
+  # MARKETPLACE V3
+  marketplaceProductsV3(limit: Int, offset: Int, category: String): MarketplaceProductConnectionV3!
+  marketplaceProductV3(id: UUID!): MarketplaceProductV3
+  suppliersV3(limit: Int, offset: Int): SupplierConnectionV3!
+  supplierV3(id: UUID!): SupplierV3
+  purchaseOrdersV3(limit: Int, offset: Int, supplierId: UUID): PurchaseOrderConnectionV3!
+  purchaseOrderV3(id: UUID!): PurchaseOrderV3
+  cartItemsV3: [PurchaseOrderItemV3!]!
+
+  # SUBSCRIPTIONS V3
+  subscriptionPlansV3(limit: Int, offset: Int): SubscriptionPlanConnectionV3!
+  subscriptionPlanV3(id: UUID!): SubscriptionPlanV3
+  subscriptionsV3(limit: Int, offset: Int, clinicId: UUID): SubscriptionConnectionV3!
+  subscriptionV3(id: UUID!): SubscriptionV3
+  billingCyclesV3(subscriptionId: UUID!): [JSON!]!
+  usageTrackingV3(subscriptionId: UUID!): JSON!
+
+  # CUSTOM CALENDAR V3
+  customCalendarViewsV3(limit: Int, offset: Int, clinicId: UUID): CustomCalendarViewConnectionV3!
+  customCalendarViewV3(id: UUID!): CustomCalendarViewV3
+  calendarSettingsV3(viewId: UUID!): JSON!
+  calendarFiltersV3(viewId: UUID!): [CalendarFilterV3!]!
+  calendarFilterV3(id: UUID!): CalendarFilterV3
+  calendarEventsV3(viewId: UUID!, startDate: DateTime!, endDate: DateTime!): CalendarEventConnectionV3!
+  calendarEventV3(id: UUID!): CalendarEventV3
+  calendarAvailabilityV3(dentistId: UUID!, date: DateTime!): JSON!
 
   # Health Check
   health: String!
 }
 
 # ============================================================================
-# AUTHENTICATION & AUTHORIZATION (V3 - VERITAS INTEGRATION)
+# MUTATIONS - V3 VARIANTS
 # ============================================================================
 
-"""
-User type represents an authenticated user in the system.
-Supports multiple roles: Admin, Dentist, Receptionist.
-"""
-type User @key(fields: "id") {
-  id: UUID!
-  username: String!
-  email: String!
-  role: UserRole!
-  firstName: String
-  lastName: String
-  fullName: String
-  isActive: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  lastLoginAt: DateTime
+type Mutation {
+  # Authentication V3
+  loginV3(input: LoginInput!): AuthResponse!
+  logoutV3: Boolean!
+  refreshTokenV3(input: RefreshTokenInput!): AuthResponse!
+
+  # PATIENTS V3
+  createPatientV3(input: PatientV3CreateInput!): PatientV3!
+  updatePatientV3(id: UUID!, input: PatientV3UpdateInput!): PatientV3!
+  deletePatientV3(id: UUID!): Boolean!
+
+  # APPOINTMENTS V3
+  createAppointmentV3(input: AppointmentV3CreateInput!): AppointmentV3!
+  updateAppointmentV3(id: UUID!, input: AppointmentV3UpdateInput!): AppointmentV3!
+  deleteAppointmentV3(id: UUID!): Boolean!
+
+  # MEDICAL RECORDS V3
+  createMedicalRecordV3(input: MedicalRecordV3CreateInput!): MedicalRecordV3!
+  updateMedicalRecordV3(id: UUID!, input: MedicalRecordV3UpdateInput!): MedicalRecordV3!
+  deleteMedicalRecordV3(id: UUID!): Boolean!
+
+  # TREATMENTS V3
+  createTreatmentV3(input: TreatmentV3CreateInput!): TreatmentV3!
+  updateTreatmentV3(id: UUID!, input: TreatmentV3UpdateInput!): TreatmentV3!
+  deleteTreatmentV3(id: UUID!): Boolean!
+
+  # DOCUMENTS V3
+  createDocumentV3(input: DocumentV3CreateInput!): DocumentV3!
+  updateDocumentV3(id: UUID!, input: DocumentV3UpdateInput!): DocumentV3!
+  deleteDocumentV3(id: UUID!): Boolean!
+
+  # INVENTORY V3
+  createInventoryV3(input: InventoryV3CreateInput!): InventoryV3!
+  updateInventoryV3(id: UUID!, input: InventoryV3UpdateInput!): InventoryV3!
+  deleteInventoryV3(id: UUID!): Boolean!
+  createEquipmentV3(input: EquipmentV3CreateInput!): EquipmentV3!
+  updateEquipmentV3(id: UUID!, input: EquipmentV3UpdateInput!): EquipmentV3!
+  deleteEquipmentV3(id: UUID!): Boolean!
+  createMaintenanceV3(input: MaintenanceV3CreateInput!): MaintenanceV3!
+  updateMaintenanceV3(id: UUID!, input: MaintenanceV3UpdateInput!): MaintenanceV3!
+  deleteMaintenanceV3(id: UUID!): Boolean!
+
+  # SUPPLIERS V3
+  createSupplierV3(input: SupplierV3CreateInput!): SupplierV3!
+  updateSupplierV3(id: UUID!, input: SupplierV3UpdateInput!): SupplierV3!
+  deleteSupplierV3(id: UUID!): Boolean!
+  createPurchaseOrderV3(input: PurchaseOrderV3CreateInput!): PurchaseOrderV3!
+  updatePurchaseOrderV3(id: UUID!, input: PurchaseOrderV3UpdateInput!): PurchaseOrderV3!
+  deletePurchaseOrderV3(id: UUID!): Boolean!
+
+  # BILLING V3
+  createBillingDataV3(input: BillingDataV3CreateInput!): BillingDataV3!
+  updateBillingDataV3(id: UUID!, input: BillingDataV3UpdateInput!): BillingDataV3!
+  deleteBillingDataV3(id: UUID!): Boolean!
+
+  # COMPLIANCE V3
+  createComplianceV3(input: ComplianceV3CreateInput!): ComplianceV3!
+  updateComplianceV3(id: UUID!, input: ComplianceV3UpdateInput!): ComplianceV3!
+  deleteComplianceV3(id: UUID!): Boolean!
+
+  # MARKETPLACE V3
+  createMarketplaceProductV3(input: MarketplaceProductV3CreateInput!): MarketplaceProductV3!
+  updateMarketplaceProductV3(id: UUID!, input: MarketplaceProductV3UpdateInput!): MarketplaceProductV3!
+  deleteMarketplaceProductV3(id: UUID!): Boolean!
+  addToCartV3(productId: UUID!, quantity: Int!): PurchaseOrderItemV3!
+  removeFromCartV3(itemId: UUID!): Boolean!
+  checkoutCartV3: PurchaseOrderV3!
+
+  # SUBSCRIPTIONS V3
+  createSubscriptionV3(input: SubscriptionV3CreateInput!): SubscriptionV3!
+  updateSubscriptionV3(id: UUID!, input: SubscriptionV3UpdateInput!): SubscriptionV3!
+  deleteSubscriptionV3(id: UUID!): Boolean!
+  createSubscriptionPlanV3(input: SubscriptionPlanV3CreateInput!): SubscriptionPlanV3!
+  updateSubscriptionPlanV3(id: UUID!, input: SubscriptionPlanV3UpdateInput!): SubscriptionPlanV3!
+  deleteSubscriptionPlanV3(id: UUID!): Boolean!
+
+  # CUSTOM CALENDAR V3
+  createCustomCalendarViewV3(input: CustomCalendarViewV3CreateInput!): CustomCalendarViewV3!
+  updateCustomCalendarViewV3(id: UUID!, input: CustomCalendarViewV3UpdateInput!): CustomCalendarViewV3!
+  deleteCustomCalendarViewV3(id: UUID!): Boolean!
+  createCalendarEventV3(input: CalendarEventV3CreateInput!): CalendarEventV3!
+  updateCalendarEventV3(id: UUID!, input: CalendarEventV3UpdateInput!): CalendarEventV3!
+  deleteCalendarEventV3(id: UUID!): Boolean!
+  createCalendarFilterV3(input: CalendarFilterV3CreateInput!): CalendarFilterV3!
+  updateCalendarFilterV3(id: UUID!, input: CalendarFilterV3UpdateInput!): CalendarFilterV3!
+  deleteCalendarFilterV3(id: UUID!): Boolean!
 }
 
-"""
-Authentication response containing access tokens and user data.
-Access token (JWT) expires in 15 minutes, refresh token in 7 days.
-"""
+# ============================================================================
+# SUBSCRIPTIONS - V3 VARIANTS
+# ============================================================================
+
+type Subscription {
+  # PATIENTS V3
+  patientCreatedV3: PatientV3!
+  patientUpdatedV3: PatientV3!
+  patientDeletedV3: PatientV3!
+
+  # APPOINTMENTS V3
+  appointmentCreatedV3: AppointmentV3!
+  appointmentUpdatedV3: AppointmentV3!
+  appointmentDeletedV3: AppointmentV3!
+
+  # MEDICAL RECORDS V3
+  medicalRecordCreatedV3: MedicalRecordV3!
+  medicalRecordUpdatedV3: MedicalRecordV3!
+  medicalRecordDeletedV3: MedicalRecordV3!
+
+  # TREATMENTS V3
+  treatmentCreatedV3: TreatmentV3!
+  treatmentUpdatedV3: TreatmentV3!
+  treatmentDeletedV3: TreatmentV3!
+
+  # DOCUMENTS V3
+  documentCreatedV3: DocumentV3!
+  documentUpdatedV3: DocumentV3!
+  documentDeletedV3: DocumentV3!
+
+  # INVENTORY V3
+  inventoryCreatedV3: InventoryV3!
+  inventoryUpdatedV3: InventoryV3!
+  inventoryDeletedV3: InventoryV3!
+  equipmentCreatedV3: EquipmentV3!
+  equipmentUpdatedV3: EquipmentV3!
+  equipmentDeletedV3: EquipmentV3!
+  maintenanceCreatedV3: MaintenanceV3!
+  maintenanceUpdatedV3: MaintenanceV3!
+  maintenanceDeletedV3: MaintenanceV3!
+
+  # SUPPLIERS V3
+  supplierCreatedV3: SupplierV3!
+  supplierUpdatedV3: SupplierV3!
+  supplierDeletedV3: SupplierV3!
+  purchaseOrderCreatedV3: PurchaseOrderV3!
+  purchaseOrderUpdatedV3: PurchaseOrderV3!
+  purchaseOrderDeletedV3: PurchaseOrderV3!
+
+  # BILLING V3
+  billingDataCreatedV3: BillingDataV3!
+  billingDataUpdatedV3: BillingDataV3!
+  billingDataDeletedV3: BillingDataV3!
+
+  # COMPLIANCE V3
+  complianceCreatedV3: ComplianceV3!
+  complianceUpdatedV3: ComplianceV3!
+  complianceDeletedV3: ComplianceV3!
+
+  # MARKETPLACE V3
+  marketplaceProductCreatedV3: MarketplaceProductV3!
+  marketplaceProductUpdatedV3: MarketplaceProductV3!
+  marketplaceProductDeletedV3: MarketplaceProductV3!
+
+  # SUBSCRIPTIONS V3
+  subscriptionCreatedV3: SubscriptionV3!
+  subscriptionUpdatedV3: SubscriptionV3!
+  subscriptionDeletedV3: SubscriptionV3!
+  subscriptionPlanCreatedV3: SubscriptionPlanV3!
+  subscriptionPlanUpdatedV3: SubscriptionPlanV3!
+  subscriptionPlanDeletedV3: SubscriptionPlanV3!
+
+  # CUSTOM CALENDAR V3
+  customCalendarViewCreatedV3: CustomCalendarViewV3!
+  customCalendarViewUpdatedV3: CustomCalendarViewV3!
+  customCalendarViewDeletedV3: CustomCalendarViewV3!
+  calendarEventCreatedV3: CalendarEventV3!
+  calendarEventUpdatedV3: CalendarEventV3!
+  calendarEventDeletedV3: CalendarEventV3!
+  calendarFilterCreatedV3: CalendarFilterV3!
+  calendarFilterUpdatedV3: CalendarFilterV3!
+  calendarFilterDeletedV3: CalendarFilterV3!
+}
+
+# ============================================================================
+# AUTHENTICATION TYPES (V3)
+# ============================================================================
+
 type AuthResponse {
   accessToken: String!
   refreshToken: String!
-  user: User!
+  user: UserV3!
   expiresIn: Int!
 }
 
-enum UserRole {
-  ADMIN
-  DENTIST
-  RECEPTIONIST
-  PATIENT
-}
-
-"""
-Input for user login mutation.
-Validates email format and password strength using @veritas directive.
-"""
 input LoginInput {
   email: String!
   password: String!
 }
 
-"""
-Input for token refresh mutation.
-Requires valid refresh token from previous authentication.
-"""
 input RefreshTokenInput {
   refreshToken: String!
-}
-
-# ============================================================================
-# MUTATIONS
-# ============================================================================
-
-type Mutation {
-  # Authentication Mutations (V3 - VERITAS)
-  login(input: LoginInput!): AuthResponse!
-  logout: Boolean!
-  refreshToken(input: RefreshTokenInput!): AuthResponse!
-  
-  # Patient Mutations
-  # Patient Mutations
-  createPatient(input: PatientCreateInput!): Patient!
-  updatePatient(id: UUID!, input: PatientUpdateInput!): Patient!
-  deletePatient(id: UUID!): Boolean!
-  activatePatient(id: UUID!): Patient!
-  deactivatePatient(id: UUID!): Patient!
-  updatePatientInsurance(id: UUID!, insuranceData: JSON!): Patient!
-
-  # Appointment Mutations
-  createAppointment(input: AppointmentCreateInput!): Appointment!
-  updateAppointment(id: UUID!, input: AppointmentUpdateInput!): Appointment!
-  deleteAppointment(id: UUID!): Boolean!
-  cancelAppointment(id: UUID!): Appointment!
-  confirmAppointment(id: UUID!): Appointment!
-  completeAppointment(id: UUID!): Appointment!
-}
-
-# ============================================================================
-# SUBSCRIPTION (Future Implementation)
-# ============================================================================
-
-type Subscription {
-  appointmentCreated: Appointment!
-  appointmentUpdated: Appointment!
-  appointmentCancelled: Appointment!
-  patientCreated: Patient!
-  patientUpdated: Patient!
 }

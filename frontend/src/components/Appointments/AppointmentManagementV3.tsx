@@ -10,15 +10,21 @@ import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner
 import { createModuleLogger } from '../../utils/logger';
 import { useDocumentLogger } from '../../utils/documentLogger';
 
-//  GRAPHQL OPERATIONS - Apollo Nuclear Integration
+//  GRAPHQL OPERATIONS V3 - Apollo Nuclear Integration with @veritas
 import { useQuery, useMutation } from '@apollo/client/react';
 import {
+  GET_APPOINTMENTS_V3,
+  CREATE_APPOINTMENT_V3,
+  UPDATE_APPOINTMENT_V3,
+  DELETE_APPOINTMENT,
+  // Legacy imports for backward compatibility
   GET_APPOINTMENTS,
+  CREATE_APPOINTMENT,
+  UPDATE_APPOINTMENT
+} from '../../graphql/queries/appointments';
+import {
   GET_TODAY_APPOINTMENTS,
   GET_UPCOMING_APPOINTMENTS,
-  CREATE_APPOINTMENT,
-  UPDATE_APPOINTMENT,
-  DELETE_APPOINTMENT,
   CreateAppointmentInput,
   UpdateAppointmentInput
 } from '../../graphql/appointment';
@@ -84,11 +90,11 @@ const l = createModuleLogger('AppointmentManagementV3');
 //  MAIN COMPONENT - AppointmentManagementV3
 const AppointmentManagementV3: React.FC = () => {
   const logger = useDocumentLogger('AppointmentManagementV3');
-  //  GRAPHQL QUERIES & MUTATIONS
-  const { data: appointmentsData, loading: queryLoading, error: queryError, refetch: refetchAppointments } = useQuery(GET_APPOINTMENTS, {
+  //  GRAPHQL QUERIES & MUTATIONS V3 - WITH @VERITAS VERIFICATION
+  const { data: appointmentsData, loading: queryLoading, error: queryError, refetch: refetchAppointments } = useQuery(GET_APPOINTMENTS_V3, {
     variables: {
-      filters: {},
-      pagination: { limit: 100, offset: 0 }
+      limit: 100,
+      offset: 0
     },
     fetchPolicy: 'cache-and-network'
   });
@@ -98,8 +104,8 @@ const AppointmentManagementV3: React.FC = () => {
     variables: { limit: 10 }
   });
 
-  const [createAppointmentMutation] = useMutation(CREATE_APPOINTMENT);
-  const [updateAppointmentMutation] = useMutation(UPDATE_APPOINTMENT);
+  const [createAppointmentMutation] = useMutation(CREATE_APPOINTMENT_V3);
+  const [updateAppointmentMutation] = useMutation(UPDATE_APPOINTMENT_V3);
   const [deleteAppointmentMutation] = useMutation(DELETE_APPOINTMENT);
 
   //  STATE MANAGEMENT - Local UI State
@@ -124,8 +130,8 @@ const AppointmentManagementV3: React.FC = () => {
     treatmentDetails: ''
   });
 
-  //  COMPUTED VALUES - Filtered and Processed Data
-  const appointments = appointmentsData?.appointments?.appointments || [];
+  //  COMPUTED VALUES V3 - Filtered and Processed Data with @veritas
+  const appointments = (appointmentsData as any)?.appointmentsV3 || [];
   const filteredAppointments = useMemo(() => {
     if (!appointments) return [];
 
@@ -138,7 +144,7 @@ const AppointmentManagementV3: React.FC = () => {
     if (selectedDate) {
       const dateStr = selectedDate;
       filtered = filtered.filter((apt: any) => {
-        const aptDate = new Date(apt.scheduled_date).toISOString().split('T')[0];
+        const aptDate = new Date(apt.appointmentDate).toISOString().split('T')[0];
         return aptDate === dateStr;
       });
     }
@@ -146,9 +152,9 @@ const AppointmentManagementV3: React.FC = () => {
     if (searchQuery && searchQuery.length >= 2) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter((apt: any) =>
-        apt.patient_name?.toLowerCase().includes(query) ||
-        apt.title?.toLowerCase().includes(query) ||
-        apt.appointment_type?.toLowerCase().includes(query)
+        apt.patient?.firstName?.toLowerCase().includes(query) ||
+        apt.patient?.lastName?.toLowerCase().includes(query) ||
+        apt.type?.toLowerCase().includes(query)
       );
     }
 
@@ -156,11 +162,11 @@ const AppointmentManagementV3: React.FC = () => {
   }, [appointments, statusFilter, selectedDate, searchQuery]);
 
   const todayAppointments = useMemo(() => {
-    return todayData?.todayAppointments || [];
+    return (todayData as any)?.todayAppointments || [];
   }, [todayData]);
 
   const upcomingAppointmentsList = useMemo(() => {
-    return upcomingData?.upcomingAppointments || [];
+    return (upcomingData as any)?.upcomingAppointments || [];
   }, [upcomingData]);
 
   //  EFFECTS - Data Synchronization and Logging

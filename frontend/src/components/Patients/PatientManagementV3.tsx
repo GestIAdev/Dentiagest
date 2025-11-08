@@ -10,13 +10,17 @@ import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner
 import { createModuleLogger } from '../../utils/logger';
 import { useDocumentLogger } from '../../utils/documentLogger';
 
-// 🎯 GRAPHQL OPERATIONS - Apollo Nuclear Integration
+// 🎯 GRAPHQL OPERATIONS V3 - Apollo Nuclear Integration with @veritas
 import { useQuery, useMutation } from '@apollo/client/react';
 import {
+  GET_PATIENTS_V3,
+  CREATE_PATIENT_V3,
+  UPDATE_PATIENT_V3,
+  DELETE_PATIENT,
+  // Legacy imports for backward compatibility
   GET_PATIENTS,
   CREATE_PATIENT,
-  UPDATE_PATIENT,
-  DELETE_PATIENT
+  UPDATE_PATIENT
 } from '../../graphql/queries/patients';
 
 // 🎯 TYPES AND INTERFACES
@@ -111,14 +115,14 @@ const l = createModuleLogger('PatientManagementV3');
 const PatientManagementV3: React.FC = () => {
   // 🎯 LOGGER INITIALIZATION - Inside component
   const logger = useDocumentLogger('PatientManagementV3');
-  // 🎯 GRAPHQL QUERIES & MUTATIONS
-  const { data: patientsData, loading: queryLoading, error: queryError, refetch: refetchPatients } = useQuery(GET_PATIENTS, {
-    variables: { filters: {} },
+  // 🎯 GRAPHQL QUERIES & MUTATIONS V3 - WITH @VERITAS VERIFICATION
+  const { data: patientsData, loading: queryLoading, error: queryError, refetch: refetchPatients } = useQuery(GET_PATIENTS_V3, {
+    variables: { limit: 100, offset: 0 },
     fetchPolicy: 'cache-and-network'
   });
 
-  const [createPatientMutation] = useMutation(CREATE_PATIENT);
-  const [updatePatientMutation] = useMutation(UPDATE_PATIENT);
+  const [createPatientMutation] = useMutation(CREATE_PATIENT_V3);
+  const [updatePatientMutation] = useMutation(UPDATE_PATIENT_V3);
   const [deletePatientMutation] = useMutation(DELETE_PATIENT);
   // Eliminadas mutaciones no utilizadas de activar/desactivar (usamos updatePatientMutation para is_active)
 
@@ -160,8 +164,8 @@ const PatientManagementV3: React.FC = () => {
     notes: ''
   });
 
-  // 🎯 COMPUTED VALUES - Filtered and Processed Data
-  const patients = useMemo(() => patientsData?.patients?.items || [], [patientsData?.patients?.items]);
+  // 🎯 COMPUTED VALUES V3 - Filtered and Processed Data with @veritas
+  const patients = useMemo(() => (patientsData as any)?.patientsV3 || [], [(patientsData as any)?.patientsV3]);
   const filteredPatients = useMemo(() => {
     if (!patients) return [];
 
