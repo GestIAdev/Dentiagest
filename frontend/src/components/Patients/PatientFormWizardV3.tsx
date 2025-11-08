@@ -14,7 +14,9 @@ import { useDocumentLogger } from '../../utils/documentLogger';
 import { useMutation } from '@apollo/client/react';
 import {
   CREATE_PATIENT,
-  UPDATE_PATIENT
+  UPDATE_PATIENT,
+  CREATE_PATIENT_V3,
+  UPDATE_PATIENT_V3
 } from '../../graphql/queries/patients';
 
 // 🎯 ICONS - Cyberpunk Medical Theme
@@ -149,8 +151,8 @@ const PatientFormWizardV3: React.FC<PatientFormWizardV3Props> = ({
 }) => {
   const logger = useDocumentLogger('PatientFormWizardV3');
   // 🎯 GRAPHQL MUTATIONS
-  const [createPatientMutation] = useMutation(CREATE_PATIENT);
-  const [updatePatientMutation] = useMutation(UPDATE_PATIENT);
+  const [createPatientMutation] = useMutation(CREATE_PATIENT_V3);
+  const [updatePatientMutation] = useMutation(UPDATE_PATIENT_V3);
 
   // 🎯 WIZARD STATE
   const [currentStep, setCurrentStep] = useState(0);

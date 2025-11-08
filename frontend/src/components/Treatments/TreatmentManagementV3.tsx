@@ -15,8 +15,11 @@ import {
   GET_TREATMENTS,
   CREATE_TREATMENT,
   UPDATE_TREATMENT,
-  DELETE_TREATMENT
-} from '../../graphql/treatment';
+  DELETE_TREATMENT,
+  GET_TREATMENTS_V3,
+  CREATE_TREATMENT_V3,
+  UPDATE_TREATMENT_V3
+} from '../../graphql/queries/treatments';
 
 // Atomic Components
 import { Button, Card, CardHeader, CardTitle, CardContent, Input, Spinner, Badge } from '../atoms';
@@ -201,33 +204,33 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
   // GRAPHQL OPERATIONS
   // ============================================================================
 
-  const { data: treatmentsData, loading: treatmentsLoading, refetch: refetchTreatments } = useQuery(GET_TREATMENTS, {
+  const { data: treatmentsData, loading: treatmentsLoading, refetch: refetchTreatments } = useQuery(GET_TREATMENTS_V3, {
     variables: { patientId, limit: 50, offset: 0 },
     skip: !patientId
   });
 
-  const { data: allTreatmentsData, loading: allTreatmentsLoading } = useQuery(GET_TREATMENTS, {
+  const { data: allTreatmentsData, loading: allTreatmentsLoading } = useQuery(GET_TREATMENTS_V3, {
     variables: { limit: 50, offset: 0 },
     skip: !!patientId
   });
 
-  const [createTreatmentMutation, { loading: createLoading }] = useMutation(CREATE_TREATMENT, {
-    refetchQueries: [{ query: GET_TREATMENTS, variables: { patientId, limit: 50, offset: 0 } }]
+  const [createTreatmentMutation, { loading: createLoading }] = useMutation(CREATE_TREATMENT_V3, {
+    refetchQueries: [{ query: GET_TREATMENTS_V3, variables: { patientId, limit: 50, offset: 0 } }]
   });
 
-  const [updateTreatmentMutation, { loading: updateLoading }] = useMutation(UPDATE_TREATMENT, {
-    refetchQueries: [{ query: GET_TREATMENTS, variables: { patientId, limit: 50, offset: 0 } }]
+  const [updateTreatmentMutation, { loading: updateLoading }] = useMutation(UPDATE_TREATMENT_V3, {
+    refetchQueries: [{ query: GET_TREATMENTS_V3, variables: { patientId, limit: 50, offset: 0 } }]
   });
 
   const [deleteTreatmentMutation, { loading: deleteLoading }] = useMutation(DELETE_TREATMENT, {
-    refetchQueries: [{ query: GET_TREATMENTS, variables: { patientId, limit: 50, offset: 0 } }]
+    refetchQueries: [{ query: GET_TREATMENTS_V3, variables: { patientId, limit: 50, offset: 0 } }]
   });
 
   // ============================================================================
   // COMPUTED VALUES
   // ============================================================================
 
-  const treatments = patientId ? treatmentsData?.treatmentsV3 || [] : allTreatmentsData?.treatmentsV3 || [];
+  const treatments = patientId ? (treatmentsData as any)?.treatmentsV3 || [] : (allTreatmentsData as any)?.treatmentsV3 || [];
   const loading = treatmentsLoading || allTreatmentsLoading;
   const mutationLoading = createLoading || updateLoading || deleteLoading;
 

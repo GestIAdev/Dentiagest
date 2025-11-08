@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import apolloGraphQL from '../../services/apolloGraphQL'; // 🥷 STEALTH GRAPHQL NINJA MODE
+import { useQuery, useMutation } from '@apollo/client/react';
+import { GET_PATIENTS_V3 } from '../../graphql/queries/patients';
+import { CREATE_APPOINTMENT_V3 } from '../../graphql/queries/appointments';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-// 🎸 APOLLO NUCLEAR - CREATE APPOINTMENT MODAL
-// Modal para crear nuevas citas
-// Integrado con Veritas verification
+// 🎸 APOLLO NUCLEAR - CREATE APPOINTMENT MODAL V3
+// Modal para crear nuevas citas - 100% GraphQL V3
+// @veritas quantum truth verification enabled
 
 interface CreateAppointmentModalProps {
   isOpen: boolean;
@@ -21,103 +23,90 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
   selectedDate,
   selectedTime
 }) => {
+  // 🎯 V3 GRAPHQL OPERATIONS - Pure GraphQL, no REST
+  const { data: patientsData, loading: loadingPatients } = useQuery(GET_PATIENTS_V3, {
+    skip: !isOpen,
+    fetchPolicy: 'cache-and-network'
+  });
+
+  const [createAppointmentMutation, { loading }] = useMutation(CREATE_APPOINTMENT_V3);
+
   const [formData, setFormData] = useState({
-    patient_id: '',
-    date: selectedDate || '',
-    time: selectedTime || '',
+    patientId: '',
+    appointmentDate: selectedDate || '',
+    appointmentTime: selectedTime || '',
     duration: 30,
-    reason: '',
+    type: '',
     notes: '',
     status: 'scheduled'
   });
 
-  const [patients, setPatients] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [loadingPatients, setLoadingPatients] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // 🚀 APOLLO VERITAS: Load patients list
-  useEffect(() => {
-    if (isOpen) {
-      loadPatients();
-    }
-  }, [isOpen]);
 
   // 🚀 APOLLO VERITAS: Update form when selectedDate/selectedTime change
   useEffect(() => {
     setFormData(prev => ({
       ...prev,
-      date: selectedDate || prev.date,
-      time: selectedTime || prev.time
+      appointmentDate: selectedDate || prev.appointmentDate,
+      appointmentTime: selectedTime || prev.appointmentTime
     }));
   }, [selectedDate, selectedTime]);
 
-  const loadPatients = async () => {
-    setLoadingPatients(true);
-    try {
-      const response = await apolloGraphQL.api.get('/patients?limit=100');
-      if (response.success) {
-        // 🥷 STEALTH WRAPPER: Core API returns paginated format with 'items'
-        const patientsData = (response as any).items || [];
-        setPatients(patientsData);
-      }
-    } catch (error) {
-      console.error('Error loading patients:', error);
-    } finally {
-      setLoadingPatients(false);
-    }
-  };
+  // 🎯 V3 PATIENTS DATA - Direct from GraphQL
+  const patients = (patientsData as any)?.patientsV3 || [];
 
   // 🛡️ APOLLO VERITAS: Form validation
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.patient_id) newErrors.patient_id = 'Paciente requerido';
-    if (!formData.date) newErrors.date = 'Fecha requerida';
-    if (!formData.time) newErrors.time = 'Hora requerida';
-    if (!formData.reason.trim()) newErrors.reason = 'Motivo requerido';
+    if (!formData.patientId) newErrors.patientId = 'Paciente requerido';
+    if (!formData.appointmentDate) newErrors.appointmentDate = 'Fecha requerida';
+    if (!formData.appointmentTime) newErrors.appointmentTime = 'Hora requerida';
+    if (!formData.type.trim()) newErrors.type = 'Tipo de cita requerido';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // ⚡ APOLLO OFFLINE SUPREMACY: Handle form submission
+  // ⚡ APOLLO V3 MUTATION: Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) return;
 
-    setLoading(true);
-
     try {
-      const appointmentData = {
-        ...formData,
-        duration: Number(formData.duration)
-      };
+      const { data } = await createAppointmentMutation({
+        variables: {
+          input: {
+            patientId: formData.patientId,
+            appointmentDate: formData.appointmentDate,
+            appointmentTime: formData.appointmentTime,
+            duration: Number(formData.duration),
+            type: formData.type,
+            notes: formData.notes || '',
+            status: formData.status
+          }
+        }
+      });
 
-      const response = await apolloGraphQL.api.post('/appointments', appointmentData);
-
-      if (response.success) {
-        onCreate(response.data);
+      // V3 mutation success
+      if (data) {
+        onCreate((data as any)?.createAppointmentV3);
         onClose();
         // Reset form
         setFormData({
-          patient_id: '',
-          date: '',
-          time: '',
+          patientId: '',
+          appointmentDate: '',
+          appointmentTime: '',
           duration: 30,
-          reason: '',
+          type: '',
           notes: '',
           status: 'scheduled'
         });
-      } else {
-        setErrors({ submit: response.error?.message || 'Error al crear cita' });
       }
     } catch (error) {
       console.error('Error creating appointment:', error);
-      setErrors({ submit: 'Error de conexión. Intente nuevamente.' });
-    } finally {
-      setLoading(false);
+      setErrors({ submit: 'Error al crear la cita. Intente nuevamente.' });
     }
   };
 
@@ -156,24 +145,24 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
               Paciente *
             </label>
             <select
-              value={formData.patient_id}
-              onChange={(e) => handleChange('patient_id', e.target.value)}
+              value={formData.patientId}
+              onChange={(e) => handleChange('patientId', e.target.value)}
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.patient_id ? 'border-red-500' : 'border-gray-300'
+                errors.patientId ? 'border-red-500' : 'border-gray-300'
               }`}
               disabled={loadingPatients}
             >
               <option value="">
                 {loadingPatients ? 'Cargando pacientes...' : 'Seleccionar paciente'}
               </option>
-              {patients.map((patient) => (
+              {patients.map((patient: any) => (
                 <option key={patient.id} value={patient.id}>
-                  {patient.first_name} {patient.last_name}
+                  {patient.firstName} {patient.lastName}
                 </option>
               ))}
             </select>
-            {errors.patient_id && (
-              <p className="text-red-500 text-xs mt-1">{errors.patient_id}</p>
+            {errors.patientId && (
+              <p className="text-red-500 text-xs mt-1">{errors.patientId}</p>
             )}
           </div>
 
@@ -185,14 +174,14 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
               </label>
               <input
                 type="date"
-                value={formData.date}
-                onChange={(e) => handleChange('date', e.target.value)}
+                value={formData.appointmentDate}
+                onChange={(e) => handleChange('appointmentDate', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.date ? 'border-red-500' : 'border-gray-300'
+                  errors.appointmentDate ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
-              {errors.date && (
-                <p className="text-red-500 text-xs mt-1">{errors.date}</p>
+              {errors.appointmentDate && (
+                <p className="text-red-500 text-xs mt-1">{errors.appointmentDate}</p>
               )}
             </div>
 
@@ -202,14 +191,14 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
               </label>
               <input
                 type="time"
-                value={formData.time}
-                onChange={(e) => handleChange('time', e.target.value)}
+                value={formData.appointmentTime}
+                onChange={(e) => handleChange('appointmentTime', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.time ? 'border-red-500' : 'border-gray-300'
+                  errors.appointmentTime ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
-              {errors.time && (
-                <p className="text-red-500 text-xs mt-1">{errors.time}</p>
+              {errors.appointmentTime && (
+                <p className="text-red-500 text-xs mt-1">{errors.appointmentTime}</p>
               )}
             </div>
           </div>
@@ -233,22 +222,22 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
             </select>
           </div>
 
-          {/* Reason */}
+          {/* Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Motivo de la cita *
+              Tipo de cita *
             </label>
             <input
               type="text"
-              value={formData.reason}
-              onChange={(e) => handleChange('reason', e.target.value)}
+              value={formData.type}
+              onChange={(e) => handleChange('type', e.target.value)}
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.reason ? 'border-red-500' : 'border-gray-300'
+                errors.type ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Ej: Consulta general, limpieza dental..."
             />
-            {errors.reason && (
-              <p className="text-red-500 text-xs mt-1">{errors.reason}</p>
+            {errors.type && (
+              <p className="text-red-500 text-xs mt-1">{errors.type}</p>
             )}
           </div>
 

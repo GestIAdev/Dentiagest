@@ -17,7 +17,11 @@ import {
   GET_MEDICAL_RECORD,
   CREATE_MEDICAL_RECORD,
   UPDATE_MEDICAL_RECORD,
-  DELETE_MEDICAL_RECORD
+  DELETE_MEDICAL_RECORD,
+  GET_MEDICAL_RECORDS_V3,
+  GET_MEDICAL_RECORD_V3,
+  CREATE_MEDICAL_RECORD_V3,
+  UPDATE_MEDICAL_RECORD_V3
 } from '../../graphql/queries/medicalRecords';
 
 // 🎯 @veritas QUANTUM TRUTH VERIFICATION - V3.0 INTEGRATION
@@ -207,15 +211,15 @@ const MedicalRecordsManagementV3: React.FC<MedicalRecordsManagementV3Props> = ({
 }) => {
   const logger = useDocumentLogger('MedicalRecordsManagementV3');
   // 🎯 GRAPHQL QUERIES & MUTATIONS
-  const { data: recordsData, loading: recordsLoading, error: recordsError, refetch: refetchRecords } = useQuery(GET_MEDICAL_RECORDS, {
+  const { data: recordsData, loading: recordsLoading, error: recordsError, refetch: refetchRecords } = useQuery(GET_MEDICAL_RECORDS_V3, {
     variables: {
       filters: patientId ? { patientId } : {}
     },
     fetchPolicy: 'cache-and-network'
   });
 
-  const [createMedicalRecordMutation] = useMutation(CREATE_MEDICAL_RECORD);
-  const [updateMedicalRecordMutation] = useMutation(UPDATE_MEDICAL_RECORD);
+  const [createMedicalRecordMutation] = useMutation(CREATE_MEDICAL_RECORD_V3);
+  const [updateMedicalRecordMutation] = useMutation(UPDATE_MEDICAL_RECORD_V3);
   const [deleteMedicalRecordMutation] = useMutation(DELETE_MEDICAL_RECORD);
 
   // 🎯 STATE MANAGEMENT - Local UI State
@@ -247,7 +251,7 @@ const MedicalRecordsManagementV3: React.FC<MedicalRecordsManagementV3Props> = ({
   });
 
   // 🎯 COMPUTED VALUES - Filtered and Processed Data
-  const medicalRecords = recordsData?.medicalRecords?.items || [];
+  const medicalRecords = (recordsData as any)?.medicalRecordsV3 || [];
   const filteredRecords = useMemo(() => {
     if (!medicalRecords) return [];
 

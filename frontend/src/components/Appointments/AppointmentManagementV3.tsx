@@ -328,15 +328,16 @@ const AppointmentManagementV3: React.FC = () => {
 
       const { data } = await deleteAppointmentMutation({
         variables: { id: appointmentId },
-        refetchQueries: [{ query: GET_APPOINTMENTS }, { query: GET_TODAY_APPOINTMENTS }, { query: GET_UPCOMING_APPOINTMENTS }]
+        refetchQueries: [{ query: GET_APPOINTMENTS_V3 }, { query: GET_TODAY_APPOINTMENTS }, { query: GET_UPCOMING_APPOINTMENTS }]
       });
 
-      if (data?.deleteAppointment?.success) {
+      // V3 mutation returns boolean directly
+      if (data) {
         l.info('Appointment deleted successfully', { appointmentId });
         setSelectedAppointment(null);
         setActiveTab('list');
       } else {
-        throw new Error(data?.deleteAppointment?.errors?.join(', ') || 'Error deleting appointment');
+        throw new Error('Error deleting appointment');
       }
     } catch (error: any) {
       l.error && l.error('Appointment deletion failed', error instanceof Error ? error : new Error(error.message));
@@ -354,13 +355,14 @@ const AppointmentManagementV3: React.FC = () => {
 
       const { data } = await updateAppointmentMutation({
         variables: { id: appointmentId, input: { status: newStatus } },
-        refetchQueries: [{ query: GET_APPOINTMENTS }, { query: GET_TODAY_APPOINTMENTS }, { query: GET_UPCOMING_APPOINTMENTS }]
+        refetchQueries: [{ query: GET_APPOINTMENTS_V3 }, { query: GET_TODAY_APPOINTMENTS }, { query: GET_UPCOMING_APPOINTMENTS }]
       });
 
-      if (data?.updateAppointment?.success) {
+      // V3 mutation returns boolean directly
+      if (data) {
         l.info('Appointment status updated successfully', { appointmentId, newStatus });
       } else {
-        throw new Error(data?.updateAppointment?.errors?.join(', ') || 'Error updating appointment status');
+        throw new Error('Error updating appointment status');
       }
     } catch (error: any) {
       l.error && l.error('Appointment status change failed', error instanceof Error ? error : new Error(error.message));
