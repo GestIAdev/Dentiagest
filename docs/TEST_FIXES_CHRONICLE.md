@@ -1585,10 +1585,215 @@ type: 'FOLLOW_UP' // ✅ Correct (from earlier session)
 
 ---
 
-**Status:** ⏸️ TACTICAL PAUSE  
+**Status:** ⏸️ TACTICAL PAUSE ✅ COMMITTED  
+**Git commit:** `94e34cb` - Database unification + Bug analysis + Chronicle update  
 **Time spent:** 2+ hours debugging Appointment (Session 1) + 30 min test run analysis (Session 2)  
 **Bugs documented:** 4 categories, 8 tests failing, clear fix path  
-**Next action:** Commit progress, refresh context, attack bugs in order
+**Next action:** Fresh start - Attack bugs in complexity order
 
-**Last updated:** 8 Nov 2025 02:40  
-**Next update:** After FOLLOWUP typo fix + UUID fixes
+---
+
+## 📋 NEXT SESSION BATTLE PLAN
+
+### **CONTEXT REFRESH:**
+- ✅ Single Database.ts source of truth (src/core/Database.ts)
+- ✅ Enum values confirmed (UPPERCASE from PostgreSQL)
+- ✅ 3/14 tests passing: Patient, Appointment, Treatment CREATE
+- ✅ All progress committed + documented
+
+### **BUG HUNT ORDER (Complexity Ascending):**
+
+**🎯 PHASE 1: QUICK WINS (12 minutes total)**
+
+**Fix 1 - FOLLOWUP Typo (2 min):**
+```typescript
+// Location: frontend/tests/dashboard-crud.test.tsx
+// Search for: 'FOLLOWUP'
+// Replace with: 'FOLLOW_UP'
+// Context: DELETE suite initialization / beforeAll / test data
+```
+**Expected:** Unblocks 3 DELETE tests
+**Result:** 3/14 → 3/14 (tests can execute without enum error)
+
+---
+
+**Fix 2 - UUID Hardcoded Tests (10 min):**
+```typescript
+// Location: frontend/tests/dashboard-crud.test.tsx
+// Tests affected:
+//   - "CREATE Appointment with conflicting time fails"
+//   - "CREATE Appointment with non-existent patient fails"
+
+// Current (WRONG):
+const input = {
+  patientId: '1',  // ❌ Invalid UUID
+};
+
+// Fix (apply dynamic creation pattern):
+const patientResult = await testClient.mutate({
+  mutation: CREATE_PATIENT_MUTATION,
+  variables: { input: { /* patient data */ } }
+});
+const patientId = patientResult.data.createPatientV3.id; // ✅ Real UUID
+
+const input = {
+  patientId,  // ✅ Valid UUID
+};
+```
+**Expected:** 2 Appointment validation tests start passing
+**Result:** 3/14 → 5/14 (35.7%)
+
+---
+
+**🎯 PHASE 2: DATA INTEGRITY (15 minutes)**
+
+**Fix 3 - @veritas Validation (15 min):**
+```typescript
+// Files to modify:
+// 1. selene/src/graphql/resolvers/Mutation/patient.ts
+// 2. selene/src/graphql/resolvers/Mutation/treatment.ts
+
+// Patient email validation:
+async createPatientV3(parent, { input }, context) {
+  // Check email uniqueness
+  const existing = await db.query(
+    'SELECT id FROM patients WHERE email = $1',
+    [input.email]
+  );
+  if (existing.rows.length > 0) {
+    throw new UserInputError('Email already exists');
+  }
+  
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(input.email)) {
+    throw new UserInputError('Invalid email format');
+  }
+  
+  // Continue with creation...
+}
+
+// Treatment cost validation:
+async createTreatmentV3(parent, { input }, context) {
+  if (input.cost <= 0) {
+    throw new UserInputError('Cost must be positive');
+  }
+  // Continue with creation...
+}
+```
+**Expected:** 3 validation tests start passing
+**Result:** 5/14 → 8/14 (57.1%)
+
+---
+
+**🎯 PHASE 3: FEATURE COMPLETE (30 minutes - OPTIONAL)**
+
+**Fix 4 - UPDATE Mutations (30 min):**
+```graphql
+# File: selene/src/graphql/schema.ts
+
+# Add input types:
+input UpdatePatientInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  dateOfBirth: String
+  # All fields optional - only update what's provided
+}
+
+input UpdateAppointmentInput {
+  appointmentDate: String
+  appointmentTime: String
+  duration: Int
+  type: String
+  status: String
+  priority: String
+  notes: String
+  # All fields optional
+}
+
+# Add mutations:
+type Mutation {
+  updatePatientV3(id: ID!, input: UpdatePatientInput!): Patient
+  updateAppointmentV3(id: ID!, input: UpdateAppointmentInput!): Appointment
+}
+```
+
+```typescript
+// File: selene/src/graphql/resolvers/Mutation/patient.ts
+async updatePatientV3(parent, { id, input }, context) {
+  const updates = [];
+  const values = [];
+  let paramIndex = 1;
+  
+  Object.keys(input).forEach(key => {
+    if (input[key] !== undefined) {
+      updates.push(`${toSnakeCase(key)} = $${paramIndex}`);
+      values.push(input[key]);
+      paramIndex++;
+    }
+  });
+  
+  values.push(id);
+  
+  const result = await db.query(
+    `UPDATE patients SET ${updates.join(', ')}, updated_at = NOW()
+     WHERE id = $${paramIndex} RETURNING *`,
+    values
+  );
+  
+  return formatPatient(result.rows[0]);
+}
+```
+**Expected:** 3 UPDATE tests start passing
+**Result:** 8/14 → 11/14 (78.5%)
+
+---
+
+**🎯 PHASE 4: CLEANUP (if time allows)**
+
+**Fix 5 - DELETE Tests (likely work automatically):**
+- Once FOLLOWUP typo fixed, DELETE suite should initialize
+- Tests may pass without additional fixes
+- If failures: Check foreign key constraints
+
+**Potential result:** 11/14 → 14/14 (100%) 🎉
+
+---
+
+### **DECISION POINT:**
+
+**Option A - Ship at 57% (8/14 tests):**
+- ✅ All CREATE operations working
+- ✅ Data validation enforced
+- ✅ Core CRUD functionality proven
+- ⏭️ Skip UPDATE mutations (feature debt)
+- **Timeline:** ~27 minutes total
+- **Risk:** Low - essential features covered
+
+**Option B - Ship at 78% (11/14 tests):**
+- ✅ All CREATE operations working
+- ✅ Data validation enforced
+- ✅ UPDATE operations implemented
+- ⏭️ DELETE tests may pass automatically
+- **Timeline:** ~57 minutes total
+- **Risk:** Medium - more complete feature set
+
+**Option C - Full 100% (14/14 tests):**
+- ✅ Complete CRUD coverage
+- ✅ All validation + edge cases
+- **Timeline:** ~90 minutes total (debugging DELETE if needed)
+- **Risk:** High time investment for diminishing returns
+
+**User context consideration:**
+- 2 weeks deadline
+- Survival mode (ship working product > perfection)
+- 90% automated testing acceptable
+
+**Recommended:** **Option A or B** (ship at 57-78%, accept 3-6 failing tests as technical debt)
+
+---
+
+**Last updated:** 8 Nov 2025 02:45  
+**Next update:** After Phase 1 fixes (FOLLOWUP + UUID)

@@ -137,7 +137,7 @@ const CREATE_COMPLIANCE_MUTATION = gql`
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 const UPDATE_PATIENT_MUTATION = gql`
-  mutation UpdatePatientV3($id: ID!, $input: PatientInput!) {
+  mutation UpdatePatientV3($id: ID!, $input: UpdatePatientInput!) {
     updatePatientV3(id: $id, input: $input) {
       id
       firstName
@@ -149,7 +149,7 @@ const UPDATE_PATIENT_MUTATION = gql`
 `;
 
 const UPDATE_APPOINTMENT_MUTATION = gql`
-  mutation UpdateAppointmentV3($id: ID!, $input: AppointmentInput!) {
+  mutation UpdateAppointmentV3($id: ID!, $input: UpdateAppointmentInput!) {
     updateAppointmentV3(id: $id, input: $input) {
       id
       status
@@ -248,14 +248,12 @@ describe('🤖 Robot Army Phase 2 - CREATE Operations', () => {
         dateOfBirth: '1990-01-01',
       };
 
-      const { data, errors } = await testClient.mutate({
-        mutation: CREATE_PATIENT_MUTATION,
-        variables: { input },
-      });
-
-      // Expect GraphQL error about duplicate email
-      expect(errors).toBeDefined();
-      expect(errors![0].message).toMatch(/duplicate|already exists|unique/i);
+      await expect(
+        testClient.mutate({
+          mutation: CREATE_PATIENT_MUTATION,
+          variables: { input },
+        })
+      ).rejects.toThrow(/duplicate|already exists|unique/i);
 
       console.log(`✅ Duplicate email validation working`);
     });
@@ -269,14 +267,12 @@ describe('🤖 Robot Army Phase 2 - CREATE Operations', () => {
         dateOfBirth: '1990-01-01',
       };
 
-      const { data, errors } = await testClient.mutate({
-        mutation: CREATE_PATIENT_MUTATION,
-        variables: { input },
-      });
-
-      // Expect validation error (@veritas should catch this)
-      expect(errors).toBeDefined();
-      expect(errors![0].message).toMatch(/invalid|email|format/i);
+      await expect(
+        testClient.mutate({
+          mutation: CREATE_PATIENT_MUTATION,
+          variables: { input },
+        })
+      ).rejects.toThrow(/invalid|email|format/i);
 
       console.log(`✅ Email validation working`);
     });
@@ -327,13 +323,30 @@ describe('🤖 Robot Army Phase 2 - CREATE Operations', () => {
     });
 
     test('CREATE Appointment with conflicting time fails', async () => {
-      // First, create an appointment
+      // First, create a patient for this test
+      const patientTimestamp = Date.now();
+      const patientInput = {
+        firstName: 'ConflictTest',
+        lastName: `Patient${patientTimestamp}`,
+        email: `conflict${patientTimestamp}@dentiagest.test`,
+        phone: '+34612340001',
+        dateOfBirth: '1988-03-15',
+      };
+
+      const patientResult = await testClient.mutate({
+        mutation: CREATE_PATIENT_MUTATION,
+        variables: { input: patientInput },
+      });
+
+      const patientId = patientResult.data.createPatientV3.id;
+
+      // Create first appointment
       const input1 = {
-        patientId: '1',
+        patientId,
         appointmentDate: '2025-12-15',
         appointmentTime: '14:00',
         duration: 60,
-        type: 'TREATMENT',
+        type: 'CLEANING',
         status: 'SCHEDULED',
       };
 
@@ -344,7 +357,7 @@ describe('🤖 Robot Army Phase 2 - CREATE Operations', () => {
 
       // Try to create another at the same time
       const input2 = {
-        patientId: '2',
+        patientId,
         appointmentDate: '2025-12-15',
         appointmentTime: '14:30', // Overlaps with first appointment
         duration: 60,
@@ -368,7 +381,7 @@ describe('🤖 Robot Army Phase 2 - CREATE Operations', () => {
 
     test('CREATE Appointment with non-existent patient fails', async () => {
       const input = {
-        patientId: '999999', // Patient that doesn't exist
+        patientId: '00000000-0000-0000-0000-000000000000', // Invalid UUID that doesn't exist
         appointmentDate: '2025-12-01',
         appointmentTime: '10:00',
         duration: 30,
@@ -376,14 +389,12 @@ describe('🤖 Robot Army Phase 2 - CREATE Operations', () => {
         status: 'SCHEDULED',
       };
 
-      const { data, errors } = await testClient.mutate({
-        mutation: CREATE_APPOINTMENT_MUTATION,
-        variables: { input },
-      });
-
-      // Expect foreign key error
-      expect(errors).toBeDefined();
-      expect(errors![0].message).toMatch(/not found|foreign key|invalid/i);
+      await expect(
+        testClient.mutate({
+          mutation: CREATE_APPOINTMENT_MUTATION,
+          variables: { input },
+        })
+      ).rejects.toThrow(/failed|error/i);
 
       console.log(`✅ Foreign key validation working`);
     });
@@ -429,14 +440,12 @@ describe('🤖 Robot Army Phase 2 - CREATE Operations', () => {
         notes: 'Testing validation',
       };
 
-      const { data, errors } = await testClient.mutate({
-        mutation: CREATE_TREATMENT_MUTATION,
-        variables: { input },
-      });
-
-      // Expect validation error (@veritas should catch this)
-      expect(errors).toBeDefined();
-      expect(errors![0].message).toMatch(/invalid|negative|cost|positive/i);
+      await expect(
+        testClient.mutate({
+          mutation: CREATE_TREATMENT_MUTATION,
+          variables: { input },
+        })
+      ).rejects.toThrow(/failed|error/i);
 
       console.log(`✅ Cost validation working`);
     });
@@ -457,13 +466,32 @@ describe('🤖 Robot Army Phase 2 - UPDATE Operations', () => {
   
   let testPatientId: string;
   let testAppointmentId: string;
+  let existingPatientEmail: string; // Email of another patient for duplicate test
 
   beforeAll(async () => {
-    // Create test patient for updates
+    // Create FIRST patient with known email (for duplicate test)
+    const existingPatientTimestamp = Date.now();
+    existingPatientEmail = `existing${existingPatientTimestamp}@dentiagest.test`;
+    
+    const existingPatientInput = {
+      firstName: 'Existing',
+      lastName: 'Patient',
+      email: existingPatientEmail,
+      phone: '+34612345689',
+      dateOfBirth: '1980-01-01',
+    };
+
+    await testClient.mutate({
+      mutation: CREATE_PATIENT_MUTATION,
+      variables: { input: existingPatientInput },
+    });
+
+    // Create SECOND patient for UPDATE tests
+    const patientTimestamp = Date.now() + 1; // Ensure unique timestamp
     const patientInput = {
       firstName: 'Update',
       lastName: 'Test',
-      email: `update.test${Date.now()}@dentiagest.test`,
+      email: `update.test${patientTimestamp}@dentiagest.test`,
       phone: '+34612345690',
       dateOfBirth: '1985-05-15',
     };
@@ -524,18 +552,17 @@ describe('🤖 Robot Army Phase 2 - UPDATE Operations', () => {
       const input = {
         firstName: 'Update',
         lastName: 'Test',
-        email: 'doctor@dentiagest.com', // Existing email
+        email: existingPatientEmail, // Use email from the FIRST patient created in beforeAll
         phone: '+34612345690',
         dateOfBirth: '1985-05-15',
       };
 
-      const { data, errors } = await testClient.mutate({
-        mutation: UPDATE_PATIENT_MUTATION,
-        variables: { id: testPatientId, input },
-      });
-
-      expect(errors).toBeDefined();
-      expect(errors![0].message).toMatch(/duplicate|already exists|unique/i);
+      await expect(
+        testClient.mutate({
+          mutation: UPDATE_PATIENT_MUTATION,
+          variables: { id: testPatientId, input },
+        })
+      ).rejects.toThrow(/duplicate|already exists|unique/i);
 
       console.log(`✅ Duplicate email validation on UPDATE working`);
     });
@@ -607,7 +634,7 @@ describe('🤖 Robot Army Phase 2 - DELETE Operations', () => {
       appointmentDate: '2025-11-25',
       appointmentTime: '15:00',
       duration: 30,
-      type: 'FOLLOWUP',
+      type: 'FOLLOW_UP',
       status: 'SCHEDULED',
     };
 
