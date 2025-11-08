@@ -1,8 +1,151 @@
+/**
+ * 🔥💀🎸 DENTIAGEST GRAPHQL QUERIES - APPOINTMENTS V3
+ * 
+ * ARCHITECT: PunkClaude (The Verse Libre)
+ * DATE: 2025-11-08
+ * MISSION: Appointment Management with @veritas quantum verification
+ */
+
 //  GRAPHQL QUERIES - APPOINTMENTS (ALINEADO CON SELENE)
 // Date: November 6, 2025 - GraphQL Migration v1.0
 // Schema: Appointment { id, patientId, patient, practitionerId, date, time, appointmentDate, appointmentTime, duration, type, status, notes, createdAt, updatedAt }
 
 import { gql } from '@apollo/client';
+
+// ============================================================================
+// APPOINTMENT QUERIES V3 - WITH @VERITAS QUANTUM VERIFICATION 🔥
+// ============================================================================
+
+export const GET_APPOINTMENTS_V3 = gql`
+  query GetAppointmentsV3($limit: Int, $offset: Int, $patientId: ID, $startDate: String, $endDate: String) {
+    appointmentsV3(limit: $limit, offset: $offset, patientId: $patientId, startDate: $startDate, endDate: $endDate) {
+      id
+      patientId
+      patientId_veritas
+      patient {
+        firstName
+        lastName
+        email
+        phone
+      }
+      practitionerId
+      practitionerId_veritas
+      appointmentDate
+      appointmentDate_veritas
+      appointmentTime
+      appointmentTime_veritas
+      duration
+      duration_veritas
+      type
+      type_veritas
+      status
+      status_veritas
+      notes
+      notes_veritas
+      createdAt
+      updatedAt
+      
+      # @veritas quantum verification metadata
+      _veritas {
+        verified
+        confidence
+        level
+        certificate
+        error
+        verifiedAt
+        algorithm
+      }
+    }
+  }
+`;
+
+export const GET_APPOINTMENT_V3 = gql`
+  query GetAppointmentV3($id: ID!) {
+    appointmentV3(id: $id) {
+      id
+      patientId
+      patientId_veritas
+      patient {
+        firstName
+        lastName
+        email
+        phone
+      }
+      practitionerId
+      practitionerId_veritas
+      appointmentDate
+      appointmentDate_veritas
+      appointmentTime
+      appointmentTime_veritas
+      duration
+      duration_veritas
+      type
+      type_veritas
+      status
+      status_veritas
+      notes
+      notes_veritas
+      treatmentDetails
+      treatmentDetails_veritas
+      createdAt
+      updatedAt
+      
+      # @veritas quantum verification metadata
+      _veritas {
+        verified
+        confidence
+        level
+        certificate
+        error
+        verifiedAt
+        algorithm
+      }
+    }
+  }
+`;
+
+export const CREATE_APPOINTMENT_V3 = gql`
+  mutation CreateAppointmentV3($input: AppointmentInputV3!) {
+    createAppointmentV3(input: $input) {
+      id
+      patientId
+      appointmentDate
+      appointmentTime
+      duration
+      type
+      status
+      createdAt
+      
+      _veritas {
+        verified
+        confidence
+        level
+      }
+    }
+  }
+`;
+
+export const UPDATE_APPOINTMENT_V3 = gql`
+  mutation UpdateAppointmentV3($id: ID!, $input: UpdateAppointmentInputV3!) {
+    updateAppointmentV3(id: $id, input: $input) {
+      id
+      appointmentDate
+      appointmentTime
+      status
+      updatedAt
+      
+      _veritas {
+        verified
+        confidence
+        level
+      }
+    }
+  }
+`;
+
+// ============================================================================
+// APPOINTMENT QUERIES (LEGACY - BACKWARD COMPATIBILITY)
+// ============================================================================
 
 export const GET_APPOINTMENTS = gql`
   query GetAppointments($limit: Int, $offset: Int, $patientId: ID) {
