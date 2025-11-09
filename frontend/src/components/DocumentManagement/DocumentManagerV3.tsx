@@ -4,7 +4,8 @@
 // Status: V3.0 - Full Apollo Nuclear Integration with @veritas Quantum Truth Verification
 // @veritas: CRITICAL/HIGH/MEDIUM fields verified with zero-knowledge proof
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { toast } from 'react-hot-toast';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
 // Design System imports
@@ -100,14 +101,15 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
   // 🎯 LOGGER INITIALIZATION
   const logger = useDocumentLogger('DocumentManagerV3');
 
-  // 🎯 GRAPHQL QUERIES & MUTATIONS
+  // 🎯 GRAPHQL QUERIES & MUTATIONS - REAL-TIME POLLING
   const { data: documentsData, loading: queryLoading, error: queryError, refetch: refetchDocuments } = useQuery(GET_UNIFIED_DOCUMENTS, {
     variables: {
       patientId: patientId,
       limit: 100,
       offset: 0
     },
-    fetchPolicy: 'cache-and-network'
+    fetchPolicy: 'cache-and-network',
+    pollInterval: 5000 // Poll every 5s for real-time sync (WebSocket alternative)
   });
 
   // (removed unused GET_DOCUMENT_TYPES and uploadDocumentMutation)
@@ -121,10 +123,55 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
   const [showUploader, setShowUploader] = useState(false);
   const [viewerMode, setViewerMode] = useState<'details' | 'viewer'>('details');
   const [showAIOverlay, setShowAIOverlay] = useState(true);
+  
+  // 🔥 REAL-TIME SYNC STATE - Track document count for change detection
+  const previousDocCountRef = useRef<number>(0);
 
   // 🎯 COMPUTED VALUES
-  const documents = documentsData?.unifiedDocumentsV3 || [];
+  const documents = (documentsData as any)?.unifiedDocumentsV3 || [];
   // (removed unused documentTypes)
+
+  // 🔥 REAL-TIME NOTIFICATIONS - Detect document changes from polling
+  useEffect(() => {
+    const currentCount = documents.length;
+    const previousCount = previousDocCountRef.current;
+    
+    // Skip first render
+    if (previousCount === 0 && currentCount > 0) {
+      previousDocCountRef.current = currentCount;
+      return;
+    }
+    
+    // Document created (count increased)
+    if (currentCount > previousCount) {
+      const newDocsCount = currentCount - previousCount;
+      toast.success(`📄 ${newDocsCount} documento${newDocsCount > 1 ? 's' : ''} creado${newDocsCount > 1 ? 's' : ''}`, {
+        duration: 4000,
+        style: {
+          background: 'linear-gradient(to right, rgb(6 182 212), rgb(168 85 247))',
+          color: 'white',
+          fontWeight: 'bold'
+        }
+      });
+      l.info(`🔔 ${newDocsCount} new document(s) detected via polling`);
+    }
+    
+    // Document deleted (count decreased)
+    if (currentCount < previousCount) {
+      const deletedCount = previousCount - currentCount;
+      toast.success(`🗑️ ${deletedCount} documento${deletedCount > 1 ? 's' : ''} eliminado${deletedCount > 1 ? 's' : ''}`, {
+        duration: 4000,
+        style: {
+          background: 'linear-gradient(to right, rgb(239 68 68), rgb(251 146 60))',
+          color: 'white',
+          fontWeight: 'bold'
+        }
+      });
+      l.info(`🔔 ${deletedCount} document(s) deleted detected via polling`);
+    }
+    
+    previousDocCountRef.current = currentCount;
+  }, [documents.length]);
 
   // 🎯 EFFECTS - Data Synchronization and Logging
   useEffect(() => {
@@ -231,31 +278,31 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
   const renderTabNavigation = () => (
     <div className="flex flex-wrap gap-2">
       <Button
-        variant={activeTab === TabType.UPLOAD ? 'default' : 'outline'}
+        variant={activeTab === TabType.UPLOAD ? 'primary' : 'secondary'}
         onClick={() => handleTabChange(TabType.UPLOAD)}
       >
         Subir
       </Button>
       <Button
-        variant={activeTab === TabType.MEDICAL ? 'default' : 'outline'}
+        variant={activeTab === TabType.MEDICAL ? 'primary' : 'secondary'}
         onClick={() => handleTabChange(TabType.MEDICAL)}
       >
         Médicos
       </Button>
       <Button
-        variant={activeTab === TabType.ADMINISTRATIVE ? 'default' : 'outline'}
+        variant={activeTab === TabType.ADMINISTRATIVE ? 'primary' : 'secondary'}
         onClick={() => handleTabChange(TabType.ADMINISTRATIVE)}
       >
         Admin
       </Button>
       <Button
-        variant={activeTab === TabType.BILLING ? 'default' : 'outline'}
+        variant={activeTab === TabType.BILLING ? 'primary' : 'secondary'}
         onClick={() => handleTabChange(TabType.BILLING)}
       >
         Facturación
       </Button>
       <Button
-        variant={activeTab === TabType.LEGAL ? 'default' : 'outline'}
+        variant={activeTab === TabType.LEGAL ? 'primary' : 'secondary'}
         onClick={() => handleTabChange(TabType.LEGAL)}
       >
         Legal
@@ -334,14 +381,14 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
               </h2>
               <div className="flex gap-2">
                 <Button
-                  variant={viewerMode === 'details' ? 'default' : 'outline'}
+                  variant={viewerMode === 'details' ? 'primary' : 'secondary'}
                   size="sm"
                   onClick={() => setViewerMode('details')}
                 >
                   📋 Detalles
                 </Button>
                 <Button
-                  variant={viewerMode === 'viewer' ? 'default' : 'outline'}
+                  variant={viewerMode === 'viewer' ? 'primary' : 'secondary'}
                   size="sm"
                   onClick={() => setViewerMode('viewer')}
                 >
@@ -365,11 +412,11 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
                 {/* Document Details Card */}
                 <Card className="cyberpunk-card">
                   <CardHeader>
-                    <h2 className="cyberpunk-text text-xl font-bold" className="cyberpunk-text text-2xl">{selectedDocument.title}</h2>
+                    <h2 className="cyberpunk-text text-2xl font-bold">{selectedDocument.title}</h2>
                     <div className="flex items-center space-x-2 mt-2">
-                      <Badge variant="default">Compatible</Badge>
+                      <Badge variant="info">Compatible</Badge>
                       {selectedDocument.ai_analyzed && (
-                        <Badge variant="outline">AI Analizado</Badge>
+                        <Badge variant="success">AI Analizado</Badge>
                       )}
                     </div>
                   </CardHeader>
@@ -473,7 +520,7 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
         <div className="flex justify-between items-center text-sm text-gray-400">
           <div>
             <span>Estado: </span>
-            <Badge variant="outline" className="bg-green-500/20 text-green-400 border-green-500">
+            <Badge variant="success" className="bg-green-500/20 text-green-400 border-green-500">
               V3.0 - Apollo Nuclear + @veritas
             </Badge>
           </div>
@@ -491,3 +538,4 @@ export default DocumentManagerV3;
 // 🎯🎸💀 DOCUMENT MANAGER V3.0 EXPORTS - OLYMPUS RECONSTRUCTION
 // Export DocumentManagerV3 as the complete document management system
 // Ready for integration with Apollo Nuclear GraphQL backend
+
