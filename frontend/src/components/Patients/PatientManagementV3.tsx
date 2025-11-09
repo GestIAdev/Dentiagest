@@ -10,6 +10,7 @@ import {
   DocumentTextIcon, 
   TrashIcon 
 } from '@heroicons/react/24/outline';
+import { useNavigate } from 'react-router-dom';
 
 // 🎯 DESIGN SYSTEM IMPORTS - Migrated from atoms
 import { Button } from '../../design-system/Button';
@@ -124,6 +125,10 @@ const l = createModuleLogger('PatientManagementV3');
 const PatientManagementV3: React.FC = () => {
   // 🎯 LOGGER INITIALIZATION - Inside component
   const logger = useDocumentLogger('PatientManagementV3');
+  
+  // 🎯 NAVIGATION - React Router
+  const navigate = useNavigate();
+  
   // 🎯 GRAPHQL QUERIES & MUTATIONS V3 - WITH @VERITAS VERIFICATION
   const { data: patientsData, loading: queryLoading, error: queryError, refetch: refetchPatients } = useQuery(GET_PATIENTS_V3, {
     variables: { limit: 100, offset: 0 },
@@ -641,7 +646,11 @@ const PatientManagementV3: React.FC = () => {
               <EyeIcon className="w-4 h-4" />
             </button>
             <button
-              onClick={(e) => { e.stopPropagation(); /* TODO: Navigate to medical records */ }}
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                navigate(`/dashboard/medical-records?patientId=${patient.id}`);
+                logger.logUserInteraction('navigate_to_medical_records', { patientId: patient.id, patientName: patient.fullName });
+              }}
               className="p-1.5 rounded hover:bg-blue-500/20 hover:text-blue-400 transition-all group"
               title="Historia Clínica"
             >
