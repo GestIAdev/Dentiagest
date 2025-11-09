@@ -10,6 +10,8 @@ import React, { useState, useEffect } from 'react';
 import { useMedicalRecordStore } from '../../stores';
 import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../atoms';
 import { createModuleLogger } from '../../utils/logger';
+import { RecordTemplates, type MedicalRecordTemplate } from './RecordTemplates';
+
 
 // 🎯 ICONS - Heroicons for medical theme
 import {
@@ -144,6 +146,7 @@ export const MedicalRecordFormV3: React.FC<MedicalRecordFormV3Props> = ({
 
   // 🎯 FORM STATE
   const [currentStep, setCurrentStep] = useState(1);
+  const [showTemplates, setShowTemplates] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     record_type: 'consultation',
     title: '',
@@ -243,6 +246,31 @@ export const MedicalRecordFormV3: React.FC<MedicalRecordFormV3Props> = ({
     }));
   };
 
+  // 🎯 TEMPLATE HANDLER - Apply template to form
+  const handleSelectTemplate = (template: MedicalRecordTemplate) => {
+    // Pre-fill form with template data
+    setFormData(prev => ({
+      ...prev,
+      record_type: template.category === 'preventive' ? 'preventive' :
+                    template.category === 'emergency' ? 'emergency' :
+                    template.category === 'restorative' || template.category === 'cosmetic' ? 'treatment' :
+                    'consultation',
+      title: template.name,
+      description: template.diagnosis,
+      diagnosis: template.diagnosis,
+      treatment_plan: template.treatmentPlan,
+      medications: template.medications?.join(', ') || '',
+      notes: template.notes,
+      priority: template.priority,
+      tags: [template.category]
+    }));
+    
+    setShowTemplates(false);
+    setCurrentStep(1);
+    
+    l.info('Template applied', { templateId: template.id });
+  };
+
   const handleSubmit = async () => {
     const validationErrors = validateForm(formData);
     setErrors(validationErrors);
@@ -300,14 +328,35 @@ export const MedicalRecordFormV3: React.FC<MedicalRecordFormV3Props> = ({
               Paso {currentStep} de {steps.length}: {steps[currentStep - 1].title}
             </p>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-          >
-            <XMarkIcon className="w-5 h-5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            {!editingRecord && !showTemplates && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowTemplates(true)}
+              >
+                📋 Usar Plantilla
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+            >
+              <XMarkIcon className="w-5 h-5" />
+            </Button>
+          </div>
         </CardHeader>
+
+        {/* Templates Modal */}
+        {showTemplates && (
+          <div className="absolute inset-0 bg-white z-10 overflow-y-auto">
+            <RecordTemplates
+              onSelectTemplate={handleSelectTemplate}
+              onClose={() => setShowTemplates(false)}
+            />
+          </div>
+        )}
 
         {/* Progress Indicator */}
         <div className="px-6 py-4 bg-gray-50 border-b">

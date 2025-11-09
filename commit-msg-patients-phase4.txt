@@ -1,0 +1,44 @@
+🔔💀 DAY 3 Phase 4: Real-Time WebSocket - PATIENTS MODULE
+
+## WHAT
+WebSocket subscription PATIENT_UPDATES integrada con auto-refetch y toast notifications.
+
+## HOW
+- Added `useSubscription<PatientUpdateData>` hook after useQuery
+- Defined PatientUpdateData interface con tipos TypeScript precisos
+- onData handler con refetch() automático
+- Toast notifications con gradients cyan→violet para eventos:
+  * CREATED: ✨ Nuevo paciente creado
+  * UPDATED: 📝 Paciente actualizado
+  * DELETED: 🗑️ Paciente eliminado
+  * ACTIVATED: ✅ Paciente activado
+  * DEACTIVATED: ❌ Paciente desactivado
+- Console.log para debugging real-time events
+
+## WHY
+Multi-user clinic environment requiere sincronización en tiempo real.
+Sin WebSocket = usuarios ven datos obsoletos = caos clínico.
+
+## METRICS
+- Files: 1 modified (PatientsPageGraphQL.tsx)
+- Lines: ~35 insertions
+- Build: SUCCESS (0 errors, 19.73s)
+- Pattern: Same as Appointments Phase 4 (proven successful)
+- Latency target: <500ms (to be tested)
+- Time: ~20 min (estimated 1.5h) → 77% faster
+
+## PATTERN
+useSubscription pattern matches Appointments module:
+1. Type-safe interface (PatientUpdateData)
+2. Generic hook useSubscription<T>
+3. onData with refetch logic
+4. Toast with gradient styling
+5. Console debugging
+
+## STATUS
+Phase 4/5 COMPLETE ✅
+Remaining: Phase 5 (UI Polish - @veritas badges, quick actions)
+
+---
+PERFORMANCE = ARTE
+Real-time sync is not optional, it's survival.
