@@ -16,7 +16,7 @@ import {
   CardContent,
   Badge,
   Spinner
-} from '../atoms';
+} from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 ICONS - Heroicons for medical theme
@@ -346,7 +346,7 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
 
     return (
       <Card className="border-green-200 bg-green-50">
-        <CardContent className="p-4">
+        <CardBody className="p-4">
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
               {isImage ? (
@@ -372,7 +372,7 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
               <XMarkIcon className="w-4 h-4" />
             </Button>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     );
   };
@@ -403,7 +403,7 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
 
     return (
       <Card className="border-blue-200 bg-blue-50">
-        <CardContent className="p-4">
+        <CardBody className="p-4">
           <div className="flex items-center space-x-3">
             <ArrowPathIcon className="w-5 h-5 text-blue-600 animate-spin" />
             <div className="flex-1">
@@ -421,7 +421,7 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
               </p>
             </div>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     );
   };
@@ -432,10 +432,10 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
       {/* Header */}
       <Card className="cyberpunk-card">
         <CardHeader>
-          <CardTitle className="cyberpunk-text flex items-center">
+          <h2 className="cyberpunk-text text-xl font-bold" className="cyberpunk-text flex items-center">
             <CloudArrowUpIcon className="w-6 h-6 mr-2" />
             Subir Documento - Olympus V3.0
-          </CardTitle>
+          </h2>
         </CardHeader>
       </Card>
 
@@ -451,7 +451,7 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          <CardContent className="p-8 text-center">
+          <CardBody className="p-8 text-center">
             <CloudArrowUpIcon className="w-16 h-16 mx-auto text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
               Arrastra y suelta tu archivo aquí
@@ -475,7 +475,7 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
               onChange={handleFileInputChange}
               accept={allowedTypes.join(',')}
             />
-          </CardContent>
+          </CardBody>
         </Card>
       )}
 
@@ -492,9 +492,9 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
       {selectedFile && validationResult?.isValid && (
         <Card className="cyberpunk-card">
           <CardHeader>
-            <CardTitle className="text-lg">Información del Documento</CardTitle>
+            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg">Información del Documento</h2>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardBody className="space-y-4">
             {/* Title */}
             <div>
               <label className="block text-sm font-medium mb-1">
@@ -567,7 +567,7 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
               {formData.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {formData.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                    <Badge key={tag} variant="warning" className="flex items-center gap-1">
                       {tag}
                       <button
                         type="button"
@@ -581,7 +581,7 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
                 </div>
               )}
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
       )}
 

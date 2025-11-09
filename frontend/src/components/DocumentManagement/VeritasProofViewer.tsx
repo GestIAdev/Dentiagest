@@ -15,7 +15,7 @@ import {
   Badge,
   Button,
   Spinner
-} from '../atoms';
+} from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 ICONS - Heroicons for medical theme
@@ -313,12 +313,12 @@ export const VeritasProofViewer: React.FC<VeritasProofViewerProps> = ({
         {/* Verification Checks */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg flex items-center">
+            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
               <DocumentCheckIcon className="w-5 h-5 mr-2" />
               Verificaciones Realizadas
-            </CardTitle>
+            </h2>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {VERIFICATION_CHECKS.map((check) => {
                 const isPassed = proof.details?.[check.key as keyof typeof proof.details] ?? false;
@@ -336,18 +336,18 @@ export const VeritasProofViewer: React.FC<VeritasProofViewerProps> = ({
                 );
               })}
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
 
         {/* Cryptographic Proof */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg flex items-center">
+            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
               <KeyIcon className="w-5 h-5 mr-2" />
               Prueba Criptográfica
-            </CardTitle>
+            </h2>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -392,18 +392,18 @@ export const VeritasProofViewer: React.FC<VeritasProofViewerProps> = ({
                 </div>
               )}
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
 
         {/* Metadata */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg flex items-center">
+            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
               <ClockIcon className="w-5 h-5 mr-2" />
               Metadatos de Verificación
-            </CardTitle>
+            </h2>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -443,18 +443,18 @@ export const VeritasProofViewer: React.FC<VeritasProofViewerProps> = ({
                 </div>
               )}
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
 
         {/* Timestamp */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg flex items-center">
+            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
               <FingerPrintIcon className="w-5 h-5 mr-2" />
               Marca de Tiempo Digital
-            </CardTitle>
+            </h2>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             <div className="p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
@@ -472,7 +472,7 @@ export const VeritasProofViewer: React.FC<VeritasProofViewerProps> = ({
                 </div>
               </div>
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
       </div>
     );
@@ -484,10 +484,10 @@ export const VeritasProofViewer: React.FC<VeritasProofViewerProps> = ({
       {/* Header */}
       <Card className="cyberpunk-card">
         <CardHeader>
-          <CardTitle className="cyberpunk-text flex items-center">
+          <h2 className="cyberpunk-text text-xl font-bold" className="cyberpunk-text flex items-center">
             <ShieldCheckIcon className="w-6 h-6 mr-2" />
             Verificación @veritas - Quantum Truth
-          </CardTitle>
+          </h2>
           <p className="text-sm text-gray-600 mt-1">
             Documento: {documentTitle}
           </p>

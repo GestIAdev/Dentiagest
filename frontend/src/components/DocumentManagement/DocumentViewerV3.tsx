@@ -4,10 +4,11 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { Button } from '../atoms';
-import { Card, CardContent, CardHeader, CardTitle } from '../atoms';
-import { Badge } from '../atoms';
-import { Spinner } from '../atoms';
+// Design System imports
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 import { AIDocumentAnalysisV3 } from './AIDocumentAnalysisV3';
 import {
   ZoomIn,
@@ -282,12 +283,12 @@ const DocumentViewerV3: React.FC<DocumentViewerV3Props> = ({
           className="absolute top-4 left-4 right-4 z-50"
         >
           <Card className="cyberpunk-card bg-black/80 backdrop-blur-md border-cyan-500/30">
-            <CardContent className="p-4">
+            <CardBody className="p-4">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 {/* Navigation Controls */}
                 <div className="flex items-center gap-2">
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     size="sm"
                     onClick={() => handlePageChange(viewerState.currentPage - 1)}
                     disabled={viewerState.currentPage <= 1}
@@ -298,7 +299,7 @@ const DocumentViewerV3: React.FC<DocumentViewerV3Props> = ({
                     {viewerState.currentPage} / {viewerState.totalPages}
                   </span>
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     size="sm"
                     onClick={() => handlePageChange(viewerState.currentPage + 1)}
                     disabled={viewerState.currentPage >= viewerState.totalPages}
@@ -309,44 +310,44 @@ const DocumentViewerV3: React.FC<DocumentViewerV3Props> = ({
 
                 {/* Zoom Controls */}
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={handleZoomOut}>
+                  <Button variant="secondary" size="sm" onClick={handleZoomOut}>
                     <ZoomOut className="w-4 h-4" />
                   </Button>
                   <span className="text-sm text-cyan-400 min-w-[60px] text-center">
                     {Math.round(viewerState.scale * 100)}%
                   </span>
-                  <Button variant="outline" size="sm" onClick={handleZoomIn}>
+                  <Button variant="secondary" size="sm" onClick={handleZoomIn}>
                     <ZoomIn className="w-4 h-4" />
                   </Button>
                 </div>
 
                 {/* Rotation Controls */}
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={handleRotateCounterClockwise}>
+                  <Button variant="secondary" size="sm" onClick={handleRotateCounterClockwise}>
                     <RotateCcw className="w-4 h-4" />
                   </Button>
                   <span className="text-sm text-cyan-400">
                     {viewerState.rotation}°
                   </span>
-                  <Button variant="outline" size="sm" onClick={handleRotateClockwise}>
+                  <Button variant="secondary" size="sm" onClick={handleRotateClockwise}>
                     <RotateCw className="w-4 h-4" />
                   </Button>
                 </div>
 
                 {/* Action Controls */}
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={handleToggleFullscreen}>
+                  <Button variant="secondary" size="sm" onClick={handleToggleFullscreen}>
                     {viewerState.isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleExport}>
+                  <Button variant="secondary" size="sm" onClick={handleExport}>
                     <Download className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handlePrint}>
+                  <Button variant="secondary" size="sm" onClick={handlePrint}>
                     <Printer className="w-4 h-4" />
                   </Button>
                   {onToggleAIOverlay && (
                     <Button
-                      variant={showAIOverlay ? "default" : "outline"}
+                      variant={showAIOverlay ? "primary" : "outline"}
                       size="sm"
                       onClick={onToggleAIOverlay}
                     >
@@ -354,13 +355,13 @@ const DocumentViewerV3: React.FC<DocumentViewerV3Props> = ({
                     </Button>
                   )}
                   {onClose && (
-                    <Button variant="outline" size="sm" onClick={onClose}>
+                    <Button variant="secondary" size="sm" onClick={onClose}>
                       <X className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
               </div>
-            </CardContent>
+            </CardBody>
           </Card>
         </motion.div>
       )}
@@ -384,10 +385,10 @@ const DocumentViewerV3: React.FC<DocumentViewerV3Props> = ({
         error={
           <div className="flex justify-center items-center h-64">
             <Card className="cyberpunk-card max-w-md">
-              <CardContent className="p-6 text-center">
+              <CardBody className="p-6 text-center">
                 <p className="text-red-400 mb-4">Error al cargar el PDF</p>
                 <p className="text-sm text-gray-400">{viewerState.error}</p>
-              </CardContent>
+              </CardBody>
             </Card>
           </div>
         }
@@ -465,7 +466,7 @@ const DocumentViewerV3: React.FC<DocumentViewerV3Props> = ({
             <div className="flex items-center gap-1">
               <Target className="w-3 h-3" style={{ color: entity.color }} />
               <span>{entity.type}</span>
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="default" className="text-xs">
                 {Math.round(entity.confidence * 100)}%
               </Badge>
             </div>
@@ -483,12 +484,12 @@ const DocumentViewerV3: React.FC<DocumentViewerV3Props> = ({
     >
       <Card className="cyberpunk-card bg-black/80 backdrop-blur-md border-cyan-500/30 max-w-sm">
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg cyberpunk-text flex items-center gap-2">
+          <h2 className="cyberpunk-text text-lg font-bold flex items-center gap-2">
             <Shield className="w-5 h-5 text-cyan-400" />
             Información del Documento
-          </CardTitle>
+          </h2>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm">
+        <CardBody className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-400">Archivo:</span>
             <span className="text-cyan-400">{doc.file_name}</span>
@@ -503,7 +504,7 @@ const DocumentViewerV3: React.FC<DocumentViewerV3Props> = ({
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">AI Analizado:</span>
-            <Badge variant={doc.ai_analyzed ? "default" : "outline"}>
+            <Badge variant={doc.ai_analyzed ? "success" : "default"}>
               {doc.ai_analyzed ? <Brain className="w-3 h-3 mr-1" /> : null}
               {doc.ai_analyzed ? 'Sí' : 'No'}
             </Badge>
@@ -511,13 +512,13 @@ const DocumentViewerV3: React.FC<DocumentViewerV3Props> = ({
           {doc.title_veritas && (
             <div className="flex justify-between">
               <span className="text-gray-400">@veritas:</span>
-              <Badge variant="outline" className="bg-green-500/20 text-green-400">
+              <Badge variant="success" className="bg-green-500/20 text-green-400">
                 <Shield className="w-3 h-3 mr-1" />
                 Verificado
               </Badge>
             </div>
           )}
-        </CardContent>
+        </CardBody>
       </Card>
     </motion.div>
   );
@@ -526,7 +527,7 @@ const DocumentViewerV3: React.FC<DocumentViewerV3Props> = ({
   if (!canRender) {
     return (
       <Card className="cyberpunk-card max-w-md mx-auto">
-        <CardContent className="p-8 text-center">
+        <CardBody className="p-8 text-center">
           <div className="text-6xl mb-4">🚫</div>
           <h3 className="text-xl font-bold cyberpunk-text mb-2">Tipo de archivo no soportado</h3>
           <p className="text-gray-400 mb-4">
@@ -536,7 +537,7 @@ const DocumentViewerV3: React.FC<DocumentViewerV3Props> = ({
             <Download className="w-4 h-4 mr-2" />
             Descargar archivo
           </Button>
-        </CardContent>
+        </CardBody>
       </Card>
     );
   }
@@ -576,7 +577,7 @@ const DocumentViewerV3: React.FC<DocumentViewerV3Props> = ({
         ) : viewerState.error ? (
           <div className="flex justify-center items-center h-full">
             <Card className="cyberpunk-card max-w-md">
-              <CardContent className="p-8 text-center">
+              <CardBody className="p-8 text-center">
                 <div className="text-6xl mb-4">⚠️</div>
                 <h3 className="text-xl font-bold cyberpunk-text mb-2">Error de carga</h3>
                 <p className="text-gray-400 mb-4">{viewerState.error}</p>
@@ -584,7 +585,7 @@ const DocumentViewerV3: React.FC<DocumentViewerV3Props> = ({
                   <Zap className="w-4 h-4 mr-2" />
                   Reintentar
                 </Button>
-              </CardContent>
+              </CardBody>
             </Card>
           </div>
         ) : (

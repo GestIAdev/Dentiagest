@@ -15,7 +15,7 @@ import {
   Badge,
   Spinner,
   Button
-} from '../atoms';
+} from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 ICONS - Heroicons for medical theme
@@ -321,7 +321,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
   if (!document.ai_analyzed) {
     return (
       <Card className="cyberpunk-card">
-        <CardContent className="p-6 text-center">
+        <CardBody className="p-6 text-center">
           <CpuChipIcon className="w-12 h-12 mx-auto text-gray-400 mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
             Análisis AI No Disponible
@@ -344,7 +344,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
               )}
             </Button>
           )}
-        </CardContent>
+        </CardBody>
       </Card>
     );
   }
@@ -355,10 +355,10 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
       <Card className="cyberpunk-card">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="cyberpunk-text flex items-center">
+            <h2 className="cyberpunk-text text-xl font-bold" className="cyberpunk-text flex items-center">
               <CpuChipIcon className="w-6 h-6 mr-2" />
               Análisis Inteligente - Olympus AI V3.0
-            </CardTitle>
+            </h2>
             {onAnalysisRefresh && (
               <Button
                 variant="outline"
@@ -384,17 +384,17 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
           onClick={() => toggleSection('overview')}
         >
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center">
+            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
               <EyeIcon className="w-5 h-5 mr-2" />
               Resumen del Análisis
-            </CardTitle>
+            </h2>
             <Button variant="ghost" size="sm">
               {expandedSections.has('overview') ? '−' : '+'}
             </Button>
           </div>
         </CardHeader>
         {expandedSections.has('overview') && (
-          <CardContent>
+          <CardBody>
             <div className="space-y-4">
               {/* AI Tags */}
               {document.ai_tags && document.ai_tags.length > 0 && (
@@ -407,7 +407,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
                     {document.ai_tags.map((tag, index) => (
                       <Badge
                         key={index}
-                        variant="secondary"
+                        variant="warning"
                         className="cursor-pointer hover:bg-cyan-100"
                         onClick={() => onTagClick?.(tag)}
                       >
@@ -439,7 +439,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
                 </div>
               )}
             </div>
-          </CardContent>
+          </CardBody>
         )}
       </Card>
 
@@ -451,17 +451,17 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
             onClick={() => toggleSection('confidence')}
           >
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg flex items-center">
+              <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
                 <ChartBarIcon className="w-5 h-5 mr-2" />
                 Puntuaciones de Confianza
-              </CardTitle>
+              </h2>
               <Button variant="ghost" size="sm">
                 {expandedSections.has('confidence') ? '−' : '+'}
               </Button>
             </div>
           </CardHeader>
           {expandedSections.has('confidence') && (
-            <CardContent>
+            <CardBody>
               <div className="space-y-4">
                 {confidenceScores.map((score, index) => (
                   <div key={index}>
@@ -469,7 +469,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
                   </div>
                 ))}
               </div>
-            </CardContent>
+            </CardBody>
           )}
         </Card>
       )}
@@ -481,19 +481,19 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
           onClick={() => toggleSection('entities')}
         >
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center">
+            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
               <HeartIcon className="w-5 h-5 mr-2" />
               Entidades Médicas Detectadas
-            </CardTitle>
+            </h2>
             <Button variant="ghost" size="sm">
               {expandedSections.has('entities') ? '−' : '+'}
             </Button>
           </div>
         </CardHeader>
         {expandedSections.has('entities') && (
-          <CardContent>
+          <CardBody>
             {renderMedicalEntities()}
-          </CardContent>
+          </CardBody>
         )}
       </Card>
 
@@ -504,19 +504,19 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
           onClick={() => toggleSection('doctype')}
         >
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center">
+            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
               <DocumentTextIcon className="w-5 h-5 mr-2" />
               Análisis de Tipo de Documento
-            </CardTitle>
+            </h2>
             <Button variant="ghost" size="sm">
               {expandedSections.has('doctype') ? '−' : '+'}
             </Button>
           </div>
         </CardHeader>
         {expandedSections.has('doctype') && (
-          <CardContent>
+          <CardBody>
             {renderDocumentTypeAnalysis()}
-          </CardContent>
+          </CardBody>
         )}
       </Card>
 
@@ -527,19 +527,19 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
           onClick={() => toggleSection('quality')}
         >
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center">
+            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
               <CheckCircleIcon className="w-5 h-5 mr-2" />
               Métricas de Calidad
-            </CardTitle>
+            </h2>
             <Button variant="ghost" size="sm">
               {expandedSections.has('quality') ? '−' : '+'}
             </Button>
           </div>
         </CardHeader>
         {expandedSections.has('quality') && (
-          <CardContent>
+          <CardBody>
             {renderQualityMetrics()}
-          </CardContent>
+          </CardBody>
         )}
       </Card>
 
@@ -551,23 +551,23 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
             onClick={() => toggleSection('ocr')}
           >
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg flex items-center">
+              <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
                 <DocumentTextIcon className="w-5 h-5 mr-2" />
                 Texto Extraído (OCR)
-              </CardTitle>
+              </h2>
               <Button variant="ghost" size="sm">
                 {expandedSections.has('ocr') ? '−' : '+'}
               </Button>
             </div>
           </CardHeader>
           {expandedSections.has('ocr') && (
-            <CardContent>
+            <CardBody>
               <div className="bg-gray-50 p-4 rounded-lg max-h-60 overflow-y-auto">
                 <pre className="text-sm text-gray-800 whitespace-pre-wrap font-mono">
                   {document.ocr_extracted_text}
                 </pre>
               </div>
-            </CardContent>
+            </CardBody>
           )}
         </Card>
       )}

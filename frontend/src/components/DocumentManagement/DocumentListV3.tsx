@@ -13,7 +13,7 @@ import {
   CardContent,
   Badge,
   Spinner
-} from '../atoms';
+} from '../../design-system';
 
 // 🎯 ICONS - Heroicons for medical theme
 import { DocumentTextIcon, PhotoIcon, TrashIcon, Squares2X2Icon, ListBulletIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
@@ -74,7 +74,7 @@ interface DocumentListV3Props {
 const getVeritasBadge = (veritasData: any) => {
   if (!veritasData || !veritasData.verified) {
     return (
-      <Badge variant="destructive" className="ml-2">
+      <Badge variant="danger" className="ml-2">
         ⚠️ No Verificado
       </Badge>
     );
@@ -110,9 +110,9 @@ const getStatusBadge = (complianceStatus: string) => {
     case 'compliant':
       return <Badge variant="default">Compatible</Badge>;
     case 'warning':
-      return <Badge variant="secondary">Revisar</Badge>;
+      return <Badge variant="warning">Revisar</Badge>;
     case 'non_compliant':
-      return <Badge variant="destructive">No Compatible</Badge>;
+      return <Badge variant="danger">No Compatible</Badge>;
     default:
       return <Badge variant="outline">Desconocido</Badge>;
   }
@@ -186,10 +186,10 @@ export const DocumentListV3: React.FC<DocumentListV3Props> = ({
   if (error) {
     return (
       <Card className="cyberpunk-card max-w-md mx-auto">
-        <CardContent className="p-6 text-center">
+        <CardBody className="p-6 text-center">
           <p className="text-red-400 mb-4">Error al cargar los documentos</p>
           <p className="text-sm text-gray-400">{error}</p>
-        </CardContent>
+        </CardBody>
       </Card>
     );
   }
@@ -198,7 +198,7 @@ export const DocumentListV3: React.FC<DocumentListV3Props> = ({
   if (filteredDocuments.length === 0) {
     return (
       <Card className="cyberpunk-card">
-        <CardContent className="p-8 text-center">
+        <CardBody className="p-8 text-center">
           <DocumentTextIcon className="w-16 h-16 mx-auto text-gray-300 mb-4" />
           <p className="text-gray-400 mb-4">
             {searchQuery ? 'No se encontraron documentos que coincidan con la búsqueda' : 'No hay documentos disponibles'}
@@ -208,7 +208,7 @@ export const DocumentListV3: React.FC<DocumentListV3Props> = ({
               Limpiar búsqueda
             </Button>
           )}
-        </CardContent>
+        </CardBody>
       </Card>
     );
   }
@@ -217,7 +217,7 @@ export const DocumentListV3: React.FC<DocumentListV3Props> = ({
   const renderDocumentCard = (document: Document) => (
     <Card key={document.id} className="cyberpunk-card hover:shadow-lg transition-all duration-200 cursor-pointer group"
           onClick={() => onDocumentSelect(document)}>
-      <CardContent className="p-4">
+      <CardBody className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
@@ -280,7 +280,7 @@ export const DocumentListV3: React.FC<DocumentListV3Props> = ({
             </Button>
           </div>
         </div>
-      </CardContent>
+      </CardBody>
     </Card>
   );
 

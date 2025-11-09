@@ -7,7 +7,11 @@
 import React, { useState, useEffect } from 'react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../atoms';
+// Design System imports
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 import { useDocumentLogger } from '../../utils/documentLogger';
 
@@ -261,7 +265,7 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
 
   const renderSearchBar = () => (
     <Card className="cyberpunk-card">
-      <CardContent className="p-4">
+      <CardBody className="p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <input
             type="text"
@@ -271,7 +275,7 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
             className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
         </div>
-      </CardContent>
+      </CardBody>
     </Card>
   );
 
@@ -293,12 +297,12 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
 
       return (
         <Card className="cyberpunk-card">
-          <CardContent className="p-8 text-center">
+          <CardBody className="p-8 text-center">
             <p className="text-gray-400 mb-4">Selecciona archivos para subir al sistema Olympus</p>
             <Button onClick={() => setShowUploader(true)}>
               Comenzar Subida
             </Button>
-          </CardContent>
+          </CardBody>
         </Card>
       );
     }
@@ -361,7 +365,7 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
                 {/* Document Details Card */}
                 <Card className="cyberpunk-card">
                   <CardHeader>
-                    <CardTitle className="cyberpunk-text text-2xl">{selectedDocument.title}</CardTitle>
+                    <h2 className="cyberpunk-text text-xl font-bold" className="cyberpunk-text text-2xl">{selectedDocument.title}</h2>
                     <div className="flex items-center space-x-2 mt-2">
                       <Badge variant="default">Compatible</Badge>
                       {selectedDocument.ai_analyzed && (
@@ -369,7 +373,7 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
                       )}
                     </div>
                   </CardHeader>
-                  <CardContent>
+                  <CardBody>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-4">
                         <h3 className="text-lg font-semibold cyberpunk-text">Información del Archivo</h3>
@@ -392,7 +396,7 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
                         </div>
                       </div>
                     </div>
-                  </CardContent>
+                  </CardBody>
                 </Card>
 
                 {/* AI Analysis */}
@@ -431,7 +435,7 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
     return (
       <div className="flex justify-center items-center h-64">
         <Card className="cyberpunk-card max-w-md">
-          <CardContent className="p-6 text-center">
+          <CardBody className="p-6 text-center">
             <p className="text-red-400 mb-4">Error al cargar los documentos</p>
             <p className="text-sm text-gray-400 mb-4">
               {queryError.message}
@@ -439,7 +443,7 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
             <Button onClick={() => refetchDocuments()}>
               Reintentar
             </Button>
-          </CardContent>
+          </CardBody>
         </Card>
       </div>
     );
