@@ -18,8 +18,12 @@ import {
   UPDATE_TREATMENT_V3
 } from '../../graphql/queries/treatments';
 
-// Atomic Components
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Spinner, Badge } from '../atoms';
+// Design System Components
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Button } from '../../design-system/Button';
+import { Input } from '../../design-system/Input';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 
 // 3D Components
 import Odontogram3DV3 from './Odontogram3DV3';
@@ -35,7 +39,7 @@ import AestheticsPreviewV3 from './AestheticsPreviewV3';
 const getVeritasBadge = (veritasData: any) => {
   if (!veritasData || !veritasData.verified) {
     return (
-      <Badge variant="destructive" className="ml-2">
+      <Badge variant="error" className="ml-2">
         ⚠️ No Verificado
       </Badge>
     );
@@ -362,11 +366,11 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
       {/* Treatments List */}
       <Card className="cyberpunk-card">
         <CardHeader>
-          <CardTitle className="cyberpunk-text">
+          <h3 className="text-lg font-semibold cyberpunk-text">
             {patientId ? 'Tratamientos del Paciente' : 'Todos los Tratamientos'}
-          </CardTitle>
+          </h3>
         </CardHeader>
-        <CardContent>
+        <CardBody>
           {loading ? (
             <div className="flex justify-center py-8">
               <Spinner size="lg" />
@@ -390,7 +394,7 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
               No se encontraron tratamientos
             </div>
           )}
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );
@@ -401,9 +405,9 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
       <Card className="cyberpunk-card">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>
+            <h3 className="text-lg font-semibold">
               {patientId ? 'Tratamientos del Paciente' : 'Todos los Tratamientos'}
-            </CardTitle>
+            </h3>
             <div className="flex items-center space-x-2">
               <Input
                 placeholder="Buscar tratamientos..."
@@ -420,7 +424,7 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardBody>
           {loading ? (
             <div className="flex justify-center py-8">
               <Spinner size="lg" />
@@ -443,7 +447,7 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
               No se encontraron tratamientos
             </div>
           )}
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );
@@ -451,11 +455,11 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
   const renderTreatmentForm = () => (
     <Card className="cyberpunk-card">
       <CardHeader>
-        <CardTitle className="cyberpunk-text">
+        <h3 className="text-lg font-semibold cyberpunk-text">
           {selectedTreatment ? 'Editar Tratamiento' : 'Nuevo Tratamiento'}
-        </CardTitle>
+        </h3>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardBody className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Paciente ID *</label>
@@ -576,7 +580,7 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
             {selectedTreatment ? 'Actualizar' : 'Crear'} Tratamiento
           </Button>
         </div>
-      </CardContent>
+      </CardBody>
     </Card>
   );
 
@@ -586,11 +590,11 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
     return (
       <Card className="cyberpunk-card">
         <CardHeader>
-          <CardTitle className="cyberpunk-text text-2xl">
+          <h3 className="cyberpunk-text text-2xl">
             Detalles del Tratamiento - {selectedTreatment.treatmentType}
-          </CardTitle>
+          </h3>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardBody className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">
               <div className="flex items-center gap-2">
@@ -669,13 +673,13 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
               Editar
             </Button>
             <Button
-              variant="destructive"
+              variant="danger"
               onClick={() => handleDeleteTreatment(selectedTreatment.id)}
             >
               Eliminar
             </Button>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     );
   };
@@ -712,11 +716,11 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
       {/* Error Display */}
       {error && (
         <Card className="border-red-500 mb-6">
-          <CardContent className="pt-6">
+          <CardBody className="pt-6">
             <div className="text-red-400">
               <strong>Error:</strong> {error}
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
       )}
 
@@ -798,9 +802,9 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <Card className="p-6 max-w-md">
             <CardHeader>
-              <CardTitle className="text-red-400">Confirmar Eliminación</CardTitle>
+              <h3 className="text-red-400">Confirmar Eliminación</h3>
             </CardHeader>
-            <CardContent>
+            <CardBody>
               <p className="text-gray-300 mb-6">
                 ¿Estás seguro de que quieres eliminar este tratamiento? Esta acción no se puede deshacer.
               </p>
@@ -812,7 +816,7 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
                   Cancelar
                 </Button>
                 <Button
-                  variant="destructive"
+                  variant="danger"
                   onClick={confirmDeleteTreatment}
                   disabled={deleteLoading}
                 >
@@ -820,7 +824,7 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
                   Eliminar
                 </Button>
               </div>
-            </CardContent>
+            </CardBody>
           </Card>
         </div>
       )}
@@ -829,3 +833,5 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
 };
 
 export default TreatmentManagementV3;
+
+
