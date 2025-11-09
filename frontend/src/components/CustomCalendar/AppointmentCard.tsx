@@ -29,7 +29,7 @@ import { format } from 'date-fns';
 import './styles/animations.css';
 
 export interface AppointmentData {
-  id: string;
+  id?: string;
   patientName: string;
   patientId: string;
   patientPhone?: string;
@@ -45,6 +45,14 @@ export interface AppointmentData {
   doctorName?: string;
   treatmentCode?: string;
   estimatedCost?: number;
+  
+  // 💀 @VERITAS QUANTUM VERIFICATION - PHASE 5
+  _veritas?: {
+    verified: boolean;
+    confidence: number;
+    level: string;
+    certificate?: string;
+  };
 }
 
 interface AppointmentCardProps {
@@ -400,22 +408,36 @@ export function AppointmentCard({
         </div>
       )}
 
-      {/* Quick Actions (only show on hover) */}
+      {/* Quick Actions (only show on hover) - PHASE 5 ENHANCED */}
       {showQuickActions && isHovered && !isDragging && (
         <div className="quick-actions absolute top-1 right-1 flex space-x-1 z-10">
           <button
             onClick={(e) => handleQuickAction(e, 'edit')}
-            className="w-5 h-5 bg-white rounded-full shadow text-xs flex items-center justify-center hover:bg-gray-50"
+            className="w-6 h-6 bg-white rounded-full shadow text-xs flex items-center justify-center hover:bg-blue-50 transition-colors"
             title="Editar cita"
           >
             ✏️
           </button>
           <button
+            onClick={(e) => handleQuickAction(e, 'complete')}
+            className="w-6 h-6 bg-white rounded-full shadow text-xs flex items-center justify-center hover:bg-green-50 transition-colors"
+            title="Marcar completada"
+          >
+            ✓
+          </button>
+          <button
             onClick={(e) => handleQuickAction(e, 'call')}
-            className="w-5 h-5 bg-white rounded-full shadow text-xs flex items-center justify-center hover:bg-gray-50"
+            className="w-6 h-6 bg-white rounded-full shadow text-xs flex items-center justify-center hover:bg-yellow-50 transition-colors"
             title="Llamar paciente"
           >
             📞
+          </button>
+          <button
+            onClick={(e) => handleQuickAction(e, 'delete')}
+            className="w-6 h-6 bg-white rounded-full shadow text-xs flex items-center justify-center hover:bg-red-50 transition-colors"
+            title="Eliminar cita"
+          >
+            🗑️
           </button>
         </div>
       )}
@@ -517,14 +539,33 @@ export function AppointmentCard({
 
           {/* Status and actions row */}
           <div className="flex items-center justify-between">
-            <div className={`
-              ${isCompact ? 'text-xs px-1 py-0.5' : 'text-xs px-2 py-1'} rounded-full font-medium
-              ${appointment.status === 'confirmed' ? 'bg-green-200 text-green-800' : ''}
-              ${appointment.status === 'pending' ? 'bg-yellow-200 text-yellow-800' : ''}
-              ${appointment.status === 'cancelled' ? 'bg-red-200 text-red-800' : ''}
-              ${appointment.status === 'completed' ? 'bg-gray-200 text-gray-800' : ''}
-            `}>
-              {STATUS_LABELS[appointment.status] || appointment.status}
+            <div className="flex items-center space-x-1">
+              {/* Status Badge */}
+              <div className={`
+                ${isCompact ? 'text-xs px-1 py-0.5' : 'text-xs px-2 py-1'} rounded-full font-medium
+                ${appointment.status === 'confirmed' ? 'bg-green-200 text-green-800' : ''}
+                ${appointment.status === 'pending' ? 'bg-yellow-200 text-yellow-800' : ''}
+                ${appointment.status === 'cancelled' ? 'bg-red-200 text-red-800' : ''}
+                ${appointment.status === 'completed' ? 'bg-gray-200 text-gray-800' : ''}
+              `}>
+                {STATUS_LABELS[appointment.status] || appointment.status}
+              </div>
+              
+              {/* 💀 @VERITAS TRUST BADGE - PHASE 5 */}
+              {appointment._veritas?.verified && appointment._veritas.confidence >= 0.7 && (
+                <div 
+                  className={`
+                    text-xs px-1.5 py-0.5 rounded-full font-bold flex items-center space-x-0.5
+                    ${appointment._veritas.confidence >= 0.9 ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white' : 
+                      appointment._veritas.confidence >= 0.7 ? 'bg-cyan-100 text-cyan-800 border border-cyan-300' : 
+                      'bg-gray-100 text-gray-600'}
+                  `}
+                  title={`@veritas verified: ${(appointment._veritas.confidence * 100).toFixed(1)}% confidence`}
+                >
+                  <span>✓</span>
+                  {!isCompact && <span>Verificado</span>}
+                </div>
+              )}
             </div>
             
             {/* Compact time display */}
