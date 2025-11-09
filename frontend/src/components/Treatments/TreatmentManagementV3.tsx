@@ -7,7 +7,7 @@
  */
 
 import React, { useState } from 'react';
-import { useQuery, useMutation } from '@apollo/client/react';
+import { useQuery, useMutation, useSubscription } from '@apollo/client/react';
 // Removed unused UI helper components (TreatmentFilters, TreatmentStats, AITreatmentInsights)
 
 // GraphQL Operations V3 - @veritas Enhanced
@@ -15,7 +15,8 @@ import {
   DELETE_TREATMENT,
   GET_TREATMENTS_V3,
   CREATE_TREATMENT_V3,
-  UPDATE_TREATMENT_V3
+  UPDATE_TREATMENT_V3,
+  TREATMENT_V3_UPDATED
 } from '../../graphql/queries/treatments';
 
 // Design System Components
@@ -225,6 +226,16 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
 
   const [deleteTreatmentMutation, { loading: deleteLoading }] = useMutation(DELETE_TREATMENT, {
     refetchQueries: [{ query: GET_TREATMENTS_V3, variables: { patientId, limit: 50, offset: 0 } }]
+  });
+
+  // Real-time subscription for treatment updates
+  useSubscription(TREATMENT_V3_UPDATED, {
+    onData: ({ data }) => {
+      if ((data as any)?.data?.treatmentV3Updated) {
+        console.log('🦷 Treatment updated via subscription', (data as any).data.treatmentV3Updated);
+        refetchTreatments();
+      }
+    }
   });
 
   // ============================================================================

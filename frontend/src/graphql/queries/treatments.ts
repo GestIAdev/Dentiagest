@@ -272,3 +272,49 @@ export const DELETE_TREATMENT = gql`
   }
 `;
 
+// ============================================================================
+// TREATMENT SUBSCRIPTIONS V3 - REAL-TIME UPDATES 🔥
+// ============================================================================
+
+export const TREATMENT_V3_UPDATED = gql`
+  subscription TreatmentV3Updated {
+    treatmentV3Updated {
+      id
+      patientId
+      patientId_veritas
+      practitionerId
+      practitionerId_veritas
+      treatmentType
+      treatmentType_veritas
+      description
+      description_veritas
+      status
+      status_veritas
+      startDate
+      startDate_veritas
+      endDate
+      endDate_veritas
+      cost
+      cost_veritas
+      notes
+      notes_veritas
+      aiRecommendations
+      aiRecommendations_veritas
+      veritasScore
+      createdAt
+      updatedAt
+      
+      # @veritas quantum verification metadata
+      _veritas {
+        verified
+        confidence
+        level
+        certificate
+        error
+        verifiedAt
+        algorithm
+      }
+    }
+  }
+`;
+
