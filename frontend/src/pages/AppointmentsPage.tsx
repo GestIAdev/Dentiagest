@@ -25,6 +25,16 @@ import { Badge } from '../design-system/Badge';
 // 📅 CUSTOM CALENDAR (Beautiful UI)
 import CalendarContainer from '../components/CustomCalendar/CalendarContainerSimple';
 
+// 🔥 GRAPHQL V3 ADAPTER
+import { 
+  GraphQLCalendarAdapter,
+  type GraphQLAppointmentV3 
+} from '../components/CustomCalendar/adapters/graphqlAdapter';
+import type { AppointmentData } from '../components/CustomCalendar/AppointmentCard';
+
+// 🎨 EDIT APPOINTMENT MODAL V3
+import { EditAppointmentModalV3 } from '../components/Appointments/EditAppointmentModalV3';
+
 // 📊 APPOINTMENT COMPONENTS (V3 GraphQL)
 // Note: We'll extract list view from AppointmentManagementV3
 // For now, we use the calendar as primary view
@@ -55,6 +65,9 @@ type ViewMode = 'calendar' | 'list' | 'stats';
 const AppointmentsPage: React.FC = () => {
   // 📊 STATE
   const [view, setView] = useState<ViewMode>('calendar');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<AppointmentData | null>(null);
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
 
   // 🔌 GRAPHQL V3 QUERY
   const { data, loading, error, refetch } = useQuery(GET_APPOINTMENTS_V3, {
@@ -70,10 +83,55 @@ const AppointmentsPage: React.FC = () => {
   const [updateAppointment] = useMutation(UPDATE_APPOINTMENT_V3);
   const [deleteAppointment] = useMutation(DELETE_APPOINTMENT);
 
-  // 📊 DATA EXTRACTION
-  const appointments = (data as any)?.appointmentsV3 || [];
+  // 📊 DATA EXTRACTION + ADAPTER
+  const rawAppointments: GraphQLAppointmentV3[] = (data as any)?.appointmentsV3 || [];
+  
+  // 🔥 CONVERT GRAPHQL V3 → CALENDAR FORMAT
+  const calendarAppointments: AppointmentData[] = GraphQLCalendarAdapter.toCalendarArray(
+    rawAppointments
+  );
 
-  // 🎨 RENDER LOADING
+  // � MODAL HANDLERS
+  const handleAppointmentClick = (appointment: AppointmentData) => {
+    setSelectedAppointment(appointment);
+    setModalMode('edit');
+    setModalOpen(true);
+  };
+
+  const handleTimeSlotClick = (date: Date, time: string) => {
+    // Create temporary appointment with clicked date/time
+    const [hours, minutes] = time.split(':');
+    const startTime = new Date(date);
+    startTime.setHours(parseInt(hours), parseInt(minutes), 0);
+
+    const endTime = new Date(startTime);
+    endTime.setMinutes(endTime.getMinutes() + 30); // Default 30 min
+
+    setSelectedAppointment({
+      id: undefined,
+      patientId: '',
+      patientName: '',
+      startTime,
+      endTime,
+      duration: 30,
+      type: 'consultation',
+      status: 'pending',
+      priority: 'normal',
+    } as AppointmentData);
+    setModalMode('create');
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setSelectedAppointment(null);
+  };
+
+  const handleModalSuccess = () => {
+    refetch(); // Refresh appointments list
+  };
+
+  // �🎨 RENDER LOADING
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -113,7 +171,7 @@ const AppointmentsPage: React.FC = () => {
                 📅 Citas
               </h1>
               <Badge variant="info" size="sm">
-                {appointments.length} citas
+                {rawAppointments.length} citas
               </Badge>
             </div>
 
@@ -150,11 +208,13 @@ const AppointmentsPage: React.FC = () => {
         {/* 📅 CALENDAR VIEW */}
         {view === 'calendar' && (
           <div className="bg-white rounded-lg shadow-sm">
-            {/* TODO Phase 2: Pass GraphQL data to CustomCalendar */}
-            <CalendarContainer />
-            <div className="p-4 text-center text-gray-500">
-              📅 CustomCalendar integration - Phase 2 (next task)
-            </div>
+            {/* 🔥 PHASE 2: GRAPHQL V3 INTEGRATED! */}
+            <CalendarContainer 
+              appointments={calendarAppointments}
+              onAppointmentClick={handleAppointmentClick}
+              onTimeSlotClick={handleTimeSlotClick}
+              onAppointmentUpdate={() => refetch()}
+            />
           </div>
         )}
 
@@ -166,37 +226,46 @@ const AppointmentsPage: React.FC = () => {
             </CardHeader>
             <CardBody>
               <div className="space-y-4">
-                {appointments.length === 0 ? (
+                {rawAppointments.length === 0 ? (
                   <p className="text-gray-500 text-center py-8">
                     No hay citas programadas
                   </p>
                 ) : (
-                  appointments.map((appointment: Appointment) => (
-                    <div
-                      key={appointment.id}
-                      className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
-                    >
-                      <div>
-                        <h3 className="font-semibold">
-                          {appointment.patient?.firstName} {appointment.patient?.lastName}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          {appointment.appointmentDate} - {appointment.appointmentTime}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {appointment.type}
-                        </p>
+                  rawAppointments.map((appointment) => {
+                    // Convert to calendar format for modal
+                    const calendarApt = GraphQLCalendarAdapter.toCalendar(appointment);
+                    
+                    return (
+                      <div
+                        key={appointment.id}
+                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
+                      >
+                        <div>
+                          <h3 className="font-semibold">
+                            {appointment.patient?.firstName} {appointment.patient?.lastName}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            {appointment.appointmentDate} - {appointment.appointmentTime}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {appointment.type}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant={getStatusVariant(appointment.status as any)}>
+                            {appointment.status}
+                          </Badge>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleAppointmentClick(calendarApt)}
+                          >
+                            Editar
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant={getStatusVariant(appointment.status)}>
-                          {appointment.status}
-                        </Badge>
-                        <Button variant="outline" size="sm">
-                          Editar
-                        </Button>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             </CardBody>
@@ -210,7 +279,7 @@ const AppointmentsPage: React.FC = () => {
               <CardBody>
                 <h3 className="text-lg font-semibold text-gray-700">Hoy</h3>
                 <p className="text-3xl font-bold text-primary-600">
-                  {getTodayAppointments(appointments).length}
+                  {getTodayAppointments(rawAppointments).length}
                 </p>
                 <p className="text-sm text-gray-500">citas programadas</p>
               </CardBody>
@@ -220,7 +289,7 @@ const AppointmentsPage: React.FC = () => {
               <CardBody>
                 <h3 className="text-lg font-semibold text-gray-700">Esta Semana</h3>
                 <p className="text-3xl font-bold text-primary-600">
-                  {getThisWeekAppointments(appointments).length}
+                  {getThisWeekAppointments(rawAppointments).length}
                 </p>
                 <p className="text-sm text-gray-500">citas programadas</p>
               </CardBody>
@@ -230,7 +299,7 @@ const AppointmentsPage: React.FC = () => {
               <CardBody>
                 <h3 className="text-lg font-semibold text-gray-700">Completadas</h3>
                 <p className="text-3xl font-bold text-green-600">
-                  {getCompletedAppointments(appointments).length}
+                  {getCompletedAppointments(rawAppointments).length}
                 </p>
                 <p className="text-sm text-gray-500">este mes</p>
               </CardBody>
@@ -238,6 +307,15 @@ const AppointmentsPage: React.FC = () => {
           </div>
         )}
       </main>
+
+      {/* 🎨 EDIT/CREATE MODAL */}
+      <EditAppointmentModalV3
+        isOpen={modalOpen}
+        onClose={handleModalClose}
+        appointment={selectedAppointment || undefined}
+        onSuccess={handleModalSuccess}
+        mode={modalMode}
+      />
     </div>
   );
 };
@@ -259,26 +337,26 @@ function getStatusVariant(status: string): 'default' | 'success' | 'warning' | '
   }
 }
 
-function getTodayAppointments(appointments: Appointment[]): Appointment[] {
+function getTodayAppointments(rawAppts: GraphQLAppointmentV3[]): GraphQLAppointmentV3[] {
   const today = new Date().toISOString().split('T')[0];
-  return appointments.filter(apt => apt.appointmentDate === today);
+  return rawAppts.filter(apt => apt.appointmentDate === today);
 }
 
-function getThisWeekAppointments(appointments: Appointment[]): Appointment[] {
+function getThisWeekAppointments(rawAppts: GraphQLAppointmentV3[]): GraphQLAppointmentV3[] {
   const today = new Date();
   const weekStart = new Date(today);
   weekStart.setDate(today.getDate() - today.getDay() + 1);
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekStart.getDate() + 6);
 
-  return appointments.filter(apt => {
+  return rawAppts.filter(apt => {
     const aptDate = new Date(apt.appointmentDate);
     return aptDate >= weekStart && aptDate <= weekEnd;
   });
 }
 
-function getCompletedAppointments(appointments: Appointment[]): Appointment[] {
-  return appointments.filter(apt => apt.status === 'completed');
+function getCompletedAppointments(rawAppts: GraphQLAppointmentV3[]): GraphQLAppointmentV3[] {
+  return rawAppts.filter(apt => apt.status === 'completed');
 }
 
 export default AppointmentsPage;
