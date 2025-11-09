@@ -10,6 +10,8 @@ import React, { useState, useMemo } from 'react';
 import { useMedicalRecordStore } from '../../stores';
 import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../atoms';
 import { createModuleLogger } from '../../utils/logger';
+import { useMedicalSecurity } from './MedicalSecurity';
+import { DocumentUploaderV3 } from '../DocumentManagement/DocumentUploaderV3';
 
 // 🎯 ICONS - Heroicons for medical theme
 import {
@@ -71,10 +73,14 @@ export const MedicalRecordDetailV3: React.FC<MedicalRecordDetailV3Props> = ({
 }) => {
   // 🎯 MEDICAL RECORD STORE - Apollo Nuclear State Management
   const { patientMedicalRecords, getMedicalRecordTimeline } = useMedicalRecordStore();
+  
+  // 🔒 SECURITY CONTEXT - Check upload permissions
+  const { accessLevel } = useMedicalSecurity();
 
   // 🎯 LOCAL STATE - Always call hooks first
   const [activeTab, setActiveTab] = useState<'overview' | 'timeline' | 'attachments'>('overview');
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [showUploader, setShowUploader] = useState(false);
 
   // 🎯 FIND CURRENT RECORD
   const currentRecord = useMemo(() => {
@@ -569,10 +575,34 @@ export const MedicalRecordDetailV3: React.FC<MedicalRecordDetailV3Props> = ({
             {/* Attachments Tab */}
             {activeTab === 'attachments' && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <PhotoIcon className="w-5 h-5 mr-2" />
-                  Archivos Adjuntos
-                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <PhotoIcon className="w-5 h-5 mr-2" />
+                    Archivos Adjuntos
+                  </h3>
+                  
+                  {/* 🔥 UPLOAD BUTTON - Phase 2 Integration */}
+                  {accessLevel.canUploadDocuments && (
+                    <Button
+                      onClick={() => setShowUploader(!showUploader)}
+                      variant="default"
+                      size="sm"
+                    >
+                      <PhotoIcon className="w-4 h-4 mr-2" />
+                      {showUploader ? 'Ocultar' : 'Subir Documento'}
+                    </Button>
+                  )}
+                </div>
+
+                {/* 🔥 DOCUMENT UPLOADER - Integration with medicalRecordId */}
+                {showUploader && accessLevel.canUploadDocuments && (
+                  <div className="mb-6">
+                    <DocumentUploaderV3
+                      patientId={currentRecord.patient_id}
+                      medicalRecordId={recordId}
+                    />
+                  </div>
+                )}
 
                 {currentRecord.attachments && (currentRecord.attachments as any[]).length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

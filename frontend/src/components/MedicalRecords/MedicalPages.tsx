@@ -25,7 +25,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import MedicalRecordsList from './MedicalRecordsList';
+import MedicalRecordsList from './MedicalRecordsListV3';
 import { MedicalRecordFormV3 as MedicalRecordForm } from './MedicalRecordFormV3'; // Migrated to V3
 import { MedicalRecordDetailV3 as MedicalRecordDetail } from './MedicalRecordDetailV3'; // Migrated to V3
 import { SensitiveDataWarning } from './MedicalSecurity';

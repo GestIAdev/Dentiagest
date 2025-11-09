@@ -20,7 +20,7 @@ import { createAdvancedCache } from './advanced-cache';
 
 // 🎯 HTTP LINK - Core GraphQL endpoint with auth
 const httpLink = createHttpLink({
-  uri: process.env.REACT_APP_GRAPHQL_URI || 'http://localhost:8000/graphql', // Load Balancer port for PM2 cluster
+  uri: process.env.REACT_APP_GRAPHQL_URL || 'http://localhost:8005/graphql', // Selene Song Core (port 8005)
   credentials: 'include',
   headers: {
     'x-apollo-nuclear-version': '3.0',
@@ -54,7 +54,7 @@ const cache = createAdvancedCache();
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: process.env.REACT_APP_GRAPHQL_WS_URI || 'ws://localhost:8000/graphql', // Load Balancer WebSocket port
+    url: process.env.REACT_APP_WS_URL || 'ws://localhost:8005/graphql', // Selene Song Core WebSocket (port 8005)
     connectionParams: () => {
       const token = localStorage.getItem('accessToken');
       return {
@@ -64,8 +64,8 @@ const wsLink = new GraphQLWsLink(
       };
     },
     on: {
-      connected: () => console.log('🔗 GraphQL WebSocket connected'),
-      error: (error: any) => console.error('🔗 GraphQL WebSocket error:', error),
+      connected: () => console.log('🔗 GraphQL WebSocket connected to Selene (port 8005)'),
+      error: (error: any) => console.error('❌ GraphQL WebSocket error:', error),
       closed: () => console.log('🔗 GraphQL WebSocket closed'),
     },
   })

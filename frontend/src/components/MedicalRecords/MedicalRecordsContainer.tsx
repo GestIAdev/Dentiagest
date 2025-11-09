@@ -10,7 +10,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import MedicalRecordsList from './MedicalRecordsList';
+import MedicalRecordsList from './MedicalRecordsListV3';
 import { MedicalRecordFormV3 as MedicalRecordForm } from './MedicalRecordFormV3'; // V3: GraphQL V3, no apolloGraphQL
 import { MedicalRecordDetailV3 as MedicalRecordDetail } from './MedicalRecordDetailV3'; // Migrated to V3
 

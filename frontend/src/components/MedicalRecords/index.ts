@@ -31,8 +31,8 @@ export {
 // Componente principal - contenedor
 export { default as MedicalRecordsContainer } from './MedicalRecordsContainer';
 
-// Componentes individuales
-export { default as MedicalRecordsList } from './MedicalRecordsList';
+// Componentes individuales - V3 APOLLO NUCLEAR
+export { default as MedicalRecordsList } from './MedicalRecordsListV3'; // V3: Complete GraphQL migration
 export { MedicalRecordFormV3 as MedicalRecordForm } from './MedicalRecordFormV3'; // V3: GraphQL V3, no apolloGraphQL
 export { MedicalRecordDetailV3 as MedicalRecordDetail } from './MedicalRecordDetailV3'; // V3: Migration complete
 
