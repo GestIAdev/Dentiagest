@@ -417,7 +417,7 @@ const AestheticsPreviewV3: React.FC<AestheticsPreviewV3Props> = ({
         <div className="lg:col-span-2">
           <Card className="cyberpunk-card">
             <CardHeader>
-              <h3 className="text-lg font-semibold" className="cyberpunk-text">
+              <h3 className="text-lg font-semibold cyberpunk-text">
                 Preview 3D IA Cuántico
               </h3>
             </CardHeader>
@@ -489,7 +489,7 @@ const AestheticsPreviewV3: React.FC<AestheticsPreviewV3Props> = ({
           {/* Design Generator */}
           <Card className="cyberpunk-card">
             <CardHeader>
-              <h3 className="text-lg font-semibold" className="cyberpunk-text">
+              <h3 className="text-lg font-semibold cyberpunk-text">
                 Generador IA Ultra-Anonymizer
               </h3>
             </CardHeader>
@@ -565,7 +565,7 @@ const AestheticsPreviewV3: React.FC<AestheticsPreviewV3Props> = ({
           {selectedDesign && (
             <Card className="cyberpunk-card">
               <CardHeader>
-                <h3 className="text-lg font-semibold" className="cyberpunk-text flex items-center">
+                <h3 className="text-lg font-semibold cyberpunk-text flex items-center">
                   Diseño Actual
                   {getVeritasBadge(selectedDesign.veritas_verification)}
                   {getAnonymizerBadge(selectedDesign.ultra_anonymizer)}
@@ -615,7 +615,7 @@ const AestheticsPreviewV3: React.FC<AestheticsPreviewV3Props> = ({
           {/* Design History */}
           <Card className="cyberpunk-card">
             <CardHeader>
-              <h3 className="text-lg font-semibold" className="cyberpunk-text">
+              <h3 className="text-lg font-semibold cyberpunk-text">
                 Historial de Diseños
               </h3>
             </CardHeader>
@@ -667,4 +667,5 @@ export default AestheticsPreviewV3;
 // Status: ACTIVE - Integrated into Treatments Domain V142_SUCCESS
 // Architecture: Apollo GraphQL + @veritas + Ultra-Anonymizer + IA Generation + Cyberpunk
 // Features: 3D face preview, IA design generation, anonymization compliance, @veritas verification
+
 
