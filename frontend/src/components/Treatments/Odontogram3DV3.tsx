@@ -16,11 +16,12 @@ import { Input } from '../../design-system/Input';
 import { Badge } from '../../design-system/Badge';
 import { Spinner } from '../../design-system/Spinner';
 
-// 🎯 MOCK GRAPHQL OPERATIONS - Replace with actual queries when available
-const GET_ODONTOGRAM_DATA = { kind: 'Document', definitions: [] } as any;
-const UPDATE_TOOTH_STATUS = { kind: 'Document', definitions: [] } as any;
-const ODONTOGRAM_UPDATED_SUBSCRIPTION = { kind: 'Document', definitions: [] } as any;
-const GET_PATIENT_MOUTH_SCANS = { kind: 'Document', definitions: [] } as any;
+// 🦷💀 REAL GRAPHQL V3 OPERATIONS
+import {
+  GET_ODONTOGRAM_DATA_V3,
+  UPDATE_TOOTH_STATUS_V3,
+  ODONTOGRAM_UPDATED_V3,
+} from '../../graphql/queries/odontogram';
 
 // removed unused mock hook useVeritasVerification
 
@@ -242,32 +243,29 @@ const Odontogram3DV3: React.FC<Odontogram3DV3Props> = ({
   const verifyData = async (data: any, type: string) => ({ verified: true, confidence: 0.95 });
 
   // GraphQL Operations
-  const { data: odontogramData, loading, error, refetch } = useQuery(GET_ODONTOGRAM_DATA, {
+  const { data: odontogramData, loading, error, refetch } = useQuery(GET_ODONTOGRAM_DATA_V3, {
     variables: { patientId },
     skip: !patientId
   });
 
-  const { data: scansData } = useQuery(GET_PATIENT_MOUTH_SCANS, {
-    variables: { patientId },
-    skip: !patientId
-  });
-
-  const [updateToothStatus] = useMutation(UPDATE_TOOTH_STATUS);
+  const [updateToothStatus] = useMutation(UPDATE_TOOTH_STATUS_V3);
 
   // Real-time subscription
-  useSubscription(ODONTOGRAM_UPDATED_SUBSCRIPTION, {
+  useSubscription(ODONTOGRAM_UPDATED_V3, {
     variables: { patientId },
     onData: ({ data }) => {
-      if (data?.data?.odontogramUpdated) {
-        console.log('Odontogram updated via subscription', data.data.odontogramUpdated);
+      if ((data as any)?.data?.odontogramUpdatedV3) {
+        console.log('🦷 Odontogram updated via subscription', (data as any).data.odontogramUpdatedV3);
         refetch();
       }
     }
   });
 
   // Extract data
-  const teeth: ToothData[] = odontogramData?.odontogramData?.teeth || [];
-  const scans = scansData?.patientMouthScans || [];
+  const teeth: ToothData[] = (odontogramData as any)?.odontogramDataV3?.teeth || [];
+  
+  // Scans stub (GET_PATIENT_MOUTH_SCANS not implemented yet)
+  const scans: any[] = [];
 
   // Handle tooth selection
   const handleToothClick = (tooth: ToothData) => {
@@ -382,7 +380,7 @@ const Odontogram3DV3: React.FC<Odontogram3DV3Props> = ({
         <div className="lg:col-span-3">
           <Card className="cyberpunk-card">
             <CardHeader>
-              <h3 className="text-lg font-semibold" className="cyberpunk-text">
+              <h3 className="text-lg font-semibold cyberpunk-text">
                 Visualización 3D Cuántica
               </h3>
             </CardHeader>
@@ -441,7 +439,7 @@ const Odontogram3DV3: React.FC<Odontogram3DV3Props> = ({
           {selectedTooth && showToothDetails && (
             <Card className="cyberpunk-card">
               <CardHeader>
-                <h3 className="text-lg font-semibold" className="cyberpunk-text flex items-center">
+                <h3 className="text-lg font-semibold cyberpunk-text flex items-center">
                   Diente #{selectedTooth.toothNumber}
                   {getVeritasBadge(selectedTooth.scanIntegrity_veritas)}
                 </h3>
@@ -515,7 +513,7 @@ const Odontogram3DV3: React.FC<Odontogram3DV3Props> = ({
           {/* Scan List */}
           <Card className="cyberpunk-card">
             <CardHeader>
-              <h3 className="text-lg font-semibold" className="cyberpunk-text">
+              <h3 className="text-lg font-semibold cyberpunk-text">
                 Escaneos Disponibles
               </h3>
             </CardHeader>
@@ -565,4 +563,5 @@ export default Odontogram3DV3;
 // Status: ACTIVE - Integrated into Treatments Domain V142_SUCCESS
 // Architecture: Apollo GraphQL + @veritas + Real-Time + Cyberpunk + Three.js
 // Features: 3D tooth visualization, status management, treatment history, @veritas verification
+
 
