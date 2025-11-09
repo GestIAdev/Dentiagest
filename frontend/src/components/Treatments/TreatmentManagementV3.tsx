@@ -10,11 +10,8 @@ import React, { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 // Removed unused UI helper components (TreatmentFilters, TreatmentStats, AITreatmentInsights)
 
-// GraphQL Operations
+// GraphQL Operations V3 - @veritas Enhanced
 import {
-  GET_TREATMENTS,
-  CREATE_TREATMENT,
-  UPDATE_TREATMENT,
   DELETE_TREATMENT,
   GET_TREATMENTS_V3,
   CREATE_TREATMENT_V3,
