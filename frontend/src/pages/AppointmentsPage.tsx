@@ -3,7 +3,7 @@
 // Mission: Merge "Agenda" + "Citas Avanzadas" into single beautiful page
 // Architecture: GraphQL V3 + CustomCalendar + Design System
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useSubscription } from '@apollo/client/react';
 
 // 🎯 GRAPHQL V3 OPERATIONS
@@ -14,8 +14,8 @@ import {
   DELETE_APPOINTMENT
 } from '../graphql/queries/appointments';
 
-// 🔔 REAL-TIME SUBSCRIPTIONS (TODO: Create subscription file)
-// import { APPOINTMENT_V3_CREATED } from '../graphql/subscriptions';
+// 🔔 REAL-TIME SUBSCRIPTIONS - PHASE 4
+import { APPOINTMENT_UPDATES } from '../graphql/subscriptions';
 
 // 🎨 DESIGN SYSTEM
 import { Button } from '../design-system/Button';
@@ -68,6 +68,7 @@ const AppointmentsPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentData | null>(null);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  const [realtimeNotification, setRealtimeNotification] = useState<string | null>(null);
 
   // 🔌 GRAPHQL V3 QUERY
   const { data, loading, error, refetch } = useQuery(GET_APPOINTMENTS_V3, {
@@ -77,6 +78,42 @@ const AppointmentsPage: React.FC = () => {
     },
     fetchPolicy: 'cache-and-network'
   });
+
+  // 🔔 REAL-TIME WEBSOCKET SUBSCRIPTION - PHASE 4
+  const { data: subscriptionData } = useSubscription(APPOINTMENT_UPDATES, {
+    variables: {
+      clinicId: undefined, // TODO: Get from user context
+      dentistId: undefined
+    }
+  });
+
+  // 📡 REAL-TIME UPDATE EFFECT - Auto-refetch on subscription event
+  useEffect(() => {
+    if (subscriptionData && (subscriptionData as any)?.appointmentUpdates) {
+      const update = (subscriptionData as any).appointmentUpdates;
+      console.log('🔔 Real-time appointment update received:', update.action, update.appointment);
+      
+      // Show toast notification
+      const actionText: Record<string, string> = {
+        'CREATED': 'creada',
+        'UPDATED': 'actualizada',
+        'DELETED': 'eliminada',
+        'CONFIRMED': 'confirmada',
+        'COMPLETED': 'completada',
+        'CANCELLED': 'cancelada'
+      };
+
+      const message = `✨ Cita ${actionText[update.action] || 'modificada'}: ${update.appointment?.patientName || 'Sin nombre'}`;
+      console.log(message);
+      
+      // Show realtime notification badge
+      setRealtimeNotification(message);
+      setTimeout(() => setRealtimeNotification(null), 5000); // Hide after 5s
+      
+      // Refetch to update calendar
+      refetch();
+    }
+  }, [subscriptionData, refetch]);
 
   // 🎯 MUTATIONS
   const [createAppointment] = useMutation(CREATE_APPOINTMENT_V3);
@@ -162,7 +199,17 @@ const AppointmentsPage: React.FC = () => {
   // 🎨 RENDER MAIN UI
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 📱 HEADER */}
+      {/* � REAL-TIME NOTIFICATION TOAST */}
+      {realtimeNotification && (
+        <div className="fixed top-4 right-4 z-50 animate-fade-in">
+          <div className="bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2">
+            <span className="text-xl">🔔</span>
+            <span className="font-medium">{realtimeNotification}</span>
+          </div>
+        </div>
+      )}
+
+      {/* �📱 HEADER */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
