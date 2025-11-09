@@ -22,6 +22,7 @@ import { DocumentUploaderV3 } from './DocumentUploaderV3';
 import { AIDocumentAnalysisV3 } from './AIDocumentAnalysisV3';
 import { VeritasProofViewer } from './VeritasProofViewer';
 import DocumentViewerV3 from './DocumentViewerV3';
+import { DocumentDeleteProtocol } from './DocumentDeleteProtocol';
 
 // 🎯 GRAPHQL OPERATIONS - Apollo Nuclear Integration
 import { useQuery, useMutation } from '@apollo/client/react';
@@ -86,7 +87,52 @@ enum TabType {
   LEGAL = 'legal'
 }
 
-// (removed unused getVeritasBadge helper)
+// ⚖️💀 @VERITAS TRUST BADGE HELPER - LEGAL COMPLIANCE UI
+interface VeritasMetadata {
+  verified: boolean;
+  confidence: number;
+}
+
+const getVeritasBadge = (veritas?: VeritasMetadata, label?: string): React.ReactElement | null => {
+  if (!veritas) return null;
+  
+  const { verified, confidence } = veritas;
+  const confidencePercent = (confidence * 100).toFixed(0);
+  
+  // ULTRA VERIFIED (90%+ confidence) - Purple→Cyan gradient
+  if (verified && confidence >= 0.9) {
+    return (
+      <span className="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-gradient-to-r from-purple-500 to-cyan-400 text-white shadow-lg">
+        {label} {confidencePercent}% ✅
+      </span>
+    );
+  }
+  
+  // HIGH CONFIDENCE (70-89%) - Cyan border
+  if (verified && confidence >= 0.7) {
+    return (
+      <span className="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-400">
+        {label} {confidencePercent}%
+      </span>
+    );
+  }
+  
+  // MODERATE (<70%) - Yellow warning
+  if (verified) {
+    return (
+      <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-500/10 text-yellow-400 border border-yellow-400/50">
+        {label} {confidencePercent}%
+      </span>
+    );
+  }
+  
+  // ERROR - Red danger
+  return (
+    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-500/10 text-red-400 border border-red-400/50">
+      {label} ERROR
+    </span>
+  );
+};
 
 // 🎨 IANARKALENDAR-INSPIRED COLOR SYSTEM - OLYMPUS EDITION
 // Removed unused OLYMPUS_COLORS to reduce unused-vars warnings
@@ -123,6 +169,10 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
   const [showUploader, setShowUploader] = useState(false);
   const [viewerMode, setViewerMode] = useState<'details' | 'viewer'>('details');
   const [showAIOverlay, setShowAIOverlay] = useState(true);
+  
+  // ⚖️ DELETE PROTOCOL STATE - Legal compliance
+  const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
+  const [jurisdiction, setJurisdiction] = useState<'ES' | 'AR' | 'GDPR'>('ES'); // Default: Spain
   
   // 🔥 REAL-TIME SYNC STATE - Track document count for change detection
   const previousDocCountRef = useRef<number>(0);
@@ -222,20 +272,29 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
     setActiveTab(TabType.MEDICAL); // Switch to details view
   };
 
+  // ⚖️💀 DELETE HANDLER - Opens legal protocol modal
   const handleDocumentDelete = async (documentId: string) => {
     logger.logUserInteraction('delete_document_attempt', { documentId });
     const doc = documents.find((d: any) => d.id === documentId);
-    if (doc && window.confirm('¿Está seguro de que desea eliminar este documento?')) {
-      try {
-        await deleteDocumentMutation({
-          variables: { documentId },
-          refetchQueries: [{ query: GET_UNIFIED_DOCUMENTS, variables: { patientId, limit: 100, offset: 0 } }]
-        });
-        l.info('Document deleted successfully', { documentId });
-        setSelectedDocument(null);
-      } catch (error: any) {
-        l.error('Document deletion failed', error instanceof Error ? error : new Error(error.message));
-      }
+    if (doc) {
+      setDocumentToDelete(doc);
+      // Modal will handle legal validation
+    }
+  };
+  
+  // ⚖️ CONFIRM DELETE - After legal protocol approval
+  const handleConfirmDelete = async (documentId: string) => {
+    try {
+      await deleteDocumentMutation({
+        variables: { documentId },
+        refetchQueries: [{ query: GET_UNIFIED_DOCUMENTS, variables: { patientId, limit: 100, offset: 0 } }]
+      });
+      l.info('Document deleted successfully (legal protocol approved)', { documentId });
+      setDocumentToDelete(null);
+      setSelectedDocument(null);
+    } catch (error: any) {
+      l.error('Document deletion failed', error instanceof Error ? error : new Error(error.message));
+      throw error; // Re-throw so protocol modal can handle it
     }
   };
 
@@ -529,6 +588,16 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
           </div>
         </div>
       </div>
+      
+      {/* ⚖️💀 DELETE PROTOCOL MODAL - Legal compliance */}
+      {documentToDelete && (
+        <DocumentDeleteProtocol
+          document={documentToDelete}
+          jurisdiction={jurisdiction}
+          onConfirmDelete={handleConfirmDelete}
+          onCancel={() => setDocumentToDelete(null)}
+        />
+      )}
     </div>
   );
 };
