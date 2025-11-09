@@ -10,7 +10,7 @@ import SettingsPage from './pages/SettingsPage';
 import DashboardLayout from './components/Layout/DashboardLayout';
 import DashboardContent from './pages/DashboardContent';
 import PatientsPageGraphQL from './pages/PatientsPageGraphQL';
-import CalendarPage from './pages/CalendarPage';
+import AppointmentsPage from './pages/AppointmentsPage'; // 🆕 UNIFIED APPOINTMENTS
 import { DocumentsPage } from './pages/DocumentsPage';
 // 🔥 V3 ARSENAL COMPLETE - POST-VITE ACTIVATION - 14 JEWELS AWAKENED
 import FinancialManagerV3 from './components/Billing/FinancialManagerV3';
@@ -137,7 +137,7 @@ function AppRoutes() {
           <Route index element={<DashboardContent />} />
           <Route path="patients" element={<PatientsPageGraphQL />} />
           <Route path="patients-graphql" element={<PatientsPageGraphQL />} />
-          <Route path="agenda" element={<CalendarPage />} />
+          <Route path="appointments" element={<AppointmentsPage />} /> {/* 🆕 UNIFIED ROUTE */}
           <Route path="medical-records/*" element={<MedicalRouter />} />
           <Route path="documents" element={<DocumentsPage />} />
           
@@ -149,7 +149,7 @@ function AppRoutes() {
           <Route path="marketplace" element={<SupplierManagerV3 />} />
           <Route path="purchase-orders" element={<PurchaseOrderManagerV3 />} />
           <Route path="compliance" element={<ComplianceManagementV3 />} />
-          <Route path="appointments-v3" element={<AppointmentManagementV3 />} />
+          {/* ❌ DELETED: "Citas Avanzadas" route - now unified in /appointments */}
           <Route path="subscriptions" element={<SubscriptionPlansManager />} />
         </Route>
 
