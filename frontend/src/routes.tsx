@@ -135,9 +135,8 @@ function AppRoutes() {
           </ProtectedRoute>
         }>
           <Route index element={<DashboardContent />} />
-          <Route path="patients" element={<PatientsPageGraphQL />} />
-          <Route path="patients-graphql" element={<PatientsPageGraphQL />} />
-          <Route path="appointments" element={<AppointmentsPage />} /> {/* 🆕 UNIFIED ROUTE */}
+          <Route path="patients" element={<PatientsPageGraphQL />} /> {/* 🆕 UNIFIED ROUTE - PATIENTS */}
+          <Route path="appointments" element={<AppointmentsPage />} /> {/* 🆕 UNIFIED ROUTE - APPOINTMENTS */}
           <Route path="medical-records/*" element={<MedicalRouter />} />
           <Route path="documents" element={<DocumentsPage />} />
           
