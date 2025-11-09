@@ -5,8 +5,13 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 
-//  TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../atoms';
+//  DESIGN SYSTEM - Phase 3 Integration
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
+// Note: Input component uses native HTML for now (Design System Input pending)
+
 import { createModuleLogger } from '../../utils/logger';
 import { useDocumentLogger } from '../../utils/documentLogger';
 
@@ -388,12 +393,12 @@ const AppointmentManagementV3: React.FC = () => {
 
   const getStatusBadge = (status: Appointment['status']) => {
     const statusConfig = {
-      scheduled: { variant: 'secondary' as const, label: 'Programada' },
-      confirmed: { variant: 'default' as const, label: 'Confirmada' },
-      in_progress: { variant: 'default' as const, label: 'En Progreso' },
-      completed: { variant: 'default' as const, label: 'Completada' },
-      cancelled: { variant: 'destructive' as const, label: 'Cancelada' },
-      no_show: { variant: 'destructive' as const, label: 'No Asistió' }
+      scheduled: { variant: 'info' as const, label: 'Programada' },
+      confirmed: { variant: 'success' as const, label: 'Confirmada' },
+      in_progress: { variant: 'warning' as const, label: 'En Progreso' },
+      completed: { variant: 'success' as const, label: 'Completada' },
+      cancelled: { variant: 'error' as const, label: 'Cancelada' },
+      no_show: { variant: 'error' as const, label: 'No Asistió' }
     };
 
     const config = statusConfig[status] || statusConfig.scheduled;
@@ -405,23 +410,23 @@ const AppointmentManagementV3: React.FC = () => {
     
     const { verified, confidence, level, error } = veritas;
     
-    let variant: "default" | "secondary" | "destructive" | "outline" = "outline";
+    let variant: "default" | "success" | "error" | "warning" | "info" = "info";
     let text = `${label || 'Veritas'}: ${verified ? '✓' : '✗'}`;
     let className = "";
     
     if (verified) {
       if (confidence >= 0.9) {
-        variant = "default";
+        variant = "success";
         className = "bg-green-500/20 text-green-400 border-green-500";
       } else if (confidence >= 0.7) {
-        variant = "secondary";
+        variant = "warning";
         className = "bg-yellow-500/20 text-yellow-400 border-yellow-500";
       } else {
-        variant = "outline";
+        variant = "info";
         className = "bg-orange-500/20 text-orange-400 border-orange-500";
       }
     } else {
-      variant = "destructive";
+      variant = "error";
       className = "bg-red-500/20 text-red-400 border-red-500";
       text = `${label || 'Veritas'}: Error`;
     }
@@ -442,7 +447,7 @@ const AppointmentManagementV3: React.FC = () => {
   const renderAppointmentCard = (appointment: any) => (
     <Card key={appointment.id} className="cyberpunk-card hover:shadow-lg transition-shadow cursor-pointer"
           onClick={() => handleAppointmentSelect(appointment)}>
-      <CardContent className="p-4">
+      <CardBody className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div>
             <h3 className="font-semibold text-lg cyberpunk-text">{appointment.type}</h3>
@@ -482,7 +487,7 @@ const AppointmentManagementV3: React.FC = () => {
             Ver Detalles
           </Button>
         </div>
-      </CardContent>
+      </CardBody>
     </Card>
   );
 
@@ -514,10 +519,10 @@ const AppointmentManagementV3: React.FC = () => {
     <div className="space-y-6">
       {/* Date Navigation */}
       <Card className="cyberpunk-card">
-        <CardContent className="p-4">
+        <CardBody className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Input
+              <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => handleDateChange(e.target.value)}
@@ -525,21 +530,21 @@ const AppointmentManagementV3: React.FC = () => {
               />
               <div className="flex space-x-2">
                 <Button
-                  variant={viewMode === 'day' ? 'default' : 'outline'}
+                  variant={viewMode === 'day' ? 'primary' : 'outline'}
                   size="sm"
                   onClick={() => setViewMode('day')}
                 >
                   Día
                 </Button>
                 <Button
-                  variant={viewMode === 'week' ? 'default' : 'outline'}
+                  variant={viewMode === 'week' ? 'primary' : 'outline'}
                   size="sm"
                   onClick={() => setViewMode('week')}
                 >
                   Semana
                 </Button>
                 <Button
-                  variant={viewMode === 'month' ? 'default' : 'outline'}
+                  variant={viewMode === 'month' ? 'primary' : 'outline'}
                   size="sm"
                   onClick={() => setViewMode('month')}
                 >
@@ -551,7 +556,7 @@ const AppointmentManagementV3: React.FC = () => {
               Nueva Cita
             </Button>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
 
       {/* Appointments for selected date */}
@@ -562,12 +567,12 @@ const AppointmentManagementV3: React.FC = () => {
 
         {filteredAppointments.length === 0 ? (
           <Card className="cyberpunk-card">
-            <CardContent className="p-8 text-center">
+            <CardBody className="p-8 text-center">
               <p className="text-gray-400 mb-4">No hay citas programadas para esta fecha</p>
               <Button onClick={() => handleTabChange('create')}>
                 Programar Primera Cita
               </Button>
-            </CardContent>
+            </CardBody>
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -580,16 +585,14 @@ const AppointmentManagementV3: React.FC = () => {
 
   const renderAppointmentForm = () => (
     <Card className="cyberpunk-card">
-      <CardHeader>
-        <CardTitle className="cyberpunk-text">
-          {selectedAppointment ? 'Editar Cita' : 'Nueva Cita'}
-        </CardTitle>
+      <CardHeader className="cyberpunk-text">
+        {selectedAppointment ? 'Editar Cita' : 'Nueva Cita'}
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardBody className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Paciente ID *</label>
-            <Input
+            <input
               value={appointmentForm.patientId}
               onChange={(e) => setAppointmentForm(prev => ({ ...prev, patientId: e.target.value }))}
               placeholder="ID del paciente"
@@ -597,7 +600,7 @@ const AppointmentManagementV3: React.FC = () => {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Dentista ID *</label>
-            <Input
+            <input
               value={appointmentForm.practitionerId}
               onChange={(e) => setAppointmentForm(prev => ({ ...prev, practitionerId: e.target.value }))}
               placeholder="ID del dentista"
@@ -608,7 +611,7 @@ const AppointmentManagementV3: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Fecha *</label>
-            <Input
+            <input
               type="date"
               value={appointmentForm.appointmentDate}
               onChange={(e) => setAppointmentForm(prev => ({ ...prev, appointmentDate: e.target.value }))}
@@ -616,7 +619,7 @@ const AppointmentManagementV3: React.FC = () => {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Hora *</label>
-            <Input
+            <input
               type="time"
               value={appointmentForm.appointmentTime}
               onChange={(e) => setAppointmentForm(prev => ({ ...prev, appointmentTime: e.target.value }))}
@@ -627,7 +630,7 @@ const AppointmentManagementV3: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Duración (minutos)</label>
-            <Input
+            <input
               type="number"
               value={appointmentForm.duration}
               onChange={(e) => setAppointmentForm(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
@@ -694,7 +697,7 @@ const AppointmentManagementV3: React.FC = () => {
             {selectedAppointment ? 'Actualizar' : 'Crear'} Cita
           </Button>
         </div>
-      </CardContent>
+      </CardBody>
     </Card>
   );
 
@@ -709,7 +712,7 @@ const AppointmentManagementV3: React.FC = () => {
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
-                <CardTitle className="cyberpunk-text text-2xl">Cita - {appointment.type}</CardTitle>
+                <h2 className="cyberpunk-text text-2xl">Cita - {appointment.type}</h2>
                 <div className="flex items-center space-x-2 mt-2">
                   {getStatusBadge(appointment.status)}
                   {appointment.status_veritas && getVeritasBadge(appointment.status_veritas)}
@@ -733,7 +736,7 @@ const AppointmentManagementV3: React.FC = () => {
                   Completar
                 </Button>
                 <Button
-                  variant="destructive"
+                  variant="danger"
                   size="sm"
                   onClick={() => handleDeleteAppointment(appointment.id)}
                 >
@@ -742,7 +745,7 @@ const AppointmentManagementV3: React.FC = () => {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold cyberpunk-text">Información de la Cita</h3>
@@ -801,7 +804,7 @@ const AppointmentManagementV3: React.FC = () => {
                 </div>
               </div>
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
       </div>
     );
@@ -823,7 +826,7 @@ const AppointmentManagementV3: React.FC = () => {
     return (
       <div className="flex justify-center items-center h-64">
         <Card className="cyberpunk-card max-w-md">
-          <CardContent className="p-6 text-center">
+          <CardBody className="p-6 text-center">
             <p className="text-red-400 mb-4">Error al cargar las citas</p>
             <p className="text-sm text-gray-400 mb-4">
               {queryError?.message || storeError}
@@ -831,7 +834,7 @@ const AppointmentManagementV3: React.FC = () => {
             <Button onClick={() => refetchAppointments()}>
               Reintentar
             </Button>
-          </CardContent>
+          </CardBody>
         </Card>
       </div>
     );
@@ -849,25 +852,25 @@ const AppointmentManagementV3: React.FC = () => {
 
         <div className="flex flex-wrap gap-2">
           <Button
-            variant={activeTab === 'calendar' ? 'default' : 'outline'}
+            variant={activeTab === 'calendar' ? 'primary' : 'outline'}
             onClick={() => handleTabChange('calendar')}
           >
             Calendario
           </Button>
           <Button
-            variant={activeTab === 'list' ? 'default' : 'outline'}
+            variant={activeTab === 'list' ? 'primary' : 'outline'}
             onClick={() => handleTabChange('list')}
           >
             Lista
           </Button>
           <Button
-            variant={activeTab === 'search' ? 'default' : 'outline'}
+            variant={activeTab === 'search' ? 'primary' : 'outline'}
             onClick={() => handleTabChange('search')}
           >
             Buscar
           </Button>
           <Button
-            variant={activeTab === 'create' ? 'default' : 'outline'}
+            variant={activeTab === 'create' ? 'primary' : 'outline'}
             onClick={() => handleTabChange('create')}
           >
             Nueva Cita
@@ -878,10 +881,10 @@ const AppointmentManagementV3: React.FC = () => {
       {/*  SEARCH BAR - Global Search */}
       {(activeTab === 'calendar' || activeTab === 'list' || activeTab === 'search') && (
         <Card className="cyberpunk-card">
-          <CardContent className="p-4">
+          <CardBody className="p-4">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
-                <Input
+                <input
                   placeholder="Buscar por paciente, título o tipo..."
                   value={searchQuery}
                   onChange={handleSearchChange}
@@ -906,7 +909,7 @@ const AppointmentManagementV3: React.FC = () => {
                 </div>
               )}
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
       )}
 
@@ -924,12 +927,12 @@ const AppointmentManagementV3: React.FC = () => {
 
           {filteredAppointments.length === 0 ? (
             <Card className="cyberpunk-card">
-              <CardContent className="p-8 text-center">
+              <CardBody className="p-8 text-center">
                 <p className="text-gray-400 mb-4">No se encontraron citas</p>
                 <Button onClick={() => handleTabChange('create')}>
                   Crear Primera Cita
                 </Button>
-              </CardContent>
+              </CardBody>
             </Card>
           ) : (
             <div className="space-y-2">
@@ -943,12 +946,12 @@ const AppointmentManagementV3: React.FC = () => {
         <div>
           <h2 className="text-xl font-semibold cyberpunk-text mb-4">Búsqueda Avanzada</h2>
           <Card className="cyberpunk-card">
-            <CardContent className="p-6">
+            <CardBody className="p-6">
               <div className="text-center text-gray-400">
                 <p> Funcionalidad de búsqueda avanzada próximamente</p>
                 <p className="text-sm mt-2">Use la barra de búsqueda superior para filtrar citas</p>
               </div>
-            </CardContent>
+            </CardBody>
           </Card>
         </div>
       )}
@@ -962,7 +965,7 @@ const AppointmentManagementV3: React.FC = () => {
         <div className="flex justify-between items-center text-sm text-gray-400">
           <div>
             <span>Estado: </span>
-            <Badge variant="outline" className="bg-green-500/20 text-green-400 border-green-500">
+            <Badge variant="success" className="bg-green-500/20 text-green-400 border-green-500">
               V3.0 - GraphQL Conquest
             </Badge>
           </div>
@@ -998,4 +1001,11 @@ export default AppointmentManagementV3;
  * Status: Appointments Province - CONQUERED WITH @veritas
  * Protocol: Guerra Relámpago - Continue mass migration
  */
+
+
+
+
+
+
+
 
