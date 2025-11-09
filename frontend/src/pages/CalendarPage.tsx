@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-// 🔍 TEMP DEBUG: Cambiando a named imports para detectar el problema
 import { default as CreateAppointmentModal } from '../components/CreateAppointmentModal';
-import { default as EditAppointmentModal } from '../components/EditAppointmentModal';
+// ❌ EditAppointmentModal REMOVED - Use AppointmentManagementV3 instead
 import { useAppointments } from '../hooks/useAppointments';
 import { useAuth } from '../context/AuthContext';
 import { usePatients } from '../hooks/usePatients';
@@ -280,14 +279,24 @@ const CalendarPage = () => {
         />
       )}
 
+      {/* ❌ EditAppointmentModal REMOVED - Use AppointmentManagementV3 for editing */}
       {showEditModal && selectedAppointment && (
-        <EditAppointmentModal
-          isOpen={showEditModal}
-          onClose={() => setShowEditModal(false)}
-          appointment={selectedAppointment}
-          onUpdate={handleUpdateAppointment}
-          onDelete={handleDeleteAppointment}
-        />
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4">Edit Appointment</h3>
+            <p className="text-gray-600 mb-4">
+              Please use the Appointments page to edit appointments.
+              <br />
+              EditAppointmentModal has been replaced by AppointmentManagementV3.
+            </p>
+            <button
+              onClick={() => setShowEditModal(false)}
+              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

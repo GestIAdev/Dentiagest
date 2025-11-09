@@ -26,8 +26,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import MedicalRecordsList from './MedicalRecordsList';
-import MedicalRecordForm from './MedicalRecordForm';
-import MedicalRecordDetail from './MedicalRecordDetail';
+import { MedicalRecordFormV3 as MedicalRecordForm } from './MedicalRecordFormV3'; // Migrated to V3
+import { MedicalRecordDetailV3 as MedicalRecordDetail } from './MedicalRecordDetailV3'; // Migrated to V3
 import { SensitiveDataWarning } from './MedicalSecurity';
 
 // Página principal de lista de historiales
@@ -104,8 +104,7 @@ export const NewMedicalRecordPage: React.FC = () => {
       
       <MedicalRecordForm
         isOpen={true}
-        onClose={handleClose}
-        onSave={handleSave}
+        onClose={handleSave} // V3 auto-closes after save
         patientId={patientId}
       />
     </div>
@@ -187,9 +186,8 @@ export const EditMedicalRecordPage: React.FC = () => {
       
       <MedicalRecordForm
         isOpen={true}
-        onClose={handleClose}
-        onSave={handleSave}
-        recordId={recordId}
+        onClose={handleSave} // V3 auto-closes after save
+        editingRecord={{ id: recordId }} // V3 expects editingRecord object
       />
     </div>
   );

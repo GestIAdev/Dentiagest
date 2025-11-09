@@ -11,8 +11,8 @@
 
 import React, { useState, useCallback } from 'react';
 import MedicalRecordsList from './MedicalRecordsList';
-import MedicalRecordForm from './MedicalRecordForm';
-import MedicalRecordDetail from './MedicalRecordDetail';
+import { MedicalRecordFormV3 as MedicalRecordForm } from './MedicalRecordFormV3'; // V3: GraphQL V3, no apolloGraphQL
+import { MedicalRecordDetailV3 as MedicalRecordDetail } from './MedicalRecordDetailV3'; // Migrated to V3
 
 // Types para el estado del contenedor
 interface MedicalRecordsContainerState {
@@ -119,10 +119,9 @@ const MedicalRecordsContainer: React.FC = () => {
         {state.showForm && (
           <MedicalRecordForm
             isOpen={state.showForm}
-            onClose={handleCloseForm}
-            recordId={state.editingRecordId}
+            onClose={handleSaveForm} // V3 auto-closes after save
+            editingRecord={state.editingRecordId ? { id: state.editingRecordId } : undefined}
             patientId={state.selectedPatientId || undefined}
-            onSave={handleSaveForm}
           />
         )}
 

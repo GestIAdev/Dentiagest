@@ -1,0 +1,81 @@
+/**
+ * 🎨 DESIGN SYSTEM GLOBAL STYLES
+ * Smooth transitions between themes
+ */
+
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Disable transitions for theme changes (instant switch) */
+body.theme-switching * {
+  transition: none !important;
+}
+
+/* Theme-specific body classes */
+body.theme-classic {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+body.theme-dark {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+body.theme-cyberpunk-medical {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Scrollbar styling for dark themes */
+body.theme-dark::-webkit-scrollbar,
+body.theme-cyberpunk-medical::-webkit-scrollbar {
+  width: 12px;
+}
+
+body.theme-dark::-webkit-scrollbar-track,
+body.theme-cyberpunk-medical::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+body.theme-dark::-webkit-scrollbar-thumb,
+body.theme-cyberpunk-medical::-webkit-scrollbar-thumb {
+  background: var(--border-main);
+  border-radius: 6px;
+}
+
+body.theme-dark::-webkit-scrollbar-thumb:hover,
+body.theme-cyberpunk-medical::-webkit-scrollbar-thumb:hover {
+  background: var(--border-dark);
+}
+
+/* Focus visible styles */
+*:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+/* Selection styles */
+::selection {
+  background: var(--color-primary-500);
+  color: white;
+}
+
+/* Font smoothing */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--font-primary);
+}
+
+/* Monospace font for code/data */
+code,
+pre,
+.font-mono {
+  font-family: var(--font-mono);
+}

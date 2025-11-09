@@ -33,8 +33,8 @@ export { default as MedicalRecordsContainer } from './MedicalRecordsContainer';
 
 // Componentes individuales
 export { default as MedicalRecordsList } from './MedicalRecordsList';
-export { default as MedicalRecordForm } from './MedicalRecordForm';
-export { default as MedicalRecordDetail } from './MedicalRecordDetail';
+export { MedicalRecordFormV3 as MedicalRecordForm } from './MedicalRecordFormV3'; // V3: GraphQL V3, no apolloGraphQL
+export { MedicalRecordDetailV3 as MedicalRecordDetail } from './MedicalRecordDetailV3'; // V3: Migration complete
 
 // Exportación por defecto del router (CAMBIADO para la nueva arquitectura)
 export { default } from './MedicalRouter';

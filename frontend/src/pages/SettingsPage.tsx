@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import MFASetupPage from './MFASetupPage';
+import { ThemeSwitcher } from '../design-system/ThemeSwitcher';
 
 const SettingsPage: React.FC = () => {
   const [activeSection, setActiveSection] = useState('security');
@@ -115,25 +116,15 @@ const SettingsPage: React.FC = () => {
           <div className="space-y-6">
             <h3 className="text-lg font-medium text-gray-900">Personalización de Apariencia</h3>
             
-            {/* Tema */}
+            {/* Tema - DESIGN SYSTEM V3 */}
             <div className="bg-white p-6 rounded-lg border border-secondary-200">
               <h4 className="text-md font-medium text-gray-900 mb-4">
                 🎨 Tema Visual
               </h4>
-              <div className="grid grid-cols-3 gap-3">
-                <button className="p-4 border-2 border-primary-500 rounded-lg bg-white">
-                  <div className="w-full h-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded mb-2"></div>
-                  <span className="text-sm font-medium">Clásico</span>
-                </button>
-                <button className="p-4 border-2 border-secondary-300 rounded-lg bg-white hover:border-primary-500">
-                  <div className="w-full h-8 bg-gradient-to-r from-purple-500 to-pink-600 rounded mb-2"></div>
-                  <span className="text-sm font-medium">Moderno</span>
-                </button>
-                <button className="p-4 border-2 border-secondary-300 rounded-lg bg-white hover:border-primary-500">
-                  <div className="w-full h-8 bg-gradient-to-r from-green-500 to-teal-600 rounded mb-2"></div>
-                  <span className="text-sm font-medium">Natural</span>
-                </button>
-              </div>
+              <p className="text-sm text-gray-600 mb-6">
+                Elige el tema que mejor se adapte a tu estilo de trabajo. Los cambios se guardan automáticamente.
+              </p>
+              <ThemeSwitcher />
             </div>
 
             {/* Skins Personalizados */}
