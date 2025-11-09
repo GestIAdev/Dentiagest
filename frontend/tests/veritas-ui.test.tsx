@@ -279,8 +279,9 @@ describe('🔬 VERITAS UI COMPONENTS - COMPREHENSIVE TESTS', () => {
     it('should display total operations count', () => {
       render(<VeritasSystemStatus metrics={mockMetrics} />);
       
-      const total = screen.queryByText(/15.*420/i) || screen.queryByText(/15,420/i);
-      expect(total || document.body).toBeTruthy();
+      // FIXED: Use queryAllByText to handle multiple matches (number appears twice)
+      const totals = screen.queryAllByText(/15.*420/i);
+      expect(totals.length).toBeGreaterThan(0);
     });
 
     it('should show verification rate percentage', () => {
