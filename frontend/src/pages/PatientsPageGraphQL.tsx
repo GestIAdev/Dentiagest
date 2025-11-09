@@ -4,7 +4,7 @@
 // ✅ ALINEADO 100% CON SCHEMA REAL DE SELENE
 
 import React, { useState } from 'react';
-import { useQuery, useMutation } from '@apollo/client/react';
+import { useQuery, useMutation, useSubscription } from '@apollo/client/react';
 import toast from 'react-hot-toast';
 import {
   GET_PATIENTS,
@@ -23,6 +23,17 @@ import {
   DeletePatientData,
   DeletePatientVariables
 } from '../graphql/queries/patients';
+import { PATIENT_UPDATES } from '../graphql/subscriptions';
+
+// 🔔 WebSocket subscription types
+interface PatientUpdateData {
+  patientUpdates: {
+    event: 'CREATED' | 'UPDATED' | 'DELETED' | 'ACTIVATED' | 'DEACTIVATED';
+    patientId: number;
+    patient?: Patient;
+  };
+}
+
 import {
   MagnifyingGlassIcon,
   UserPlusIcon,
@@ -89,6 +100,38 @@ const PatientsPageGraphQL: React.FC = () => {
       fetchPolicy: 'network-only'  // 🔥 FIX: Avoid cache duplicates
     }
   );
+
+  // 🔔 REAL-TIME WEBSOCKET SUBSCRIPTION
+  useSubscription<PatientUpdateData>(PATIENT_UPDATES, {
+    onData: ({ data: subData }) => {
+      const update = subData?.data?.patientUpdates;
+      if (!update) return;
+
+      console.log('🔔 Patient update received:', update.event, update.patientId);
+
+      // Auto-refetch on any change
+      if (['CREATED', 'UPDATED', 'DELETED', 'ACTIVATED', 'DEACTIVATED'].includes(update.event)) {
+        refetch();
+        
+        // Toast notification with gradient
+        const messages: Record<string, string> = {
+          CREATED: '✨ Nuevo paciente creado',
+          UPDATED: '📝 Paciente actualizado',
+          DELETED: '🗑️ Paciente eliminado',
+          ACTIVATED: '✅ Paciente activado',
+          DEACTIVATED: '❌ Paciente desactivado'
+        };
+        
+        toast.success(messages[update.event] || '🔔 Actualización recibida', {
+          duration: 5000,
+          style: {
+            background: 'linear-gradient(to right, rgb(6 182 212), rgb(168 85 247))',
+            color: 'white'
+          }
+        });
+      }
+    }
+  });
 
   const [createPatient, { loading: creating }] = useMutation<CreatePatientData, CreatePatientVariables>(
     CREATE_PATIENT,
