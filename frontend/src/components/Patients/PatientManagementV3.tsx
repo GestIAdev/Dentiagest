@@ -4,6 +4,12 @@
 // Status: V3.0 - Full reconstruction with Zustand + Atomic Components + GraphQL
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  PencilIcon, 
+  EyeIcon, 
+  DocumentTextIcon, 
+  TrashIcon 
+} from '@heroicons/react/24/outline';
 
 // 🎯 DESIGN SYSTEM IMPORTS - Migrated from atoms
 import { Button } from '../../design-system/Button';
@@ -433,6 +439,48 @@ const PatientManagementV3: React.FC = () => {
   };
 
   // 🎯 UTILITY FUNCTIONS
+  
+  // Quick action handlers
+  const handleEdit = (patient: any) => {
+    setSelectedPatient(patient);
+    setPatientForm({
+      firstName: patient.firstName || '',
+      lastName: patient.lastName || '',
+      email: patient.email || '',
+      phone: patient.phone || '',
+      phoneSecondary: patient.phoneSecondary || '',
+      dateOfBirth: patient.dateOfBirth || '',
+      gender: patient.gender || '',
+      addressStreet: patient.addressStreet || '',
+      addressCity: patient.addressCity || '',
+      addressState: patient.addressState || '',
+      addressPostalCode: patient.addressPostalCode || '',
+      addressCountry: patient.addressCountry || '',
+      emergencyContactName: patient.emergencyContactName || '',
+      emergencyContactPhone: patient.emergencyContactPhone || '',
+      emergencyContactRelationship: patient.emergencyContactRelationship || '',
+      medicalConditions: patient.medicalConditions || '',
+      medicationsCurrent: patient.medicationsCurrent || '',
+      allergies: patient.allergies || '',
+      anxietyLevel: patient.anxietyLevel || '',
+      specialNeeds: patient.specialNeeds || '',
+      insuranceProvider: patient.insuranceProvider || '',
+      insurancePolicyNumber: patient.insurancePolicyNumber || '',
+      insuranceGroupNumber: patient.insuranceGroupNumber || '',
+      consentToTreatment: patient.consentToTreatment || false,
+      consentToContact: patient.consentToContact || false,
+      preferredContactMethod: patient.preferredContactMethod || '',
+      notes: patient.notes || ''
+    });
+    setActiveTab('create'); // Switch to form tab
+  };
+
+  const handleDelete = (patientId: string) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este paciente?')) {
+      handleDeletePatient(patientId);
+    }
+  };
+
   const resetPatientForm = () => {
     setPatientForm({
       firstName: '',
@@ -466,42 +514,60 @@ const PatientManagementV3: React.FC = () => {
   };
 
   const getStatusBadge = (isActive: boolean) => (
-    <Badge variant={isActive ? "default" : "secondary"}>
+    <Badge variant={isActive ? "success" : "warning"}>
       {isActive ? 'Activo' : 'Inactivo'}
     </Badge>
   );
 
+  // 💎 @veritas TRUST BADGES - PUNKGROK GRADIENT STYLE
   const getVeritasBadge = (veritas?: VeritasMetadata, label?: string) => {
     if (!veritas) return null;
     
     const { verified, confidence, level, error } = veritas;
+    const confidencePercent = (confidence * 100).toFixed(0);
     
-    let variant: "default" | "secondary" | "destructive" | "outline" = "outline";
-    let text = `${label || 'Veritas'}: ${verified ? '✓' : '✗'}`;
-    let className = "";
-    
-    if (verified) {
-      if (confidence >= 0.9) {
-        variant = "default";
-        className = "bg-green-500/20 text-green-400 border-green-500";
-      } else if (confidence >= 0.7) {
-        variant = "secondary";
-        className = "bg-yellow-500/20 text-yellow-400 border-yellow-500";
-      } else {
-        variant = "outline";
-        className = "bg-orange-500/20 text-orange-400 border-orange-500";
-      }
+    // 🎨 GRADIENT TIERS - Performance = Arte
+    if (verified && confidence >= 0.9) {
+      // 🔥 ULTRA VERIFIED - Purple→Cyan gradient
+      return (
+        <span 
+          className="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-gradient-to-r from-purple-500 to-cyan-400 text-white shadow-lg"
+          title={`Confianza: ${confidencePercent}% | Nivel: ${level} | ULTRA VERIFIED`}
+        >
+          {label || 'Veritas'} {confidencePercent}%
+        </span>
+      );
+    } else if (verified && confidence >= 0.7) {
+      // ⚡ HIGH CONFIDENCE - Cyan border glow
+      return (
+        <span 
+          className="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-400 shadow-sm"
+          title={`Confianza: ${confidencePercent}% | Nivel: ${level} | HIGH CONFIDENCE`}
+        >
+          {label || 'Veritas'} {confidencePercent}%
+        </span>
+      );
+    } else if (verified) {
+      // ⚠️ MODERATE - Yellow warning
+      return (
+        <span 
+          className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-500/10 text-yellow-400 border border-yellow-400/50"
+          title={`Confianza: ${confidencePercent}% | Nivel: ${level} | MODERATE`}
+        >
+          {label || 'Veritas'} {confidencePercent}%
+        </span>
+      );
     } else {
-      variant = "destructive";
-      className = "bg-red-500/20 text-red-400 border-red-500";
-      text = `${label || 'Veritas'}: Error`;
+      // ❌ ERROR - Red danger
+      return (
+        <span 
+          className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-500/10 text-red-400 border border-red-400/50"
+          title={`Error: ${error || 'Verification failed'} | Nivel: ${level}`}
+        >
+          {label || 'Veritas'} ERROR
+        </span>
+      );
     }
-    
-    return (
-      <Badge variant={variant} className={`text-xs ${className}`} title={`Confianza: ${(confidence * 100).toFixed(1)}% | Nivel: ${level}${error ? ` | Error: ${error}` : ''}`}>
-        {text}
-      </Badge>
-    );
   };
 
   const getGenderLabel = (gender?: string) => {
@@ -534,23 +600,61 @@ const PatientManagementV3: React.FC = () => {
         </div>
 
         <div className="space-y-2 text-sm">
-          {patient.age && <p><span className="text-gray-400">Edad:</span> {patient.age} años</p>}
+          {patient.age && (
+            <div className="flex items-center gap-2">
+              <span className="text-gray-400">Edad:</span> 
+              <Badge variant="info" className="text-xs">{patient.age} años</Badge>
+            </div>
+          )}
           {patient.gender && <p><span className="text-gray-400">Género:</span> {getGenderLabel(patient.gender)}</p>}
           {patient.insuranceProvider && (
-            <p><span className="text-gray-400">Seguro:</span> {patient.insuranceProvider}</p>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-400">Seguro:</span>
+              <Badge variant={patient.insuranceStatus === 'active' ? 'success' : 'error'} className="text-xs">
+                {patient.insuranceProvider}
+              </Badge>
+            </div>
           )}
           {patient.specialNeeds && (
-            <Badge variant="outline" className="text-xs">Atención Especial</Badge>
+            <Badge variant="warning" className="text-xs">⚠️ Atención Especial</Badge>
           )}
         </div>
 
-        <div className="mt-4 flex justify-between items-center">
+        {/* 🎯 QUICK ACTIONS - PUNKGROK STYLE */}
+        <div className="mt-4 flex justify-between items-center pt-3 border-t border-gray-700">
           <span className="text-xs text-gray-500">
-            Creado: {new Date(patient.createdAt).toLocaleDateString()}
+            {new Date(patient.createdAt).toLocaleDateString()}
           </span>
-          <Button size="sm" variant="outline">
-            Ver Detalles
-          </Button>
+          <div className="flex gap-1">
+            <button
+              onClick={(e) => { e.stopPropagation(); handleEdit(patient); }}
+              className="p-1.5 rounded hover:bg-cyan-500/20 hover:text-cyan-400 transition-all group"
+              title="Editar Paciente"
+            >
+              <PencilIcon className="w-4 h-4" />
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); handlePatientSelect(patient); }}
+              className="p-1.5 rounded hover:bg-purple-500/20 hover:text-purple-400 transition-all group"
+              title="Ver Perfil"
+            >
+              <EyeIcon className="w-4 h-4" />
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); /* TODO: Navigate to medical records */ }}
+              className="p-1.5 rounded hover:bg-blue-500/20 hover:text-blue-400 transition-all group"
+              title="Historia Clínica"
+            >
+              <DocumentTextIcon className="w-4 h-4" />
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); handleDelete(patient.id); }}
+              className="p-1.5 rounded hover:bg-red-500/20 hover:text-red-400 transition-all group"
+              title="Eliminar"
+            >
+              <TrashIcon className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </CardBody>
     </Card>
@@ -707,7 +811,7 @@ const PatientManagementV3: React.FC = () => {
                 <div className="flex items-center space-x-2 mt-2">
                   {getStatusBadge(patient.isActive)}
                   {patient.requiresSpecialCare && (
-                    <Badge variant="outline">Atención Especial</Badge>
+                    <Badge variant="default">Atención Especial</Badge>
                   )}
                 </div>
               </div>
@@ -871,19 +975,19 @@ const PatientManagementV3: React.FC = () => {
 
         <div className="flex flex-wrap gap-2">
           <Button
-            variant={activeTab === 'list' ? 'default' : 'outline'}
+            variant={activeTab === 'list' ? 'primary' : 'outline'}
             onClick={() => handleTabChange('list')}
           >
             Lista
           </Button>
           <Button
-            variant={activeTab === 'search' ? 'default' : 'outline'}
+            variant={activeTab === 'search' ? 'primary' : 'outline'}
             onClick={() => handleTabChange('search')}
           >
             Buscar
           </Button>
           <Button
-            variant={activeTab === 'create' ? 'default' : 'outline'}
+            variant={activeTab === 'create' ? 'primary' : 'outline'}
             onClick={() => handleTabChange('create')}
           >
             Nuevo Paciente
@@ -906,14 +1010,14 @@ const PatientManagementV3: React.FC = () => {
               </div>
               <div className="flex gap-2">
                 <Button
-                  variant={viewMode === 'grid' ? 'default' : 'outline'}
+                  variant={viewMode === 'grid' ? 'primary' : 'outline'}
                   size="sm"
                   onClick={() => setViewMode('grid')}
                 >
                   Grid
                 </Button>
                 <Button
-                  variant={viewMode === 'list' ? 'default' : 'outline'}
+                  variant={viewMode === 'list' ? 'primary' : 'outline'}
                   size="sm"
                   onClick={() => setViewMode('list')}
                 >
@@ -979,7 +1083,7 @@ const PatientManagementV3: React.FC = () => {
         <div className="flex justify-between items-center text-sm text-gray-400">
           <div>
             <span>Estado: </span>
-            <Badge variant="outline" className="bg-green-500/20 text-green-400 border-green-500">
+            <Badge variant="default" className="bg-green-500/20 text-green-400 border-green-500">
               V3.0 - Operativo
             </Badge>
           </div>
