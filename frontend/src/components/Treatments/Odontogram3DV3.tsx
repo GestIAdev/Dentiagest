@@ -10,7 +10,11 @@ import { useQuery, useSubscription, useMutation } from '@apollo/client/react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Text } from '@react-three/drei';
 import * as THREE from 'three';
-import { Button, Card, CardContent, CardHeader, CardTitle, Spinner, Badge, Input } from '../atoms';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Button } from '../../design-system/Button';
+import { Input } from '../../design-system/Input';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 
 // 🎯 MOCK GRAPHQL OPERATIONS - Replace with actual queries when available
 const GET_ODONTOGRAM_DATA = { kind: 'Document', definitions: [] } as any;
@@ -331,13 +335,13 @@ const Odontogram3DV3: React.FC<Odontogram3DV3Props> = ({
   if (error) {
     return (
       <Card className="border-red-500">
-        <CardContent className="pt-6">
+        <CardBody className="pt-6">
           <div className="text-red-400 text-center">
             <div className="text-4xl mb-4">⚠️</div>
             <h3 className="text-lg font-medium mb-2">Error en Odontograma 3D</h3>
             <p>{error.message}</p>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     );
   }
@@ -378,11 +382,11 @@ const Odontogram3DV3: React.FC<Odontogram3DV3Props> = ({
         <div className="lg:col-span-3">
           <Card className="cyberpunk-card">
             <CardHeader>
-              <CardTitle className="cyberpunk-text">
+              <h3 className="text-lg font-semibold" className="cyberpunk-text">
                 Visualización 3D Cuántica
-              </CardTitle>
+              </h3>
             </CardHeader>
-            <CardContent>
+            <CardBody>
               <div className="h-[600px] bg-gradient-to-br from-gray-900 via-purple-900 to-cyan-900 rounded-lg overflow-hidden shadow-2xl shadow-cyan-500/20">
                 <Suspense fallback={
                   <div className="flex items-center justify-center h-full">
@@ -426,7 +430,7 @@ const Odontogram3DV3: React.FC<Odontogram3DV3Props> = ({
                   Reset Vista
                 </Button>
               </div>
-            </CardContent>
+            </CardBody>
           </Card>
         </div>
 
@@ -437,12 +441,12 @@ const Odontogram3DV3: React.FC<Odontogram3DV3Props> = ({
           {selectedTooth && showToothDetails && (
             <Card className="cyberpunk-card">
               <CardHeader>
-                <CardTitle className="cyberpunk-text flex items-center">
+                <h3 className="text-lg font-semibold" className="cyberpunk-text flex items-center">
                   Diente #{selectedTooth.toothNumber}
                   {getVeritasBadge(selectedTooth.scanIntegrity_veritas)}
-                </CardTitle>
+                </h3>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardBody className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Estado</label>
                   <select
@@ -504,18 +508,18 @@ const Odontogram3DV3: React.FC<Odontogram3DV3Props> = ({
                     Actualizar
                   </Button>
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
           )}
 
           {/* Scan List */}
           <Card className="cyberpunk-card">
             <CardHeader>
-              <CardTitle className="cyberpunk-text">
+              <h3 className="text-lg font-semibold" className="cyberpunk-text">
                 Escaneos Disponibles
-              </CardTitle>
+              </h3>
             </CardHeader>
-            <CardContent>
+            <CardBody>
               {scans.length > 0 ? (
                 <div className="space-y-2 max-h-64 overflow-y-auto">
                   {scans
@@ -545,7 +549,7 @@ const Odontogram3DV3: React.FC<Odontogram3DV3Props> = ({
                   No hay escaneos disponibles
                 </p>
               )}
-            </CardContent>
+            </CardBody>
           </Card>
 
         </div>
@@ -561,3 +565,4 @@ export default Odontogram3DV3;
 // Status: ACTIVE - Integrated into Treatments Domain V142_SUCCESS
 // Architecture: Apollo GraphQL + @veritas + Real-Time + Cyberpunk + Three.js
 // Features: 3D tooth visualization, status management, treatment history, @veritas verification
+

@@ -10,7 +10,10 @@ import { useQuery, useMutation } from '@apollo/client/react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Text, Sphere, Box } from '@react-three/drei';
 import * as THREE from 'three';
-import { Button, Card, CardContent, CardHeader, CardTitle, Spinner, Badge } from '../atoms';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Button } from '../../design-system/Button';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 
 // 🎯 MOCK GRAPHQL - Replace with actual queries when available
 const GET_AESTHETIC_PREVIEW = { kind: 'Document', definitions: [] } as any;
@@ -414,11 +417,11 @@ const AestheticsPreviewV3: React.FC<AestheticsPreviewV3Props> = ({
         <div className="lg:col-span-2">
           <Card className="cyberpunk-card">
             <CardHeader>
-              <CardTitle className="cyberpunk-text">
+              <h3 className="text-lg font-semibold" className="cyberpunk-text">
                 Preview 3D IA Cuántico
-              </CardTitle>
+              </h3>
             </CardHeader>
-            <CardContent>
+            <CardBody>
               <div className="h-[500px] bg-gradient-to-br from-gray-900 via-purple-900 to-cyan-900 rounded-lg overflow-hidden shadow-2xl shadow-cyan-500/20">
                 <Suspense fallback={
                   <div className="flex items-center justify-center h-full">
@@ -476,7 +479,7 @@ const AestheticsPreviewV3: React.FC<AestheticsPreviewV3Props> = ({
                   </Button>
                 </div>
               )}
-            </CardContent>
+            </CardBody>
           </Card>
         </div>
 
@@ -486,11 +489,11 @@ const AestheticsPreviewV3: React.FC<AestheticsPreviewV3Props> = ({
           {/* Design Generator */}
           <Card className="cyberpunk-card">
             <CardHeader>
-              <CardTitle className="cyberpunk-text">
+              <h3 className="text-lg font-semibold" className="cyberpunk-text">
                 Generador IA Ultra-Anonymizer
-              </CardTitle>
+              </h3>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardBody className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Tipo de Diseño</label>
                 <select
@@ -555,20 +558,20 @@ const AestheticsPreviewV3: React.FC<AestheticsPreviewV3Props> = ({
                   </>
                 )}
               </Button>
-            </CardContent>
+            </CardBody>
           </Card>
 
           {/* Current Design Info */}
           {selectedDesign && (
             <Card className="cyberpunk-card">
               <CardHeader>
-                <CardTitle className="cyberpunk-text flex items-center">
+                <h3 className="text-lg font-semibold" className="cyberpunk-text flex items-center">
                   Diseño Actual
                   {getVeritasBadge(selectedDesign.veritas_verification)}
                   {getAnonymizerBadge(selectedDesign.ultra_anonymizer)}
-                </CardTitle>
+                </h3>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardBody className="space-y-3">
                 <div>
                   <span className="text-gray-400">Nombre:</span>
                   <span className="ml-2 font-medium text-white">{selectedDesign.designName}</span>
@@ -605,18 +608,18 @@ const AestheticsPreviewV3: React.FC<AestheticsPreviewV3Props> = ({
                      selectedDesign.status === 'generating' ? 'Generando' : 'Fallido'}
                   </Badge>
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
           )}
 
           {/* Design History */}
           <Card className="cyberpunk-card">
             <CardHeader>
-              <CardTitle className="cyberpunk-text">
+              <h3 className="text-lg font-semibold" className="cyberpunk-text">
                 Historial de Diseños
-              </CardTitle>
+              </h3>
             </CardHeader>
-            <CardContent>
+            <CardBody>
               {history.length > 0 ? (
                 <div className="space-y-3 max-h-64 overflow-y-auto">
                   {history.map((design: AestheticDesign) => (
@@ -648,7 +651,7 @@ const AestheticsPreviewV3: React.FC<AestheticsPreviewV3Props> = ({
                   No hay diseños previos
                 </p>
               )}
-            </CardContent>
+            </CardBody>
           </Card>
 
         </div>
@@ -664,3 +667,4 @@ export default AestheticsPreviewV3;
 // Status: ACTIVE - Integrated into Treatments Domain V142_SUCCESS
 // Architecture: Apollo GraphQL + @veritas + Ultra-Anonymizer + IA Generation + Cyberpunk
 // Features: 3D face preview, IA design generation, anonymization compliance, @veritas verification
+
