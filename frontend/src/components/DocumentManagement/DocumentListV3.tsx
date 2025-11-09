@@ -10,7 +10,7 @@ import React, { useMemo } from 'react';
 import {
   Button,
   Card,
-  CardContent,
+  CardBody,
   Badge,
   Spinner
 } from '../../design-system';
@@ -70,36 +70,44 @@ interface DocumentListV3Props {
 
 // Logger eliminado por no uso
 
-// 🎯 VERITAS BADGE HELPER - @veritas Quantum Truth Verification
-const getVeritasBadge = (veritasData: any) => {
-  if (!veritasData || !veritasData.verified) {
+// ⚖️💀 @VERITAS TRUST BADGE HELPER - LEGAL COMPLIANCE UI (UPDATED STANDARD)
+const getVeritasBadge = (veritasData: any): React.ReactElement | null => {
+  if (!veritasData) return null;
+  
+  const { verified, confidence } = veritasData;
+  const confidencePercent = ((confidence || 0) * 100).toFixed(0);
+  
+  // ULTRA VERIFIED (90%+ confidence) - Purple→Cyan gradient
+  if (verified && (confidence || 0) >= 0.9) {
     return (
-      <Badge variant="danger" className="ml-2">
-        ⚠️ No Verificado
+      <Badge variant="veritas" className="ml-2 bg-gradient-to-r from-purple-500 to-cyan-400 text-white font-bold shadow-lg">
+        ✅ {confidencePercent}%
       </Badge>
     );
   }
-
-  const level = veritasData.level || 'UNKNOWN';
-  const confidence = veritasData.confidence || 0;
-
-  let variant: 'success' | 'warning' | 'destructive' = 'success';
-  let icon = '✅';
-
-  if (level === 'CRITICAL' || level === 'HIGH') {
-    variant = confidence > 0.8 ? 'success' : 'warning';
-    icon = confidence > 0.8 ? '🛡️' : '⚠️';
-  } else if (level === 'MEDIUM') {
-    variant = confidence > 0.6 ? 'success' : 'warning';
-    icon = confidence > 0.6 ? '🔒' : '⚠️';
-  } else {
-    variant = 'destructive';
-    icon = '❌';
+  
+  // HIGH CONFIDENCE (70-89%) - Cyan border
+  if (verified && (confidence || 0) >= 0.7) {
+    return (
+      <Badge variant="info" className="ml-2 font-semibold">
+        🔒 {confidencePercent}%
+      </Badge>
+    );
   }
-
+  
+  // MODERATE (<70%) - Yellow warning
+  if (verified) {
+    return (
+      <Badge variant="warning" className="ml-2">
+        ⚠️ {confidencePercent}%
+      </Badge>
+    );
+  }
+  
+  // ERROR - Red danger
   return (
-    <Badge variant={variant} className="ml-2">
-      {icon} {level} ({Math.round(confidence * 100)}%)
+    <Badge variant="error" className="ml-2">
+      ❌ ERROR
     </Badge>
   );
 };
@@ -108,13 +116,13 @@ const getVeritasBadge = (veritasData: any) => {
 const getStatusBadge = (complianceStatus: string) => {
   switch (complianceStatus) {
     case 'compliant':
-      return <Badge variant="default">Compatible</Badge>;
+      return <Badge variant="success">Compatible</Badge>;
     case 'warning':
       return <Badge variant="warning">Revisar</Badge>;
     case 'non_compliant':
-      return <Badge variant="danger">No Compatible</Badge>;
+      return <Badge variant="error">No Compatible</Badge>;
     default:
-      return <Badge variant="outline">Desconocido</Badge>;
+      return <Badge variant="info">Desconocido</Badge>;
   }
 };
 
@@ -204,7 +212,7 @@ export const DocumentListV3: React.FC<DocumentListV3Props> = ({
             {searchQuery ? 'No se encontraron documentos que coincidan con la búsqueda' : 'No hay documentos disponibles'}
           </p>
           {searchQuery && (
-            <Button variant="outline" onClick={() => {/* Clear search */}}>
+            <Button variant="secondary" onClick={() => {/* Clear search */}}>
               Limpiar búsqueda
             </Button>
           )}
@@ -238,7 +246,7 @@ export const DocumentListV3: React.FC<DocumentListV3Props> = ({
               {document.compliance_status_veritas && getVeritasBadge(document.compliance_status_veritas)}
             </div>
             {document.ai_analyzed && (
-              <Badge variant="outline" className="text-xs bg-cyan-500/20 text-cyan-400 border-cyan-500">
+              <Badge variant="info" className="text-xs bg-cyan-500/20 text-cyan-400 border-cyan-500">
                 🤖 AI Analizado
               </Badge>
             )}
@@ -254,12 +262,12 @@ export const DocumentListV3: React.FC<DocumentListV3Props> = ({
           {document.smart_tags && document.smart_tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
               {document.smart_tags.slice(0, 3).map((tag, index) => (
-                <Badge key={index} variant="outline" className="text-xs">
+                <Badge key={index} variant="info" className="text-xs">
                   {tag}
                 </Badge>
               ))}
               {document.smart_tags.length > 3 && (
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="info" className="text-xs">
                   +{document.smart_tags.length - 3}
                 </Badge>
               )}
@@ -272,10 +280,10 @@ export const DocumentListV3: React.FC<DocumentListV3Props> = ({
             Creado: {new Date(document.created_at).toLocaleDateString()}
           </span>
           <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onDocumentDownload(document); }}>
+            <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); onDocumentDownload(document); }}>
               <ArrowRightIcon className="w-4 h-4" />
             </Button>
-            <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onDocumentDelete(document.id); }}>
+            <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); onDocumentDelete(document.id); }}>
               <TrashIcon className="w-4 h-4" />
             </Button>
           </div>
@@ -310,7 +318,7 @@ export const DocumentListV3: React.FC<DocumentListV3Props> = ({
           <div className="flex items-center gap-2 mt-1">
             {getStatusBadge(document.compliance_status)}
             {document.ai_analyzed && (
-              <Badge variant="outline" className="text-xs">AI</Badge>
+              <Badge variant="info" className="text-xs">AI</Badge>
             )}
             <span className="text-xs text-gray-500">
               {new Date(document.created_at).toLocaleDateString()}
@@ -319,10 +327,10 @@ export const DocumentListV3: React.FC<DocumentListV3Props> = ({
         </div>
       </div>
       <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onDocumentDownload(document); }}>
+        <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); onDocumentDownload(document); }}>
           Descargar
         </Button>
-        <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onDocumentDelete(document.id); }}>
+        <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); onDocumentDelete(document.id); }}>
           Eliminar
         </Button>
       </div>
@@ -337,7 +345,7 @@ export const DocumentListV3: React.FC<DocumentListV3Props> = ({
         <div className="flex justify-end">
           <div className="flex gap-2">
             <Button
-              variant={viewMode === 'grid' ? 'default' : 'outline'}
+              variant={viewMode === 'grid' ? 'primary' : 'secondary'}
               size="sm"
               onClick={() => onViewModeChange('grid')}
             >
@@ -345,7 +353,7 @@ export const DocumentListV3: React.FC<DocumentListV3Props> = ({
               Grid
             </Button>
             <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
+              variant={viewMode === 'list' ? 'primary' : 'secondary'}
               size="sm"
               onClick={() => onViewModeChange('list')}
             >
