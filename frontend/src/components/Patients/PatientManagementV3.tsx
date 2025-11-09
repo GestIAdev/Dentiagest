@@ -5,8 +5,11 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 
-// 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../atoms';
+// 🎯 DESIGN SYSTEM IMPORTS - Migrated from atoms
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 import { useDocumentLogger } from '../../utils/documentLogger';
 
@@ -514,7 +517,7 @@ const PatientManagementV3: React.FC = () => {
   const renderPatientCard = (patient: any) => (
     <Card key={patient.id} className="cyberpunk-card hover:shadow-lg transition-shadow cursor-pointer"
           onClick={() => handlePatientSelect(patient)}>
-      <CardContent className="p-4">
+      <CardBody className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div>
             <h3 className="font-semibold text-lg cyberpunk-text">{patient.firstName} {patient.lastName}</h3>
@@ -549,7 +552,7 @@ const PatientManagementV3: React.FC = () => {
             Ver Detalles
           </Button>
         </div>
-      </CardContent>
+      </CardBody>
     </Card>
   );
 
@@ -574,15 +577,15 @@ const PatientManagementV3: React.FC = () => {
   const renderPatientForm = () => (
     <Card className="cyberpunk-card">
       <CardHeader>
-        <CardTitle className="cyberpunk-text">
+        <h2 className="cyberpunk-text text-xl font-bold">
           {selectedPatient ? 'Editar Paciente' : 'Nuevo Paciente'}
-        </CardTitle>
+        </h2>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardBody className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Nombre *</label>
-            <Input
+            <input
               value={patientForm.firstName}
               onChange={(e) => setPatientForm(prev => ({ ...prev, firstName: e.target.value }))}
               placeholder="Nombre"
@@ -590,7 +593,7 @@ const PatientManagementV3: React.FC = () => {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Apellido *</label>
-            <Input
+            <input
               value={patientForm.lastName}
               onChange={(e) => setPatientForm(prev => ({ ...prev, lastName: e.target.value }))}
               placeholder="Apellido"
@@ -601,7 +604,7 @@ const PatientManagementV3: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Email *</label>
-            <Input
+            <input
               type="email"
               value={patientForm.email}
               onChange={(e) => setPatientForm(prev => ({ ...prev, email: e.target.value }))}
@@ -610,7 +613,7 @@ const PatientManagementV3: React.FC = () => {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Teléfono *</label>
-            <Input
+            <input
               value={patientForm.phone}
               onChange={(e) => setPatientForm(prev => ({ ...prev, phone: e.target.value }))}
               placeholder="+1234567890"
@@ -621,7 +624,7 @@ const PatientManagementV3: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Fecha de Nacimiento</label>
-            <Input
+            <input
               type="date"
               value={patientForm.dateOfBirth}
               onChange={(e) => setPatientForm(prev => ({ ...prev, dateOfBirth: e.target.value }))}
@@ -685,7 +688,7 @@ const PatientManagementV3: React.FC = () => {
             {selectedPatient ? 'Actualizar' : 'Crear'} Paciente
           </Button>
         </div>
-      </CardContent>
+      </CardBody>
     </Card>
   );
 
@@ -700,7 +703,7 @@ const PatientManagementV3: React.FC = () => {
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
-                <CardTitle className="cyberpunk-text text-2xl">{patient.firstName} {patient.lastName}</CardTitle>
+                <h2 className="cyberpunk-text text-2xl font-bold">{patient.firstName} {patient.lastName}</h2>
                 <div className="flex items-center space-x-2 mt-2">
                   {getStatusBadge(patient.isActive)}
                   {patient.requiresSpecialCare && (
@@ -717,7 +720,7 @@ const PatientManagementV3: React.FC = () => {
                   {patient.isActive ? 'Desactivar' : 'Activar'}
                 </Button>
                 <Button
-                  variant="destructive"
+                  variant="danger"
                   size="sm"
                   onClick={() => handleDeletePatient(patient.id)}
                 >
@@ -726,7 +729,7 @@ const PatientManagementV3: React.FC = () => {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold cyberpunk-text">Información Personal</h3>
@@ -820,7 +823,7 @@ const PatientManagementV3: React.FC = () => {
                 <p className="mt-2">{patient.notes}</p>
               </div>
             )}
-          </CardContent>
+          </CardBody>
         </Card>
       </div>
     );
@@ -842,7 +845,7 @@ const PatientManagementV3: React.FC = () => {
     return (
       <div className="flex justify-center items-center h-64">
         <Card className="cyberpunk-card max-w-md">
-          <CardContent className="p-6 text-center">
+          <CardBody className="p-6 text-center">
             <p className="text-red-400 mb-4">Error al cargar los pacientes</p>
             <p className="text-sm text-gray-400 mb-4">
               {queryError?.message || storeError}
@@ -850,7 +853,7 @@ const PatientManagementV3: React.FC = () => {
             <Button onClick={() => refetchPatients()}>
               Reintentar
             </Button>
-          </CardContent>
+          </CardBody>
         </Card>
       </div>
     );
@@ -891,10 +894,10 @@ const PatientManagementV3: React.FC = () => {
       {/* 🎯 SEARCH BAR - Global Search */}
       {(activeTab === 'list' || activeTab === 'search') && (
         <Card className="cyberpunk-card">
-          <CardContent className="p-4">
+          <CardBody className="p-4">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
-                <Input
+                <input
                   placeholder="Buscar por nombre, email o teléfono..."
                   value={searchQuery}
                   onChange={handleSearchChange}
@@ -918,7 +921,7 @@ const PatientManagementV3: React.FC = () => {
                 </Button>
               </div>
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
       )}
 
@@ -934,12 +937,12 @@ const PatientManagementV3: React.FC = () => {
 
           {filteredPatients.length === 0 ? (
             <Card className="cyberpunk-card">
-              <CardContent className="p-8 text-center">
+              <CardBody className="p-8 text-center">
                 <p className="text-gray-400 mb-4">No se encontraron pacientes</p>
                 <Button onClick={() => handleTabChange('create')}>
                   Crear Primer Paciente
                 </Button>
-              </CardContent>
+              </CardBody>
             </Card>
           ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -957,12 +960,12 @@ const PatientManagementV3: React.FC = () => {
         <div>
           <h2 className="text-xl font-semibold cyberpunk-text mb-4">Búsqueda Avanzada</h2>
           <Card className="cyberpunk-card">
-            <CardContent className="p-6">
+            <CardBody className="p-6">
               <div className="text-center text-gray-400">
                 <p>🎯 Funcionalidad de búsqueda avanzada próximamente</p>
                 <p className="text-sm mt-2">Use la barra de búsqueda superior para filtrar pacientes</p>
               </div>
-            </CardContent>
+            </CardBody>
           </Card>
         </div>
       )}
