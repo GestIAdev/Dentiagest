@@ -4,11 +4,16 @@
 // Status: V3.0 - Smart reordering with supplier integration and predictive analytics
 // Challenge: AI-driven inventory optimization with multi-supplier management
 
-import React, { useState, useMemo } from 'react';
+import * as React from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner, Input } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL QUERIES - V3.0 Auto-Order Integration
@@ -23,7 +28,7 @@ import {
 } from '../../graphql/queries/inventory';
 
 // 🎯 SUBSCRIPTIONS - V3.0 Real-time Integration
-import { useInventorySubscriptionsV3, useStockLevelChanged } from '../../graphql/subscriptions';
+import { useInventorySubscriptionsV3 } from '../../hooks/useInventorySubscriptionsV3';
 
 // 🎯 ICONS - Heroicons for auto-order theme
 import {
@@ -189,8 +194,14 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
   });
 
   // 🎯 REAL-TIME SUBSCRIPTIONS - V3.0 Live Updates
-  const { isConnected: inventorySubscriptionsActive } = useInventorySubscriptionsV3();
-  const { isConnected: stockAlertsActive } = useStockLevelChanged(materialId, 5); // Alert when stock drops below 5
+  const {
+    inventoryData,
+    lowStockData,
+    purchaseOrderData,
+    inventoryLoading,
+    lowStockLoading,
+    purchaseOrderLoading
+  } = useInventorySubscriptionsV3(materialId, undefined); // Solo inventory por ahora
 
   // 🎯 GRAPHQL MUTATIONS
   const [createRule] = useMutation(CREATE_AUTO_ORDER_RULE);
@@ -200,15 +211,15 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
 
   // 🎯 PROCESSED DATA
   const autoOrderRules = useMemo(() => {
-    return rulesData?.autoOrderRulesV3 || [];
+    return (rulesData as any)?.autoOrderRulesV3 || [];
   }, [rulesData]);
 
   const pendingOrders = useMemo(() => {
-    return pendingData?.pendingOrdersV3 || [];
+    return (pendingData as any)?.pendingOrdersV3 || [];
   }, [pendingData]);
 
   const analytics = useMemo(() => {
-    return analyticsData?.autoOrderAnalyticsV3 || {};
+    return (analyticsData as any)?.autoOrderAnalyticsV3 || {};
   }, [analyticsData]);
 
   // 🎯 FORM HANDLERS - GraphQL Integration
@@ -301,15 +312,15 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case 'critical':
-        return <Badge variant="destructive">Crítico</Badge>;
+        return <Badge variant="error">Crítico</Badge>;
       case 'high':
         return <Badge variant="warning">Alto</Badge>;
       case 'medium':
-        return <Badge variant="secondary">Medio</Badge>;
+        return <Badge variant="info">Medio</Badge>;
       case 'low':
-        return <Badge variant="outline">Bajo</Badge>;
+        return <Badge variant="default">Bajo</Badge>;
       default:
-        return <Badge variant="outline">{priority}</Badge>;
+        return <Badge variant="default">{priority}</Badge>;
     }
   };
 
@@ -330,7 +341,7 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
               <CpuChipIcon className="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <CardTitle className="text-xl">Gestión de Reorden Automático 🤖</CardTitle>
+              <h2 className="text-xl">Gestión de Reorden Automático 🤖</h2>
               <p className="text-sm text-gray-600 mt-1">
                 IA-powered inventory optimization and supplier management
               </p>
@@ -340,9 +351,9 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
           <div className="flex items-center space-x-2">
             {/* Real-time Connection Status */}
             <div className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-gray-700/50 border border-gray-600/30">
-              <div className={`w-2 h-2 rounded-full ${(inventorySubscriptionsActive && stockAlertsActive) ? 'bg-green-400 animate-pulse' : 'bg-yellow-400'}`}></div>
-              <span className={`text-xs font-medium ${(inventorySubscriptionsActive && stockAlertsActive) ? 'text-green-300' : 'text-yellow-300'}`}>
-                {(inventorySubscriptionsActive && stockAlertsActive) ? 'Live' : 'Partial'}
+              <div className={`w-2 h-2 rounded-full ${(!inventoryLoading && !lowStockLoading && !purchaseOrderLoading) ? 'bg-green-400 animate-pulse' : 'bg-yellow-400'}`}></div>
+              <span className={`text-xs font-medium ${(!inventoryLoading && !lowStockLoading && !purchaseOrderLoading) ? 'text-green-300' : 'text-yellow-300'}`}>
+                {(!inventoryLoading && !lowStockLoading && !purchaseOrderLoading) ? 'Live' : 'Connecting'}
               </span>
             </div>
             
@@ -352,7 +363,7 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
           </div>
         </CardHeader>
 
-        <CardContent className="p-0">
+        <CardBody className="p-0">
           {/* Tab Navigation */}
           <div className="border-b border-gray-200">
             <div className="flex space-x-8 px-6">
@@ -378,7 +389,7 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
                 <ShoppingCartIcon className="w-4 h-4 mr-2 inline" />
                 Pedidos Pendientes
                 {pendingOrders.length > 0 && (
-                  <Badge variant="warning" className="ml-2">
+                  <Badge variant="info" className="ml-2">
                     {pendingOrders.length}
                   </Badge>
                 )}
@@ -428,13 +439,13 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
                 <div className="space-y-4">
                   {autoOrderRules.map((rule: AutoOrderRule) => (
                     <Card key={rule.id}>
-                      <CardContent className="p-4">
+                      <CardBody className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
                             <div className="flex items-center space-x-3 mb-2">
                               <h4 className="font-medium text-gray-900">{rule.materialName}</h4>
                               {getPriorityBadge(rule.priority)}
-                              <Badge variant={rule.isActive ? 'success' : 'secondary'}>
+                              <Badge variant={rule.isActive ? 'success' : 'default'}>
                                 {rule.isActive ? 'Activo' : 'Inactivo'}
                               </Badge>
                             </div>
@@ -469,7 +480,7 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
                             </Button>
                           </div>
                         </div>
-                      </CardContent>
+                      </CardBody>
                     </Card>
                   ))}
                 </div>
@@ -479,9 +490,9 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
               {showRuleForm && (
                 <Card className="mt-6">
                   <CardHeader>
-                    <CardTitle>Crear Nueva Regla de Reorden</CardTitle>
+                    <h2>Crear Nueva Regla de Reorden</h2>
                   </CardHeader>
-                  <CardContent>
+                  <CardBody>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -504,7 +515,7 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Punto de Reorden
                         </label>
-                        <Input
+                        <input
                           type="number"
                           min="0"
                           value={ruleForm.reorderPoint}
@@ -516,7 +527,7 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Cantidad de Reorden
                         </label>
-                        <Input
+                        <input
                           type="number"
                           min="0"
                           value={ruleForm.reorderQuantity}
@@ -544,7 +555,7 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Límite de Presupuesto
                         </label>
-                        <Input
+                        <input
                           type="number"
                           min="0"
                           step="0.01"
@@ -578,7 +589,7 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
                         Cancelar
                       </Button>
                     </div>
-                  </CardContent>
+                  </CardBody>
                 </Card>
               )}
             </div>
@@ -602,7 +613,7 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
                 <div className="space-y-4">
                   {pendingOrders.map((order: PendingOrder) => (
                     <Card key={order.id}>
-                      <CardContent className="p-4">
+                      <CardBody className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
                             <div className="flex items-center space-x-3 mb-2">
@@ -641,7 +652,7 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
                             </Button>
                           </div>
                         </div>
-                      </CardContent>
+                      </CardBody>
                     </Card>
                   ))}
                 </div>
@@ -660,12 +671,12 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg flex items-center">
+                    <h2 className="text-lg flex items-center">
                       <ArrowTrendingUpIcon className="w-5 h-5 mr-2" />
                       Eficiencia de Predicción
-                    </CardTitle>
+                    </h2>
                   </CardHeader>
-                  <CardContent>
+                  <CardBody>
                     <div className="text-3xl font-bold text-green-600 mb-2">
                       {analytics.aiAccuracy ? `${(analytics.aiAccuracy * 100).toFixed(1)}%` : '87%'}
                     </div>
@@ -673,17 +684,17 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
                     <div className="mt-2 text-xs text-gray-500">
                       Basado en datos históricos de los últimos 6 meses
                     </div>
-                  </CardContent>
+                  </CardBody>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg flex items-center">
+                    <h2 className="text-lg flex items-center">
                       <CurrencyDollarIcon className="w-5 h-5 mr-2" />
                       Ahorros Totales
-                    </CardTitle>
+                    </h2>
                   </CardHeader>
-                  <CardContent>
+                  <CardBody>
                     <div className="text-3xl font-bold text-blue-600 mb-2">
                       ${analytics.totalSavings ? analytics.totalSavings.toLocaleString() : '12,450'}
                     </div>
@@ -691,17 +702,17 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
                     <div className="mt-2 text-xs text-gray-500">
                       Reducción de stockouts y sobre-stock
                     </div>
-                  </CardContent>
+                  </CardBody>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg flex items-center">
+                    <h2 className="text-lg flex items-center">
                       <ClockIcon className="w-5 h-5 mr-2" />
                       Tasa de Éxito
-                    </CardTitle>
+                    </h2>
                   </CardHeader>
-                  <CardContent>
+                  <CardBody>
                     <div className="text-3xl font-bold text-purple-600 mb-2">
                       {analytics.successRate ? `${(analytics.successRate * 100).toFixed(1)}%` : '94.2%'}
                     </div>
@@ -709,15 +720,15 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
                     <div className="mt-2 text-xs text-gray-500">
                       {analytics.totalOrdersExecuted || 0} de {analytics.totalOrdersGenerated || 0} órdenes
                     </div>
-                  </CardContent>
+                  </CardBody>
                 </Card>
               </div>
 
               <Card className="mt-6">
                 <CardHeader>
-                  <CardTitle>Predicciones de Demanda por Material</CardTitle>
+                  <h2>Predicciones de Demanda por Material</h2>
                 </CardHeader>
-                <CardContent>
+                <CardBody>
                   <div className="space-y-4">
                     {autoOrderRules.slice(0, 5).map((rule: AutoOrderRule) => (
                       <div key={rule.id} className="flex items-center justify-between p-4 border rounded-lg">
@@ -748,11 +759,11 @@ export const AutoOrderManagerV3: React.FC<AutoOrderManagerV3Props> = ({
                       </div>
                     ))}
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
             </div>
           )}
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

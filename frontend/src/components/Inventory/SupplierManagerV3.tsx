@@ -10,7 +10,11 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL QUERIES - V3.0 Integration
@@ -145,11 +149,11 @@ export const SupplierManagerV3: React.FC<SupplierManagerV3Props> = ({
 
   // 🎯 PROCESSED DATA
   const suppliers = useMemo(() => {
-    return suppliersData?.suppliersV3 || [];
+    return (suppliersData as any)?.suppliersV3 || [];
   }, [suppliersData]);
 
   const analytics = useMemo(() => {
-    return analyticsData?.inventoryAnalyticsV3 || null;
+    return (analyticsData as any)?.inventoryAnalyticsV3 || null;
   }, [analyticsData]);
 
   // 🎯 FILTERED SUPPLIERS
@@ -171,7 +175,7 @@ export const SupplierManagerV3: React.FC<SupplierManagerV3Props> = ({
   // 🎯 UNIQUE CATEGORIES
   const categories = useMemo(() => {
     const allCategories = suppliers.flatMap((supplier: Supplier) => supplier.categories);
-    return [...new Set(allCategories)] as string[];
+    return Array.from(new Set(allCategories)) as string[];
   }, [suppliers]);
 
   // 🎯 PERFORMANCE METRICS SUMMARY
@@ -251,9 +255,9 @@ export const SupplierManagerV3: React.FC<SupplierManagerV3Props> = ({
                 <BuildingStorefrontIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                   🎯 Gestión de Proveedores V3.0
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   Gestión de relaciones con proveedores y análisis de rendimiento cuántico
                 </p>
@@ -281,7 +285,7 @@ export const SupplierManagerV3: React.FC<SupplierManagerV3Props> = ({
 
         {/* Performance Summary */}
         {performanceSummary && (
-          <CardContent className="pt-4">
+          <CardBody className="pt-4">
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-cyan-400">{performanceSummary.totalSuppliers}</div>
@@ -304,17 +308,17 @@ export const SupplierManagerV3: React.FC<SupplierManagerV3Props> = ({
                 <div className="text-xs text-gray-400">Tasa de Rendimiento</div>
               </div>
             </div>
-          </CardContent>
+          </CardBody>
         )}
       </Card>
 
       {/* Filters Section */}
       <Card className="bg-gray-800/50 backdrop-blur-sm border border-gray-600/30">
-        <CardContent className="pt-6">
+        <CardBody className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
+              <input
                 type="text"
                 placeholder="Buscar proveedores..."
                 value={searchTerm}
@@ -361,7 +365,7 @@ export const SupplierManagerV3: React.FC<SupplierManagerV3Props> = ({
               </Button>
             </div>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
 
       {/* Main Content */}
@@ -369,15 +373,15 @@ export const SupplierManagerV3: React.FC<SupplierManagerV3Props> = ({
         /* Suppliers List View */
         <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-cyan-500/20">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-cyan-300 flex items-center space-x-2">
+            <h2 className="text-lg text-cyan-300 flex items-center space-x-2">
               <BuildingStorefrontIcon className="w-5 h-5" />
               <span>Lista de Proveedores</span>
               <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30">
                 {filteredSuppliers.length}
               </Badge>
-            </CardTitle>
+            </h2>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             {suppliersLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Spinner size="sm" />
@@ -396,7 +400,7 @@ export const SupplierManagerV3: React.FC<SupplierManagerV3Props> = ({
 
                   return (
                     <Card key={supplier.id} className="bg-gray-800/30 border border-gray-600/30 hover:border-purple-500/30 transition-colors">
-                      <CardContent className="p-4">
+                      <CardBody className="p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
@@ -509,24 +513,24 @@ export const SupplierManagerV3: React.FC<SupplierManagerV3Props> = ({
                             </Button>
                           </div>
                         </div>
-                      </CardContent>
+                      </CardBody>
                     </Card>
                   );
                 })}
               </div>
             )}
-          </CardContent>
+          </CardBody>
         </Card>
       ) : (
         /* Performance Analytics View */
         <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-purple-500/20">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-purple-300 flex items-center space-x-2">
+            <h2 className="text-lg text-purple-300 flex items-center space-x-2">
               <ChartBarIcon className="w-5 h-5" />
               <span>Análisis de Rendimiento</span>
-            </CardTitle>
+            </h2>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             {analyticsLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Spinner size="sm" />
@@ -554,7 +558,7 @@ export const SupplierManagerV3: React.FC<SupplierManagerV3Props> = ({
                 <p className="text-gray-500">Los datos de rendimiento se mostrarán aquí cuando estén disponibles</p>
               </div>
             )}
-          </CardContent>
+          </CardBody>
         </Card>
       )}
 

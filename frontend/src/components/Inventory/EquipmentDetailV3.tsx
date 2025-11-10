@@ -10,7 +10,10 @@ import React, { useMemo } from 'react';
 import { useQuery } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 
 // 🎯 GRAPHQL QUERIES - V3.0 Integration
 import { GET_EQUIPMENT_ITEM } from '../../graphql/queries/inventory';
@@ -57,7 +60,7 @@ export const EquipmentDetailV3: React.FC<EquipmentDetailV3Props> = ({
 
   // 🎯 PROCESSED EQUIPMENT DATA
   const equipment = useMemo(() => {
-    return equipmentData?.equipmentDetailV3 || null;
+    return (equipmentData as any)?.equipmentDetailV3 || null;
   }, [equipmentData]);
 
   // 🎯 EQUIPMENT STATUS CALCULATION
@@ -227,9 +230,9 @@ export const EquipmentDetailV3: React.FC<EquipmentDetailV3Props> = ({
                 <CategoryIcon className="w-8 h-8 text-white" />
               </div>
               <div>
-                <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                   🎯 Detalles del Equipo V3.0
-                </CardTitle>
+                </h2>
                 <h2 className="text-xl font-semibold text-white mt-1">{equipment.name}</h2>
                 <p className="text-gray-300 text-sm">
                   {equipment.model} - {equipment.serialNumber}
@@ -265,19 +268,19 @@ export const EquipmentDetailV3: React.FC<EquipmentDetailV3Props> = ({
           </div>
         </CardHeader>
 
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <CardBody className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Information Column */}
             <div className="lg:col-span-2 space-y-6">
               {/* Status Overview */}
               <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-cyan-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-cyan-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-cyan-300 flex items-center space-x-2">
                     <InformationCircleIcon className="w-5 h-5" />
                     <span>Estado General</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardBody className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-center space-x-3">
                       <div className={`w-3 h-3 rounded-full ${equipmentStatus.status === 'good' ? 'bg-green-400' : equipmentStatus.status === 'maintenance_due' ? 'bg-red-400' : 'bg-yellow-400'}`}></div>
@@ -304,18 +307,18 @@ export const EquipmentDetailV3: React.FC<EquipmentDetailV3Props> = ({
                       Condición: {conditionBadge.label}
                     </Badge>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
 
               {/* Basic Information */}
               <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-purple-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-purple-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-purple-300 flex items-center space-x-2">
                     <DocumentTextIcon className="w-5 h-5" />
                     <span>Información Básica</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent>
+                <CardBody>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-400 mb-1">Categoría</label>
@@ -343,18 +346,18 @@ export const EquipmentDetailV3: React.FC<EquipmentDetailV3Props> = ({
                       </div>
                     </div>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
 
               {/* Financial Information */}
               <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-pink-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-pink-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-pink-300 flex items-center space-x-2">
                     <CurrencyDollarIcon className="w-5 h-5" />
                     <span>Información Financiera</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent>
+                <CardBody>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-400 mb-1">Precio de Compra</label>
@@ -386,18 +389,18 @@ export const EquipmentDetailV3: React.FC<EquipmentDetailV3Props> = ({
                       </p>
                     </div>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
 
               {/* Maintenance Information */}
               <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-cyan-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-cyan-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-cyan-300 flex items-center space-x-2">
                     <CalendarDaysIcon className="w-5 h-5" />
                     <span>Mantenimiento</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent>
+                <CardBody>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-400 mb-1">Intervalo de Mantenimiento</label>
@@ -425,21 +428,21 @@ export const EquipmentDetailV3: React.FC<EquipmentDetailV3Props> = ({
                       </p>
                     </div>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
 
               {/* Notes */}
               {equipment.notes && (
                 <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-gray-500/20">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-gray-300 flex items-center space-x-2">
+                    <h2 className="text-lg text-gray-300 flex items-center space-x-2">
                       <TagIcon className="w-5 h-5" />
                       <span>Notas Adicionales</span>
-                    </CardTitle>
+                    </h2>
                   </CardHeader>
-                  <CardContent>
+                  <CardBody>
                     <p className="text-white whitespace-pre-wrap">{equipment.notes}</p>
-                  </CardContent>
+                  </CardBody>
                 </Card>
               )}
             </div>
@@ -450,12 +453,12 @@ export const EquipmentDetailV3: React.FC<EquipmentDetailV3Props> = ({
               {equipment._veritas && (
                 <Card className="bg-gradient-to-br from-green-900/20 to-green-800/20 backdrop-blur-sm border border-green-500/20">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-green-300 flex items-center space-x-2">
+                    <h2 className="text-lg text-green-300 flex items-center space-x-2">
                       <ShieldCheckIcon className="w-5 h-5" />
                       <span>Verificación @veritas</span>
-                    </CardTitle>
+                    </h2>
                   </CardHeader>
-                  <CardContent className="space-y-3">
+                  <CardBody className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-300">Confianza:</span>
                       <span className="text-green-300 font-mono font-semibold">
@@ -474,19 +477,19 @@ export const EquipmentDetailV3: React.FC<EquipmentDetailV3Props> = ({
                         {equipment._veritas.level}
                       </Badge>
                     </div>
-                  </CardContent>
+                  </CardBody>
                 </Card>
               )}
 
               {/* Quick Actions */}
               <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-purple-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-purple-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-purple-300 flex items-center space-x-2">
                     <BoltIcon className="w-5 h-5" />
                     <span>Acciones Rápidas</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardBody className="space-y-3">
                   <Button
                     onClick={() => onEdit(equipment)}
                     className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
@@ -510,18 +513,18 @@ export const EquipmentDetailV3: React.FC<EquipmentDetailV3Props> = ({
                     <ChartBarIcon className="w-4 h-4 mr-2" />
                     Ver Historial
                   </Button>
-                </CardContent>
+                </CardBody>
               </Card>
 
               {/* Equipment Stats */}
               <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-cyan-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-cyan-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-cyan-300 flex items-center space-x-2">
                     <ChartBarIcon className="w-5 h-5" />
                     <span>Estadísticas</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardBody className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-400">Valor de Depreciación</span>
                     <span className="text-white font-semibold">{depreciation.toFixed(1)}%</span>
@@ -540,11 +543,11 @@ export const EquipmentDetailV3: React.FC<EquipmentDetailV3Props> = ({
                       {statusBadge.label}
                     </Badge>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
             </div>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

@@ -9,7 +9,9 @@
 import React from 'react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
 
 // 🎯 ICONS - Heroicons for marketplace theme
 import {
@@ -78,9 +80,9 @@ export const SupplierDetailViewV3: React.FC<SupplierDetailViewV3Props> = ({
                 <BuildingStorefrontIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                   🎯 Detalle del Proveedor V3.0
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   Verificación cuántica @veritas activa
                 </p>
@@ -97,11 +99,11 @@ export const SupplierDetailViewV3: React.FC<SupplierDetailViewV3Props> = ({
           </div>
         </CardHeader>
 
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <CardBody className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="space-y-6">
             {/* 🎯 SUPPLIER HEADER */}
             <Card className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-500/20">
-              <CardContent className="p-6">
+              <CardBody className="p-6">
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex items-center space-x-4">
                     <div className={`w-16 h-16 rounded-xl flex items-center justify-center shadow-lg ${supplier.isActive ? 'bg-green-500/20 border border-green-500/30' : 'bg-red-500/20 border border-red-500/30'}`}>
@@ -169,18 +171,18 @@ export const SupplierDetailViewV3: React.FC<SupplierDetailViewV3Props> = ({
                     </div>
                   </div>
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* 🎯 CONTACT INFORMATION */}
             <Card className="bg-gray-800/50 border border-gray-600/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-purple-300 flex items-center space-x-2">
+                <h2 className="text-lg text-purple-300 flex items-center space-x-2">
                   <UserIcon className="w-5 h-5" />
                   <span>Información de Contacto</span>
-                </CardTitle>
+                </h2>
               </CardHeader>
-              <CardContent>
+              <CardBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div className="flex items-center space-x-3">
@@ -215,18 +217,18 @@ export const SupplierDetailViewV3: React.FC<SupplierDetailViewV3Props> = ({
                     </div>
                   </div>
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* 🎯 CATEGORIES */}
             <Card className="bg-gray-800/50 border border-gray-600/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-cyan-300 flex items-center space-x-2">
+                <h2 className="text-lg text-cyan-300 flex items-center space-x-2">
                   <GlobeAltIcon className="w-5 h-5" />
                   <span>Categorías de Productos</span>
-                </CardTitle>
+                </h2>
               </CardHeader>
-              <CardContent>
+              <CardBody>
                 <div className="flex flex-wrap gap-2">
                   {supplier.categories?.map((category: string, index: number) => (
                     <Badge
@@ -237,18 +239,18 @@ export const SupplierDetailViewV3: React.FC<SupplierDetailViewV3Props> = ({
                     </Badge>
                   ))}
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* 🎯 BUSINESS METRICS */}
             <Card className="bg-gray-800/50 border border-gray-600/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-green-300 flex items-center space-x-2">
+                <h2 className="text-lg text-green-300 flex items-center space-x-2">
                   <TruckIcon className="w-5 h-5" />
                   <span>Métricas de Negocio</span>
-                </CardTitle>
+                </h2>
               </CardHeader>
-              <CardContent>
+              <CardBody>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-cyan-400">{supplier.totalOrders}</div>
@@ -265,19 +267,19 @@ export const SupplierDetailViewV3: React.FC<SupplierDetailViewV3Props> = ({
                     <div className="text-gray-400 text-sm">Promedio por Orden</div>
                   </div>
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* 🎯 @VERITAS VERIFICATION DETAILS */}
             {supplier._veritas && (
               <Card className="bg-gradient-to-r from-green-900/30 to-cyan-900/30 border border-green-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-green-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-green-300 flex items-center space-x-2">
                     <ShieldCheckIcon className="w-5 h-5" />
                     <span>Verificación @veritas</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent>
+                <CardBody>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                       <label className="text-gray-400 text-sm">Confianza</label>
@@ -302,16 +304,16 @@ export const SupplierDetailViewV3: React.FC<SupplierDetailViewV3Props> = ({
                     <label className="text-gray-400 text-sm">Algoritmo</label>
                     <p className="text-cyan-300 font-mono text-sm">{supplier._veritas.algorithm}</p>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
             )}
 
             {/* 🎯 TIMESTAMPS */}
             <Card className="bg-gray-800/50 border border-gray-600/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-gray-300">Información del Sistema</CardTitle>
+                <h2 className="text-lg text-gray-300">Información del Sistema</h2>
               </CardHeader>
-              <CardContent>
+              <CardBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="text-gray-400 text-sm">Creado</label>
@@ -322,7 +324,7 @@ export const SupplierDetailViewV3: React.FC<SupplierDetailViewV3Props> = ({
                     <p className="text-white font-semibold">{formatDate(supplier.updatedAt)}</p>
                   </div>
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* 🎯 ACTION BUTTONS */}
@@ -335,7 +337,7 @@ export const SupplierDetailViewV3: React.FC<SupplierDetailViewV3Props> = ({
               </Button>
             </div>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

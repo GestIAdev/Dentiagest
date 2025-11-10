@@ -10,8 +10,7 @@ import React, { useState, useMemo } from 'react';
 import {
   Card,
   CardHeader,
-  CardTitle,
-  CardContent,
+  CardBody,
   Badge,
   Button,
   Spinner
@@ -313,7 +312,7 @@ export const VeritasProofViewer: React.FC<VeritasProofViewerProps> = ({
         {/* Verification Checks */}
         <Card>
           <CardHeader>
-            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
+            <h2 className="text-cyan-400 text-lg font-bold flex items-center">
               <DocumentCheckIcon className="w-5 h-5 mr-2" />
               Verificaciones Realizadas
             </h2>
@@ -342,7 +341,7 @@ export const VeritasProofViewer: React.FC<VeritasProofViewerProps> = ({
         {/* Cryptographic Proof */}
         <Card>
           <CardHeader>
-            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
+            <h2 className="cyberpunk-text text-lg font-bold flex items-center">
               <KeyIcon className="w-5 h-5 mr-2" />
               Prueba Criptográfica
             </h2>
@@ -364,7 +363,7 @@ export const VeritasProofViewer: React.FC<VeritasProofViewerProps> = ({
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Algoritmo
                   </label>
-                  <Badge variant="outline" className="font-mono">
+                  <Badge variant="default" className="font-mono">
                     {proof.proof.algorithm || 'SHA-256'}
                   </Badge>
                 </div>
@@ -398,7 +397,7 @@ export const VeritasProofViewer: React.FC<VeritasProofViewerProps> = ({
         {/* Metadata */}
         <Card>
           <CardHeader>
-            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
+            <h2 className="text-cyan-400 text-lg font-bold flex items-center">
               <ClockIcon className="w-5 h-5 mr-2" />
               Metadatos de Verificación
             </h2>
@@ -426,7 +425,7 @@ export const VeritasProofViewer: React.FC<VeritasProofViewerProps> = ({
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Altura del Bloque
                   </label>
-                  <Badge variant="outline" className="font-mono">
+                  <Badge variant="default" className="font-mono">
                     #{proof.metadata.blockHeight}
                   </Badge>
                 </div>
@@ -449,7 +448,7 @@ export const VeritasProofViewer: React.FC<VeritasProofViewerProps> = ({
         {/* Timestamp */}
         <Card>
           <CardHeader>
-            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
+            <h2 className="text-cyan-400 text-lg font-bold flex items-center">
               <FingerPrintIcon className="w-5 h-5 mr-2" />
               Marca de Tiempo Digital
             </h2>
@@ -464,7 +463,7 @@ export const VeritasProofViewer: React.FC<VeritasProofViewerProps> = ({
                   </p>
                 </div>
                 <div className="text-right">
-                  <Badge variant="outline" className="mb-1">
+                  <Badge variant="default" className="mb-1">
                     <LockClosedIcon className="w-4 h-4 mr-1" />
                     Firmado
                   </Badge>
@@ -482,9 +481,9 @@ export const VeritasProofViewer: React.FC<VeritasProofViewerProps> = ({
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Header */}
-      <Card className="cyberpunk-card">
+      <Card variant="glass" className="border-cyan-500/20">
         <CardHeader>
-          <h2 className="cyberpunk-text text-xl font-bold" className="cyberpunk-text flex items-center">
+          <h2 className="text-cyan-400 text-lg font-bold flex items-center">
             <ShieldCheckIcon className="w-6 h-6 mr-2" />
             Verificación @veritas - Quantum Truth
           </h2>

@@ -6,15 +6,23 @@
 // 🎨 THEME: Cyberpunk Medical - Cyan/Purple/Pink gradients with quantum effects
 // 🔒 SECURITY: @veritas quantum truth verification on critical inventory values
 
-import React, { useState, useEffect, useMemo } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL QUERIES - V3.0 Integration
 import { GET_INVENTORY_DASHBOARD, GET_INVENTORY_AI_INSIGHTS } from '../../graphql/queries/inventory';
+
+// 🎯 SUBSCRIPTIONS - V3.0 Real-time Integration
+import { useInventorySubscriptionsV3 } from '../../hooks/useInventorySubscriptionsV3';
 
 // 🎯 INVENTORY SUB-COMPONENTS - V3 Integration
 import DentalMaterialManagerV3 from './DentalMaterialManagerV3';
@@ -43,6 +51,128 @@ import {
 } from '@heroicons/react/24/outline';
 
 const l = createModuleLogger('InventoryManagementV3');
+
+// 🎯 COLOR SYSTEM - Static Tailwind Classes for Dynamic Colors
+const COLOR_CLASSES = {
+  cyan: {
+    bg: 'bg-cyan-500/20',
+    bgGradient: 'bg-gradient-to-br from-cyan-500/20 to-cyan-600/20',
+    border: 'border-cyan-500/30',
+    text: 'text-cyan-400',
+    shadow: 'shadow-cyan-500/25',
+    iconBg: 'bg-gradient-to-br from-cyan-500 to-cyan-600'
+  },
+  red: {
+    bg: 'bg-red-500/20',
+    bgGradient: 'bg-gradient-to-br from-red-500/20 to-red-600/20',
+    border: 'border-red-500/30',
+    text: 'text-red-400',
+    shadow: 'shadow-red-500/25',
+    iconBg: 'bg-gradient-to-br from-red-500 to-red-600'
+  },
+  green: {
+    bg: 'bg-green-500/20',
+    bgGradient: 'bg-gradient-to-br from-green-500/20 to-green-600/20',
+    border: 'border-green-500/30',
+    text: 'text-green-400',
+    shadow: 'shadow-green-500/25',
+    iconBg: 'bg-gradient-to-br from-green-500 to-green-600'
+  },
+  yellow: {
+    bg: 'bg-yellow-500/20',
+    bgGradient: 'bg-gradient-to-br from-yellow-500/20 to-yellow-600/20',
+    border: 'border-yellow-500/30',
+    text: 'text-yellow-400',
+    shadow: 'shadow-yellow-500/25',
+    iconBg: 'bg-gradient-to-br from-yellow-500 to-yellow-600'
+  },
+  purple: {
+    bg: 'bg-purple-500/20',
+    bgGradient: 'bg-gradient-to-br from-purple-500/20 to-purple-600/20',
+    border: 'border-purple-500/30',
+    text: 'text-purple-400',
+    shadow: 'shadow-purple-500/25',
+    iconBg: 'bg-gradient-to-br from-purple-500 to-purple-600'
+  },
+  pink: {
+    bg: 'bg-pink-500/20',
+    bgGradient: 'bg-gradient-to-br from-pink-500/20 to-pink-600/20',
+    border: 'border-pink-500/30',
+    text: 'text-pink-400',
+    shadow: 'shadow-pink-500/25',
+    iconBg: 'bg-gradient-to-br from-pink-500 to-pink-600'
+  },
+  emerald: {
+    bg: 'bg-emerald-500/20',
+    bgGradient: 'bg-gradient-to-br from-emerald-500/20 to-emerald-600/20',
+    border: 'border-emerald-500/30',
+    text: 'text-emerald-400',
+    shadow: 'shadow-emerald-500/25',
+    iconBg: 'bg-gradient-to-br from-emerald-500 to-emerald-600'
+  },
+  orange: {
+    bg: 'bg-orange-500/20',
+    bgGradient: 'bg-gradient-to-br from-orange-500/20 to-orange-600/20',
+    border: 'border-orange-500/30',
+    text: 'text-orange-400',
+    shadow: 'shadow-orange-500/25',
+    iconBg: 'bg-gradient-to-br from-orange-500 to-orange-600'
+  }
+};
+
+// 🎯 HELPER FUNCTION - Get color classes safely
+const getColorClasses = (color: string) => {
+  return COLOR_CLASSES[color as keyof typeof COLOR_CLASSES] || COLOR_CLASSES.cyan;
+};
+
+// 🎯 GRAPHQL DATA TYPES
+interface InventoryDashboardData {
+  inventoryDashboardV3: {
+    totalMaterials: number;
+    lowStockAlerts: number;
+    activeEquipment: number;
+    maintenanceDue: number;
+    totalSuppliers: number;
+    pendingOrders: number;
+    totalValue: number;
+    totalValue_veritas: number;
+    _veritas: {
+      verified: boolean;
+      confidence: number;
+    } | null;
+  };
+}
+
+interface InventoryAIInsightsData {
+  inventoryAIInsightsV3: {
+    insights: Array<{
+      id: string;
+      type: string;
+      title: string;
+      description: string;
+      confidence: number;
+      impact: string;
+      recommendation: string;
+      priority: string;
+    }>;
+    predictions: Array<{
+      itemId: string;
+      predictedDemand: number;
+      confidence: number;
+      timeFrame: string;
+    }>;
+    optimizations: Array<{
+      type: string;
+      description: string;
+      potentialSavings: number;
+      implementationEffort: string;
+    }>;
+    _veritas: {
+      verified: boolean;
+      confidence: number;
+    };
+  };
+}
 
 // 🎯 INVENTORY MODULE CONFIGURATION
 const INVENTORY_MODULES = [
@@ -96,8 +226,8 @@ export const InventoryManagementV3: React.FC<InventoryManagementV3Props> = ({
   const [showAIInsights, setShowAIInsights] = useState(false);
 
   // 🎯 GRAPHQL QUERIES - V3.0 Dashboard Data
-  const { data: dashboardData, loading: dashboardLoading, error: dashboardError, refetch: refetchDashboard } = useQuery(GET_INVENTORY_DASHBOARD);
-  const { data: aiInsightsData, loading: aiInsightsLoading } = useQuery(GET_INVENTORY_AI_INSIGHTS, {
+  const { data: dashboardData, loading: dashboardLoading, error: dashboardError, refetch: refetchDashboard } = useQuery<InventoryDashboardData>(GET_INVENTORY_DASHBOARD);
+  const { data: aiInsightsData, loading: aiInsightsLoading } = useQuery<InventoryAIInsightsData>(GET_INVENTORY_AI_INSIGHTS, {
     variables: { context: 'inventory_overview' },
     skip: !showAIInsights
   });
@@ -118,12 +248,12 @@ export const InventoryManagementV3: React.FC<InventoryManagementV3Props> = ({
       };
     }
 
-    return dashboardData.inventoryDashboardV3;
+    return dashboardData.inventoryDashboardV3 as any;
   }, [dashboardData]);
 
   // 🎯 AI INSIGHTS STATE
   const aiInsights = useMemo(() => {
-    return aiInsightsData?.inventoryAIInsightsV3 || { insights: [], predictions: [], optimizations: [] };
+    return aiInsightsData?.inventoryAIInsightsV3 as any || { insights: [], predictions: [], optimizations: [] };
   }, [aiInsightsData]);
 
   // 🎯 ACTIVE MODULE COMPONENT
@@ -223,7 +353,7 @@ export const InventoryManagementV3: React.FC<InventoryManagementV3Props> = ({
               Actualizar Dashboard
             </Button>
             <Button
-              variant={showAIInsights ? "default" : "secondary"}
+              variant={showAIInsights ? "primary" : "secondary"}
               onClick={() => setShowAIInsights(!showAIInsights)}
               disabled={aiInsightsLoading}
               className="bg-purple-500/20 hover:bg-purple-500/30 border-purple-500/30 text-purple-300"
@@ -243,7 +373,7 @@ export const InventoryManagementV3: React.FC<InventoryManagementV3Props> = ({
             return (
               <Card key={index} className="relative overflow-hidden bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10">
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-purple-500/5 to-pink-500/5"></div>
-                <CardContent className="relative p-4">
+                <CardBody className="relative p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-300">{card.title}</p>
@@ -257,8 +387,8 @@ export const InventoryManagementV3: React.FC<InventoryManagementV3Props> = ({
                       </p>
                     </div>
                     <div className="flex flex-col items-end space-y-2">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-${card.color}-500/20 to-${card.color}-600/20 border border-${card.color}-500/30`}>
-                        <Icon className={`w-5 h-5 text-${card.color}-400`} />
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getColorClasses(card.color).bgGradient} ${getColorClasses(card.color).border}`}>
+                        <Icon className={`w-5 h-5 ${getColorClasses(card.color).text}`} />
                       </div>
                       {card.veritasVerified && (
                         <div className="flex items-center space-x-1">
@@ -268,7 +398,7 @@ export const InventoryManagementV3: React.FC<InventoryManagementV3Props> = ({
                       )}
                     </div>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
             );
           })}
@@ -279,12 +409,12 @@ export const InventoryManagementV3: React.FC<InventoryManagementV3Props> = ({
       {showAIInsights && (
         <Card className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 backdrop-blur-sm border border-purple-500/20">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-purple-300">
+            <h2 className="flex items-center space-x-2 text-purple-300">
               <SparklesIcon className="w-5 h-5" />
               <span>🤖 IA Insights - Análisis Predictivo</span>
-            </CardTitle>
+            </h2>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             {aiInsightsLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Spinner className="w-6 h-6 text-purple-400" />
@@ -298,7 +428,7 @@ export const InventoryManagementV3: React.FC<InventoryManagementV3Props> = ({
                     <div key={idx} className="p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
                       <p className="text-sm text-cyan-200">{insight.description}</p>
                       <div className="flex items-center justify-between mt-2">
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="info" className="text-xs">
                           {insight.priority}
                         </Badge>
                         <span className="text-xs text-cyan-400">
@@ -334,19 +464,19 @@ export const InventoryManagementV3: React.FC<InventoryManagementV3Props> = ({
                 </div>
               </div>
             )}
-          </CardContent>
+          </CardBody>
         </Card>
       )}
 
       {/* Module Navigation - Cyberpunk Medical Theme */}
       <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm border border-purple-500/20">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-purple-300">
+          <h2 className="flex items-center space-x-2 text-purple-300">
             <ChartBarIcon className="w-5 h-5" />
             <span>Módulos de Inventario - Provincia del Arsenal</span>
-          </CardTitle>
+          </h2>
         </CardHeader>
-        <CardContent>
+        <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {INVENTORY_MODULES.map((module) => {
               const Icon = module.icon;
@@ -358,7 +488,7 @@ export const InventoryManagementV3: React.FC<InventoryManagementV3Props> = ({
                   onClick={() => setActiveModule(module.id)}
                   className={`relative overflow-hidden p-4 rounded-xl border-2 transition-all duration-300 text-left group ${
                     isActive
-                      ? `border-${module.color}-400 bg-gradient-to-br from-${module.color}-500/20 to-${module.color}-600/20 shadow-lg shadow-${module.color}-500/25`
+                      ? `border-${module.color}-400 ${getColorClasses(module.color).bgGradient} ${getColorClasses(module.color).shadow}`
                       : 'border-gray-600/50 hover:border-gray-500/70 bg-gray-800/50 hover:bg-gray-700/50 backdrop-blur-sm'
                   }`}
                 >
@@ -366,7 +496,7 @@ export const InventoryManagementV3: React.FC<InventoryManagementV3Props> = ({
                   <div className="relative flex items-center space-x-3">
                     <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-300 ${
                       isActive
-                        ? `bg-gradient-to-br from-${module.color}-500 to-${module.color}-600 shadow-lg shadow-${module.color}-500/50`
+                        ? `${getColorClasses(module.color).iconBg} shadow-lg ${getColorClasses(module.color).shadow}`
                         : 'bg-gray-700/50 group-hover:bg-gray-600/50'
                     }`}>
                       <Icon className={`w-6 h-6 transition-colors duration-300 ${
@@ -395,20 +525,20 @@ export const InventoryManagementV3: React.FC<InventoryManagementV3Props> = ({
               );
             })}
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
 
       {/* Active Module Content */}
       <Card className="bg-gradient-to-br from-gray-900/30 to-gray-800/30 backdrop-blur-sm border border-cyan-500/20">
-        <CardContent className="p-0">
+        <CardBody className="p-0">
           <ActiveModuleComponent />
-        </CardContent>
+        </CardBody>
       </Card>
 
       {/* Quick Actions Footer - Cyberpunk Medical Theme */}
       <Card className="relative overflow-hidden bg-gradient-to-br from-cyan-900/20 via-purple-900/20 to-pink-900/20 backdrop-blur-sm border border-cyan-500/20">
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 animate-pulse"></div>
-        <CardContent className="relative p-6">
+        <CardBody className="relative p-6">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
@@ -442,7 +572,7 @@ export const InventoryManagementV3: React.FC<InventoryManagementV3Props> = ({
               </Button>
             </div>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

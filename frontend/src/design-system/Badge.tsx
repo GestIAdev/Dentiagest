@@ -6,7 +6,8 @@
  * SIZES: sm, md, lg
  */
 
-import React, { HTMLAttributes, ReactNode } from 'react';
+import * as React from 'react';
+import { HTMLAttributes, ReactNode } from 'react';
 import { cn } from '../utils/cn';
 
 type BadgeVariant = 'default' | 'success' | 'warning' | 'error' | 'info' | 'veritas';

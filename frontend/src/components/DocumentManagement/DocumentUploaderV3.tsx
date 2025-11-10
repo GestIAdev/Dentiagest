@@ -12,8 +12,7 @@ import {
   Input,
   Card,
   CardHeader,
-  CardTitle,
-  CardContent,
+  CardBody,
   Badge,
   Spinner
 } from '../../design-system';
@@ -432,7 +431,7 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
       {/* Header */}
       <Card className="cyberpunk-card">
         <CardHeader>
-          <h2 className="cyberpunk-text text-xl font-bold" className="cyberpunk-text flex items-center">
+          <h2 className="cyberpunk-text text-lg font-bold flex items-center">
             <CloudArrowUpIcon className="w-6 h-6 mr-2" />
             Subir Documento - Olympus V3.0
           </h2>
@@ -492,7 +491,7 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
       {selectedFile && validationResult?.isValid && (
         <Card className="cyberpunk-card">
           <CardHeader>
-            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg">Información del Documento</h2>
+            <h2 className="cyberpunk-text text-lg font-bold">Información del Documento</h2>
           </CardHeader>
           <CardBody className="space-y-4">
             {/* Title */}

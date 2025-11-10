@@ -10,7 +10,10 @@ import React, { useState, useEffect } from 'react';
 import { useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+
+import { Badge } from '../../design-system/Badge';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL QUERIES - V3.0 Integration
@@ -248,9 +251,9 @@ export const SupplierFormV3: React.FC<SupplierFormV3Props> = ({
                 <BuildingStorefrontIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                   🎯 {supplier ? 'Editar' : 'Nuevo'} Proveedor V3.0
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   Gestión completa de proveedores con verificación cuántica
                 </p>
@@ -268,7 +271,7 @@ export const SupplierFormV3: React.FC<SupplierFormV3Props> = ({
         </CardHeader>
 
         <form onSubmit={handleSubmit}>
-          <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          <CardBody className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Basic Information */}
               <div className="space-y-4">
@@ -281,7 +284,7 @@ export const SupplierFormV3: React.FC<SupplierFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Nombre del Proveedor *
                   </label>
-                  <Input
+                  <input
                     type="text"
                     value={formData.name}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('name', e.target.value)}
@@ -300,7 +303,7 @@ export const SupplierFormV3: React.FC<SupplierFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Persona de Contacto *
                   </label>
-                  <Input
+                  <input
                     type="text"
                     value={formData.contactPerson}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('contactPerson', e.target.value)}
@@ -321,7 +324,7 @@ export const SupplierFormV3: React.FC<SupplierFormV3Props> = ({
                   </label>
                   <div className="relative">
                     <EnvelopeIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <Input
+                    <input
                       type="email"
                       value={formData.email}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('email', e.target.value)}
@@ -343,7 +346,7 @@ export const SupplierFormV3: React.FC<SupplierFormV3Props> = ({
                   </label>
                   <div className="relative">
                     <PhoneIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <Input
+                    <input
                       type="tel"
                       value={formData.phone}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('phone', e.target.value)}
@@ -393,7 +396,7 @@ export const SupplierFormV3: React.FC<SupplierFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     ID Fiscal
                   </label>
-                  <Input
+                  <input
                     type="text"
                     value={formData.taxId}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('taxId', e.target.value)}
@@ -421,7 +424,7 @@ export const SupplierFormV3: React.FC<SupplierFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Límite de Crédito ($)
                   </label>
-                  <Input
+                  <input
                     type="number"
                     step="0.01"
                     value={formData.creditLimit}
@@ -457,7 +460,7 @@ export const SupplierFormV3: React.FC<SupplierFormV3Props> = ({
                     Calificación (1-5)
                   </label>
                   <div className="flex items-center space-x-2">
-                    <Input
+                    <input
                       type="number"
                       min="1"
                       max="5"
@@ -512,7 +515,7 @@ export const SupplierFormV3: React.FC<SupplierFormV3Props> = ({
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Inicio del Contrato
                 </label>
-                <Input
+                <input
                   type="date"
                   value={formData.contractStart}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('contractStart', e.target.value)}
@@ -524,7 +527,7 @@ export const SupplierFormV3: React.FC<SupplierFormV3Props> = ({
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Fin del Contrato
                 </label>
-                <Input
+                <input
                   type="date"
                   value={formData.contractEnd}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('contractEnd', e.target.value)}
@@ -576,7 +579,7 @@ export const SupplierFormV3: React.FC<SupplierFormV3Props> = ({
                 )}
               </Button>
             </div>
-          </CardContent>
+          </CardBody>
         </form>
       </Card>
     </div>

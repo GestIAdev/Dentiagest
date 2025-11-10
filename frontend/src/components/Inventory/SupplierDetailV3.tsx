@@ -9,7 +9,9 @@
 import React from 'react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
 
 // 🎯 ICONS - Heroicons for supplier theme
 import {
@@ -81,9 +83,9 @@ export const SupplierDetailV3: React.FC<SupplierDetailV3Props> = ({
                 <BuildingStorefrontIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                   🎯 Detalles del Proveedor V3.0
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   Información completa con verificación cuántica @veritas
                 </p>
@@ -109,18 +111,18 @@ export const SupplierDetailV3: React.FC<SupplierDetailV3Props> = ({
           </div>
         </CardHeader>
 
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <CardBody className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Basic Information */}
             <div className="space-y-6">
               <Card className="bg-gradient-to-br from-cyan-900/20 to-cyan-800/20 backdrop-blur-sm border border-cyan-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-cyan-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-cyan-300 flex items-center space-x-2">
                     <UserIcon className="w-5 h-5" />
                     <span>Información de Contacto</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardBody className="space-y-4">
                   <div className="flex items-center space-x-3">
                     <UserIcon className="w-5 h-5 text-cyan-400" />
                     <div>
@@ -152,18 +154,18 @@ export const SupplierDetailV3: React.FC<SupplierDetailV3Props> = ({
                       <p className="text-white font-medium whitespace-pre-line">{supplier.address}</p>
                     </div>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
 
               {/* Business Information */}
               <Card className="bg-gradient-to-br from-purple-900/20 to-purple-800/20 backdrop-blur-sm border border-purple-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-purple-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-purple-300 flex items-center space-x-2">
                     <CreditCardIcon className="w-5 h-5" />
                     <span>Información Empresarial</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardBody className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-gray-400 text-sm">ID Fiscal</p>
@@ -202,7 +204,7 @@ export const SupplierDetailV3: React.FC<SupplierDetailV3Props> = ({
                       </span>
                     </div>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
             </div>
 
@@ -212,12 +214,12 @@ export const SupplierDetailV3: React.FC<SupplierDetailV3Props> = ({
               {supplier.performanceMetrics && (
                 <Card className="bg-gradient-to-br from-pink-900/20 to-pink-800/20 backdrop-blur-sm border border-pink-500/20">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-pink-300 flex items-center space-x-2">
+                    <h2 className="text-lg text-pink-300 flex items-center space-x-2">
                       <ChartBarIcon className="w-5 h-5" />
                       <span>Métricas de Rendimiento</span>
-                    </CardTitle>
+                    </h2>
                   </CardHeader>
-                  <CardContent>
+                  <CardBody>
                     <div className="grid grid-cols-2 gap-3">
                       <PerformanceMetric
                         label="Entrega a Tiempo"
@@ -241,19 +243,19 @@ export const SupplierDetailV3: React.FC<SupplierDetailV3Props> = ({
                         color="text-purple-400"
                       />
                     </div>
-                  </CardContent>
+                  </CardBody>
                 </Card>
               )}
 
               {/* Categories */}
               <Card className="bg-gradient-to-br from-green-900/20 to-green-800/20 backdrop-blur-sm border border-green-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-green-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-green-300 flex items-center space-x-2">
                     <DocumentTextIcon className="w-5 h-5" />
                     <span>Categorías de Productos</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent>
+                <CardBody>
                   {supplier.categories && supplier.categories.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {supplier.categories.map((category: string) => (
@@ -265,19 +267,19 @@ export const SupplierDetailV3: React.FC<SupplierDetailV3Props> = ({
                   ) : (
                     <p className="text-gray-400">No hay categorías especificadas</p>
                   )}
-                </CardContent>
+                </CardBody>
               </Card>
 
               {/* Contract Information */}
               {(supplier.contractStart || supplier.contractEnd) && (
                 <Card className="bg-gradient-to-br from-yellow-900/20 to-yellow-800/20 backdrop-blur-sm border border-yellow-500/20">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-yellow-300 flex items-center space-x-2">
+                    <h2 className="text-lg text-yellow-300 flex items-center space-x-2">
                       <CalendarDaysIcon className="w-5 h-5" />
                       <span>Información del Contrato</span>
-                    </CardTitle>
+                    </h2>
                   </CardHeader>
-                  <CardContent className="space-y-3">
+                  <CardBody className="space-y-3">
                     {supplier.contractStart && (
                       <div>
                         <p className="text-gray-400 text-sm">Fecha de Inicio</p>
@@ -300,7 +302,7 @@ export const SupplierDetailV3: React.FC<SupplierDetailV3Props> = ({
                         )}
                       </div>
                     )}
-                  </CardContent>
+                  </CardBody>
                 </Card>
               )}
 
@@ -308,14 +310,14 @@ export const SupplierDetailV3: React.FC<SupplierDetailV3Props> = ({
               {supplier.notes && (
                 <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-gray-600/30">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-gray-300 flex items-center space-x-2">
+                    <h2 className="text-lg text-gray-300 flex items-center space-x-2">
                       <DocumentTextIcon className="w-5 h-5" />
                       <span>Notas Adicionales</span>
-                    </CardTitle>
+                    </h2>
                   </CardHeader>
-                  <CardContent>
+                  <CardBody>
                     <p className="text-white whitespace-pre-line">{supplier.notes}</p>
-                  </CardContent>
+                  </CardBody>
                 </Card>
               )}
 
@@ -323,12 +325,12 @@ export const SupplierDetailV3: React.FC<SupplierDetailV3Props> = ({
               {supplier._veritas && (
                 <Card className="bg-gradient-to-br from-indigo-900/20 to-indigo-800/20 backdrop-blur-sm border border-indigo-500/20">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-indigo-300 flex items-center space-x-2">
+                    <h2 className="text-lg text-indigo-300 flex items-center space-x-2">
                       <ShieldCheckIcon className="w-5 h-5" />
                       <span>Verificación @veritas</span>
-                    </CardTitle>
+                    </h2>
                   </CardHeader>
-                  <CardContent className="space-y-3">
+                  <CardBody className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-gray-400">Estado:</span>
                       <Badge className={supplier._veritas.verified ?
@@ -356,7 +358,7 @@ export const SupplierDetailV3: React.FC<SupplierDetailV3Props> = ({
                         {new Date(supplier._veritas.verifiedAt).toLocaleString()}
                       </span>
                     </div>
-                  </CardContent>
+                  </CardBody>
                 </Card>
               )}
             </div>
@@ -371,7 +373,7 @@ export const SupplierDetailV3: React.FC<SupplierDetailV3Props> = ({
               Cerrar
             </Button>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

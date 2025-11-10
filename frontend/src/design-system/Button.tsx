@@ -7,7 +7,8 @@
  * STATES: default, hover, active, disabled, loading
  */
 
-import React, { ButtonHTMLAttributes, ReactNode } from 'react';
+import * as React from 'react';
+import { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '../utils/cn';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';

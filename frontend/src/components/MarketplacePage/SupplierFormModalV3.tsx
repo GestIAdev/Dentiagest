@@ -10,7 +10,10 @@ import React, { useState, useEffect } from 'react';
 import { useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Textarea, Badge, Spinner } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL MUTATIONS - V3.0 Integration
@@ -253,9 +256,9 @@ export const SupplierFormModalV3: React.FC<SupplierFormModalV3Props> = ({
                 <BuildingStorefrontIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                   🎯 {supplier ? 'Editar' : 'Crear'} Proveedor V3.0
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   Sistema de proveedores fortificado con verificación cuántica @veritas
                 </p>
@@ -272,7 +275,7 @@ export const SupplierFormModalV3: React.FC<SupplierFormModalV3Props> = ({
           </div>
         </CardHeader>
 
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <CardBody className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* 🎯 BASIC INFORMATION */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -282,11 +285,11 @@ export const SupplierFormModalV3: React.FC<SupplierFormModalV3Props> = ({
                 </label>
                 <div className="relative">
                   <BuildingStorefrontIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
+                  <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    className={`pl-10 bg-gray-700/50 border-gray-600/50 text-white ${errors.name ? 'border-red-500/50' : ''}`}
+                    className={`pl-10 bg-gray-700/50 border-gray-600/50 text-white rounded-lg px-3 py-2 w-full focus:border-purple-500/50 focus:ring-purple-500/20 ${errors.name ? 'border-red-500/50' : ''}`}
                     placeholder="Nombre de la empresa"
                   />
                 </div>
@@ -304,11 +307,11 @@ export const SupplierFormModalV3: React.FC<SupplierFormModalV3Props> = ({
                 </label>
                 <div className="relative">
                   <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
+                  <input
                     type="text"
                     value={formData.contactName}
                     onChange={(e) => handleInputChange('contactName', e.target.value)}
-                    className={`pl-10 bg-gray-700/50 border-gray-600/50 text-white ${errors.contactName ? 'border-red-500/50' : ''}`}
+                    className={`pl-10 bg-gray-700/50 border-gray-600/50 text-white rounded-lg px-3 py-2 w-full focus:border-purple-500/50 focus:ring-purple-500/20 ${errors.contactName ? 'border-red-500/50' : ''}`}
                     placeholder="Persona de contacto"
                   />
                 </div>
@@ -329,11 +332,11 @@ export const SupplierFormModalV3: React.FC<SupplierFormModalV3Props> = ({
                 </label>
                 <div className="relative">
                   <EnvelopeIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
+                  <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className={`pl-10 bg-gray-700/50 border-gray-600/50 text-white ${errors.email ? 'border-red-500/50' : ''}`}
+                    className={`pl-10 bg-gray-700/50 border-gray-600/50 text-white rounded-lg px-3 py-2 w-full focus:border-purple-500/50 focus:ring-purple-500/20 ${errors.email ? 'border-red-500/50' : ''}`}
                     placeholder="proveedor@email.com"
                   />
                 </div>
@@ -351,11 +354,11 @@ export const SupplierFormModalV3: React.FC<SupplierFormModalV3Props> = ({
                 </label>
                 <div className="relative">
                   <PhoneIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
+                  <input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className={`pl-10 bg-gray-700/50 border-gray-600/50 text-white ${errors.phone ? 'border-red-500/50' : ''}`}
+                    className={`pl-10 bg-gray-700/50 border-gray-600/50 text-white rounded-lg px-3 py-2 w-full focus:border-purple-500/50 focus:ring-purple-500/20 ${errors.phone ? 'border-red-500/50' : ''}`}
                     placeholder="+1 (555) 123-4567"
                   />
                 </div>
@@ -375,10 +378,10 @@ export const SupplierFormModalV3: React.FC<SupplierFormModalV3Props> = ({
               </label>
               <div className="relative">
                 <MapPinIcon className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                <Textarea
+                <textarea
                   value={formData.address}
                   onChange={(e) => handleInputChange('address', e.target.value)}
-                  className={`pl-10 bg-gray-700/50 border-gray-600/50 text-white ${errors.address ? 'border-red-500/50' : ''}`}
+                  className={`pl-10 bg-gray-700/50 border-gray-600/50 text-white rounded-lg px-3 py-2 w-full focus:border-purple-500/50 focus:ring-purple-500/20 ${errors.address ? 'border-red-500/50' : ''}`}
                   placeholder="Dirección completa del proveedor"
                   rows={3}
                 />
@@ -397,11 +400,11 @@ export const SupplierFormModalV3: React.FC<SupplierFormModalV3Props> = ({
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   ID Fiscal *
                 </label>
-                <Input
+                <input
                   type="text"
                   value={formData.taxId}
                   onChange={(e) => handleInputChange('taxId', e.target.value)}
-                  className={`bg-gray-700/50 border-gray-600/50 text-white ${errors.taxId ? 'border-red-500/50' : ''}`}
+                  className={`bg-gray-700/50 border-gray-600/50 text-white rounded-lg px-3 py-2 w-full focus:border-purple-500/50 focus:ring-purple-500/20 ${errors.taxId ? 'border-red-500/50' : ''}`}
                   placeholder="Número de identificación fiscal"
                 />
                 {errors.taxId && (
@@ -439,13 +442,13 @@ export const SupplierFormModalV3: React.FC<SupplierFormModalV3Props> = ({
                 </label>
                 <div className="relative">
                   <BanknotesIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
+                  <input
                     type="number"
                     min="0"
                     step="0.01"
                     value={formData.creditLimit}
                     onChange={(e) => handleInputChange('creditLimit', parseFloat(e.target.value) || 0)}
-                    className="pl-10 bg-gray-700/50 border-gray-600/50 text-white"
+                    className="pl-10 bg-gray-700/50 border-gray-600/50 text-white rounded-lg px-3 py-2 w-full focus:border-purple-500/50 focus:ring-purple-500/20"
                     placeholder="0.00"
                   />
                 </div>
@@ -509,11 +512,11 @@ export const SupplierFormModalV3: React.FC<SupplierFormModalV3Props> = ({
               <div className="space-y-3">
                 {formData.categories.map((category, index) => (
                   <div key={index} className="flex items-center space-x-3">
-                    <Input
+                    <input
                       type="text"
                       value={category}
                       onChange={(e) => handleCategoryChange(index, e.target.value)}
-                      className="flex-1 bg-gray-700/50 border-gray-600/50 text-white"
+                      className="flex-1 bg-gray-700/50 border-gray-600/50 text-white rounded-lg px-3 py-2 focus:border-purple-500/50 focus:ring-purple-500/20"
                       placeholder={`Categoría ${index + 1} (ej: Equipos, Materiales, Servicios)`}
                     />
                     {formData.categories.length > 1 && (
@@ -579,7 +582,7 @@ export const SupplierFormModalV3: React.FC<SupplierFormModalV3Props> = ({
               </Button>
             </div>
           </form>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

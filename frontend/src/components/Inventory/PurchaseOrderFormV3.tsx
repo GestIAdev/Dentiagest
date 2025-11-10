@@ -10,7 +10,11 @@ import React, { useState, useEffect } from 'react';
 import { useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL MUTATIONS - V3.0 Integration
@@ -263,9 +267,9 @@ export const PurchaseOrderFormV3: React.FC<PurchaseOrderFormV3Props> = ({
                 <DocumentTextIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                   🎯 {order ? 'Editar' : 'Nueva'} Orden de Compra V3.0
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   Gestión completa con validación cuántica @veritas
                 </p>
@@ -282,7 +286,7 @@ export const PurchaseOrderFormV3: React.FC<PurchaseOrderFormV3Props> = ({
           </div>
         </CardHeader>
 
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <CardBody className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* General Information */}
             <div className="space-y-4">
@@ -322,7 +326,7 @@ export const PurchaseOrderFormV3: React.FC<PurchaseOrderFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Fecha de Orden *
                   </label>
-                  <Input
+                  <input
                     type="date"
                     value={formData.orderDate}
                     onChange={(e) => handleInputChange('orderDate', e.target.value)}
@@ -342,7 +346,7 @@ export const PurchaseOrderFormV3: React.FC<PurchaseOrderFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Entrega Esperada *
                   </label>
-                  <Input
+                  <input
                     type="date"
                     value={formData.expectedDelivery}
                     onChange={(e) => handleInputChange('expectedDelivery', e.target.value)}
@@ -413,13 +417,13 @@ export const PurchaseOrderFormV3: React.FC<PurchaseOrderFormV3Props> = ({
               <div className="space-y-3">
                 {formData.items.map((item, index) => (
                   <Card key={item.id || index} className="bg-gray-800/30 border border-gray-600/30">
-                    <CardContent className="p-4">
+                    <CardBody className="p-4">
                       <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                         <div className="md:col-span-2">
                           <label className="block text-sm font-medium text-gray-300 mb-2">
                             Descripción
                           </label>
-                          <Input
+                          <input
                             value={item.description}
                             onChange={(e) => handleItemChange(index, 'description', e.target.value)}
                             placeholder="Descripción del item"
@@ -431,7 +435,7 @@ export const PurchaseOrderFormV3: React.FC<PurchaseOrderFormV3Props> = ({
                           <label className="block text-sm font-medium text-gray-300 mb-2">
                             Cantidad
                           </label>
-                          <Input
+                          <input
                             type="number"
                             min="1"
                             value={item.quantity}
@@ -444,7 +448,7 @@ export const PurchaseOrderFormV3: React.FC<PurchaseOrderFormV3Props> = ({
                           <label className="block text-sm font-medium text-gray-300 mb-2">
                             Precio Unit.
                           </label>
-                          <Input
+                          <input
                             type="number"
                             min="0"
                             step="0.01"
@@ -475,7 +479,7 @@ export const PurchaseOrderFormV3: React.FC<PurchaseOrderFormV3Props> = ({
                           </Button>
                         </div>
                       </div>
-                    </CardContent>
+                    </CardBody>
                   </Card>
                 ))}
               </div>
@@ -484,14 +488,14 @@ export const PurchaseOrderFormV3: React.FC<PurchaseOrderFormV3Props> = ({
               {showAddItem && (
                 <Card className="bg-gray-800/50 border border-cyan-500/30">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-cyan-300">Agregar Nuevo Item</CardTitle>
+                    <h2 className="text-lg text-cyan-300">Agregar Nuevo Item</h2>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardBody className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
                         Descripción *
                       </label>
-                      <Input
+                      <input
                         value={newItem.description}
                         onChange={(e) => setNewItem(prev => ({ ...prev, description: e.target.value }))}
                         placeholder="Descripción del item"
@@ -504,7 +508,7 @@ export const PurchaseOrderFormV3: React.FC<PurchaseOrderFormV3Props> = ({
                         <label className="block text-sm font-medium text-gray-300 mb-2">
                           Cantidad *
                         </label>
-                        <Input
+                        <input
                           type="number"
                           min="1"
                           value={newItem.quantity}
@@ -517,7 +521,7 @@ export const PurchaseOrderFormV3: React.FC<PurchaseOrderFormV3Props> = ({
                         <label className="block text-sm font-medium text-gray-300 mb-2">
                           Precio Unitario *
                         </label>
-                        <Input
+                        <input
                           type="number"
                           min="0"
                           step="0.01"
@@ -550,14 +554,14 @@ export const PurchaseOrderFormV3: React.FC<PurchaseOrderFormV3Props> = ({
                         Agregar Item
                       </Button>
                     </div>
-                  </CardContent>
+                  </CardBody>
                 </Card>
               )}
             </div>
 
             {/* Order Summary */}
             <Card className="bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-500/30">
-              <CardContent className="p-4">
+              <CardBody className="p-4">
                 <h4 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
                   <CurrencyDollarIcon className="w-5 h-5 text-green-400" />
                   <span>Resumen de la Orden</span>
@@ -592,7 +596,7 @@ export const PurchaseOrderFormV3: React.FC<PurchaseOrderFormV3Props> = ({
                     <span className="text-purple-400">{formatCurrency(finalAmount)}</span>
                   </div>
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* General Error */}
@@ -635,7 +639,7 @@ export const PurchaseOrderFormV3: React.FC<PurchaseOrderFormV3Props> = ({
               </Button>
             </div>
           </form>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

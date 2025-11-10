@@ -4,10 +4,14 @@
 // Status: V3.0 - Multi-step form with real-time validation and auto-save
 // Challenge: Intelligent form with supplier integration and compliance checking
 
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Spinner } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 ICONS - Heroicons for form theme
@@ -308,9 +312,9 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
               <CubeIcon className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <CardTitle>
+              <h2>
                 {mode === 'create' ? 'Crear Nuevo Material Dental' : 'Editar Material Dental'}
-              </CardTitle>
+              </h2>
               <p className="text-sm text-gray-600 mt-1">
                 {mode === 'create' ? 'Complete la información del nuevo material' : 'Modifique la información del material'}
               </p>
@@ -342,7 +346,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
         </CardHeader>
 
         <form onSubmit={handleSubmit}>
-          <CardContent className="p-6 overflow-y-auto max-h-96">
+          <CardBody className="p-6 overflow-y-auto max-h-96">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Basic Information */}
               <div className="md:col-span-2">
@@ -356,7 +360,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Nombre del Material *
                 </label>
-                <Input
+                <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
@@ -388,7 +392,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   SKU *
                 </label>
-                <Input
+                <input
                   type="text"
                   value={formData.sku}
                   onChange={(e) => handleInputChange('sku', e.target.value)}
@@ -402,7 +406,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Fabricante *
                 </label>
-                <Input
+                <input
                   type="text"
                   value={formData.manufacturer}
                   onChange={(e) => handleInputChange('manufacturer', e.target.value)}
@@ -416,7 +420,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Número de Lote
                 </label>
-                <Input
+                <input
                   type="text"
                   value={formData.batchNumber}
                   onChange={(e) => handleInputChange('batchNumber', e.target.value)}
@@ -428,7 +432,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Fecha de Vencimiento
                 </label>
-                <Input
+                <input
                   type="date"
                   value={formData.expirationDate}
                   onChange={(e) => handleInputChange('expirationDate', e.target.value)}
@@ -449,7 +453,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Costo Unitario ($) *
                 </label>
-                <Input
+                <input
                   type="number"
                   step="0.01"
                   min="0"
@@ -465,7 +469,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Precio Unitario ($) *
                 </label>
-                <Input
+                <input
                   type="number"
                   step="0.01"
                   min="0"
@@ -489,7 +493,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Stock Actual
                 </label>
-                <Input
+                <input
                   type="number"
                   min="0"
                   value={formData.currentStock}
@@ -504,7 +508,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Stock Mínimo
                 </label>
-                <Input
+                <input
                   type="number"
                   min="0"
                   value={formData.minimumStock}
@@ -519,7 +523,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Stock Máximo
                 </label>
-                <Input
+                <input
                   type="number"
                   min="0"
                   value={formData.maximumStock}
@@ -534,7 +538,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Ubicación
                 </label>
-                <Input
+                <input
                   type="text"
                   value={formData.location}
                   onChange={(e) => handleInputChange('location', e.target.value)}
@@ -596,7 +600,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Punto de Reorden
                       </label>
-                      <Input
+                      <input
                         type="number"
                         min="0"
                         value={formData.reorderPoint}
@@ -611,7 +615,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Cantidad de Reorden
                       </label>
-                      <Input
+                      <input
                         type="number"
                         min="0"
                         value={formData.reorderQuantity}
@@ -625,7 +629,7 @@ export const DentalMaterialFormV3: React.FC<DentalMaterialFormV3Props> = ({
                 )}
               </div>
             </div>
-          </CardContent>
+          </CardBody>
 
           {/* Form Actions */}
           <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-between">

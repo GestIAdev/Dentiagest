@@ -10,7 +10,10 @@ import React, { useMemo } from 'react';
 import { useQuery } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 
 // 🎯 GRAPHQL QUERIES - V3.0 Integration
 import { GET_INVENTORY_ANALYTICS } from '../../graphql/queries/inventory';
@@ -66,7 +69,7 @@ const PerformanceMetricCard: React.FC<{
 
   return (
     <Card className={`bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-gray-600/30`}>
-      <CardContent className="p-4">
+      <CardBody className="p-4">
         <div className="flex items-center justify-between mb-2">
           <div className={`p-2 rounded-lg bg-${color}-500/20`}>
             {icon}
@@ -102,7 +105,7 @@ const PerformanceMetricCard: React.FC<{
             </div>
           </div>
         )}
-      </CardContent>
+      </CardBody>
     </Card>
   );
 };
@@ -146,11 +149,11 @@ const AIInsightsCard: React.FC<{ insights: any[] }> = ({ insights }) => {
   if (!insights || insights.length === 0) {
     return (
       <Card className="bg-gradient-to-br from-purple-900/20 to-purple-800/20 backdrop-blur-sm border border-purple-500/20">
-        <CardContent className="p-6 text-center">
+        <CardBody className="p-6 text-center">
           <BoltIcon className="w-12 h-12 mx-auto text-purple-400 mb-4" />
           <h3 className="text-lg font-semibold text-purple-300 mb-2">Análisis IA Disponible</h3>
           <p className="text-gray-400">Los insights de IA se mostrarán aquí cuando estén disponibles</p>
-        </CardContent>
+        </CardBody>
       </Card>
     );
   }
@@ -159,7 +162,7 @@ const AIInsightsCard: React.FC<{ insights: any[] }> = ({ insights }) => {
     <div className="space-y-4">
       {insights.map((insight, index) => (
         <Card key={index} className="bg-gradient-to-br from-purple-900/20 to-purple-800/20 backdrop-blur-sm border border-purple-500/20">
-          <CardContent className="p-4">
+          <CardBody className="p-4">
             <div className="flex items-start space-x-3">
               <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
                 <BoltIcon className="w-4 h-4 text-purple-400" />
@@ -181,7 +184,7 @@ const AIInsightsCard: React.FC<{ insights: any[] }> = ({ insights }) => {
                 </div>
               </div>
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
       ))}
     </div>
@@ -201,7 +204,7 @@ export const SupplierPerformanceV3: React.FC<SupplierPerformanceV3Props> = ({
 
   // 🎯 PROCESSED DATA
   const analytics = useMemo(() => {
-    return analyticsData?.inventoryAnalyticsV3 || null;
+    return (analyticsData as any)?.inventoryAnalyticsV3 || null;
   }, [analyticsData]);
 
   // 🎯 MOCK PERFORMANCE DATA (Replace with real data when available)
@@ -256,9 +259,9 @@ export const SupplierPerformanceV3: React.FC<SupplierPerformanceV3Props> = ({
                 <ChartBarIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                   🎯 Rendimiento del Proveedor V3.0
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   Análisis avanzado con IA predictiva y verificación cuántica
                 </p>
@@ -276,18 +279,18 @@ export const SupplierPerformanceV3: React.FC<SupplierPerformanceV3Props> = ({
           </div>
         </CardHeader>
 
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <CardBody className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Performance Metrics */}
             <div className="space-y-6">
               <Card className="bg-gradient-to-br from-cyan-900/20 to-cyan-800/20 backdrop-blur-sm border border-cyan-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-cyan-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-cyan-300 flex items-center space-x-2">
                     <ChartBarIcon className="w-5 h-5" />
                     <span>Métricas de Rendimiento</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent>
+                <CardBody>
                   <div className="grid grid-cols-1 gap-4">
                     <PerformanceMetricCard
                       title="Entrega a Tiempo"
@@ -329,20 +332,20 @@ export const SupplierPerformanceV3: React.FC<SupplierPerformanceV3Props> = ({
                       icon={<ArrowTrendingUpIcon className="w-5 h-5 text-purple-400" />}
                     />
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
 
               {/* Performance Trend */}
               <Card className="bg-gradient-to-br from-pink-900/20 to-pink-800/20 backdrop-blur-sm border border-pink-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-pink-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-pink-300 flex items-center space-x-2">
                     <ArrowTrendingUpIcon className="w-5 h-5" />
                     <span>Tendencia de Rendimiento</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent>
+                <CardBody>
                   <PerformanceTrend data={trendData} />
-                </CardContent>
+                </CardBody>
               </Card>
             </div>
 
@@ -351,33 +354,33 @@ export const SupplierPerformanceV3: React.FC<SupplierPerformanceV3Props> = ({
               {/* AI Insights */}
               <Card className="bg-gradient-to-br from-purple-900/20 to-purple-800/20 backdrop-blur-sm border border-purple-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-purple-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-purple-300 flex items-center space-x-2">
                     <BoltIcon className="w-5 h-5" />
                     <span>Insights de IA</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent>
+                <CardBody>
                   <AIInsightsCard insights={aiInsights} />
-                </CardContent>
+                </CardBody>
               </Card>
 
               {/* Overall Analytics */}
               {analyticsLoading ? (
                 <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-gray-600/30">
-                  <CardContent className="p-6 text-center">
+                  <CardBody className="p-6 text-center">
                     <Spinner size="sm" />
                     <p className="text-gray-300 mt-2">Cargando análisis...</p>
-                  </CardContent>
+                  </CardBody>
                 </Card>
               ) : analytics ? (
                 <Card className="bg-gradient-to-br from-indigo-900/20 to-indigo-800/20 backdrop-blur-sm border border-indigo-500/20">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-indigo-300 flex items-center space-x-2">
+                    <h2 className="text-lg text-indigo-300 flex items-center space-x-2">
                       <ShieldCheckIcon className="w-5 h-5" />
                       <span>Análisis General</span>
-                    </CardTitle>
+                    </h2>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardBody className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center p-3 bg-gray-800/30 rounded-lg">
                         <div className="text-xl font-bold text-indigo-400">
@@ -404,15 +407,15 @@ export const SupplierPerformanceV3: React.FC<SupplierPerformanceV3Props> = ({
                         </p>
                       </div>
                     )}
-                  </CardContent>
+                  </CardBody>
                 </Card>
               ) : (
                 <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-gray-600/30">
-                  <CardContent className="p-6 text-center">
+                  <CardBody className="p-6 text-center">
                     <ChartBarIcon className="w-12 h-12 mx-auto text-gray-500 mb-4" />
                     <h3 className="text-lg font-medium text-gray-300 mb-2">Análisis No Disponible</h3>
                     <p className="text-gray-500">Los datos de análisis se mostrarán aquí cuando estén disponibles</p>
-                  </CardContent>
+                  </CardBody>
                 </Card>
               )}
             </div>
@@ -427,7 +430,7 @@ export const SupplierPerformanceV3: React.FC<SupplierPerformanceV3Props> = ({
               Cerrar
             </Button>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

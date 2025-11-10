@@ -6,11 +6,15 @@
 // 🎨 THEME: Cyberpunk Medical - Cyan/Purple/Pink gradients with quantum effects
 // 🔒 SECURITY: @veritas quantum truth verification on critical material values
 
-import React, { useState, useMemo } from 'react';
+import * as React from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL QUERIES - V3.0 Integration
@@ -131,7 +135,7 @@ export const DentalMaterialManagerV3: React.FC<DentalMaterialManagerV3Props> = (
 
   // 🎯 PROCESSED MATERIALS DATA
   const materials = useMemo(() => {
-    return materialsData?.dentalMaterialsV3 || [];
+    return (materialsData as any)?.dentalMaterialsV3 || [];
   }, [materialsData]);
 
   // 🎯 FILTERED AND SORTED MATERIALS
@@ -335,7 +339,7 @@ export const DentalMaterialManagerV3: React.FC<DentalMaterialManagerV3Props> = (
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card className="relative overflow-hidden bg-gradient-to-br from-cyan-900/20 to-cyan-800/20 backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/40 transition-all duration-300">
           <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-cyan-600/5"></div>
-          <CardContent className="relative p-4">
+          <CardBody className="relative p-4">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-cyan-500/20 to-cyan-600/20 rounded-lg flex items-center justify-center border border-cyan-500/30">
                 <CubeIcon className="w-5 h-5 text-cyan-400" />
@@ -347,12 +351,12 @@ export const DentalMaterialManagerV3: React.FC<DentalMaterialManagerV3Props> = (
                 </p>
               </div>
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
 
         <Card className="relative overflow-hidden bg-gradient-to-br from-red-900/20 to-red-800/20 backdrop-blur-sm border border-red-500/20 hover:border-red-400/40 transition-all duration-300">
           <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-red-600/5"></div>
-          <CardContent className="relative p-4">
+          <CardBody className="relative p-4">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-lg flex items-center justify-center border border-red-500/30">
                 <ExclamationTriangleIcon className="w-5 h-5 text-red-400" />
@@ -364,12 +368,12 @@ export const DentalMaterialManagerV3: React.FC<DentalMaterialManagerV3Props> = (
                 </p>
               </div>
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
 
         <Card className="relative overflow-hidden bg-gradient-to-br from-yellow-900/20 to-yellow-800/20 backdrop-blur-sm border border-yellow-500/20 hover:border-yellow-400/40 transition-all duration-300">
           <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-yellow-600/5"></div>
-          <CardContent className="relative p-4">
+          <CardBody className="relative p-4">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 rounded-lg flex items-center justify-center border border-yellow-500/30">
                 <ExclamationTriangleIcon className="w-5 h-5 text-yellow-400" />
@@ -381,12 +385,12 @@ export const DentalMaterialManagerV3: React.FC<DentalMaterialManagerV3Props> = (
                 </p>
               </div>
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
 
         <Card className="relative overflow-hidden bg-gradient-to-br from-pink-900/20 to-pink-800/20 backdrop-blur-sm border border-pink-500/20 hover:border-pink-400/40 transition-all duration-300">
           <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-pink-600/5"></div>
-          <CardContent className="relative p-4">
+          <CardBody className="relative p-4">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-pink-500/20 to-pink-600/20 rounded-lg flex items-center justify-center border border-pink-500/30">
                 <XCircleIcon className="w-5 h-5 text-pink-400" />
@@ -398,12 +402,12 @@ export const DentalMaterialManagerV3: React.FC<DentalMaterialManagerV3Props> = (
                 </p>
               </div>
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
 
         <Card className="relative overflow-hidden bg-gradient-to-br from-green-900/20 to-green-800/20 backdrop-blur-sm border border-green-500/20 hover:border-green-400/40 transition-all duration-300">
           <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/5"></div>
-          <CardContent className="relative p-4">
+          <CardBody className="relative p-4">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-green-500/20 to-green-600/20 rounded-lg flex items-center justify-center border border-green-500/30">
                 <ChartBarIcon className="w-5 h-5 text-green-400" />
@@ -415,17 +419,17 @@ export const DentalMaterialManagerV3: React.FC<DentalMaterialManagerV3Props> = (
                 </p>
               </div>
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
       </div>
 
       {/* Filters and Search - Cyberpunk Medical Theme */}
       <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm border border-purple-500/20">
-        <CardContent className="p-4">
+        <CardBody className="p-4">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-cyan-400" />
-              <Input
+              <input
                 type="text"
                 placeholder="Buscar materiales..."
                 value={searchQuery}
@@ -454,18 +458,18 @@ export const DentalMaterialManagerV3: React.FC<DentalMaterialManagerV3Props> = (
               })}
             </div>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
 
       {/* Materials Table - Cyberpunk Medical Theme */}
       <Card className="bg-gradient-to-br from-gray-900/30 to-gray-800/30 backdrop-blur-sm border border-cyan-500/20">
         <CardHeader className="border-b border-gray-600/30">
-          <CardTitle className="flex items-center space-x-2 text-purple-300">
+          <h2 className="flex items-center space-x-2 text-purple-300">
             <ChartBarIcon className="w-5 h-5" />
             <span>Lista de Materiales - Provincia del Arsenal</span>
-          </CardTitle>
+          </h2>
         </CardHeader>
-        <CardContent>
+        <CardBody>
           {materialsLoading ? (
             <div className="flex items-center justify-center py-12">
               <Spinner size="lg" />
@@ -561,7 +565,7 @@ export const DentalMaterialManagerV3: React.FC<DentalMaterialManagerV3Props> = (
                           </div>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+                          <Badge variant="info" className="bg-purple-500/20 text-purple-300 border-purple-500/30">
                             {MATERIAL_CATEGORIES.find(c => c.value === material.category)?.label || material.category}
                           </Badge>
                         </td>
@@ -625,7 +629,7 @@ export const DentalMaterialManagerV3: React.FC<DentalMaterialManagerV3Props> = (
               </table>
             </div>
           )}
-        </CardContent>
+        </CardBody>
       </Card>
 
       {/* Modals */}

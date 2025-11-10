@@ -10,7 +10,11 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL QUERIES - V3.0 Integration
@@ -162,11 +166,11 @@ export const PurchaseOrderManagerV3: React.FC<PurchaseOrderManagerV3Props> = ({
 
   // 🎯 PROCESSED DATA
   const purchaseOrders = useMemo(() => {
-    return ordersData?.purchaseOrdersV3 || [];
+    return (ordersData as any)?.purchaseOrdersV3 || [];
   }, [ordersData]);
 
   const suppliers = useMemo(() => {
-    return suppliersData?.suppliersV3 || [];
+    return (suppliersData as any)?.suppliersV3 || [];
   }, [suppliersData]);
 
   // 🎯 FILTERED ORDERS
@@ -282,9 +286,9 @@ export const PurchaseOrderManagerV3: React.FC<PurchaseOrderManagerV3Props> = ({
                 <DocumentTextIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                   🎯 Gestión de Órdenes de Compra V3.0
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   Ciclo de vida completo de órdenes con flujo de aprobación cuántico
                 </p>
@@ -312,7 +316,7 @@ export const PurchaseOrderManagerV3: React.FC<PurchaseOrderManagerV3Props> = ({
 
         {/* Analytics Summary */}
         {analyticsSummary && (
-          <CardContent className="pt-4">
+          <CardBody className="pt-4">
             <div className="grid grid-cols-2 md:grid-cols-7 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-cyan-400">{analyticsSummary.totalOrders}</div>
@@ -343,17 +347,17 @@ export const PurchaseOrderManagerV3: React.FC<PurchaseOrderManagerV3Props> = ({
                 <div className="text-xs text-gray-400">Tasa Aprobación</div>
               </div>
             </div>
-          </CardContent>
+          </CardBody>
         )}
       </Card>
 
       {/* Filters Section */}
       <Card className="bg-gray-800/50 backdrop-blur-sm border border-gray-600/30">
-        <CardContent className="pt-6">
+        <CardBody className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
+              <input
                 type="text"
                 placeholder="Buscar órdenes..."
                 value={searchTerm}
@@ -387,7 +391,7 @@ export const PurchaseOrderManagerV3: React.FC<PurchaseOrderManagerV3Props> = ({
               ))}
             </select>
 
-            <Input
+            <input
               type="date"
               placeholder="Desde"
               value={dateFrom}
@@ -395,7 +399,7 @@ export const PurchaseOrderManagerV3: React.FC<PurchaseOrderManagerV3Props> = ({
               className="bg-gray-700/50 border-gray-600/50 text-white placeholder-gray-400 focus:border-purple-500/50 focus:ring-purple-500/20"
             />
 
-            <Input
+            <input
               type="date"
               placeholder="Hasta"
               value={dateTo}
@@ -421,7 +425,7 @@ export const PurchaseOrderManagerV3: React.FC<PurchaseOrderManagerV3Props> = ({
               </Button>
             </div>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
 
       {/* Main Content */}
@@ -429,15 +433,15 @@ export const PurchaseOrderManagerV3: React.FC<PurchaseOrderManagerV3Props> = ({
         /* Orders List View */
         <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-cyan-500/20">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-cyan-300 flex items-center space-x-2">
+            <h2 className="text-lg text-cyan-300 flex items-center space-x-2">
               <DocumentTextIcon className="w-5 h-5" />
               <span>Lista de Órdenes</span>
               <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30">
                 {filteredOrders.length}
               </Badge>
-            </CardTitle>
+            </h2>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             {ordersLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Spinner size="sm" />
@@ -457,7 +461,7 @@ export const PurchaseOrderManagerV3: React.FC<PurchaseOrderManagerV3Props> = ({
 
                   return (
                     <Card key={order.id} className="bg-gray-800/30 border border-gray-600/30 hover:border-purple-500/30 transition-colors">
-                      <CardContent className="p-4">
+                      <CardBody className="p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
@@ -571,30 +575,30 @@ export const PurchaseOrderManagerV3: React.FC<PurchaseOrderManagerV3Props> = ({
                             )}
                           </div>
                         </div>
-                      </CardContent>
+                      </CardBody>
                     </Card>
                   );
                 })}
               </div>
             )}
-          </CardContent>
+          </CardBody>
         </Card>
       ) : (
         /* Analytics View */
         <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-purple-500/20">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-purple-300 flex items-center space-x-2">
+            <h2 className="text-lg text-purple-300 flex items-center space-x-2">
               <ArrowPathIcon className="w-5 h-5" />
               <span>Análisis de Órdenes</span>
-            </CardTitle>
+            </h2>
           </CardHeader>
-          <CardContent>
+          <CardBody>
             <div className="text-center py-8">
               <ArrowPathIcon className="w-12 h-12 mx-auto text-purple-400 mb-4" />
               <h3 className="text-lg font-semibold text-purple-300 mb-2">Análisis Avanzado</h3>
               <p className="text-gray-400">Métricas detalladas y tendencias de órdenes próximamente</p>
             </div>
-          </CardContent>
+          </CardBody>
         </Card>
       )}
 

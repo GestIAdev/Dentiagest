@@ -6,7 +6,8 @@
  * FEATURES: Hover effects, padding variants, shadow levels
  */
 
-import React, { HTMLAttributes, ReactNode } from 'react';
+import * as React from 'react';
+import { HTMLAttributes, ReactNode } from 'react';
 import { cn } from '../utils/cn';
 
 type CardVariant = 'default' | 'elevated' | 'outlined' | 'glass';

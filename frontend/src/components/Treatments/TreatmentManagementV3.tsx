@@ -49,7 +49,7 @@ const getVeritasBadge = (veritasData: any) => {
   const level = veritasData.level || 'UNKNOWN';
   const confidence = veritasData.confidence || 0;
 
-  let variant: 'success' | 'warning' | 'destructive' = 'success';
+  let variant: 'success' | 'warning' | 'error' = 'success';
   let icon = '✅';
 
   if (level === 'CRITICAL' || level === 'HIGH') {
@@ -59,7 +59,7 @@ const getVeritasBadge = (veritasData: any) => {
     variant = confidence > 0.6 ? 'success' : 'warning';
     icon = confidence > 0.6 ? '🔒' : '⚠️';
   } else {
-    variant = 'destructive';
+    variant = 'error';
     icon = '❌';
   }
 
@@ -99,6 +99,7 @@ interface Treatment {
   cost?: number;
   cost_veritas?: any;
   notes?: string;
+  materialsUsed?: Array<{ inventoryItemId: string; quantity: number }>;
   aiRecommendations?: string[];
   veritasScore?: number;
   createdAt: string;
@@ -115,6 +116,7 @@ interface TreatmentFormData {
   endDate?: string;
   cost?: number;
   notes?: string;
+  materialsUsed: Array<{ inventoryItemId: string; quantity: number }>;
 }
 
 const TreatmentCard = ({ treatment, onSelect, onStart, onComplete, onUpdate, compact, urgent }: any) => (
@@ -198,7 +200,8 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
     startDate: '',
     endDate: '',
     cost: 0,
-    notes: ''
+    notes: '',
+    materialsUsed: []
   });
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string | null }>({ show: false, id: null });
 
@@ -277,7 +280,8 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
             startDate: treatmentForm.startDate,
             endDate: treatmentForm.endDate || undefined,
             cost: treatmentForm.cost || undefined,
-            notes: treatmentForm.notes || undefined
+            notes: treatmentForm.notes || undefined,
+            materialsUsed: treatmentForm.materialsUsed
           }
         }
       });
@@ -301,7 +305,8 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
             startDate: treatmentForm.startDate,
             endDate: treatmentForm.endDate || undefined,
             cost: treatmentForm.cost || undefined,
-            notes: treatmentForm.notes || undefined
+            notes: treatmentForm.notes || undefined,
+            materialsUsed: treatmentForm.materialsUsed
           }
         }
       });
@@ -338,7 +343,8 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
       startDate: '',
       endDate: '',
       cost: 0,
-      notes: ''
+      notes: '',
+      materialsUsed: []
     });
   };
 
@@ -352,7 +358,8 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
       startDate: treatment.startDate.split('T')[0],
       endDate: treatment.endDate ? treatment.endDate.split('T')[0] : '',
       cost: treatment.cost || 0,
-      notes: treatment.notes || ''
+      notes: treatment.notes || '',
+      materialsUsed: treatment.materialsUsed || []
     });
     setSelectedTreatment(treatment);
     setShowCreateForm(true);
@@ -572,6 +579,59 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
           />
         </div>
 
+        {/* Materials Used Section */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Materiales Utilizados</label>
+          {treatmentForm.materialsUsed.map((material, index) => (
+            <div key={index} className="flex items-center space-x-2 mb-2">
+              <Input
+                placeholder="ID del Item de Inventario"
+                value={material.inventoryItemId}
+                onChange={(e) => {
+                  const newMaterials = [...treatmentForm.materialsUsed];
+                  newMaterials[index].inventoryItemId = e.target.value;
+                  setTreatmentForm(prev => ({ ...prev, materialsUsed: newMaterials }));
+                }}
+                className="flex-1"
+              />
+              <Input
+                type="number"
+                placeholder="Cantidad"
+                value={material.quantity}
+                onChange={(e) => {
+                  const newMaterials = [...treatmentForm.materialsUsed];
+                  newMaterials[index].quantity = parseInt(e.target.value) || 0;
+                  setTreatmentForm(prev => ({ ...prev, materialsUsed: newMaterials }));
+                }}
+                min="0"
+                className="w-24"
+              />
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => {
+                  const newMaterials = treatmentForm.materialsUsed.filter((_, i) => i !== index);
+                  setTreatmentForm(prev => ({ ...prev, materialsUsed: newMaterials }));
+                }}
+              >
+                ✕
+              </Button>
+            </div>
+          ))}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setTreatmentForm(prev => ({
+                ...prev,
+                materialsUsed: [...prev.materialsUsed, { inventoryItemId: '', quantity: 1 }]
+              }));
+            }}
+          >
+            ➕ Añadir Material
+          </Button>
+        </div>
+
         <div className="flex justify-end space-x-2 pt-4">
           <Button
             variant="outline"
@@ -668,6 +728,20 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
             <div>
               <span className="text-gray-400">Notas:</span>
               <p className="mt-2 bg-gray-700 p-3 rounded-md">{selectedTreatment.notes}</p>
+            </div>
+          )}
+
+          {selectedTreatment.materialsUsed && selectedTreatment.materialsUsed.length > 0 && (
+            <div>
+              <span className="text-gray-400">Materiales Utilizados:</span>
+              <div className="mt-2 space-y-2">
+                {selectedTreatment.materialsUsed.map((material, index) => (
+                  <div key={index} className="bg-gray-700 p-3 rounded-md flex justify-between items-center">
+                    <span>ID: {material.inventoryItemId}</span>
+                    <span>Cantidad: {material.quantity}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

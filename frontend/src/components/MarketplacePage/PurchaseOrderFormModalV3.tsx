@@ -10,7 +10,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Textarea, Badge, Spinner } from '../atoms';
+import { Button, Card, CardHeader, CardBody, Badge, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL MUTATIONS - V3.0 Integration
@@ -265,9 +265,9 @@ export const PurchaseOrderFormModalV3: React.FC<PurchaseOrderFormModalV3Props> =
                 <CalculatorIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                   🎯 {order ? 'Editar' : 'Crear'} Orden de Compra V3.0
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   Sistema de órdenes fortificado con verificación cuántica @veritas
                 </p>
@@ -284,7 +284,7 @@ export const PurchaseOrderFormModalV3: React.FC<PurchaseOrderFormModalV3Props> =
           </div>
         </CardHeader>
 
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <CardBody className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* 🎯 SUPPLIER SELECTION */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -316,11 +316,11 @@ export const PurchaseOrderFormModalV3: React.FC<PurchaseOrderFormModalV3Props> =
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Fecha de Orden *
                 </label>
-                <Input
+                <input
                   type="date"
                   value={formData.orderDate}
                   onChange={(e) => handleInputChange('orderDate', e.target.value)}
-                  className={`bg-gray-700/50 border-gray-600/50 text-white ${errors.orderDate ? 'border-red-500/50' : ''}`}
+                  className={`w-full bg-gray-700/50 border rounded-lg px-3 py-2 text-white focus:border-purple-500/50 focus:ring-purple-500/20 focus:outline-none ${errors.orderDate ? 'border-red-500/50' : 'border-gray-600/50'}`}
                 />
                 {errors.orderDate && (
                   <p className="text-red-400 text-sm mt-1 flex items-center">
@@ -336,11 +336,11 @@ export const PurchaseOrderFormModalV3: React.FC<PurchaseOrderFormModalV3Props> =
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Fecha Estimada de Entrega
               </label>
-              <Input
+              <input
                 type="date"
                 value={formData.estimatedDeliveryDate}
                 onChange={(e) => handleInputChange('estimatedDeliveryDate', e.target.value)}
-                className="bg-gray-700/50 border-gray-600/50 text-white"
+                className="w-full bg-gray-700/50 border border-gray-600/50 rounded-lg px-3 py-2 text-white focus:border-purple-500/50 focus:ring-purple-500/20 focus:outline-none"
               />
             </div>
 
@@ -371,18 +371,18 @@ export const PurchaseOrderFormModalV3: React.FC<PurchaseOrderFormModalV3Props> =
               <div className="space-y-4">
                 {formData.items.map((item, index) => (
                   <Card key={index} className="bg-gray-800/30 border border-gray-600/30">
-                    <CardContent className="p-4">
+                    <CardBody className="p-4">
                       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                         <div className="md:col-span-2">
                           <label className="block text-sm font-medium text-gray-300 mb-2">
                             Producto *
                           </label>
-                          <Input
+                          <input
                             type="text"
                             placeholder="Nombre del producto"
                             value={item.productName}
                             onChange={(e) => handleItemChange(index, 'productName', e.target.value)}
-                            className={`bg-gray-700/50 border-gray-600/50 text-white ${errors[`item_${index}_productName`] ? 'border-red-500/50' : ''}`}
+                            className={`w-full bg-gray-700/50 border rounded-lg px-3 py-2 text-white focus:border-purple-500/50 focus:ring-purple-500/20 focus:outline-none placeholder-gray-400 ${errors[`item_${index}_productName`] ? 'border-red-500/50' : 'border-gray-600/50'}`}
                           />
                           {errors[`item_${index}_productName`] && (
                             <p className="text-red-400 text-xs mt-1">{errors[`item_${index}_productName`]}</p>
@@ -393,13 +393,13 @@ export const PurchaseOrderFormModalV3: React.FC<PurchaseOrderFormModalV3Props> =
                           <label className="block text-sm font-medium text-gray-300 mb-2">
                             Cantidad *
                           </label>
-                          <Input
+                          <input
                             type="number"
                             min="1"
                             step="1"
                             value={item.quantity}
                             onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value) || 1)}
-                            className={`bg-gray-700/50 border-gray-600/50 text-white ${errors[`item_${index}_quantity`] ? 'border-red-500/50' : ''}`}
+                            className={`w-full bg-gray-700/50 border rounded-lg px-3 py-2 text-white focus:border-purple-500/50 focus:ring-purple-500/20 focus:outline-none ${errors[`item_${index}_quantity`] ? 'border-red-500/50' : 'border-gray-600/50'}`}
                           />
                           {errors[`item_${index}_quantity`] && (
                             <p className="text-red-400 text-xs mt-1">{errors[`item_${index}_quantity`]}</p>
@@ -410,13 +410,13 @@ export const PurchaseOrderFormModalV3: React.FC<PurchaseOrderFormModalV3Props> =
                           <label className="block text-sm font-medium text-gray-300 mb-2">
                             Precio Unitario *
                           </label>
-                          <Input
+                          <input
                             type="number"
                             min="0"
                             step="0.01"
                             value={item.unitPrice}
                             onChange={(e) => handleItemChange(index, 'unitPrice', parseFloat(e.target.value) || 0)}
-                            className={`bg-gray-700/50 border-gray-600/50 text-white ${errors[`item_${index}_unitPrice`] ? 'border-red-500/50' : ''}`}
+                            className={`w-full bg-gray-700/50 border rounded-lg px-3 py-2 text-white focus:border-purple-500/50 focus:ring-purple-500/20 focus:outline-none ${errors[`item_${index}_unitPrice`] ? 'border-red-500/50' : 'border-gray-600/50'}`}
                           />
                           {errors[`item_${index}_unitPrice`] && (
                             <p className="text-red-400 text-xs mt-1">{errors[`item_${index}_unitPrice`]}</p>
@@ -445,7 +445,7 @@ export const PurchaseOrderFormModalV3: React.FC<PurchaseOrderFormModalV3Props> =
                           )}
                         </div>
                       </div>
-                    </CardContent>
+                    </CardBody>
                   </Card>
                 ))}
               </div>
@@ -453,19 +453,19 @@ export const PurchaseOrderFormModalV3: React.FC<PurchaseOrderFormModalV3Props> =
 
             {/* 🎯 COST SUMMARY */}
             <Card className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-500/20">
-              <CardContent className="p-4">
+              <CardBody className="p-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Costo de Envío
                     </label>
-                    <Input
+                    <input
                       type="number"
                       min="0"
                       step="0.01"
                       value={formData.shippingCost}
                       onChange={(e) => handleInputChange('shippingCost', parseFloat(e.target.value) || 0)}
-                      className="bg-gray-700/50 border-gray-600/50 text-white"
+                      className="w-full bg-gray-700/50 border border-gray-600/50 rounded-lg px-3 py-2 text-white focus:border-purple-500/50 focus:ring-purple-500/20 focus:outline-none"
                     />
                   </div>
 
@@ -473,13 +473,13 @@ export const PurchaseOrderFormModalV3: React.FC<PurchaseOrderFormModalV3Props> =
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Impuestos
                     </label>
-                    <Input
+                    <input
                       type="number"
                       min="0"
                       step="0.01"
                       value={formData.taxAmount}
                       onChange={(e) => handleInputChange('taxAmount', parseFloat(e.target.value) || 0)}
-                      className="bg-gray-700/50 border-gray-600/50 text-white"
+                      className="w-full bg-gray-700/50 border border-gray-600/50 rounded-lg px-3 py-2 text-white focus:border-purple-500/50 focus:ring-purple-500/20 focus:outline-none"
                     />
                   </div>
 
@@ -501,7 +501,7 @@ export const PurchaseOrderFormModalV3: React.FC<PurchaseOrderFormModalV3Props> =
                     </div>
                   </div>
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* 🎯 NOTES */}
@@ -509,12 +509,12 @@ export const PurchaseOrderFormModalV3: React.FC<PurchaseOrderFormModalV3Props> =
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Notas
               </label>
-              <Textarea
+              <textarea
                 value={formData.notes}
                 onChange={(e) => handleInputChange('notes', e.target.value)}
                 placeholder="Notas adicionales sobre la orden..."
                 rows={3}
-                className="bg-gray-700/50 border-gray-600/50 text-white placeholder-gray-400"
+                className="w-full bg-gray-700/50 border border-gray-600/50 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-purple-500/50 focus:ring-purple-500/20 focus:outline-none resize-none"
               />
             </div>
 
@@ -565,7 +565,7 @@ export const PurchaseOrderFormModalV3: React.FC<PurchaseOrderFormModalV3Props> =
               </Button>
             </div>
           </form>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

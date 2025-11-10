@@ -10,8 +10,7 @@ import React, { useState, useMemo } from 'react';
 import {
   Card,
   CardHeader,
-  CardTitle,
-  CardContent,
+  CardBody,
   Badge,
   Spinner,
   Button
@@ -188,7 +187,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
           />
         </div>
       </div>
-      <Badge variant="outline" className={getConfidenceColor(score)}>
+      <Badge variant="info" className={getConfidenceColor(score)}>
         {getConfidenceLabel(score)}
       </Badge>
     </div>
@@ -224,7 +223,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
                   </p>
                 </div>
               </div>
-              <Badge variant="outline" className={getConfidenceColor(entity.confidence)}>
+              <Badge variant="info" className={getConfidenceColor(entity.confidence)}>
                 {formatConfidenceScore(entity.confidence)}
               </Badge>
             </div>
@@ -248,7 +247,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-medium text-blue-900">Tipo Predicho</h4>
-            <Badge variant="outline" className={getConfidenceColor(confidence)}>
+            <Badge variant="info" className={getConfidenceColor(confidence)}>
               {formatConfidenceScore(confidence)}
             </Badge>
           </div>
@@ -262,7 +261,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
               {alternatives.slice(0, 3).map((alt, index) => (
                 <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
                   <span className="text-sm text-gray-700">{alt.type}</span>
-                  <Badge variant="outline" className={getConfidenceColor(alt.confidence)}>
+                  <Badge variant="info" className={getConfidenceColor(alt.confidence)}>
                     {formatConfidenceScore(alt.confidence)}
                   </Badge>
                 </div>
@@ -355,7 +354,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
       <Card className="cyberpunk-card">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <h2 className="cyberpunk-text text-xl font-bold" className="cyberpunk-text flex items-center">
+            <h2 className="cyberpunk-text text-xl font-bold flex items-center">
               <CpuChipIcon className="w-6 h-6 mr-2" />
               Análisis Inteligente - Olympus AI V3.0
             </h2>
@@ -384,7 +383,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
           onClick={() => toggleSection('overview')}
         >
           <div className="flex items-center justify-between">
-            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
+            <h2 className="cyberpunk-text text-lg font-bold flex items-center">
               <EyeIcon className="w-5 h-5 mr-2" />
               Resumen del Análisis
             </h2>
@@ -435,7 +434,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
               {analysisResults.language && (
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-600">Idioma detectado:</span>
-                  <Badge variant="outline">{analysisResults.language}</Badge>
+                  <Badge variant="info">{analysisResults.language}</Badge>
                 </div>
               )}
             </div>
@@ -451,7 +450,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
             onClick={() => toggleSection('confidence')}
           >
             <div className="flex items-center justify-between">
-              <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
+              <h2 className="cyberpunk-text text-lg font-bold flex items-center">
                 <ChartBarIcon className="w-5 h-5 mr-2" />
                 Puntuaciones de Confianza
               </h2>
@@ -481,7 +480,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
           onClick={() => toggleSection('entities')}
         >
           <div className="flex items-center justify-between">
-            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
+            <h2 className="cyberpunk-text text-lg font-bold flex items-center">
               <HeartIcon className="w-5 h-5 mr-2" />
               Entidades Médicas Detectadas
             </h2>
@@ -504,7 +503,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
           onClick={() => toggleSection('doctype')}
         >
           <div className="flex items-center justify-between">
-            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
+            <h2 className="cyberpunk-text text-lg font-bold flex items-center">
               <DocumentTextIcon className="w-5 h-5 mr-2" />
               Análisis de Tipo de Documento
             </h2>
@@ -527,7 +526,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
           onClick={() => toggleSection('quality')}
         >
           <div className="flex items-center justify-between">
-            <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
+            <h2 className="cyberpunk-text text-lg font-bold flex items-center">
               <CheckCircleIcon className="w-5 h-5 mr-2" />
               Métricas de Calidad
             </h2>
@@ -551,7 +550,7 @@ export const AIDocumentAnalysisV3: React.FC<AIDocumentAnalysisV3Props> = ({
             onClick={() => toggleSection('ocr')}
           >
             <div className="flex items-center justify-between">
-              <h2 className="cyberpunk-text text-xl font-bold" className="text-lg flex items-center">
+              <h2 className="cyberpunk-text text-lg font-bold flex items-center">
                 <DocumentTextIcon className="w-5 h-5 mr-2" />
                 Texto Extraído (OCR)
               </h2>

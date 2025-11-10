@@ -10,7 +10,10 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL QUERIES - V3.0 Integration
@@ -129,11 +132,11 @@ export const MaintenanceSchedulerV3: React.FC<MaintenanceSchedulerV3Props> = ({
 
   // 🎯 PROCESSED DATA
   const equipment = useMemo(() => {
-    return equipmentData?.equipmentItemV3 || null;
+    return (equipmentData as any)?.equipmentItemV3 || null;
   }, [equipmentData]);
 
   const maintenanceRecords = useMemo(() => {
-    return maintenanceData?.maintenanceScheduleV3 || [];
+    return (maintenanceData as any)?.maintenanceScheduleV3 || [];
   }, [maintenanceData]);
 
   // 🎯 CALCULATE NEXT MAINTENANCE
@@ -305,9 +308,9 @@ export const MaintenanceSchedulerV3: React.FC<MaintenanceSchedulerV3Props> = ({
                 <CalendarDaysIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                   🎯 Programador de Mantenimiento V3.0
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   Gestión predictiva de mantenimiento con IA cuántica
                 </p>
@@ -336,18 +339,18 @@ export const MaintenanceSchedulerV3: React.FC<MaintenanceSchedulerV3Props> = ({
           </div>
         </CardHeader>
 
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <CardBody className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Predictive Suggestions */}
             <div className="lg:col-span-1">
               <Card className="bg-gradient-to-br from-purple-900/20 to-purple-800/20 backdrop-blur-sm border border-purple-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-purple-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-purple-300 flex items-center space-x-2">
                     <BoltIcon className="w-5 h-5" />
                     <span>Sugerencias IA</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent>
+                <CardBody>
                   {predictiveSuggestions.length === 0 ? (
                     <p className="text-gray-400 text-sm">No hay sugerencias pendientes</p>
                   ) : (
@@ -370,7 +373,7 @@ export const MaintenanceSchedulerV3: React.FC<MaintenanceSchedulerV3Props> = ({
                       ))}
                     </div>
                   )}
-                </CardContent>
+                </CardBody>
               </Card>
             </div>
 
@@ -378,12 +381,12 @@ export const MaintenanceSchedulerV3: React.FC<MaintenanceSchedulerV3Props> = ({
             <div className="lg:col-span-2">
               <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 backdrop-blur-sm border border-cyan-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-cyan-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-cyan-300 flex items-center space-x-2">
                     <ClockIcon className="w-5 h-5" />
                     <span>Historial de Mantenimiento</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent>
+                <CardBody>
                   {maintenanceLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Spinner size="sm" />
@@ -403,7 +406,7 @@ export const MaintenanceSchedulerV3: React.FC<MaintenanceSchedulerV3Props> = ({
 
                         return (
                           <Card key={record.id} className="bg-gray-800/30 border border-gray-600/30">
-                            <CardContent className="p-4">
+                            <CardBody className="p-4">
                               <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center space-x-3">
                                   <Badge className={`bg-${typeInfo.color}-500/20 text-${typeInfo.color}-300 border-${typeInfo.color}-500/30`}>
@@ -461,13 +464,13 @@ export const MaintenanceSchedulerV3: React.FC<MaintenanceSchedulerV3Props> = ({
                                   </span>
                                 </div>
                               )}
-                            </CardContent>
+                            </CardBody>
                           </Card>
                         );
                       })}
                     </div>
                   )}
-                </CardContent>
+                </CardBody>
               </Card>
             </div>
           </div>
@@ -477,11 +480,11 @@ export const MaintenanceSchedulerV3: React.FC<MaintenanceSchedulerV3Props> = ({
             <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
               <Card className="w-full max-w-2xl bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-sm border border-pink-500/20">
                 <CardHeader className="border-b border-gray-600/30">
-                  <CardTitle className="text-xl font-bold bg-gradient-to-r from-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                  <h2 className="text-xl font-bold bg-gradient-to-r from-pink-400 to-cyan-400 bg-clip-text text-transparent">
                     {editingRecord ? '🎯 Editar Mantenimiento' : '🎯 Nuevo Mantenimiento'}
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent className="p-6 space-y-4">
+                <CardBody className="p-6 space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">Tipo de Mantenimiento</label>
@@ -513,7 +516,7 @@ export const MaintenanceSchedulerV3: React.FC<MaintenanceSchedulerV3Props> = ({
 
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Descripción</label>
-                    <Input
+                    <input
                       type="text"
                       value={formData.description}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('description', e.target.value)}
@@ -525,7 +528,7 @@ export const MaintenanceSchedulerV3: React.FC<MaintenanceSchedulerV3Props> = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">Fecha Programada</label>
-                      <Input
+                      <input
                         type="date"
                         value={formData.scheduledDate}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('scheduledDate', e.target.value)}
@@ -535,7 +538,7 @@ export const MaintenanceSchedulerV3: React.FC<MaintenanceSchedulerV3Props> = ({
 
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">Técnico Asignado</label>
-                      <Input
+                      <input
                         type="text"
                         value={formData.technician}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('technician', e.target.value)}
@@ -548,7 +551,7 @@ export const MaintenanceSchedulerV3: React.FC<MaintenanceSchedulerV3Props> = ({
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">Costo Estimado ($)</label>
-                      <Input
+                      <input
                         type="number"
                         step="0.01"
                         value={formData.estimatedCost}
@@ -560,7 +563,7 @@ export const MaintenanceSchedulerV3: React.FC<MaintenanceSchedulerV3Props> = ({
 
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">Duración Estimada (horas)</label>
-                      <Input
+                      <input
                         type="number"
                         step="0.5"
                         value={formData.estimatedDuration}
@@ -613,11 +616,11 @@ export const MaintenanceSchedulerV3: React.FC<MaintenanceSchedulerV3Props> = ({
                       {editingRecord ? 'Actualizar' : 'Programar'} Mantenimiento
                     </Button>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
             </div>
           )}
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

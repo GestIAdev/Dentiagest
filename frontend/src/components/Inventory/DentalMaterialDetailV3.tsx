@@ -4,10 +4,14 @@
 // Status: V3.0 - Comprehensive detail view with usage history and compliance tracking
 // Challenge: Intelligent detail view with predictive analytics and compliance monitoring
 
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 ICONS - Heroicons for detail theme
@@ -174,11 +178,11 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
       case 'active':
         return <Badge variant="success">Activo</Badge>;
       case 'inactive':
-        return <Badge variant="secondary">Inactivo</Badge>;
+        return <Badge variant="warning">Inactivo</Badge>;
       case 'discontinued':
-        return <Badge variant="destructive">Descontinuado</Badge>;
+        return <Badge variant="error">Descontinuado</Badge>;
       default:
-        return <Badge variant="secondary">{status}</Badge>;
+        return <Badge variant="default">{status}</Badge>;
     }
   };
 
@@ -189,9 +193,9 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
       case 'expiring_soon':
         return <Badge variant="warning">Vence Pronto</Badge>;
       case 'expired':
-        return <Badge variant="destructive">Vencido</Badge>;
+        return <Badge variant="error">Vencido</Badge>;
       default:
-        return <Badge variant="secondary">{complianceStatus}</Badge>;
+        return <Badge variant="default">{complianceStatus}</Badge>;
     }
   };
 
@@ -234,7 +238,7 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
               <CubeIcon className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <CardTitle className="text-xl">{material.name}</CardTitle>
+              <h2 className="text-xl">{material.name}</h2>
               <p className="text-sm text-gray-600 mt-1">
                 SKU: {material.sku} • Fabricante: {material.manufacturer}
               </p>
@@ -253,7 +257,7 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
           </div>
         </CardHeader>
 
-        <CardContent className="p-0">
+        <CardBody className="p-0">
           <Tabs>
             <TabList>
               <Tab isActive={activeTab === 'overview'} onClick={() => setActiveTab('overview')}>
@@ -278,9 +282,9 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
                   <div className="lg:col-span-2 space-y-6">
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-lg">Información Básica</CardTitle>
+                        <h2 className="text-lg">Información Básica</h2>
                       </CardHeader>
-                      <CardContent className="space-y-4">
+                      <CardBody className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <label className="text-sm font-medium text-gray-500">Categoría</label>
@@ -316,15 +320,15 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
                             </p>
                           </div>
                         )}
-                      </CardContent>
+                      </CardBody>
                     </Card>
 
                     {/* Pricing Information */}
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-lg">Información de Precios</CardTitle>
+                        <h2 className="text-lg">Información de Precios</h2>
                       </CardHeader>
-                      <CardContent>
+                      <CardBody>
                         <div className="grid grid-cols-3 gap-4">
                           <div>
                             <label className="text-sm font-medium text-gray-500">Costo Unitario</label>
@@ -345,7 +349,7 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
                             </p>
                           </div>
                         </div>
-                      </CardContent>
+                      </CardBody>
                     </Card>
                   </div>
 
@@ -353,9 +357,9 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
                   <div className="space-y-6">
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-lg">Estado del Inventario</CardTitle>
+                        <h2 className="text-lg">Estado del Inventario</h2>
                       </CardHeader>
-                      <CardContent className="space-y-4">
+                      <CardBody className="space-y-4">
                         <div>
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-sm font-medium text-gray-500">Stock Actual</span>
@@ -410,15 +414,15 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
                             </div>
                           </div>
                         )}
-                      </CardContent>
+                      </CardBody>
                     </Card>
 
                     {/* Last Updated */}
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-lg">Última Actualización</CardTitle>
+                        <h2 className="text-lg">Última Actualización</h2>
                       </CardHeader>
-                      <CardContent>
+                      <CardBody>
                         <div className="space-y-2">
                           <div>
                             <label className="text-sm font-medium text-gray-500">Último Chequeo</label>
@@ -433,7 +437,7 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
                             </p>
                           </div>
                         </div>
-                      </CardContent>
+                      </CardBody>
                     </Card>
                   </div>
                 </div>
@@ -445,9 +449,9 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
               <div className="p-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Historial de Uso</CardTitle>
+                    <h2 className="text-lg">Historial de Uso</h2>
                   </CardHeader>
-                  <CardContent>
+                  <CardBody>
                     {isLoadingHistory ? (
                       <div className="flex items-center justify-center py-8">
                         <Spinner size="lg" />
@@ -495,7 +499,7 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
                         ))}
                       </div>
                     )}
-                  </CardContent>
+                  </CardBody>
                 </Card>
               </div>
             </TabPanel>
@@ -506,9 +510,9 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Estadísticas de Uso</CardTitle>
+                      <h2 className="text-lg">Estadísticas de Uso</h2>
                     </CardHeader>
-                    <CardContent>
+                    <CardBody>
                       <div className="space-y-4">
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-600">Uso Promedio por Semana</span>
@@ -523,14 +527,14 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
                           <span className="text-sm font-medium">23 días</span>
                         </div>
                       </div>
-                    </CardContent>
+                    </CardBody>
                   </Card>
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Predicciones</CardTitle>
+                      <h2 className="text-lg">Predicciones</h2>
                     </CardHeader>
-                    <CardContent>
+                    <CardBody>
                       <div className="space-y-4">
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-600">Próximo Reorden</span>
@@ -545,13 +549,13 @@ export const DentalMaterialDetailV3: React.FC<DentalMaterialDetailV3Props> = ({
                           <span className="text-sm font-medium">92%</span>
                         </div>
                       </div>
-                    </CardContent>
+                    </CardBody>
                   </Card>
                 </div>
               </div>
             </TabPanel>
           </Tabs>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

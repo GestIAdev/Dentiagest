@@ -300,6 +300,105 @@ export const STOCK_LEVEL_CHANGED = gql`
 `;
 
 // ============================================================================
+// INVENTORY V3 SUBSCRIPTIONS - REAL-TIME UPDATES
+// ============================================================================
+
+export const INVENTORY_UPDATED_V3 = gql`
+  subscription InventoryUpdatedV3($productId: ID) {
+    inventoryUpdatedV3(productId: $productId) {
+      id
+      productId
+      product {
+        id
+        name
+        sku
+        category
+        brand
+      }
+      quantity
+      minStockLevel
+      maxStockLevel
+      location
+      batchNumber
+      expiryDate
+      costPrice
+      sellingPrice
+      status
+      lastUpdated
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const LOW_STOCK_ALERT_V3 = gql`
+  subscription LowStockAlertV3($productId: ID) {
+    lowStockAlertV3(productId: $productId) {
+      id
+      productId
+      product {
+        id
+        name
+        sku
+        category
+        brand
+      }
+      quantity
+      minStockLevel
+      maxStockLevel
+      location
+      batchNumber
+      expiryDate
+      costPrice
+      sellingPrice
+      status
+      lastUpdated
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const PURCHASE_ORDER_STATUS_V3 = gql`
+  subscription PurchaseOrderStatusV3($orderId: ID) {
+    purchaseOrderStatusV3(orderId: $orderId) {
+      id
+      orderNumber
+      supplierId
+      supplier {
+        id
+        name
+        contactInfo
+        address
+      }
+      items {
+        id
+        productId
+        product {
+          id
+          name
+          sku
+        }
+        quantity
+        unitPrice
+        totalPrice
+        expectedDeliveryDate
+      }
+      status
+      totalAmount
+      orderDate
+      expectedDeliveryDate
+      actualDeliveryDate
+      notes
+      createdBy
+      approvedBy
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+// ============================================================================
 // SUBSCRIPTION HOOKS
 // ============================================================================
 
@@ -767,26 +866,157 @@ export const useSubscriptionV3 = (config: SubscriptionConfig) => {
 };
 
 // ============================================================================
-// INVENTORY SUBSCRIPTION MANAGER V3.0
+// INVENTORY V3 SUBSCRIPTION HOOKS - REAL-TIME UPDATES
+// ============================================================================
+
+export const useInventoryUpdatedV3 = (productId?: string) => {
+  const [isConnected, setIsConnected] = useState(false);
+  const { addNotification } = useUIStore();
+
+  useEffect(() => {
+    const subscription = apolloClient.subscribe({
+      query: INVENTORY_UPDATED_V3,
+      variables: { productId },
+    }).subscribe({
+      next: ({ data }: { data: any }) => {
+        if (data?.inventoryUpdatedV3) {
+          console.log('📦 Inventory updated:', data.inventoryUpdatedV3);
+          const item = data.inventoryUpdatedV3;
+
+          addNotification({
+            id: `inventory-updated-${item.id}`,
+            type: 'info',
+            title: 'Inventario Actualizado',
+            message: `${item.product.name} - Cantidad: ${item.quantity}`,
+            timestamp: Date.now(),
+            read: false
+          });
+        }
+      },
+      error: (error: any) => {
+        console.error('Inventory updated subscription error:', error);
+      },
+    });
+
+    setIsConnected(true);
+
+    return () => {
+      subscription.unsubscribe();
+      setIsConnected(false);
+    };
+  }, [productId, addNotification]);
+
+  return { isConnected };
+};
+
+export const useLowStockAlertV3 = (productId?: string) => {
+  const [isConnected, setIsConnected] = useState(false);
+  const { addNotification } = useUIStore();
+
+  useEffect(() => {
+    const subscription = apolloClient.subscribe({
+      query: LOW_STOCK_ALERT_V3,
+      variables: { productId },
+    }).subscribe({
+      next: ({ data }: { data: any }) => {
+        if (data?.lowStockAlertV3) {
+          console.log('⚠️ Low stock alert:', data.lowStockAlertV3);
+          const item = data.lowStockAlertV3;
+
+          addNotification({
+            id: `low-stock-${item.id}`,
+            type: 'warning',
+            title: 'Alerta de Stock Bajo',
+            message: `${item.product.name} - Solo ${item.quantity} unidades restantes`,
+            timestamp: Date.now(),
+            read: false
+          });
+        }
+      },
+      error: (error: any) => {
+        console.error('Low stock alert subscription error:', error);
+      },
+    });
+
+    setIsConnected(true);
+
+    return () => {
+      subscription.unsubscribe();
+      setIsConnected(false);
+    };
+  }, [productId, addNotification]);
+
+  return { isConnected };
+};
+
+export const usePurchaseOrderStatusV3 = (orderId?: string) => {
+  const [isConnected, setIsConnected] = useState(false);
+  const { addNotification } = useUIStore();
+
+  useEffect(() => {
+    const subscription = apolloClient.subscribe({
+      query: PURCHASE_ORDER_STATUS_V3,
+      variables: { orderId },
+    }).subscribe({
+      next: ({ data }: { data: any }) => {
+        if (data?.purchaseOrderStatusV3) {
+          console.log('📋 Purchase order status update:', data.purchaseOrderStatusV3);
+          const order = data.purchaseOrderStatusV3;
+
+          const statusMessages = {
+            PENDING: 'Orden pendiente de aprobación',
+            APPROVED: 'Orden aprobada',
+            ORDERED: 'Orden colocada al proveedor',
+            SHIPPED: 'Orden en camino',
+            DELIVERED: 'Orden entregada',
+            CANCELLED: 'Orden cancelada'
+          };
+
+          addNotification({
+            id: `order-status-${order.id}`,
+            type: 'info',
+            title: 'Estado de Orden Actualizado',
+            message: `Orden ${order.orderNumber}: ${statusMessages[order.status as keyof typeof statusMessages] || order.status}`,
+            timestamp: Date.now(),
+            read: false
+          });
+        }
+      },
+      error: (error: any) => {
+        console.error('Purchase order status subscription error:', error);
+      },
+    });
+
+    setIsConnected(true);
+
+    return () => {
+      subscription.unsubscribe();
+      setIsConnected(false);
+    };
+  }, [orderId, addNotification]);
+
+  return { isConnected };
+};
+
+// ============================================================================
+// UNIFIED INVENTORY SUBSCRIPTIONS V3.0 - COMBINED HOOK
 // ============================================================================
 
 export const useInventorySubscriptionsV3 = () => {
-  const created = useInventoryV3Created();
-  const updated = useInventoryV3Updated();
-  const deleted = useInventoryV3Deleted();
-
-  const isConnected = created.isConnected && updated.isConnected && deleted.isConnected;
-
-  useEffect(() => {
-    if (isConnected) {
-      console.log('📦🔗 Inventory V3.0 real-time subscriptions active');
-    }
-  }, [isConnected]);
+  const inventoryUpdated = useInventoryUpdatedV3();
+  const lowStockAlert = useLowStockAlertV3();
+  const purchaseOrderStatus = usePurchaseOrderStatusV3();
+  const inventoryCreated = useInventoryV3Created();
+  const inventoryUpdatedOld = useInventoryV3Updated();
+  const inventoryDeleted = useInventoryV3Deleted();
 
   return {
-    isConnected,
-    created,
-    updated,
-    deleted
+    inventoryUpdated: inventoryUpdated.isConnected,
+    lowStockAlert: lowStockAlert.isConnected,
+    purchaseOrderStatus: purchaseOrderStatus.isConnected,
+    inventoryCreated: inventoryCreated.isConnected,
+    inventoryUpdatedOld: inventoryUpdatedOld.isConnected,
+    inventoryDeleted: inventoryDeleted.isConnected,
+    isConnected: inventoryUpdated.isConnected && lowStockAlert.isConnected && purchaseOrderStatus.isConnected
   };
 };

@@ -10,7 +10,10 @@ import React, { useState, useEffect } from 'react';
 import { useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Spinner } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL MUTATIONS - V3.0 Integration
@@ -251,9 +254,9 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
                 <WrenchScrewdriverIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                   {equipment ? '🎯 Editar Equipo V3.0' : '🎯 Nuevo Equipo V3.0'}
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   Gestión cuántica de equipos con verificación @veritas
                 </p>
@@ -270,7 +273,7 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
           </div>
         </CardHeader>
 
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <CardBody className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information Section */}
             <div className="space-y-4">
@@ -284,7 +287,7 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Nombre del Equipo *
                   </label>
-                  <Input
+                  <input
                     type="text"
                     value={formData.name}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('name', e.target.value)}
@@ -300,7 +303,7 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Modelo
                   </label>
-                  <Input
+                  <input
                     type="text"
                     value={formData.model}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('model', e.target.value)}
@@ -313,7 +316,7 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Número de Serie *
                   </label>
-                  <Input
+                  <input
                     type="text"
                     value={formData.serialNumber}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('serialNumber', e.target.value)}
@@ -329,7 +332,7 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Fabricante
                   </label>
-                  <Input
+                  <input
                     type="text"
                     value={formData.manufacturer}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('manufacturer', e.target.value)}
@@ -361,7 +364,7 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Ubicación
                   </label>
-                  <Input
+                  <input
                     type="text"
                     value={formData.location}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('location', e.target.value)}
@@ -384,7 +387,7 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Fecha de Compra
                   </label>
-                  <Input
+                  <input
                     type="date"
                     value={formData.purchaseDate}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('purchaseDate', e.target.value)}
@@ -396,7 +399,7 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Precio de Compra ($)
                   </label>
-                  <Input
+                  <input
                     type="number"
                     step="0.01"
                     value={formData.purchasePrice}
@@ -413,7 +416,7 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Valor Actual ($)
                   </label>
-                  <Input
+                  <input
                     type="number"
                     step="0.01"
                     value={formData.currentValue}
@@ -472,7 +475,7 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Vencimiento de Garantía
                   </label>
-                  <Input
+                  <input
                     type="date"
                     value={formData.warrantyExpiry}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('warrantyExpiry', e.target.value)}
@@ -494,7 +497,7 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Intervalo de Mantenimiento (días)
                   </label>
-                  <Input
+                  <input
                     type="number"
                     value={formData.maintenanceInterval}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('maintenanceInterval', parseInt(e.target.value) || 365)}
@@ -510,7 +513,7 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Último Mantenimiento
                   </label>
-                  <Input
+                  <input
                     type="date"
                     value={formData.lastMaintenance}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('lastMaintenance', e.target.value)}
@@ -522,7 +525,7 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Próximo Mantenimiento
                   </label>
-                  <Input
+                  <input
                     type="date"
                     value={formData.nextMaintenance}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('nextMaintenance', e.target.value)}
@@ -587,7 +590,7 @@ export const EquipmentFormV3: React.FC<EquipmentFormV3Props> = ({
               </Button>
             </div>
           </form>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

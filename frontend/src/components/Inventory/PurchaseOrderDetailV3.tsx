@@ -9,7 +9,9 @@
 import React from 'react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
 
 // 🎯 ICONS - Heroicons for purchase order theme
 import {
@@ -82,9 +84,9 @@ export const PurchaseOrderDetailV3: React.FC<PurchaseOrderDetailV3Props> = ({
                 <DocumentTextIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                   🎯 Detalle Orden de Compra V3.0
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   {order.orderNumber} • Verificación cuántica @veritas
                 </p>
@@ -101,11 +103,11 @@ export const PurchaseOrderDetailV3: React.FC<PurchaseOrderDetailV3Props> = ({
           </div>
         </CardHeader>
 
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <CardBody className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="space-y-6">
             {/* Order Header */}
             <Card className="bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-500/30">
-              <CardContent className="p-6">
+              <CardBody className="p-6">
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex items-center space-x-4">
                     <div className={`w-16 h-16 rounded-xl flex items-center justify-center shadow-lg ${statusInfo.bgColor} border ${statusInfo.borderColor}`}>
@@ -145,7 +147,7 @@ export const PurchaseOrderDetailV3: React.FC<PurchaseOrderDetailV3Props> = ({
                     </div>
                   </div>
                 )}
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* Order Information */}
@@ -153,12 +155,12 @@ export const PurchaseOrderDetailV3: React.FC<PurchaseOrderDetailV3Props> = ({
               {/* General Information */}
               <Card className="bg-gray-800/30 border border-gray-600/30">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-cyan-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-cyan-300 flex items-center space-x-2">
                     <DocumentTextIcon className="w-5 h-5" />
                     <span>Información General</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardBody className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm text-gray-400">Número de Orden</label>
@@ -198,18 +200,18 @@ export const PurchaseOrderDetailV3: React.FC<PurchaseOrderDetailV3Props> = ({
                       <p className="text-white bg-gray-700/50 p-3 rounded-lg mt-1">{order.notes}</p>
                     </div>
                   )}
-                </CardContent>
+                </CardBody>
               </Card>
 
               {/* Supplier Information */}
               <Card className="bg-gray-800/30 border border-gray-600/30">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-purple-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-purple-300 flex items-center space-x-2">
                     <BuildingStorefrontIcon className="w-5 h-5" />
                     <span>Información del Proveedor</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardBody className="space-y-4">
                   <div>
                     <label className="text-sm text-gray-400">Nombre del Proveedor</label>
                     <p className="text-white font-semibold">{order.supplier?.name || 'No especificado'}</p>
@@ -229,27 +231,27 @@ export const PurchaseOrderDetailV3: React.FC<PurchaseOrderDetailV3Props> = ({
                       </div>
                     </div>
                   )}
-                </CardContent>
+                </CardBody>
               </Card>
             </div>
 
             {/* Order Items */}
             <Card className="bg-gray-800/30 border border-gray-600/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-pink-300 flex items-center space-x-2">
+                <h2 className="text-lg text-pink-300 flex items-center space-x-2">
                   <ClipboardDocumentListIcon className="w-5 h-5" />
                   <span>Items de la Orden</span>
                   <Badge className="bg-pink-500/20 text-pink-300 border-pink-500/30">
                     {order.items?.length || 0} items
                   </Badge>
-                </CardTitle>
+                </h2>
               </CardHeader>
-              <CardContent>
+              <CardBody>
                 {order.items && order.items.length > 0 ? (
                   <div className="space-y-3">
                     {order.items.map((item: any, index: number) => (
                       <Card key={item.id || index} className="bg-gray-700/30 border border-gray-600/30">
-                        <CardContent className="p-4">
+                        <CardBody className="p-4">
                           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
                             <div className="md:col-span-2">
                               <h4 className="text-white font-semibold">{item.description}</h4>
@@ -273,7 +275,7 @@ export const PurchaseOrderDetailV3: React.FC<PurchaseOrderDetailV3Props> = ({
                               <p className="text-purple-400 font-bold">{formatCurrency(item.totalPrice)}</p>
                             </div>
                           </div>
-                        </CardContent>
+                        </CardBody>
                       </Card>
                     ))}
                   </div>
@@ -284,12 +286,12 @@ export const PurchaseOrderDetailV3: React.FC<PurchaseOrderDetailV3Props> = ({
                     <p className="text-gray-500">Esta orden no tiene items asociados</p>
                   </div>
                 )}
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* Order Summary */}
             <Card className="bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-500/30">
-              <CardContent className="p-6">
+              <CardBody className="p-6">
                 <h4 className="text-xl font-semibold text-white mb-6 flex items-center space-x-2">
                   <CurrencyDollarIcon className="w-6 h-6 text-green-400" />
                   <span>Resumen Financiero</span>
@@ -353,7 +355,7 @@ export const PurchaseOrderDetailV3: React.FC<PurchaseOrderDetailV3Props> = ({
                     )}
                   </div>
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* Action Buttons */}
@@ -366,7 +368,7 @@ export const PurchaseOrderDetailV3: React.FC<PurchaseOrderDetailV3Props> = ({
               </Button>
             </div>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

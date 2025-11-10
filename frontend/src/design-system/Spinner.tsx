@@ -6,7 +6,7 @@
  * PURPOSE: Loading spinner component
  */
 
-import React from 'react';
+import * as React from 'react';
 
 export interface SpinnerProps {
   size?: 'sm' | 'md' | 'lg';

@@ -9,7 +9,7 @@
 import React from 'react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge } from '../atoms';
+import { Button, Card, CardHeader, CardBody, Badge } from '../../design-system';
 
 // 🎯 ICONS - Heroicons for marketplace theme
 import {
@@ -84,9 +84,9 @@ export const PurchaseOrderDetailViewV3: React.FC<PurchaseOrderDetailViewV3Props>
                 <EyeIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                   🎯 Detalle de Orden de Compra V3.0
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   Verificación cuántica @veritas activa
                 </p>
@@ -103,11 +103,11 @@ export const PurchaseOrderDetailViewV3: React.FC<PurchaseOrderDetailViewV3Props>
           </div>
         </CardHeader>
 
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <CardBody className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="space-y-6">
             {/* 🎯 ORDER HEADER */}
             <Card className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-500/20">
-              <CardContent className="p-6">
+              <CardBody className="p-6">
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex items-center space-x-4">
                     <div className={`w-16 h-16 rounded-xl flex items-center justify-center shadow-lg ${statusInfo.bgColor} border ${statusInfo.borderColor}`}>
@@ -170,18 +170,18 @@ export const PurchaseOrderDetailViewV3: React.FC<PurchaseOrderDetailViewV3Props>
                     </div>
                   )}
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* 🎯 SUPPLIER INFORMATION */}
             <Card className="bg-gray-800/50 border border-gray-600/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-purple-300 flex items-center space-x-2">
+                <h2 className="text-lg text-purple-300 flex items-center space-x-2">
                   <BuildingStorefrontIcon className="w-5 h-5" />
                   <span>Información del Proveedor</span>
-                </CardTitle>
+                </h2>
               </CardHeader>
-              <CardContent>
+              <CardBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
@@ -204,22 +204,22 @@ export const PurchaseOrderDetailViewV3: React.FC<PurchaseOrderDetailViewV3Props>
                     </div>
                   </div>
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* 🎯 ORDER ITEMS */}
             <Card className="bg-gray-800/50 border border-gray-600/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-cyan-300 flex items-center space-x-2">
+                <h2 className="text-lg text-cyan-300 flex items-center space-x-2">
                   <CubeIcon className="w-5 h-5" />
                   <span>Items de la Orden ({order.items?.length || 0})</span>
-                </CardTitle>
+                </h2>
               </CardHeader>
-              <CardContent>
+              <CardBody>
                 <div className="space-y-4">
                   {order.items?.map((item: any, index: number) => (
                     <Card key={item.id || index} className="bg-gray-700/30 border border-gray-600/20">
-                      <CardContent className="p-4">
+                    <CardBody className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
                             <div className="flex items-center space-x-3 mb-2">
@@ -252,22 +252,22 @@ export const PurchaseOrderDetailViewV3: React.FC<PurchaseOrderDetailViewV3Props>
                             </div>
                           </div>
                         </div>
-                      </CardContent>
+                      </CardBody>
                     </Card>
                   ))}
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* 🎯 COST BREAKDOWN */}
             <Card className="bg-gradient-to-r from-cyan-900/30 to-purple-900/30 border border-cyan-500/20">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-pink-300 flex items-center space-x-2">
+                <h2 className="text-lg text-pink-300 flex items-center space-x-2">
                   <BanknotesIcon className="w-5 h-5" />
                   <span>Desglose de Costos</span>
-                </CardTitle>
+                </h2>
               </CardHeader>
-              <CardContent>
+              <CardBody>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-300">Subtotal de Items</span>
@@ -288,18 +288,18 @@ export const PurchaseOrderDetailViewV3: React.FC<PurchaseOrderDetailViewV3Props>
                     <span className="text-2xl text-cyan-300 font-bold">{formatCurrency(order.totalAmount)}</span>
                   </div>
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* 🎯 NOTES */}
             {order.notes && (
               <Card className="bg-gray-800/50 border border-gray-600/30">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-purple-300">Notas</CardTitle>
+                  <h2 className="text-lg text-purple-300">Notas</h2>
                 </CardHeader>
-                <CardContent>
+                <CardBody>
                   <p className="text-white whitespace-pre-wrap">{order.notes}</p>
-                </CardContent>
+                </CardBody>
               </Card>
             )}
 
@@ -307,12 +307,12 @@ export const PurchaseOrderDetailViewV3: React.FC<PurchaseOrderDetailViewV3Props>
             {order._veritas && (
               <Card className="bg-gradient-to-r from-green-900/30 to-cyan-900/30 border border-green-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-green-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-green-300 flex items-center space-x-2">
                     <ShieldCheckIcon className="w-5 h-5" />
                     <span>Verificación @veritas</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent>
+                <CardBody>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                       <label className="text-gray-400 text-sm">Confianza</label>
@@ -337,7 +337,7 @@ export const PurchaseOrderDetailViewV3: React.FC<PurchaseOrderDetailViewV3Props>
                     <label className="text-gray-400 text-sm">Algoritmo</label>
                     <p className="text-cyan-300 font-mono text-sm">{order._veritas.algorithm}</p>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
             )}
 
@@ -351,7 +351,7 @@ export const PurchaseOrderDetailViewV3: React.FC<PurchaseOrderDetailViewV3Props>
               </Button>
             </div>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );

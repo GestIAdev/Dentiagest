@@ -10,7 +10,10 @@ import React, { useState } from 'react';
 import { useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL MUTATIONS - V3.0 Integration
@@ -190,9 +193,9 @@ export const OrderApprovalV3: React.FC<OrderApprovalV3Props> = ({
                 <ShieldCheckIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                   🎯 Aprobación de Orden V3.0
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   {order.orderNumber} • Verificación cuántica @veritas
                 </p>
@@ -209,11 +212,11 @@ export const OrderApprovalV3: React.FC<OrderApprovalV3Props> = ({
           </div>
         </CardHeader>
 
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <CardBody className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="space-y-6">
             {/* Order Summary */}
             <Card className="bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-500/30">
-              <CardContent className="p-6">
+              <CardBody className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h3 className="text-xl font-bold text-white">{order.orderNumber}</h3>
@@ -258,7 +261,7 @@ export const OrderApprovalV3: React.FC<OrderApprovalV3Props> = ({
                     </div>
                   )}
                 </div>
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* Order Details */}
@@ -266,12 +269,12 @@ export const OrderApprovalV3: React.FC<OrderApprovalV3Props> = ({
               {/* Order Information */}
               <Card className="bg-gray-800/30 border border-gray-600/30">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-cyan-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-cyan-300 flex items-center space-x-2">
                     <DocumentTextIcon className="w-5 h-5" />
                     <span>Detalles de la Orden</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardBody className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Fecha de Orden:</span>
                     <span className="text-white">{formatDate(order.orderDate)}</span>
@@ -296,18 +299,18 @@ export const OrderApprovalV3: React.FC<OrderApprovalV3Props> = ({
                     <span className="text-white">Total:</span>
                     <span className="text-purple-400">{formatCurrency(order.totalAmount)}</span>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
 
               {/* Approval Level Selection */}
               <Card className="bg-gray-800/30 border border-gray-600/30">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-purple-300 flex items-center space-x-2">
+                  <h2 className="text-lg text-purple-300 flex items-center space-x-2">
                     <UserIcon className="w-5 h-5" />
                     <span>Nivel de Aprobación</span>
-                  </CardTitle>
+                  </h2>
                 </CardHeader>
-                <CardContent>
+                <CardBody>
                   <div className="space-y-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -330,22 +333,22 @@ export const OrderApprovalV3: React.FC<OrderApprovalV3Props> = ({
                       <p><strong>Ejecutivo:</strong> Aprobaciones sin límite</p>
                     </div>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
             </div>
 
             {/* Order Items Preview */}
             <Card className="bg-gray-800/30 border border-gray-600/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-pink-300 flex items-center space-x-2">
+                <h2 className="text-lg text-pink-300 flex items-center space-x-2">
                   <ClipboardDocumentListIcon className="w-5 h-5" />
                   <span>Items de la Orden</span>
                   <Badge className="bg-pink-500/20 text-pink-300 border-pink-500/30">
                     {order.items?.length || 0} items
                   </Badge>
-                </CardTitle>
+                </h2>
               </CardHeader>
-              <CardContent>
+              <CardBody>
                 {order.items && order.items.length > 0 ? (
                   <div className="space-y-2 max-h-40 overflow-y-auto">
                     {order.items.map((item: any, index: number) => (
@@ -363,13 +366,13 @@ export const OrderApprovalV3: React.FC<OrderApprovalV3Props> = ({
                 ) : (
                   <p className="text-gray-400 text-center py-4">No hay items en esta orden</p>
                 )}
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* @veritas Verification Status */}
             {order._veritas && (
               <Card className="bg-green-500/10 border border-green-500/30">
-                <CardContent className="p-4">
+                <CardBody className="p-4">
                   <div className="flex items-center space-x-3">
                     <ShieldCheckIcon className="w-6 h-6 text-green-400" />
                     <div>
@@ -379,18 +382,18 @@ export const OrderApprovalV3: React.FC<OrderApprovalV3Props> = ({
                       </p>
                     </div>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
             )}
 
             {/* Decision Comments */}
             <Card className="bg-gray-800/30 border border-gray-600/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-white">
+                <h2 className="text-lg text-white">
                   Comentarios de Decisión *
-                </CardTitle>
+                </h2>
               </CardHeader>
-              <CardContent>
+              <CardBody>
                 <textarea
                   value={decision.comments}
                   onChange={(e) => setDecision(prev => ({ ...prev, comments: e.target.value }))}
@@ -401,7 +404,7 @@ export const OrderApprovalV3: React.FC<OrderApprovalV3Props> = ({
                 <p className="text-gray-400 text-sm mt-2">
                   Los comentarios son obligatorios y quedarán registrados en el historial de auditoría
                 </p>
-              </CardContent>
+              </CardBody>
             </Card>
 
             {/* Action Buttons */}
@@ -445,7 +448,7 @@ export const OrderApprovalV3: React.FC<OrderApprovalV3Props> = ({
               </div>
             </div>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
 
       {/* Reject Confirmation Modal */}
@@ -453,12 +456,12 @@ export const OrderApprovalV3: React.FC<OrderApprovalV3Props> = ({
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
           <Card className="w-full max-w-md bg-gradient-to-br from-red-900/20 via-pink-900/20 to-purple-900/20 backdrop-blur-sm border border-red-500/20">
             <CardHeader className="border-b border-gray-600/30">
-              <CardTitle className="text-xl font-bold text-red-400 flex items-center space-x-2">
+              <h2 className="text-xl font-bold text-red-400 flex items-center space-x-2">
                 <XCircleIcon className="w-6 h-6" />
                 <span>Confirmar Rechazo</span>
-              </CardTitle>
+              </h2>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardBody className="p-6">
               <div className="space-y-4">
                 <p className="text-white">
                   ¿Está seguro de que desea rechazar la orden <strong>{order.orderNumber}</strong>?
@@ -497,7 +500,7 @@ export const OrderApprovalV3: React.FC<OrderApprovalV3Props> = ({
                   </Button>
                 </div>
               </div>
-            </CardContent>
+            </CardBody>
           </Card>
         </div>
       )}

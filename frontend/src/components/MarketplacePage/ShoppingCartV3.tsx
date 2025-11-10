@@ -10,7 +10,10 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useSubscription } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../atoms';
+import { Button } from '../../design-system/Button';
+import { Card, CardHeader, CardBody } from '../../design-system/Card';
+import { Badge } from '../../design-system/Badge';
+import { Spinner } from '../../design-system/Spinner';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL QUERIES - V3.0 Integration
@@ -282,10 +285,10 @@ export const ShoppingCartV3: React.FC<ShoppingCartV3Props> = ({
   if (cartLoading) {
     return (
       <Card className={`bg-gradient-to-br from-slate-900 via-purple-900/50 to-slate-900 backdrop-blur-sm border border-cyan-500/20 ${className}`}>
-        <CardContent className="p-8 flex items-center justify-center">
+        <CardBody className="p-8 flex items-center justify-center">
           <Spinner size="sm" />
           <span className="ml-2 text-gray-300">Cargando carrito de compras...</span>
-        </CardContent>
+        </CardBody>
       </Card>
     );
   }
@@ -295,16 +298,16 @@ export const ShoppingCartV3: React.FC<ShoppingCartV3Props> = ({
     return (
       <Card className={`bg-gradient-to-br from-slate-900 via-purple-900/50 to-slate-900 backdrop-blur-sm border border-cyan-500/20 ${className}`}>
         <CardHeader className="border-b border-gray-600/30">
-          <CardTitle className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent flex items-center space-x-2">
+          <h2 className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent flex items-center space-x-2">
             <ShoppingCartIcon className="w-6 h-6" />
             <span>🎯 Carrito de Compras V3.0</span>
-          </CardTitle>
+          </h2>
         </CardHeader>
-        <CardContent className="p-8 text-center">
+        <CardBody className="p-8 text-center">
           <ShoppingBagIcon className="w-16 h-16 mx-auto text-gray-500 mb-4" />
           <h3 className="text-lg font-medium text-gray-300 mb-2">Tu carrito está vacío</h3>
           <p className="text-gray-500">Agrega productos desde el catálogo para comenzar tus compras</p>
-        </CardContent>
+        </CardBody>
       </Card>
     );
   }
@@ -314,12 +317,12 @@ export const ShoppingCartV3: React.FC<ShoppingCartV3Props> = ({
     return (
       <Card className={`bg-gradient-to-br from-green-900/50 via-cyan-900/50 to-slate-900 backdrop-blur-sm border border-green-500/20 ${className}`}>
         <CardHeader className="border-b border-gray-600/30">
-          <CardTitle className="text-xl font-bold bg-gradient-to-r from-green-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent flex items-center space-x-2">
+          <h2 className="text-xl font-bold bg-gradient-to-r from-green-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent flex items-center space-x-2">
             <CheckCircleIcon className="w-6 h-6" />
             <span>🎯 ¡Checkout Exitoso!</span>
-          </CardTitle>
+          </h2>
         </CardHeader>
-        <CardContent className="p-8 text-center">
+        <CardBody className="p-8 text-center">
           <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-cyan-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-500/25">
             <CheckCircleIcon className="w-10 h-10 text-white" />
           </div>
@@ -342,7 +345,7 @@ export const ShoppingCartV3: React.FC<ShoppingCartV3Props> = ({
               Continuar Comprando
             </Button>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     );
   }
@@ -358,9 +361,9 @@ export const ShoppingCartV3: React.FC<ShoppingCartV3Props> = ({
                 <ShoppingCartIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                   🎯 Carrito de Compras V3.0
-                </CardTitle>
+                </h2>
                 <p className="text-gray-300 text-sm mt-1">
                   Mercado negro fortificado con verificación cuántica @veritas
                 </p>
@@ -384,7 +387,7 @@ export const ShoppingCartV3: React.FC<ShoppingCartV3Props> = ({
 
         {/* 🎯 CART SUMMARY */}
         {cartSummary && (
-          <CardContent className="pt-4">
+          <CardBody className="pt-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-cyan-400">{cartSummary.itemCount}</div>
@@ -403,23 +406,23 @@ export const ShoppingCartV3: React.FC<ShoppingCartV3Props> = ({
                 <div className="text-xs text-gray-400">Total</div>
               </div>
             </div>
-          </CardContent>
+          </CardBody>
         )}
       </Card>
 
       {/* 🎯 CART ITEMS */}
       <Card className="bg-gray-800/50 backdrop-blur-sm border border-gray-600/30">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-cyan-300 flex items-center space-x-2">
+          <h2 className="text-lg text-cyan-300 flex items-center space-x-2">
             <CubeIcon className="w-5 h-5" />
             <span>Items en el Carrito</span>
-          </CardTitle>
+          </h2>
         </CardHeader>
-        <CardContent>
+        <CardBody>
           <div className="space-y-4">
             {cartItems.map((item: CartItem) => (
               <Card key={item.id} className="bg-gray-700/30 border border-gray-600/20 hover:border-purple-500/30 transition-colors">
-                <CardContent className="p-4">
+                <CardBody className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
@@ -477,22 +480,22 @@ export const ShoppingCartV3: React.FC<ShoppingCartV3Props> = ({
                       </Button>
                     </div>
                   </div>
-                </CardContent>
+                </CardBody>
               </Card>
             ))}
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
 
       {/* 🎯 COST BREAKDOWN */}
       <Card className="bg-gradient-to-r from-cyan-900/30 to-purple-900/30 border border-cyan-500/20">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-pink-300 flex items-center space-x-2">
+          <h2 className="text-lg text-pink-300 flex items-center space-x-2">
             <CalculatorIcon className="w-5 h-5" />
             <span>Resumen de Costos</span>
-          </CardTitle>
+          </h2>
         </CardHeader>
-        <CardContent>
+        <CardBody>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-gray-300">Subtotal</span>
@@ -511,7 +514,7 @@ export const ShoppingCartV3: React.FC<ShoppingCartV3Props> = ({
               <span className="text-2xl text-cyan-300 font-bold">{formatCurrency(cart.totalAmount || 0)}</span>
             </div>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
 
       {/* 🎯 @VERITAS VERIFICATION BADGE */}
@@ -524,7 +527,7 @@ export const ShoppingCartV3: React.FC<ShoppingCartV3Props> = ({
 
       {/* 🎯 CHECKOUT ACTION */}
       <Card className="bg-gradient-to-r from-pink-900/30 to-cyan-900/30 border border-pink-500/20">
-        <CardContent className="p-6">
+        <CardBody className="p-6">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-bold text-white mb-2">¿Listo para completar tu orden?</h3>
@@ -550,7 +553,7 @@ export const ShoppingCartV3: React.FC<ShoppingCartV3Props> = ({
               )}
             </Button>
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     </div>
   );
