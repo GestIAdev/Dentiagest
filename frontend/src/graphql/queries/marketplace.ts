@@ -403,46 +403,22 @@ export const DELETE_SUPPLIER = gql`
 // 🎯 SHOPPING CART QUERIES - V3.0 Enhanced
 export const GET_SHOPPING_CART = gql`
   query GetShoppingCartV3($userId: ID!) {
-    shoppingCartV3(userId: $userId) {
+    cartItemsV3(userId: $userId) {
       id
       userId
-      userId_veritas
-      items {
+      productId
+      quantity
+      unitPrice
+      totalPrice
+      notes
+      addedAt
+      product {
         id
-        productId
-        productId_veritas
-        productName
-        productName_veritas
-        quantity
-        unitPrice
-        unitPrice_veritas
-        totalPrice
-        totalPrice_veritas
-        supplierId
-        supplierId_veritas
-        supplierName
-        supplierName_veritas
-        addedAt
-        _veritas {
-          verified
-          confidence
-          level
-          certificate
-          error
-          verifiedAt
-          algorithm
-        }
+        name
+        category
+        sku
+        price
       }
-      subtotal
-      subtotal_veritas
-      taxAmount
-      taxAmount_veritas
-      shippingCost
-      shippingCost_veritas
-      totalAmount
-      totalAmount_veritas
-      createdAt
-      updatedAt
       _veritas {
         verified
         confidence

@@ -55,7 +55,7 @@ export const GET_DENTAL_MATERIALS = gql`
     $limit: Int
     $offset: Int
   ) {
-    dentalMaterialsV3(
+    materialsV3(
       category: $category
       searchTerm: $searchTerm
       lowStockOnly: $lowStockOnly
@@ -88,7 +88,6 @@ export const GET_DENTAL_MATERIALS = gql`
       supplier {
         id
         name
-        contactInfo
       }
 
       # V3.0 @veritas QUANTUM TRUTH VERIFICATION
@@ -107,7 +106,7 @@ export const GET_DENTAL_MATERIALS = gql`
 
 export const GET_DENTAL_MATERIAL = gql`
   query GetDentalMaterial($id: ID!) {
-    dentalMaterialV3(id: $id) {
+    materialV3(id: $id) {
       id
       name
       name_veritas
@@ -278,7 +277,7 @@ export const GET_EQUIPMENT = gql`
     $limit: Int
     $offset: Int
   ) {
-    equipmentV3(
+    equipmentsV3(
       category: $category
       status: $status
       maintenanceDue: $maintenanceDue
@@ -315,18 +314,16 @@ export const GET_EQUIPMENT = gql`
       supplier {
         id
         name
-        contactInfo
       }
 
       # MAINTENANCE HISTORY
       maintenanceHistory {
         id
-        date
-        type
+        scheduledDate
+        maintenanceType
         description
-        cost
+        estimatedCost
         technician
-        nextDue
       }
 
       # V3.0 @veritas QUANTUM TRUTH VERIFICATION
@@ -533,47 +530,39 @@ export const DELETE_EQUIPMENT = gql`
 
 export const GET_SUPPLIERS = gql`
   query GetSuppliers(
-    $activeOnly: Boolean
-    $searchTerm: String
+    $category: String
+    $verifiedOnly: Boolean
     $limit: Int
     $offset: Int
   ) {
     suppliersV3(
-      activeOnly: $activeOnly
-      searchTerm: $searchTerm
+      category: $category
+      verifiedOnly: $verifiedOnly
       limit: $limit
       offset: $offset
     ) {
       id
       name
-      name_veritas
-      contactPerson
       email
       phone
-      address
-      taxId
-      paymentTerms
-      creditLimit
-      currentBalance
-      currentBalance_veritas
-      status
-      status_veritas
+      address {
+        street
+        city
+        state
+        zipCode
+        country
+      }
       rating
+      totalReviews
+      verified
       categories
-      contractStart
-      contractEnd
-      notes
-      notes_veritas
+      paymentTerms
+      minimumOrderValue
+      shippingMethods
+      certifications
+      active
       createdAt
       updatedAt
-
-      # PERFORMANCE METRICS
-      performanceMetrics {
-        onTimeDelivery
-        qualityRating
-        responseTime
-        overallScore
-      }
 
       # V3.0 @veritas QUANTUM TRUTH VERIFICATION
       _veritas {
@@ -747,9 +736,9 @@ export const DELETE_SUPPLIER = gql`
 export const GET_PURCHASE_ORDERS = gql`
   query GetPurchaseOrders(
     $status: String
-    $supplierId: String
-    $dateFrom: DateTime
-    $dateTo: DateTime
+    $supplierId: ID
+    $dateFrom: String
+    $dateTo: String
     $limit: Int
     $offset: Int
   ) {
@@ -763,21 +752,16 @@ export const GET_PURCHASE_ORDERS = gql`
     ) {
       id
       orderNumber
-      orderNumber_veritas
       supplierId
       status
-      status_veritas
       orderDate
-      expectedDelivery
-      actualDelivery
-      totalAmount
-      totalAmount_veritas
-      taxAmount
-      discountAmount
+      estimatedDeliveryDate
+      actualDeliveryDate
+      subtotal
+      tax
+      shippingCost
+      total
       notes
-      notes_veritas
-      createdBy
-      approvedBy
       createdAt
       updatedAt
 
@@ -785,19 +769,17 @@ export const GET_PURCHASE_ORDERS = gql`
       supplier {
         id
         name
-        contactInfo
       }
 
       # ORDER ITEMS
       items {
         id
-        materialId
-        equipmentId
+        productId
         quantity
         unitPrice
         totalPrice
-        description
-        status
+        deliveredQuantity
+        notes
       }
 
       # V3.0 @veritas QUANTUM TRUTH VERIFICATION
