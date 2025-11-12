@@ -248,15 +248,15 @@ export const FinancialManagerV3: React.FC<FinancialManagerV3Props> = ({
 
   // 🎯 PROCESSED DATA
   const invoices = useMemo(() => {
-    return invoicesData?.invoicesV3 || [];
+    return (invoicesData as any)?.invoicesV3 || [];
   }, [invoicesData]);
 
   const payments = useMemo(() => {
-    return paymentsData?.paymentsV3 || [];
+    return (paymentsData as any)?.paymentsV3 || [];
   }, [paymentsData]);
 
   const analytics = useMemo(() => {
-    return analyticsData?.financialAnalyticsV3 || {};
+    return (analyticsData as any)?.financialAnalyticsV3 || {};
   }, [analyticsData]);
 
   // 🎯 FILTERED DATA

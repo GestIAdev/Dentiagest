@@ -163,7 +163,7 @@ const PaymentFormModalV3: React.FC<PaymentFormModalV3Props> = ({
         refetchQueries: ['GetPaymentsV3']
       });
 
-      setTransactionId(result.data.createPaymentV3.id);
+      setTransactionId((result.data as any)?.createPaymentV3?.id);
 
       if (paymentMethod !== 'blockchain') {
         setPaymentStatus('completed');
