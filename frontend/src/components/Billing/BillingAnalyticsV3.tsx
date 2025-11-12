@@ -4,11 +4,20 @@
 // Status: V3.0 - Quantum financial intelligence with real-time analytics
 // Challenge: Transform raw financial data into actionable quantum insights
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
+
+// 🔥 APOLLO CLIENT V4 ESM HOOKS - Real-time data from Selene
+import { useQuery } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS
 import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
+
+// 🎯 GRAPHQL QUERIES - V3.0 Integration (LECTURA - Real-time from Selene)
+import {
+  GET_FINANCIAL_ANALYTICS,
+  GET_FINANCIAL_DASHBOARD
+} from '../../graphql/queries/financial';
 
 // 🎯 ICONS
 import {
@@ -48,68 +57,77 @@ export const BillingAnalyticsV3: React.FC<BillingAnalyticsV3Props> = ({
   onExport
 }) => {
   const [loading, setLoading] = useState(true);
-  const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [selectedPeriod, setSelectedPeriod] = useState('30d');
 
-  // 🎯 MOCK ANALYTICS DATA
-  const mockAnalyticsData = {
-    summary: {
-      totalRevenue: 125000.00,
-      totalInvoices: 245,
-      paidInvoices: 198,
-      pendingInvoices: 47,
-      overdueInvoices: 12,
-      averagePaymentTime: 8.5,
-      collectionRate: 94.2
+  // 🎯 GRAPHQL QUERY - Real analytics from Selene  
+  const { 
+    data, 
+    loading: queryLoading, 
+    error: queryError,
+    refetch: refetchAnalytics 
+  } = useQuery(GET_FINANCIAL_ANALYTICS, {
+    variables: {
+      dateFrom: dateRange?.start || undefined,
+      dateTo: dateRange?.end || undefined,
+      patientId: undefined
     },
-    trends: {
-      revenueGrowth: 12.5,
-      invoiceGrowth: 8.3,
-      paymentSpeed: -2.1,
-      collectionRate: 1.8
-    },
-    topPerformers: [
-      { name: 'Dr. María González', revenue: 45000, invoices: 89, collectionRate: 98.2 },
-      { name: 'Dr. Carlos Rodríguez', revenue: 38000, invoices: 76, collectionRate: 95.8 },
-      { name: 'Dra. Ana López', revenue: 32000, invoices: 65, collectionRate: 92.3 }
-    ],
-    paymentMethods: [
-      { method: 'Efectivo', amount: 25000, percentage: 20, color: 'green' },
-      { method: 'Tarjeta de Crédito', amount: 37500, percentage: 30, color: 'blue' },
-      { method: 'Transferencia', amount: 31250, percentage: 25, color: 'purple' },
-      { method: 'Blockchain', amount: 31250, percentage: 25, color: 'orange' }
-    ],
-    monthlyData: [
-      { month: 'Jul', revenue: 95000, invoices: 180, paid: 152 },
-      { month: 'Ago', revenue: 105000, invoices: 195, paid: 165 },
-      { month: 'Sep', revenue: 125000, invoices: 245, paid: 198 }
-    ],
-    alerts: [
-      { type: 'warning', message: '12 facturas vencidas requieren atención inmediata', priority: 'high' },
-      { type: 'info', message: 'Tasa de cobro mejoró 1.8% este mes', priority: 'medium' },
-      { type: 'success', message: 'Nuevo récord de ingresos mensuales', priority: 'low' }
-    ]
-  };
+    pollInterval: 30000 // Poll every 30 seconds for real-time updates
+  });
 
-  // 🎯 LOAD ANALYTICS DATA
-  useEffect(() => {
-    loadAnalyticsData();
-  }, [selectedPeriod, dateRange]);
+  // 🎯 MEMOIZED PROCESSED DATA from GraphQL
+  const analyticsData = useMemo(() => {
+    if (!data?.financialAnalytics) return null;
+    
+    const analytics = (data as any).financialAnalytics;
+    return {
+      summary: {
+        totalRevenue: analytics.total_revenue || 0,
+        totalInvoices: analytics.total_invoices || 0,
+        paidInvoices: analytics.paid_invoices || 0,
+        pendingInvoices: analytics.pending_invoices || 0,
+        overdueInvoices: analytics.overdue_invoices || 0,
+        averagePaymentTime: analytics.average_payment_time || 0,
+        collectionRate: analytics.collection_rate || 0
+      },
+      trends: {
+        revenueGrowth: analytics.revenue_growth || 0,
+        invoiceGrowth: analytics.invoice_growth || 0,
+        paymentSpeed: analytics.payment_speed || 0,
+        collectionRate: analytics.collection_trend || 0
+      },
+      topPerformers: analytics.top_performers || [],
+      paymentMethods: analytics.payment_methods || [],
+      monthlyData: analytics.monthly_data || [],
+      alerts: analytics.alerts || []
+    };
+  }, [data]);
 
-  const loadAnalyticsData = async () => {
-    try {
-      setLoading(true);
-      // TODO: Load real analytics data from GraphQL
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Mock delay
-      setAnalyticsData(mockAnalyticsData);
-    } catch (error) {
-      l.error('Failed to load analytics data', error as Error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // 🎯 LOADING STATE
+  const isLoading = queryLoading || (loading && !analyticsData);
 
-  // 🎯 FORMAT CURRENCY
+  if (isLoading) {
+    return (
+      <div className={`flex items-center justify-center min-h-[400px] ${className}`}>
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (queryError || !analyticsData) {
+    return (
+      <Card className="bg-red-950/20 border-red-500/30">
+        <CardHeader>
+          <CardTitle className="text-red-400">Error en Analytics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-red-300">{queryError?.message || 'No hay datos disponibles'}</p>
+          <Button onClick={() => refetchAnalytics()} className="mt-4">
+            Reintentar
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
@@ -158,6 +176,9 @@ export const BillingAnalyticsV3: React.FC<BillingAnalyticsV3Props> = ({
     );
   }
 
+  // Cast analytics data for safe access
+  const data_ = (analyticsData as any) || {};
+
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Header */}
@@ -200,7 +221,7 @@ export const BillingAnalyticsV3: React.FC<BillingAnalyticsV3Props> = ({
 
       {/* Alerts */}
       <div className="space-y-3">
-        {analyticsData.alerts.map((alert: any, index: number) => (
+        {data_.alerts.map((alert: any, index: number) => (
           <div
             key={index}
             className={`p-4 rounded-lg border backdrop-blur-sm ${
@@ -227,10 +248,10 @@ export const BillingAnalyticsV3: React.FC<BillingAnalyticsV3Props> = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-green-300/80 text-sm font-medium">Ingresos Totales</p>
-                <p className="text-2xl font-bold text-white">{formatCurrency(analyticsData.summary.totalRevenue)}</p>
-                <div className={`flex items-center space-x-1 text-sm ${getTrendColor(analyticsData.trends.revenueGrowth)}`}>
-                  {React.createElement(getTrendIcon(analyticsData.trends.revenueGrowth), { className: "w-4 h-4" })}
-                  <span>{formatPercentage(analyticsData.trends.revenueGrowth)}</span>
+                <p className="text-2xl font-bold text-white">{formatCurrency(data_.summary.totalRevenue)}</p>
+                <div className={`flex items-center space-x-1 text-sm ${getTrendColor(data_.trends.revenueGrowth)}`}>
+                  {React.createElement(getTrendIcon(data_.trends.revenueGrowth), { className: "w-4 h-4" })}
+                  <span>{formatPercentage(data_.trends.revenueGrowth)}</span>
                 </div>
               </div>
               <CurrencyDollarIcon className="w-8 h-8 text-green-400" />
@@ -244,10 +265,10 @@ export const BillingAnalyticsV3: React.FC<BillingAnalyticsV3Props> = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-300/80 text-sm font-medium">Tasa de Cobro</p>
-                <p className="text-2xl font-bold text-white">{analyticsData.summary.collectionRate}%</p>
-                <div className={`flex items-center space-x-1 text-sm ${getTrendColor(analyticsData.trends.collectionRate)}`}>
-                  {React.createElement(getTrendIcon(analyticsData.trends.collectionRate), { className: "w-4 h-4" })}
-                  <span>{formatPercentage(analyticsData.trends.collectionRate)}</span>
+                <p className="text-2xl font-bold text-white">{data_.summary.collectionRate}%</p>
+                <div className={`flex items-center space-x-1 text-sm ${getTrendColor(data_.trends.collectionRate)}`}>
+                  {React.createElement(getTrendIcon(data_.trends.collectionRate), { className: "w-4 h-4" })}
+                  <span>{formatPercentage(data_.trends.collectionRate)}</span>
                 </div>
               </div>
               <ArrowTrendingUpIcon className="w-8 h-8 text-blue-400" />
@@ -261,8 +282,8 @@ export const BillingAnalyticsV3: React.FC<BillingAnalyticsV3Props> = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-purple-300/80 text-sm font-medium">Facturas Pendientes</p>
-                <p className="text-2xl font-bold text-white">{analyticsData.summary.pendingInvoices}</p>
-                <p className="text-sm text-orange-300">de {analyticsData.summary.totalInvoices} total</p>
+                <p className="text-2xl font-bold text-white">{data_.summary.pendingInvoices}</p>
+                <p className="text-sm text-orange-300">de {data_.summary.totalInvoices} total</p>
               </div>
               <ClockIcon className="w-8 h-8 text-purple-400" />
             </div>
@@ -275,10 +296,10 @@ export const BillingAnalyticsV3: React.FC<BillingAnalyticsV3Props> = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-red-300/80 text-sm font-medium">Tiempo Promedio</p>
-                <p className="text-2xl font-bold text-white">{analyticsData.summary.averagePaymentTime}d</p>
-                <div className={`flex items-center space-x-1 text-sm ${getTrendColor(-analyticsData.trends.paymentSpeed)}`}>
-                  {React.createElement(getTrendIcon(-analyticsData.trends.paymentSpeed), { className: "w-4 h-4" })}
-                  <span>{formatPercentage(-analyticsData.trends.paymentSpeed)}</span>
+                <p className="text-2xl font-bold text-white">{data_.summary.averagePaymentTime}d</p>
+                <div className={`flex items-center space-x-1 text-sm ${getTrendColor(-data_.trends.paymentSpeed)}`}>
+                  {React.createElement(getTrendIcon(-data_.trends.paymentSpeed), { className: "w-4 h-4" })}
+                  <span>{formatPercentage(-data_.trends.paymentSpeed)}</span>
                 </div>
               </div>
               <BoltIcon className="w-8 h-8 text-red-400" />
@@ -299,7 +320,7 @@ export const BillingAnalyticsV3: React.FC<BillingAnalyticsV3Props> = ({
             </CardTitle>
           </CardHeader>
           <CardContent className="relative space-y-4">
-            {analyticsData.paymentMethods.map((method: any, index: number) => (
+            {data_.paymentMethods.map((method: any, index: number) => (
               <div key={index} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-white font-medium">{method.method}</span>
@@ -334,7 +355,7 @@ export const BillingAnalyticsV3: React.FC<BillingAnalyticsV3Props> = ({
             </CardTitle>
           </CardHeader>
           <CardContent className="relative space-y-4">
-            {analyticsData.topPerformers.map((performer: any, index: number) => (
+            {data_.topPerformers.map((performer: any, index: number) => (
               <div key={index} className="flex items-center justify-between p-3 bg-slate-800/30 rounded-lg border border-slate-600/30">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-full flex items-center justify-center">
@@ -368,7 +389,7 @@ export const BillingAnalyticsV3: React.FC<BillingAnalyticsV3Props> = ({
         </CardHeader>
         <CardContent className="relative">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {analyticsData.monthlyData.map((month: any, index: number) => (
+            {data_.monthlyData.map((month: any, index: number) => (
               <div key={index} className="text-center p-4 bg-slate-800/30 rounded-lg border border-slate-600/30">
                 <h3 className="text-white font-semibold text-lg mb-2">{month.month}</h3>
                 <div className="space-y-2">
@@ -395,3 +416,4 @@ export const BillingAnalyticsV3: React.FC<BillingAnalyticsV3Props> = ({
 };
 
 export default BillingAnalyticsV3;
+

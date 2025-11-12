@@ -16,18 +16,24 @@ import { useQuery, useMutation } from '@apollo/client/react';
 import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 
-// 🎯 GRAPHQL QUERIES - V3.0 Integration
+// 🎯 GRAPHQL QUERIES - V3.0 Integration (LECTURA - Real-time data from Selene)
 import {
   GET_INVOICES,
   GET_PAYMENTS,
   GET_FINANCIAL_ANALYTICS,
+  GET_FINANCIAL_DASHBOARD,
+  GET_OUTSTANDING_INVOICES
+} from '../../graphql/queries/financial';
+
+// 🎯 GRAPHQL MUTATIONS - V3.0 Integration (ESCRITURA - Write operations to Selene)
+import {
   CREATE_INVOICE,
-  CREATE_PAYMENT,
   UPDATE_INVOICE,
-  UPDATE_PAYMENT,
   DELETE_INVOICE,
+  CREATE_PAYMENT,
+  UPDATE_PAYMENT,
   DELETE_PAYMENT
-} from '../../graphql/queries/billing';
+} from '../../graphql/mutations/billing';
 
 // 🎯 PATIENTS HOOK
 import { useGraphQLPatients } from '../../hooks/useGraphQLPatients';

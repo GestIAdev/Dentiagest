@@ -40,7 +40,7 @@ import {
 
 // GraphQL Hooks
 import { useMutation } from '@apollo/client/react';
-import { CREATE_PAYMENT } from '../../graphql/queries/billing';
+import { CREATE_PAYMENT, UPDATE_PAYMENT } from '../../graphql/mutations/billing';
 
 // Zustand Store
 import { useFinancialStore } from '../../stores/useFinancialStore';

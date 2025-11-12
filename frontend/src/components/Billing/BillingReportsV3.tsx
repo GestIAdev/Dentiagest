@@ -181,8 +181,8 @@ export const BillingReportsV3: React.FC<BillingReportsV3Props> = ({
   const generateReport = async (reportType: ReportType, format: string) => {
     try {
       setIsGenerating(true);
-      // TODO: Implement actual report generation
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Mock delay
+      // TODO: Implement actual report generation from GraphQL GENERATE_FINANCIAL_REPORT mutation
+      // For now, just create a local report entry
 
       const newReport = {
         id: Date.now().toString(),
