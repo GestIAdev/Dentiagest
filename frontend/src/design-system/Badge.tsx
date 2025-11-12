@@ -10,7 +10,7 @@ import * as React from 'react';
 import { HTMLAttributes, ReactNode } from 'react';
 import { cn } from '../utils/cn';
 
-type BadgeVariant = 'default' | 'success' | 'warning' | 'error' | 'info' | 'veritas';
+type BadgeVariant = 'default' | 'success' | 'warning' | 'error' | 'info' | 'veritas' | 'secondary' | 'outline' | 'destructive';
 type BadgeSize = 'sm' | 'md' | 'lg';
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
@@ -50,6 +50,21 @@ const variantStyles: Record<BadgeVariant, string> = {
     bg-gradient-to-r from-cyan-600/20 to-purple-600/20
     text-cyan-400
     border border-cyan-500/30
+  `,
+  secondary: `
+    bg-gray-600/20
+    text-gray-300
+    border border-gray-600/30
+  `,
+  outline: `
+    bg-transparent
+    text-gray-400
+    border border-gray-600/30
+  `,
+  destructive: `
+    bg-red-600/20
+    text-red-400
+    border border-red-600/30
   `,
 };
 
@@ -95,7 +110,8 @@ export const Badge: React.FC<BadgeProps> = ({
             variant === 'error' && 'bg-red-400',
             variant === 'info' && 'bg-blue-400',
             variant === 'veritas' && 'bg-cyan-400',
-            variant === 'default' && 'bg-gray-400'
+            variant === 'destructive' && 'bg-red-400',
+            (variant === 'default' || variant === 'secondary' || variant === 'outline') && 'bg-gray-400'
           )}
         />
       )}

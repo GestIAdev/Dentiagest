@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 
 // 🎯 TITAN PATTERN IMPORTS
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../atoms';
+import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 ICONS

@@ -124,3 +124,48 @@ export const CardFooter: React.FC<HTMLAttributes<HTMLDivElement>> = ({
     </div>
   );
 };
+
+// Card Title component
+export const CardTitle: React.FC<HTMLAttributes<HTMLHeadingElement>> = ({
+  className,
+  children,
+  ...props
+}) => {
+  return (
+    <h2
+      className={cn('text-lg font-semibold text-[var(--text-primary)]', className)}
+      {...props}
+    >
+      {children}
+    </h2>
+  );
+};
+
+// Card Description component
+export const CardDescription: React.FC<HTMLAttributes<HTMLParagraphElement>> = ({
+  className,
+  children,
+  ...props
+}) => {
+  return (
+    <p
+      className={cn('text-sm text-[var(--text-secondary)]', className)}
+      {...props}
+    >
+      {children}
+    </p>
+  );
+};
+
+// Card Content component (alias for CardBody)
+export const CardContent: React.FC<HTMLAttributes<HTMLDivElement>> = ({
+  className,
+  children,
+  ...props
+}) => {
+  return (
+    <div className={cn('py-4', className)} {...props}>
+      {children}
+    </div>
+  );
+};

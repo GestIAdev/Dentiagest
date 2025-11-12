@@ -37,7 +37,7 @@ import {
   CardFooter,
   Badge,
   Spinner
-} from '../atoms';
+} from '../../design-system';
 
 // GraphQL Hooks
 import { useMutation } from '@apollo/client/react';

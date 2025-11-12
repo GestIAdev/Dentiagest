@@ -11,7 +11,7 @@ import * as React from 'react';
 import { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '../utils/cn';
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'default';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -25,6 +25,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary: `
+    bg-gradient-to-r from-[var(--color-primary-600)] to-[var(--color-primary-700)]
+    text-white
+    hover:from-[var(--color-primary-500)] hover:to-[var(--color-primary-600)]
+    active:from-[var(--color-primary-700)] active:to-[var(--color-primary-800)]
+    shadow-md hover:shadow-lg
+    disabled:from-gray-400 disabled:to-gray-500
+  `,
+  default: `
     bg-gradient-to-r from-[var(--color-primary-600)] to-[var(--color-primary-700)]
     text-white
     hover:from-[var(--color-primary-500)] hover:to-[var(--color-primary-600)]
