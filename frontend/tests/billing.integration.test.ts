@@ -324,69 +324,82 @@ async function verifyAuditLog(
   expectedOldValues?: any,
   expectedNewValues?: any
 ): Promise<boolean> {
-  // ✅ PHASE 2 COMPLETE: GATE 4 VERIFICATION ENABLED
-  try {
-    // Query auditTrail via GraphQL to check data_audit_logs table
-    const result: any = await queryDatabase(GET_AUDIT_TRAIL, {
-      entityType,
-      entityId,
-      limit: 100,
-    });
+  // 🔥 PHASE 2 HONEST TEST: GATE 4 VERIFICATION - NO GRACEFUL BYPASSES
+  // Race condition fix: Add retry loop with exponential backoff to ensure audit log is persisted
+  const MAX_RETRIES = 5;
+  const INITIAL_DELAY = 100; // ms
+  
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      // Query auditTrail via GraphQL to check data_audit_logs table
+      const result: any = await queryDatabase(GET_AUDIT_TRAIL, {
+        entityType,
+        entityId,
+        limit: 100,
+      });
 
-    const history = result.auditTrail?.history || [];
-    const matchingLog = history.find((log: any) => 
-      log.operation === action
-    );
+      const history = result.auditTrail?.history || [];
+      const matchingLog = history.find((log: any) => 
+        log.operation === action
+      );
 
-    if (!matchingLog) {
-      console.error(`❌ Audit log NOT FOUND: ${entityType} ${entityId} ${action}`);
-      console.error(`   Available logs:`, history.map((log: any) => log.operation));
-      return false;
-    }
-
-    console.log(`✅ Audit log FOUND: ${entityType} ${entityId} ${action}`);
-
-    // Verify old_values if provided
-    if (expectedOldValues && matchingLog.oldValues) {
-      const oldValues = typeof matchingLog.oldValues === 'string' 
-        ? JSON.parse(matchingLog.oldValues) 
-        : matchingLog.oldValues;
-      for (const [key, expectedValue] of Object.entries(expectedOldValues)) {
-        if (oldValues[key] !== expectedValue) {
-          console.error(`❌ old_values.${key} mismatch: expected ${expectedValue}, got ${oldValues[key]}`);
-          return false;
+      if (!matchingLog) {
+        // If no match found and we have retries left, wait and retry
+        if (attempt < MAX_RETRIES - 1) {
+          const delayMs = INITIAL_DELAY * Math.pow(2, attempt);
+          console.warn(`⏳ Audit log not found yet (attempt ${attempt + 1}/${MAX_RETRIES}). Retrying in ${delayMs}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+          continue;
+        } else {
+          // Final attempt failed - this is a real error
+          console.error(`❌ GATE 4 FAILED: Audit log NOT FOUND after ${MAX_RETRIES} retries`);
+          console.error(`   Entity: ${entityType}:${entityId}`);
+          console.error(`   Action: ${action}`);
+          console.error(`   Available logs:`, history.map((log: any) => log.operation));
+          throw new Error(`Audit log verification failed: ${entityType}:${entityId} ${action} not found after ${MAX_RETRIES} retries`);
         }
       }
-      console.log(`✅ old_values verified:`, expectedOldValues);
-    }
 
-    // Verify new_values if provided
-    if (expectedNewValues && matchingLog.newValues) {
-      const newValues = typeof matchingLog.newValues === 'string'
-        ? JSON.parse(matchingLog.newValues)
-        : matchingLog.newValues;
-      for (const [key, expectedValue] of Object.entries(expectedNewValues)) {
-        if (newValues[key] !== expectedValue) {
-          console.error(`❌ new_values.${key} mismatch: expected ${expectedValue}, got ${newValues[key]}`);
-          return false;
+      console.log(`✅ GATE 4 PASSED: Audit log FOUND on attempt ${attempt + 1}: ${entityType} ${entityId} ${action}`);
+
+      // Verify old_values if provided
+      if (expectedOldValues && matchingLog.oldValues) {
+        const oldValues = typeof matchingLog.oldValues === 'string' 
+          ? JSON.parse(matchingLog.oldValues) 
+          : matchingLog.oldValues;
+        for (const [key, expectedValue] of Object.entries(expectedOldValues)) {
+          if (oldValues[key] !== expectedValue) {
+            throw new Error(`❌ old_values.${key} mismatch: expected ${expectedValue}, got ${oldValues[key]}`);
+          }
         }
+        console.log(`✅ old_values verified:`, expectedOldValues);
       }
-      console.log(`✅ new_values verified:`, expectedNewValues);
-    }
 
-    return true;
-  } catch (error: any) {
-    // If auditTrail resolver doesn't exist yet, skip
-    if (error.message?.includes('Cannot query field "auditTrail"')) {
-      console.warn(`⚠️ auditTrail GraphQL resolver not yet implemented - skipping audit verification for now`);
-      return true; // Don't fail - just skip
+      // Verify new_values if provided
+      if (expectedNewValues && matchingLog.newValues) {
+        const newValues = typeof matchingLog.newValues === 'string'
+          ? JSON.parse(matchingLog.newValues)
+          : matchingLog.newValues;
+        for (const [key, expectedValue] of Object.entries(expectedNewValues)) {
+          if (newValues[key] !== expectedValue) {
+            throw new Error(`❌ new_values.${key} mismatch: expected ${expectedValue}, got ${newValues[key]}`);
+          }
+        }
+        console.log(`✅ new_values verified:`, expectedNewValues);
+      }
+
+      return true; // Success!
+    } catch (error: any) {
+      // Only on final attempt or unexpected errors, throw
+      if (attempt === MAX_RETRIES - 1) {
+        console.error(`❌ GATE 4 VERIFICATION FAILED (Final attempt):`, error.message);
+        throw error; // Let the test fail properly
+      }
+      // Otherwise continue to retry
     }
-    if (error.message?.includes('No audit trail found')) {
-      console.warn(`⚠️ No audit trail found yet for ${entityType}:${entityId} (might be first operation)`);
-      return true; // Don't fail - audit might not have propagated yet
-    }
-    throw error;
   }
+  
+  throw new Error('Audit log verification failed - max retries exceeded');
 }
 
 // ✅ PHASE 2: GATE 1 VERIFICATION - Input validation for billing operations
@@ -517,6 +530,7 @@ describe('💳 PART 2: Four-Gate Pattern E2E - createPaymentPlan', () => {
     console.log('✅ Gate 1.0 PASSED: Input validation rules satisfied');
     
     // Execute createPaymentPlan mutation
+    console.log('🔍 TEST DEBUG: About to call createPaymentPlan mutation...');
     const result: any = await queryDatabase(CREATE_PAYMENT_PLAN, {
       input: {
         billingId: testBillingId,
@@ -529,6 +543,7 @@ describe('💳 PART 2: Four-Gate Pattern E2E - createPaymentPlan', () => {
         // Note: createdBy removed - not in CreatePaymentPlanInput schema
       }
     });
+    console.log('🔍 TEST DEBUG: createPaymentPlan mutation returned:', !!result);
 
     const newPlan = result.createPaymentPlan;
     testPlanId = newPlan.id;
