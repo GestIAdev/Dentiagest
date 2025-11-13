@@ -9,7 +9,7 @@
 import React from 'react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../atoms/index';
+import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 ICONS - Heroicons for compliance theme

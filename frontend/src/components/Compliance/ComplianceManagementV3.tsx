@@ -10,7 +10,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../atoms/index';
+import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL QUERIES - V3.0 Integration
@@ -228,7 +228,7 @@ export const ComplianceManagementV3: React.FC<ComplianceManagementV3Props> = ({
 
   // 🎯 PROCESSED DATA - @veritas Enhanced
   const dashboardStats = useMemo(() => {
-    return dashboardData?.complianceDashboardStats || {
+    return (dashboardData as any)?.complianceDashboardStats || {
       totalRegulations: 0,
       activeRegulations: 0,
       expiringRegulations: 0,
@@ -243,15 +243,15 @@ export const ComplianceManagementV3: React.FC<ComplianceManagementV3Props> = ({
   }, [dashboardData]);
 
   const regulations = useMemo(() => {
-    return regulationsData?.complianceRegulations || [];
+    return (regulationsData as any)?.complianceRegulations || [];
   }, [regulationsData]);
 
   const audits = useMemo(() => {
-    return auditsData?.complianceAudits || [];
+    return (auditsData as any)?.complianceAudits || [];
   }, [auditsData]);
 
   const findings = useMemo(() => {
-    return findingsData?.complianceFindings || [];
+    return (findingsData as any)?.complianceFindings || [];
   }, [findingsData]);
 
   // 🎯 FILTERED DATA - Advanced Filtering

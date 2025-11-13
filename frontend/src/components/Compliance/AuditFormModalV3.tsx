@@ -10,7 +10,7 @@ import React, { useState, useEffect } from 'react';
 import { useMutation } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Spinner } from '../atoms/index';
+import { Button, Card, CardHeader, CardTitle, CardContent, Input, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 
 // 🎯 GRAPHQL MUTATIONS - V3.0 Integration
