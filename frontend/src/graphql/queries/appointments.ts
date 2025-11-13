@@ -143,6 +143,17 @@ export const UPDATE_APPOINTMENT_V3 = gql`
   }
 `;
 
+//  DELETE APPOINTMENT V3 - Delete with verification
+export const DELETE_APPOINTMENT_V3 = gql`
+  mutation DeleteAppointmentV3($id: ID!) {
+    deleteAppointmentV3(id: $id) {
+      success
+      message
+      id
+    }
+  }
+`;
+
 // ============================================================================
 // APPOINTMENT QUERIES (LEGACY - BACKWARD COMPATIBILITY)
 // ============================================================================

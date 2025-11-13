@@ -136,6 +136,17 @@ export const UPDATE_MEDICAL_RECORD_V3 = gql`
   }
 `;
 
+//  DELETE MEDICAL RECORD V3 - Delete with verification
+export const DELETE_MEDICAL_RECORD_V3 = gql`
+  mutation DeleteMedicalRecordV3($id: ID!) {
+    deleteMedicalRecordV3(id: $id) {
+      success
+      message
+      id
+    }
+  }
+`;
+
 // ============================================================================
 // MEDICAL RECORD QUERIES (LEGACY - BACKWARD COMPATIBILITY)
 // ============================================================================

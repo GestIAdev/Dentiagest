@@ -332,7 +332,7 @@ const PatientManagementV3: React.FC = () => {
 
       await createPatientMutation({
         variables: { input: patientData },
-        refetchQueries: [{ query: GET_PATIENTS }]
+        refetchQueries: [{ query: GET_PATIENTS_V3 }]
       });
 
   l.info('Patient created successfully');
@@ -387,7 +387,7 @@ const PatientManagementV3: React.FC = () => {
 
       await updatePatientMutation({
         variables: { id: selectedPatient.id, input: patientData },
-        refetchQueries: [{ query: GET_PATIENTS }]
+        refetchQueries: [{ query: GET_PATIENTS_V3 }]
       });
 
       l.info('Patient updated successfully', { patientId: selectedPatient.id });
@@ -409,7 +409,7 @@ const PatientManagementV3: React.FC = () => {
 
       await deletePatientMutation({
         variables: { id: patientId },
-        refetchQueries: [{ query: GET_PATIENTS }]
+        refetchQueries: [{ query: GET_PATIENTS_V3 }]
       });
 
       l.info('Patient deleted successfully', { patientId });
@@ -431,7 +431,7 @@ const PatientManagementV3: React.FC = () => {
 
       await updatePatientMutation({
         variables: { id: patientId, input: { is_active: !isActive } },
-        refetchQueries: [{ query: GET_PATIENTS }]
+        refetchQueries: [{ query: GET_PATIENTS_V3 }]
       });
 
       l.info('Patient status updated successfully', { patientId, newStatus: !isActive });

@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../atoms';
+import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 import { useDocumentLogger } from '../../utils/documentLogger';
 

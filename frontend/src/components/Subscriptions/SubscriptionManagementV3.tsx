@@ -14,7 +14,7 @@ import {
   CANCEL_SUBSCRIPTION_V3,
   REACTIVATE_SUBSCRIPTION_V3
 } from '../../graphql/queries/subscriptions';
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../atoms';
+import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 
 const l = createModuleLogger('SubscriptionManagementV3');
@@ -344,7 +344,7 @@ const SubscriptionManagementV3: React.FC<SubscriptionManagementV3Props> = ({ cli
                       <div className="flex flex-col space-y-2">
                         {subscription.status === 'active' && !subscription.cancelAtPeriodEnd && (
                           <Button
-                            variant="destructive"
+                            variant="danger"
                             size="sm"
                             onClick={() => handleCancelSubscription(subscription.id, true)}
                             disabled={cancelLoading}

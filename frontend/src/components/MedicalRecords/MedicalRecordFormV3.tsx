@@ -8,7 +8,7 @@ import React, { useState, useEffect } from 'react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
 import { useMedicalRecordStore } from '../../stores';
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../atoms';
+import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 import { RecordTemplates, type MedicalRecordTemplate } from './RecordTemplates';
 

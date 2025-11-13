@@ -8,7 +8,7 @@ import React, { useState, useMemo } from 'react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
 import { useMedicalRecordStore } from '../../stores';
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../atoms';
+import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 import { useMedicalSecurity } from './MedicalSecurity';
 import { DocumentUploaderV3 } from '../DocumentManagement/DocumentUploaderV3';
@@ -306,7 +306,7 @@ export const MedicalRecordDetailV3: React.FC<MedicalRecordDetailV3Props> = ({
                 )}
                 {onDelete && (
                   <Button
-                    variant="destructive"
+                    variant="danger"
                     size="sm"
                     onClick={handleDelete}
                   >

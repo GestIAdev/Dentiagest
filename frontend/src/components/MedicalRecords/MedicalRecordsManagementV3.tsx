@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../atoms';
+import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 import { useDocumentLogger } from '../../utils/documentLogger';
 
@@ -21,7 +21,8 @@ import {
   GET_MEDICAL_RECORDS_V3,
   GET_MEDICAL_RECORD_V3,
   CREATE_MEDICAL_RECORD_V3,
-  UPDATE_MEDICAL_RECORD_V3
+  UPDATE_MEDICAL_RECORD_V3,
+  DELETE_MEDICAL_RECORD_V3
 } from '../../graphql/queries/medicalRecords';
 
 // 🎯 @veritas QUANTUM TRUTH VERIFICATION - V3.0 INTEGRATION
@@ -220,7 +221,7 @@ const MedicalRecordsManagementV3: React.FC<MedicalRecordsManagementV3Props> = ({
 
   const [createMedicalRecordMutation] = useMutation(CREATE_MEDICAL_RECORD_V3);
   const [updateMedicalRecordMutation] = useMutation(UPDATE_MEDICAL_RECORD_V3);
-  const [deleteMedicalRecordMutation] = useMutation(DELETE_MEDICAL_RECORD);
+  const [deleteMedicalRecordMutation] = useMutation(DELETE_MEDICAL_RECORD_V3);
 
   // 🎯 STATE MANAGEMENT - Local UI State
   const [activeTab, setActiveTab] = useState<'list' | 'search' | 'create' | 'details'>('list');
@@ -392,7 +393,7 @@ const MedicalRecordsManagementV3: React.FC<MedicalRecordsManagementV3Props> = ({
 
       const { data } = await createMedicalRecordMutation({
         variables: { input: recordData },
-        refetchQueries: [{ query: GET_MEDICAL_RECORDS }]
+        refetchQueries: [{ query: GET_MEDICAL_RECORDS_V3 }]
       });
 
       l.info('Medical record created successfully', { recordId: (data as any)?.createMedicalRecord?.id });
@@ -443,7 +444,7 @@ const MedicalRecordsManagementV3: React.FC<MedicalRecordsManagementV3Props> = ({
 
       const { data } = await updateMedicalRecordMutation({
         variables: { id: selectedRecord.id, input: recordData },
-        refetchQueries: [{ query: GET_MEDICAL_RECORDS }]
+        refetchQueries: [{ query: GET_MEDICAL_RECORDS_V3 }]
       });
 
       l.info('Medical record updated successfully', { recordId: selectedRecord.id });
@@ -468,7 +469,7 @@ const MedicalRecordsManagementV3: React.FC<MedicalRecordsManagementV3Props> = ({
 
       const { data } = await deleteMedicalRecordMutation({
         variables: { id: recordId },
-        refetchQueries: [{ query: GET_MEDICAL_RECORDS }]
+        refetchQueries: [{ query: GET_MEDICAL_RECORDS_V3 }]
       });
 
       l.info('Medical record deleted successfully', { recordId });
@@ -846,7 +847,7 @@ const MedicalRecordsManagementV3: React.FC<MedicalRecordsManagementV3Props> = ({
                   Cambiar Estado
                 </Button>
                 <Button
-                  variant="destructive"
+                  variant="danger"
                   size="sm"
                   onClick={() => handleDeleteRecord(record.id)}
                 >
