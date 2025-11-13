@@ -1,0 +1,53 @@
+{
+  "name": "dentiagest-robot-army-compliance-tests",
+  "version": "1.0.0",
+  "description": "Robot Army E2E tests for Compliance Module - by PunkClaude & Radwulf",
+  "main": "robot-army-compliance.test.ts",
+  "scripts": {
+    "test": "jest --verbose --detectOpenHandles",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": [
+    "e2e",
+    "compliance",
+    "audit",
+    "four-gate",
+    "robot-army"
+  ],
+  "author": "PunkClaude & Radwulf",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.9.5",
+    "graphql": "^16.8.1",
+    "cross-fetch": "^4.0.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/*.test.ts"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ],
+    "collectCoverageFrom": [
+      "**/*.ts",
+      "!**/*.test.ts",
+      "!**/node_modules/**"
+    ],
+    "testTimeout": 60000
+  }
+}
