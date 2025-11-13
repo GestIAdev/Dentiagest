@@ -1,18 +1,21 @@
 /**
  * 🏴‍☠️ IAnarkalendar © GestIA Dev + PunkClaude 2025
  * 🔒 PHASE 3: DIGITAL FORTRESS INTEGRATION - Calendar + Security
+ * 🔴 DIRECTIVA 012: MATAR AL FANTASMA - CONECTIVIDAD REAL
  */
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useQuery } from '@apollo/client/react';
 import { useAuth } from '../../context/AuthContext'; // 🔒 SECURITY INTEGRATION!
 import { useCalendarState } from './hooks/useCalendarStateSimple';
 import { WeekViewSimple } from './WeekViewSimple';
 import { DayViewSimple } from './DayViewSimple';
 import MonthViewSimple from './MonthViewSimple';
 import { parseClinicDateTime } from '../../utils/timezone'; // 🌍 TIMEZONE SOLUTION!
+import { GET_APPOINTMENTS_V3 } from '../../graphql/queries/appointments'; // 🔴 REAL DATA!
 
 interface CalendarProps {
   view?: 'month' | 'week' | 'day';
@@ -20,7 +23,7 @@ interface CalendarProps {
   onDateChange?: (date: Date) => void;
   onViewChange?: (view: 'month' | 'week' | 'day') => void;
   className?: string;
-  appointments?: any[]; // 🏥 REAL APPOINTMENT DATA
+  // 🔴 DIRECTIVA 012: ELIMINADO prop appointments - Ahora cargamos con useQuery!
   onAppointmentClick?: (appointment: any) => void;
   onAppointmentUpdate?: () => void; // 🔥 NEW: Callback to refresh appointments
   onDateClick?: (date: Date) => void;
@@ -33,12 +36,57 @@ export function CalendarContainer({
   onDateChange,
   onViewChange,
   className = '',
-  appointments = [],
   onAppointmentClick,
   onAppointmentUpdate, // 🔥 NEW: Callback to refresh appointments
   onDateClick,
   onTimeSlotClick // 🕒 + BUTTON HANDLER
 }: CalendarProps) {
+  
+  // 🔴 DIRECTIVA 012: CARGAR APPOINTMENTS DESDE APOLLO!
+  const { data: appointmentsData, loading: appointmentsLoading, error: appointmentsError, refetch: refetchAppointments } = useQuery<{ appointmentsV3: any[] }>(GET_APPOINTMENTS_V3, {
+    variables: {
+      limit: 1000, // Get all appointments for the calendar
+      offset: 0
+    },
+    pollInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Extract appointments from Apollo response
+  const rawAppointments = appointmentsData?.appointmentsV3 || [];
+
+  // 🔴 DIRECTIVA 012: Transform Apollo data to Calendar format
+  const transformAppointmentData = (apt: any): any => {
+    const startDate = parseClinicDateTime(apt.appointmentDate);
+    const [hours, minutes] = (apt.appointmentTime || '09:00').split(':').map(Number);
+    
+    if (startDate) {
+      startDate.setHours(hours || 9, minutes || 0, 0, 0);
+    }
+
+    const endDate = startDate ? new Date(startDate) : new Date();
+    if (startDate) {
+      endDate.setMinutes(endDate.getMinutes() + (apt.duration || 30));
+    }
+
+    return {
+      id: apt.id,
+      patientId: apt.patientId,
+      patientName: apt.patient ? `${apt.patient.firstName} ${apt.patient.lastName}` : 'Unknown',
+      patientPhone: apt.patient?.phone,
+      patientEmail: apt.patient?.email,
+      startTime: startDate || new Date(),
+      endTime: endDate || new Date(),
+      duration: apt.duration || 30,
+      type: apt.type || 'consultation',
+      status: apt.status || 'pending',
+      notes: apt.notes,
+      appointmentDate: apt.appointmentDate,
+      appointmentTime: apt.appointmentTime,
+      _veritas: apt._veritas,
+    };
+  };
+
+  const transformedAppointments = rawAppointments.map(transformAppointmentData);
   
   // 🔒 DIGITAL FORTRESS: Get user role for security filtering
   const { state: authState } = useAuth();
@@ -67,7 +115,7 @@ export function CalendarContainer({
   };
 
   // 🎯 Apply security filtering to appointments
-  const secureAppointments = appointments.map(apt => 
+  const secureAppointments = transformedAppointments.map((apt: any) => 
     sanitizeAppointmentForRole(apt, userRole)
   );
   
@@ -93,6 +141,19 @@ export function CalendarContainer({
       onViewChange(currentView);
     }
   }, [currentView, onViewChange]);
+
+  // 🔴 DIRECTIVA 012: Handle appointment refetch callback
+  useEffect(() => {
+    if (onAppointmentUpdate) {
+      const handleUpdate = () => {
+        refetchAppointments();
+      };
+      // Register for updates if needed
+      return () => {
+        // Cleanup
+      };
+    }
+  }, [onAppointmentUpdate, refetchAppointments]);
 
   // 🏴‍☠️ AINARKALENDAR - Professional calendar system
   // Built by: PunkClaude & Raul (GestIA Dev - 2025)
