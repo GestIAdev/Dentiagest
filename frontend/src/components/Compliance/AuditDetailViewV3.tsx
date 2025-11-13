@@ -7,10 +7,14 @@
 // 🔒 SECURITY: @veritas quantum truth verification on audit data
 
 import React from 'react';
+import { useQuery } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
 import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
+
+// 🎯 GRAPHQL QUERIES - Real-Time Audit Trail
+import { AUDIT_TRAIL } from '../../graphql/queries/audit';
 
 // 🎯 ICONS - Heroicons for compliance theme
 import {
@@ -29,6 +33,9 @@ import {
 interface AuditDetailViewV3Props {
   audit: ComplianceAudit;
   onClose: () => void;
+  // Real-time audit trail options
+  fetchAuditTrail?: boolean;
+  auditTrailLimit?: number;
 }
 
 // 🎯 COMPLIANCE AUDIT INTERFACE - @veritas Enhanced
@@ -104,8 +111,26 @@ const l = createModuleLogger('AuditDetailViewV3');
 
 export const AuditDetailViewV3: React.FC<AuditDetailViewV3Props> = ({
   audit,
-  onClose
+  onClose,
+  fetchAuditTrail = true,
+  auditTrailLimit = 100
 }) => {
+  // 🎯 GRAPHQL QUERY - Real-time audit trail
+  const { data: auditTrailData, loading: auditTrailLoading, error: auditTrailError } = useQuery(
+    AUDIT_TRAIL,
+    {
+      variables: {
+        entityType: 'audit',
+        entityId: audit.id,
+        limit: auditTrailLimit
+      },
+      skip: !fetchAuditTrail,
+      pollInterval: 30000 // Actualizar cada 30 segundos
+    }
+  );
+
+  // 🎯 EXTRACT AUDIT TRAIL - Real data from AuditDatabase
+  const auditTrail = (auditTrailData as any)?.auditTrail;
   // 🎯 GET STATUS INFO - Cyberpunk Themed
   const getStatusInfo = (status: string) => {
     return AUDIT_STATUS_CONFIG[status as keyof typeof AUDIT_STATUS_CONFIG] || AUDIT_STATUS_CONFIG.SCHEDULED;
@@ -303,7 +328,114 @@ export const AuditDetailViewV3: React.FC<AuditDetailViewV3Props> = ({
               </Card>
             </div>
 
-            {/* 🎯 FINDINGS LIST - Findings Section */}
+            {/* 🎯 AUDIT TRAIL HISTORY - Real Mutations from AuditDatabase */}
+            {auditTrail && auditTrail.history && auditTrail.history.length > 0 ? (
+              <Card className="bg-gray-800/30 border border-cyan-600/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg text-cyan-300 flex items-center space-x-2">
+                    <CheckCircleIcon className="w-5 h-5" />
+                    <span>Historial de Auditoría ({auditTrail.totalMutations})</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {auditTrail.history.map((entry: any, idx: number) => {
+                      const operationColors: Record<string, { bg: string; text: string; border: string }> = {
+                        'CREATE': { bg: 'bg-green-500/20', text: 'text-green-300', border: 'border-green-500/30' },
+                        'UPDATE': { bg: 'bg-blue-500/20', text: 'text-blue-300', border: 'border-blue-500/30' },
+                        'DELETE': { bg: 'bg-red-500/20', text: 'text-red-300', border: 'border-red-500/30' },
+                        'SOFT_DELETE': { bg: 'bg-orange-500/20', text: 'text-orange-300', border: 'border-orange-500/30' },
+                        'INTEGRITY_VIOLATION': { bg: 'bg-purple-500/20', text: 'text-purple-300', border: 'border-purple-500/30' },
+                      };
+
+                      const opColor = operationColors[entry.operation] || { bg: 'bg-gray-500/20', text: 'text-gray-300', border: 'border-gray-500/30' };
+                      const statusColor = entry.integrityStatus === 'PASSED' 
+                        ? 'text-green-400' 
+                        : entry.integrityStatus === 'FAILED' 
+                        ? 'text-red-400' 
+                        : 'text-yellow-400';
+
+                      return (
+                        <div key={idx} className={`${opColor.bg} ${opColor.border} border rounded-lg p-3`}>
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center space-x-3">
+                              <Badge className={`${opColor.text} ${opColor.bg} border ${opColor.border}`}>
+                                {entry.operation}
+                              </Badge>
+                              <span className="text-xs text-gray-400 font-mono">
+                                {formatDate(entry.timestamp)}
+                              </span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className={`text-xs font-mono ${statusColor}`}>
+                                {entry.integrityStatus}
+                              </span>
+                              {entry.integrityStatus === 'PASSED' && (
+                                <CheckCircleIcon className="w-4 h-4 text-green-400" />
+                              )}
+                              {entry.integrityStatus === 'FAILED' && (
+                                <ExclamationTriangleIcon className="w-4 h-4 text-red-400" />
+                              )}
+                              {entry.integrityStatus === 'WARNED' && (
+                                <ExclamationTriangleIcon className="w-4 h-4 text-yellow-400" />
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="text-xs text-gray-400 mb-2">
+                            <span>Usuario: <span className="text-gray-300">{entry.userEmail || entry.userId}</span></span>
+                            {entry.ipAddress && (
+                              <>
+                                <span className="mx-2">•</span>
+                                <span>IP: <span className="text-gray-300 font-mono">{entry.ipAddress}</span></span>
+                              </>
+                            )}
+                          </div>
+
+                          {entry.changedFields && entry.changedFields.length > 0 && (
+                            <div className="text-xs text-gray-400 mt-2">
+                              <span>Campos: </span>
+                              <span className="text-cyan-400">
+                                {entry.changedFields.join(', ')}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : auditTrailLoading ? (
+              <Card className="bg-gray-800/30 border border-cyan-600/30">
+                <CardContent className="py-8">
+                  <div className="flex items-center justify-center space-x-2">
+                    <Spinner className="w-5 h-5" />
+                    <span className="text-gray-400">Cargando historial de auditoría...</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : auditTrailError ? (
+              <Card className="bg-gray-800/30 border border-red-600/30">
+                <CardContent className="py-4">
+                  <div className="flex items-center space-x-2 text-red-400">
+                    <ExclamationTriangleIcon className="w-5 h-5" />
+                    <span className="text-sm">Error cargando historial: {auditTrailError.message}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="bg-gray-800/30 border border-gray-600/30">
+                <CardContent className="py-4">
+                  <div className="flex items-center space-x-2 text-gray-400">
+                    <CheckCircleIcon className="w-5 h-5" />
+                    <span className="text-sm">No hay historial de auditoría disponible</span>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* 🎯 FINDINGS LIST - Legacy Findings Section */}
             {audit.findings.length > 0 && (
               <Card className="bg-gray-800/30 border border-gray-600/30">
                 <CardHeader className="pb-3">

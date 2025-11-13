@@ -7,10 +7,14 @@
 // 🔒 SECURITY: @veritas quantum truth verification on analytics data
 
 import React, { useState, useEffect } from 'react';
+import { useQuery } from '@apollo/client/react';
 
 // 🎯 TITAN PATTERN IMPORTS - Core Dependencies
 import { Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
+
+// 🎯 GRAPHQL QUERIES - Real-Time Audit Dashboard
+import { VERIFICATION_DASHBOARD } from '../../graphql/queries/audit';
 
 // 🎯 ICONS - Heroicons for compliance theme
 import {
@@ -29,10 +33,13 @@ import {
 
 // 🎯 COMPLIANCE ANALYTICS V3.0 INTERFACE
 interface ComplianceAnalyticsV3Props {
-  regulations: ComplianceRegulation[];
-  audits: ComplianceAudit[];
-  findings: ComplianceFinding[];
+  regulations?: ComplianceRegulation[];
+  audits?: ComplianceAudit[];
+  findings?: ComplianceFinding[];
   isLoading?: boolean;
+  // New props for real-time data
+  showLiveData?: boolean;
+  pollInterval?: number; // milliseconds
 }
 
 // 🎯 COMPLIANCE DATA INTERFACES - @veritas Enhanced
@@ -95,26 +102,57 @@ interface ComplianceMetrics {
 const l = createModuleLogger('ComplianceAnalyticsV3');
 
 export const ComplianceAnalyticsV3: React.FC<ComplianceAnalyticsV3Props> = ({
-  regulations,
-  audits,
-  findings,
-  isLoading = false
+  regulations = [],
+  audits = [],
+  findings = [],
+  isLoading = false,
+  showLiveData = true,
+  pollInterval = 30000 // 30 segundos
 }) => {
   // 🎯 STATE MANAGEMENT
   const [metrics, setMetrics] = useState<ComplianceMetrics | null>(null);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
 
-  // 🎯 CALCULATE METRICS - Quantum Analytics
-  useEffect(() => {
-    if (isLoading) return;
+  // 🎯 GRAPHQL QUERY - Real-time verification dashboard
+  const { data: dashboardData, loading: dashboardLoading, error: dashboardError } = useQuery(
+    VERIFICATION_DASHBOARD,
+    {
+      skip: !showLiveData, // Solo ejecutar si queremos datos en vivo
+      pollInterval: showLiveData ? pollInterval : 0,
+      fetchPolicy: 'cache-and-network'
+    }
+  );
 
-    const calculateMetrics = (): ComplianceMetrics => {
+  // 🎯 PROCESS METRICS - Hybrid approach (mock + real data)
+  useEffect(() => {
+    if (dashboardLoading || isLoading) return;
+
+    const processMetrics = (): ComplianceMetrics => {
+      // Si tenemos datos del dashboard real, los usamos
+      if ((dashboardData as any)?.verificationDashboard && showLiveData) {
+        const dashboard = (dashboardData as any).verificationDashboard;
+        
+        return {
+          totalRegulations: regulations.length || 0,
+          activeRegulations: regulations.filter(r => r.status === 'ACTIVE').length || 0,
+          totalAudits: audits.length || 0,
+          completedAudits: audits.filter(a => a.status === 'COMPLETED').length || 0,
+          totalFindings: findings.length || 0,
+          openFindings: findings.filter(f => f.status === 'OPEN').length || 0,
+          criticalFindings: findings.filter(f => f.severity === 'CRITICAL' && f.status !== 'CLOSED').length || 0,
+          // Datos del dashboard real
+          averageComplianceScore: dashboard.integrityScore || 0,
+          complianceTrend: dashboard.integrityScore > 85 ? 'UP' : dashboard.integrityScore < 70 ? 'DOWN' : 'STABLE',
+          riskLevel: dashboard.criticalIssues > 0 ? 'CRITICAL' : dashboard.warningIssues > 5 ? 'HIGH' : 'LOW',
+          veritasConfidence: Math.round(dashboard.integrityScore) // Usa integrityScore como confianza
+        };
+      }
+
+      // Fallback: usar datos locales si no hay datos del dashboard
       const totalRegulations = regulations.length;
       const activeRegulations = regulations.filter(r => r.status === 'ACTIVE').length;
-
       const totalAudits = audits.length;
       const completedAudits = audits.filter(a => a.status === 'COMPLETED').length;
-
       const totalFindings = findings.length;
       const openFindings = findings.filter(f => f.status === 'OPEN').length;
       const criticalFindings = findings.filter(f => f.severity === 'CRITICAL' && f.status !== 'CLOSED').length;
@@ -123,16 +161,13 @@ export const ComplianceAnalyticsV3: React.FC<ComplianceAnalyticsV3Props> = ({
         ? Math.round(regulations.reduce((sum, r) => sum + r.complianceScore, 0) / regulations.length)
         : 0;
 
-      // 🎯 COMPLIANCE TREND - Simple calculation (would be more complex in real implementation)
       const complianceTrend: 'UP' | 'DOWN' | 'STABLE' = averageComplianceScore > 85 ? 'UP' : averageComplianceScore < 70 ? 'DOWN' : 'STABLE';
 
-      // 🎯 RISK LEVEL CALCULATION
       let riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' = 'LOW';
       if (criticalFindings > 0) riskLevel = 'CRITICAL';
       else if (openFindings > 10) riskLevel = 'HIGH';
       else if (openFindings > 5) riskLevel = 'MEDIUM';
 
-      // 🎯 @VERITAS CONFIDENCE - Average confidence across all verified entities
       const veritasEntities = [...regulations, ...audits, ...findings].filter(e => e._veritas);
       const veritasConfidence = veritasEntities.length > 0
         ? Math.round(veritasEntities.reduce((sum, e) => sum + (e._veritas?.confidence || 0), 0) / veritasEntities.length)
@@ -153,8 +188,8 @@ export const ComplianceAnalyticsV3: React.FC<ComplianceAnalyticsV3Props> = ({
       };
     };
 
-    setMetrics(calculateMetrics());
-  }, [regulations, audits, findings, isLoading]);
+    setMetrics(processMetrics());
+  }, [regulations, audits, findings, dashboardData, dashboardLoading, isLoading, showLiveData]);
 
   // 🎯 LOADING STATE
   if (isLoading || !metrics) {
