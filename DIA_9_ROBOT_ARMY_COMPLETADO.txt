@@ -156,7 +156,7 @@ Tests tardan mucho:
 
 robot-army-compliance.test.ts
 ├─ Apollo Client Setup
-│  └─ Endpoint: http://localhost:4000/graphql
+│  └─ Endpoint: http://localhost:8005/graphql
 │  └─ Fetch Policy: network-only (datos frescos siempre)
 │
 ├─ GraphQL Queries & Mutations
