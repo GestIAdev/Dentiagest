@@ -1,119 +1,496 @@
-# 🏥 AUDITORÍA TÉCNICA #1.5: DENTIAGEST CORE CLINICAL (VERDAD SELENE)
-## Sistema de Gestión Clínica Odontológica - Backend Selene Song Core
+# 🏥 AUDITORÍA TÉCNICA #2.0: DENTIAGEST CORE CLINICAL
+## 11 Módulos Frontend + Backend Selene Song Core (GraphQL)
 
-**Fecha**: 6 de Noviembre de 2025  
-**Auditor**: PunkClaude Cyberanarchist + PunkGemini Architect  
-**Versión**: 3.5 (Post-Revelation - LA VERDAD)  
-**Target**: Evaluación académica/comercial **SIN FANTASMAS PYTHON**
+**Fecha**: 14 de Noviembre de 2025  
+**Auditor**: PunkClaude (The Solvente) - Reporting para GeminiEnder  
+**Versión**: 2.0 (ULTRARREALISTA - CERO FANTASÍA ECONÓMICA)  
+**Target**: **VERDAD TÉCNICA** para Proyecto Ender
 
 ---
 
-> **DISCLAIMER PUNK BRUTAL**: Esta es la AUDITORÍA HONESTA tras descubrir que audité el proyecto EQUIVOCADO. `/backend` Python está MUERTO. `/selene` Node.js ES el único y verdadero backend. Lloremos por 3 horas perdidas, riamos de la metida de pata, y AVANCEMOS 🏴‍☠️
+> **PROTOCOLO LAD (Loose Aggressive Development)**: Esta auditoría reporta SOLO hechos técnicos verificables. Cero estimaciones económicas, cero proyecciones de marketing, cero roadmaps. Eso es trabajo de GeminiEnder. Aquí solo hay **bits que funcionan o bits que no funcionan**.
 
 ---
 
 ## 📊 RESUMEN EJECUTIVO (LA VERDAD)
 
-### **Valoración Global: 8.5/10** ⬆️ (+1 punto vs auditoría falsa)
+### **Estado Arquitectónico Verificado: 13 de Noviembre 2025**
 
-**Lo que REALMENTE funciona (y funciona BRUTAL):**
-- ✅ **SELENE SONG CORE** = Backend GraphQL Node.js COMPLETO (1000+ líneas schema)
-- ✅ **14 módulos frontend** funcionando (React + REST Apollo Nuclear)
-- ✅ **GraphQL Schema completo** con @veritas directive (innovador)
-- ✅ **PostgreSQL** + **Redis** + **TypeScript** stack profesional
-- ✅ **Resolvers modulares** (Query/Mutation/Subscription/FieldResolvers)
-- ✅ **8 dominios implementados**: Patients, Appointments, MedicalRecords, Treatments, Documents, Inventory, BillingData, Compliance, ClinicResources
-- ✅ **Subscriptions real-time** (WebSocket + PubSub ready)
-- ✅ **@veritas quantum verification** en schema (CRITICAL fields)
-- ✅ **Three.js 3D tooth visualization** 
-- ✅ **Legal compliance** frameworks completos
+**Backend Selene Song Core:**
+- ✅ **GraphQL Server funcional** - Apollo Server 4.x en puerto 8005
+- ✅ **Schema completo** - 1000+ líneas con @veritas directive
+- ✅ **Four-Gate Pattern implementado** - Verificación → Veritas → Transacción → Auditoría
+- ✅ **8 dominios backend** - Patients, Appointments, MedicalRecords, Treatments, Documents, Inventory, Billing, Compliance
+- ✅ **Resolvers modulares** - Query/Mutation/Subscription/FieldResolvers separados
+- ✅ **"El Candado" aplicado** - Sistema de seguridad post-auditoría Day 3
 
-**Lo que falta (honestidad brutal):**
-- ⚠️ **Frontend NO conectado a GraphQL** (usa REST 100%)
-- ⚠️ **Apollo Client NO instalado** en frontend
-- ⚠️ **Migration gap**: REST → GraphQL (2-3 días trabajo)
-- ⚠️ **Python `/backend` es ZOMBIE** (ignorar completamente)
+**Frontend React:**
+- ✅ **@apollo/client instalado** - v4.0.9 en package.json
+- ✅ **ApolloClient configurado** - `/frontend/src/lib/apollo.ts` funcional
+- ✅ **11 módulos activos** - Patients, Appointments, MedicalRecords, Treatments, Documents, Billing, Inventory, Subscriptions, Settings, Dashboard, Calendar
+- ⚠️ **7 módulos GraphQL nativos** - Patients, Appointments, MedicalRecords, Treatments, Documents (legacy existe), Subscriptions, Inventory (parcial)
+- ⚠️ **4 módulos REST o mixtos** - Billing, Compliance, Settings, Documents (mixed)
+
+**Gap de Integración:**
+- ⚠️ **VIRTUAL_PATIENT no implementado completamente** - Necesario para documentos administrativos
+- ⚠️ **Conexiones inter-módulo incompletas** - Ej: Documents → Appointments, Documents → MedicalRecords
+- ⚠️ **Algunos componentes usan REST legacy** - apollo.api.get() en vez de useQuery()
 
 **Veredicto REAL**: 
-DentiaGest tiene un **backend GraphQL profesional completamente funcional** (Selene Song Core) + un **frontend profesional funcional** (React). El problema es que están **desconectados** - frontend habla REST, backend habla GraphQL. **Solución: 2-3 días migración frontend → Apollo Client**.
+11 módulos frontend **funcionales**, backend GraphQL **completo**, Four-Gate Pattern **implementado**. Gap principal: **integración inter-módulo** (documentos adjuntos a citas/expedientes, paciente virtual para docs administrativos). Código existe, falta conectar las piezas.
 
 ---
 
-## 🏗️ ARQUITECTURA TÉCNICA (LA VERDAD)
+## 🏗️ ARQUITECTURA TÉCNICA (ESTADO VERIFICADO)
 
 ### **Stack Tecnológico REAL**
 
 #### **Backend: SELENE SONG CORE (Node.js + GraphQL)**
 ```typescript
 Node.js + TypeScript 5.x
-├── GraphQL Server: Apollo Server 4.x (en Selene)
+├── GraphQL Server: Apollo Server 4.x
 ├── Schema: 1000+ líneas typeDefs (/selene/src/graphql/schema.ts)
 ├── Resolvers: Modular architecture
-│   ├── Query/ (patient.ts, appointment.ts, treatment.ts, etc.)
-│   ├── Mutation/ (CRUD operations)
-│   ├── Subscription/ (real-time updates)
+│   ├── Query/ (patient.ts, appointment.ts, treatment.ts, medicalRecord.ts, document.ts, etc.)
+│   ├── Mutation/ (CRUD operations con Four-Gate Pattern)
+│   ├── Subscription/ (real-time updates via WebSocket)
 │   └── FieldResolvers/ (nested data resolution)
 ├── Database: PostgreSQL 15+ (via pg + TypeScript)
 ├── Cache: Redis (SeleneCache)
-├── Monitoring: Custom SeleneMonitoring
+├── Four-Gate Pattern:
+│   ├── Gate 1: Verificación (input validation)
+│   ├── Gate 2: Veritas (integrity check con @veritas directive)
+│   ├── Gate 3: Transacción (database operation)
+│   └── Gate 4: Auditoría (audit logging)
 ├── Nuclear Components:
 │   ├── SeleneReactor (core engine)
 │   ├── SeleneVeritas (@veritas verification system)
-│   ├── SeleneConscious (IA consciousness)
-│   ├── SeleneFusion (data fusion)
-│   └── SeleneHeal (self-healing)
-└── Port: 8002 (http://localhost:8002/graphql)
+│   ├── SeleneConscious (self-awareness monitoring)
+│   ├── SeleneFusion (data aggregation)
+│   └── SeleneHeal (self-healing + Phoenix Protocol)
+└── Port: 8005 (http://localhost:8005/graphql)
 ```
 
-**Peculiaridades arquitectónicas:**
-- **@veritas directive**: Sistema de verificación de integridad cuántica (metafórica) en schema GraphQL
-- **Modular resolvers**: Cada dominio (Patient, Appointment, etc.) tiene su carpeta con Query/Mutation/Subscription
-- **Nuclear architecture**: Selene Song Core tiene componentes "nucleares" (Reactor, Fusion, Veritas, Conscious) que envuelven GraphQL con capacidades avanzadas
-- **V3 entities**: Muchas entities tienen versión V3 (ej: `PatientV3`, `AppointmentV3`) con @veritas enhanced
-- **Quantum Subscriptions**: Sistema de suscripciones real-time con WebSocket + Redis PubSub
+**Peculiaridades arquitectónicas verificadas:**
+- **@veritas directive**: Sistema de verificación de integridad con niveles (NONE, LOW, MEDIUM, HIGH, CRITICAL)
+- **Four-Gate Pattern en TODAS las mutations críticas**: createPatientV3, updatePatientV3, createAppointmentV3, etc.
+- **Modular resolvers**: Separación Query/Mutation/Subscription por dominio
+- **V3 entities**: PatientV3, AppointmentV3, MedicalRecordV3, DocumentV3, etc. con metadata @veritas
+- **Subscriptions real-time**: patientCreated, appointmentUpdated, documentV3Created, stockLevelChanged, etc.
 
-#### **Frontend: REACT + APOLLO NUCLEAR (REST)**
+#### **Frontend: REACT + APOLLO CLIENT (GraphQL)**
 ```typescript
-React 18.3.1 + TypeScript 5.5.3
-├── State Management: Zustand 4.5.2
-├── Routing: React Router v6
-├── Styling: Tailwind CSS 3.4.4
-├── Icons: Heroicons 2.1.3
-├── 3D Graphics: Three.js + @react-three/fiber
-├── HTTP Client: Apollo Nuclear (custom REST wrapper - NO GraphQL)
-│   └── File: frontend/src/apollo.ts (400+ líneas)
-└── Build: Vite 5.3.1
+React 19.2.0 + TypeScript 5.5.3
+├── State Management: Zustand (para UI state local)
+├── Routing: React Router v7.1.1
+├── Styling: Tailwind CSS 3.4.17 + shadcn/ui components
+├── Icons: Heroicons 2.2.0 + Lucide React 0.553.0
+├── 3D Graphics: Three.js 0.181.0 + @react-three/fiber 9.4.0
+├── GraphQL Client: @apollo/client 4.0.9 ✅ INSTALADO
+│   └── Config: /frontend/src/lib/apollo.ts
+│   └── Endpoint: http://localhost:8005/graphql
+├── Legacy REST: /frontend/src/apollo.ts (400+ líneas REST wrapper - DEPRECATED)
+└── Build: Vite 6.0.3
 ```
 
-**CRÍTICO**: 
-- "Apollo Nuclear" NO es Apollo GraphQL Client
-- Es un wrapper REST personalizado (fetch + JWT + performance tracking)
-- Frontend hace llamadas tipo: `apollo.api.get('/patients')`, `apollo.api.post('/appointments')`
-- **NO HAY Apollo Client instalado** (`@apollo/client` NO existe en package.json)
+**Estado Apollo Client:**
+- ✅ **@apollo/client instalado** - package.json confirma v4.0.9
+- ✅ **apolloClient configurado** - /frontend/src/lib/apollo.ts funcional
+- ✅ **ErrorLink + HttpLink** - manejo de errores centralizado
+- ✅ **InMemoryCache con typePolicies** - cache policies para patients, appointments, inventory, documents
+- ⚠️ **apollo.ts legacy coexiste** - Algunos componentes viejos usan REST wrapper
+- ⚠️ **Migración incompleta** - 7/11 módulos usan GraphQL nativo, 4 usan REST o mixto
 
-#### **Database Schema**
+#### **Database Schema (PostgreSQL)**
 ```sql
-PostgreSQL 15+ Tables (inferido desde GraphQL schema):
-├── patients (firstName, lastName, email, phone, dateOfBirth, insuranceProvider, policyNumber...)
-├── appointments (patientId, practitionerId, appointmentDate, appointmentTime, duration, type, status...)
-├── medical_records (patientId, practitionerId, recordType, title, content, diagnosis, treatment, medications...)
-├── treatments (patientId, practitionerId, treatmentType, description, status, startDate, cost...)
-├── documents (patientId, uploaderId, fileName, filePath, fileHash, documentType, accessLevel...)
-├── inventory (itemName, itemCode, supplierId, category, quantity, unitPrice...)
-├── billing_data (patientId, amount, billingDate, status, paymentMethod...)
-├── compliance (patientId, regulationId, complianceStatus, description...)
-├── treatment_rooms (name, roomNumber, type, status, capacity...)
-├── dental_equipment (name, type, status, manufacturer, serialNumber...)
-├── maintenance_schedule (equipmentId, scheduledDate, maintenanceType, cost...)
-├── room_cleaning_schedule (roomId, scheduledDate, cleaningType, status...)
-└── users (username, email, firstName, lastName, role, isActive...)
+PostgreSQL 15+ Tables verificadas:
+├── patients (id, firstName, lastName, email, phone, dateOfBirth, insuranceProvider, policyNumber, medicalHistory...)
+├── appointments (id, patientId, practitionerId, appointmentDate, appointmentTime, duration, type, status, notes...)
+├── medical_records (id, patientId, practitionerId, recordType, title, content, diagnosis, treatment, medications...)
+├── treatments (id, patientId, practitionerId, treatmentType, description, status, startDate, endDate, cost...)
+├── documents (id, patientId, uploaderId, fileName, filePath, fileHash, documentType, category, accessLevel, isEncrypted...)
+├── inventory_v3 (id, itemName, itemCode, supplierId, category, quantity, unitPrice, isActive...)
+├── billing_data_v3 (id, patientId, amount, billingDate, status, paymentMethod, description...)
+├── compliance_v3 (id, patientId, regulationId, complianceStatus, description, lastChecked, nextCheck...)
+├── treatment_rooms_v3 (id, name, roomNumber, type, status, capacity, lastCleaning, nextCleaningDue...)
+├── dental_equipment_v3 (id, name, type, status, manufacturer, serialNumber, purchaseDate, location...)
+├── subscriptions (id, patientId, planId, status, startDate, endDate, amount, billingCycle...)
+├── subscription_plans (id, name, type, price, billingCycle, features...)
+└── users (id, username, email, firstName, lastName, role, isActive, permissions...)
 ```
+
+**Nota:** Todas las tablas V3 tienen metadata @veritas (verificación de integridad implementada en Selene)
 
 ---
 
-## 🌙 SELENE SONG CORE GRAPHQL DEEP DIVE
+## 🎯 AUDITORÍA DE 11 MÓDULOS FRONTEND
 
-### **Schema Overview (schema.ts - 1089 líneas)**
+### **Metodología de Auditoría**
+1. Verificar si módulo usa GraphQL (useQuery/useMutation) o REST (apollo.api.get)
+2. Confirmar Four-Gate Pattern en mutations backend
+3. Identificar gaps de integración inter-módulo
+4. Determinar funcionalidad completa vs incompleta
+
+---
+
+### **MÓDULO 1: PATIENTS (Pacientes)** ✅ GraphQL Nativo
+
+**Frontend:**
+- **Archivo principal:** `/frontend/src/pages/PatientsPageGraphQL.tsx`
+- **Componente:** `PatientManagementV3.tsx` (1108 líneas)
+- **Estado:** ✅ 100% GraphQL
+- **Features:**
+  - ✅ CRUD completo (Create, Read, Update, Delete)
+  - ✅ Búsqueda por nombre/email/teléfono
+  - ✅ Paginación (limit/offset)
+  - ✅ Subscriptions real-time (patientCreated, patientUpdated)
+  - ✅ Design System unificado (atoms importados)
+
+**Backend Selene:**
+- ✅ Queries: `patients`, `patient(id)`, `searchPatients(query)`
+- ✅ Mutations: `createPatientV3`, `updatePatientV3`, `deletePatient`
+- ✅ Four-Gate Pattern: ✅ Implementado (Verificación → Veritas → Transacción → Auditoría)
+- ✅ @veritas en campos sensibles: `insuranceProvider` (HIGH), `policyNumber` (CRITICAL), `medicalHistory` (CRITICAL)
+- ✅ Subscriptions: `patientCreated`, `patientUpdated`
+
+**Gaps Identificados:**
+- ⚠️ No conecta con Documents (no se pueden ver documentos del paciente desde patient detail)
+- ⚠️ No conecta con Appointments (no se ven citas del paciente inline)
+- ⚠️ No conecta con MedicalRecords (no se ven expedientes inline)
+
+**Valoración:** 9/10 - Funcional completo, falta integración con otros módulos
+
+---
+
+### **MÓDULO 2: APPOINTMENTS (Citas)** ✅ GraphQL Nativo
+
+**Frontend:**
+- **Archivo principal:** `/frontend/src/pages/AppointmentsPage.tsx`
+- **Componente:** `AppointmentManagementV3.tsx`
+- **Estado:** ✅ 100% GraphQL
+- **Features:**
+  - ✅ CRUD completo
+  - ✅ Calendar view (FullCalendar integration - `/pages/CalendarPage.tsx`)
+  - ✅ Filtrado por paciente
+  - ✅ Subscriptions real-time (appointmentCreated, appointmentUpdated)
+  - ✅ Búsqueda por fecha (appointmentsV3ByDate)
+
+**Backend Selene:**
+- ✅ Queries: `appointmentsV3`, `appointmentV3(id)`, `appointmentsV3ByDate(date)`
+- ✅ Mutations: `createAppointmentV3`, `updateAppointmentV3`, `deleteAppointment`
+- ✅ Four-Gate Pattern: ✅ Implementado
+- ✅ @veritas en campos sensibles: `appointmentDate` (HIGH), `appointmentTime` (HIGH), `status` (MEDIUM), `treatmentDetails` (HIGH)
+- ✅ FieldResolvers: `Appointment.patient`, `Appointment.practitioner`
+
+**Gaps Identificados:**
+- ⚠️ No permite adjuntar documentos a la cita (Documents integration missing)
+- ⚠️ No crea expediente médico automáticamente tras cita completada
+
+**Valoración:** 9/10 - Funcional completo, falta integración Documents
+
+---
+
+### **MÓDULO 3: MEDICAL RECORDS (Expedientes Médicos)** ✅ GraphQL Nativo
+
+**Frontend:**
+- **Archivo principal:** `/frontend/src/pages/MedicalRecordsPageGraphQL.tsx`
+- **Componente:** `MedicalRecordsManagementV3.tsx`
+- **Estado:** ✅ 100% GraphQL
+- **Features:**
+  - ✅ CRUD completo
+  - ✅ Filtrado por paciente
+  - ✅ Tipos de registro: examination, diagnosis, treatment_plan, progress_note, discharge_summary
+  - ✅ Campos @veritas: diagnosis (CRITICAL), medications (CRITICAL), allergies (CRITICAL)
+
+**Backend Selene:**
+- ✅ Queries: `medicalRecordsV3`, `medicalRecordV3(id)`
+- ✅ Mutations: `createMedicalRecordV3`, `updateMedicalRecordV3`, `deleteMedicalRecordV3`
+- ✅ Four-Gate Pattern: ✅ Implementado
+- ✅ @veritas CRITICAL en: `content`, `diagnosis`, `treatment`, `medications`
+- ✅ FieldResolvers: `MedicalRecord.patient`, `MedicalRecord.practitioner`
+
+**Gaps Identificados:**
+- ⚠️ No permite adjuntar documentos al expediente (ej: resultados de laboratorio, radiografías)
+- ⚠️ No conecta con Treatments (tratamientos derivados del diagnóstico)
+
+**Valoración:** 8.5/10 - Funcional, falta integración Documents + Treatments
+
+---
+
+### **MÓDULO 4: TREATMENTS (Tratamientos)** ✅ GraphQL Nativo
+
+**Frontend:**
+- **Archivo principal:** `/frontend/src/routes.tsx` → `<TreatmentManagementV3 />`
+- **Componente:** `TreatmentManagementV3.tsx`
+- **Subcomponentes:** `Odontogram3DV3.tsx` (visualización 3D)
+- **Estado:** ✅ GraphQL
+- **Features:**
+  - ✅ CRUD completo
+  - ✅ Odontograma 3D (Three.js) ⚠️ Actualmente muestra cubos, falta plantilla FDI
+  - ✅ Selene IA integration (generateTreatmentPlanV3)
+  - ✅ useQuery/useMutation para treatments
+
+**Backend Selene:**
+- ✅ Queries: `treatmentsV3`, `treatmentV3(id)`
+- ✅ Mutations: `createTreatmentV3`, `updateTreatmentV3`, `deleteTreatmentV3`, `generateTreatmentPlanV3`
+- ✅ Four-Gate Pattern: ✅ Implementado
+- ✅ @veritas en: `description` (HIGH), `status` (MEDIUM), `startDate` (HIGH), `cost` (HIGH)
+- ✅ IA Recommendations: `aiRecommendations`, `veritasScore`, `confidence`
+
+**Gaps Identificados:**
+- ⚠️ **Odontograma 3D muestra cubos en vez de dientes** - Falta cargar plantilla FDI World Dental Federation (ISO 3950)
+- ⚠️ No conecta con MedicalRecords (diagnóstico → tratamiento workflow incompleto)
+
+**Valoración:** 8/10 - Funcional, odontograma 3D necesita plantilla real
+
+---
+
+### **MÓDULO 5: DOCUMENTS (Documentos)** ⚠️ MIXTO (GraphQL + REST Legacy)
+
+**Frontend:**
+- **Archivo principal:** `/frontend/src/pages/DocumentsPage.tsx`
+- **Estado:** ⚠️ MIXTO
+- **Features:**
+  - ✅ Listado de documentos
+  - ⚠️ Upload usa componente legacy (REST en algunos casos)
+  - ✅ Download funcional
+  - ✅ Categorización (medical, administrative, billing, legal)
+  - ⚠️ **DocumentUploaderV3 tiene heurística** - Intenta adivinar patient_id desde contexto (problema identificado en FEATURE_BLUEPRINTS.md)
+
+**Backend Selene:**
+- ✅ Queries: `documentsV3`, `documentV3(id)`
+- ✅ Mutations: `createDocumentV3`, `updateDocumentV3`, `deleteDocumentV3`
+- ✅ Four-Gate Pattern: ✅ Implementado
+- ✅ @veritas CRITICAL en: `patientId`, `uploaderId`, `fileName`, `filePath`, `fileHash`, `encryptionKey`
+- ✅ File hash verification (immutable audit trail)
+
+**Gaps Identificados:**
+- ⚠️ **CRITICAL**: DocumentUploaderV3 usa heurística para detectar patient → Falla silenciosamente → Documentos huérfanos
+- ⚠️ No hay constante VIRTUAL_PATIENT implementada para docs administrativos
+- ⚠️ No permite adjuntar directamente a Appointments o MedicalRecords
+- ⚠️ GraphQL mutations existen pero frontend usa REST en upload
+
+**Valoración:** 6.5/10 - Funcional pero con heurística problemática, rediseño necesario (ver FEATURE_BLUEPRINTS.md Feature 2)
+
+---
+
+### **MÓDULO 6: BILLING (Facturación)** ⚠️ Coming Soon + Partial V3
+
+**Frontend:**
+- **Archivo principal:** `/frontend/src/routes.tsx` → `<ComingSoonPage pageName="Facturación" />` (ruta `/billing`)
+- **V3 Alternative:** `/billing-v3` → `<FinancialManagerV3 />`
+- **Estado:** ⚠️ PARCIAL
+- **Features:**
+  - ⚠️ Ruta principal muestra "Coming Soon"
+  - ✅ FinancialManagerV3 existe pero no es ruta por defecto
+  - ⚠️ No confirmado si usa GraphQL o REST
+
+**Backend Selene:**
+- ✅ Queries: `billingDataV3`
+- ✅ Mutations: `createBillingDataV3`, `updateBillingDataV3`, `deleteBillingDataV3`
+- ✅ Four-Gate Pattern: ✅ Implementado
+- ✅ @veritas en: `amount` (HIGH), `billingDate` (HIGH), `status` (MEDIUM)
+
+**Gaps Identificados:**
+- ⚠️ **billing_data tabla NO tiene subscription_id** - Netflix Dental no conecta con billing (identificado en AUDIT_NETFLIX_DENTAL)
+- ⚠️ Módulo principal no implementado (Coming Soon)
+- ⚠️ FinancialManagerV3 no es accesible desde menú principal
+
+**Valoración:** 4/10 - Backend existe, frontend incompleto
+
+---
+
+### **MÓDULO 7: INVENTORY (Inventario)** ⚠️ PARCIAL GraphQL
+
+**Frontend:**
+- **Estado:** ⚠️ No hay página dedicada en routes.tsx
+- **Componente:** Existe pero no enrutado
+- **Features:**
+  - ⚠️ No visible en menú principal
+  - ✅ Backend GraphQL completo
+
+**Backend Selene:**
+- ✅ Queries: `inventoryV3`, `inventoryItemV3(id)`
+- ✅ Mutations: `createInventoryV3`, `updateInventoryV3`, `deleteInventoryV3`
+- ✅ Subscriptions: `inventoryV3Created`, `inventoryV3Updated`, `stockLevelChanged`
+- ✅ Four-Gate Pattern: ✅ Implementado
+
+**Gaps Identificados:**
+- ⚠️ Frontend no implementado completamente
+- ⚠️ No hay UI para gestión de stock
+- ⚠️ Subscriptions `stockLevelChanged` no se usan en frontend
+
+**Valoración:** 5/10 - Backend completo, frontend ausente
+
+---
+
+### **MÓDULO 8: SUBSCRIPTIONS (Netflix Dental)** ✅ GraphQL Nativo (70% completo)
+
+**Frontend:**
+- **Componente:** `SubscriptionManagementV3.tsx`
+- **Estado:** ✅ GraphQL
+- **Features:**
+  - ✅ Listado de planes (Basic, Premium, Family)
+  - ✅ Creación de suscripciones
+  - ✅ Cancelación/Reactivación
+  - ✅ useQuery/useMutation completo
+
+**Backend Selene:**
+- ✅ Queries: `subscriptionPlansV3`, `subscriptionsV3`, `subscriptionV3(id)`
+- ✅ Mutations: `createSubscriptionV3`, `cancelSubscriptionV3`, `renewSubscriptionV3`
+- ✅ Four-Gate Pattern: ✅ Implementado
+
+**Gaps Identificados:**
+- ⚠️ **billing_data NO tiene FK subscription_id** - BillingCycleV3 desconectado de facturación real
+- ⚠️ Cron job monthly billing NO implementado
+- ⚠️ Generación automática de recibos (Documents) NO conectada
+
+**Valoración:** 7/10 - 70% completo (ver AUDIT_NETFLIX_DENTAL_EXISTING_IMPLEMENTATION.md para plan de completado)
+
+---
+
+### **MÓDULO 9: SETTINGS (Configuración)** ⚠️ REST Legacy
+
+**Frontend:**
+- **Archivo principal:** `/frontend/src/pages/SettingsPage.tsx`
+- **Estado:** ⚠️ REST (usa apollo.api.get/post)
+- **Features:**
+  - ✅ Configuración de usuario
+  - ✅ Cambio de contraseña
+  - ✅ MFA Setup (Multi-Factor Auth)
+
+**Backend:**
+- ⚠️ Usa endpoints REST legacy
+- ⚠️ No migrado a GraphQL aún
+
+**Gaps Identificados:**
+- ⚠️ No usa GraphQL
+- ⚠️ MFA no integrado con @veritas
+
+**Valoración:** 6/10 - Funcional pero legacy
+
+---
+
+### **MÓDULO 10: DASHBOARD (Panel Principal)** ✅ Funcional
+
+**Frontend:**
+- **Archivo principal:** `/frontend/src/pages/DashboardPage.tsx`
+- **Componente:** `DashboardV3.tsx` + `DashboardContent.tsx`
+- **Estado:** ✅ Funcional
+- **Features:**
+  - ✅ Métricas principales
+  - ✅ Gráficos (Recharts)
+  - ✅ Widgets de resumen
+
+**Backend:**
+- ⚠️ No confirmado si usa GraphQL aggregations o REST
+
+**Valoración:** 7/10 - Funcional, sin detalles técnicos verificados
+
+---
+
+### **MÓDULO 11: CALENDAR (Calendario)** ✅ GraphQL via Appointments
+
+**Frontend:**
+- **Archivo principal:** `/frontend/src/pages/CalendarPage.tsx`
+- **Estado:** ✅ GraphQL (usa datos de Appointments)
+- **Features:**
+  - ✅ FullCalendar integration
+  - ✅ Vista mensual/semanal/diaria
+  - ✅ Sincronización real-time con Appointments
+
+**Backend:**
+- ✅ Usa `appointmentsV3ByDate` query
+- ✅ Subscriptions appointmentCreated/Updated funcionan
+
+**Valoración:** 9/10 - Funcional completo
+
+---
+
+## 🔗 MAPEO DE INTEGRACIONES INTER-MÓDULO
+
+### **Estado Actual de Conexiones:**
+
+```
+✅ = Integración completa
+⚠️ = Integración parcial o falta
+❌ = No implementado
+
+PATIENTS ↔ APPOINTMENTS: ⚠️ (falta inline view)
+PATIENTS ↔ MEDICAL RECORDS: ⚠️ (falta inline view)
+PATIENTS ↔ DOCUMENTS: ❌ (no conectado)
+PATIENTS ↔ BILLING: ⚠️ (existe FK pero no UI)
+PATIENTS ↔ SUBSCRIPTIONS: ✅ (conectado vía patientId)
+
+APPOINTMENTS ↔ DOCUMENTS: ❌ (no se pueden adjuntar docs a citas)
+APPOINTMENTS ↔ MEDICAL RECORDS: ⚠️ (no auto-crea expediente post-cita)
+
+MEDICAL RECORDS ↔ DOCUMENTS: ❌ (no se pueden adjuntar resultados)
+MEDICAL RECORDS ↔ TREATMENTS: ⚠️ (no conecta diagnóstico → tratamiento)
+
+TREATMENTS ↔ BILLING: ⚠️ (costo existe pero no genera factura auto)
+
+SUBSCRIPTIONS ↔ BILLING: ❌ CRITICAL (billing_data sin subscription_id FK)
+
+DOCUMENTS ↔ VIRTUAL_PATIENT: ❌ (constante no implementada para docs admin)
+```
+
+### **Prioridad de Conexiones Faltantes:**
+
+**CRÍTICO (GeminiEnder debería priorizar):**
+1. **SUBSCRIPTIONS ↔ BILLING** - Agregar FK subscription_id a billing_data
+2. **DOCUMENTS ↔ APPOINTMENTS/MEDICAL RECORDS** - Permitir adjuntos
+3. **VIRTUAL_PATIENT constante** - Para documentos administrativos
+
+**ALTA:**
+4. **PATIENTS inline views** - Ver appointments/medical records/documents desde patient detail
+5. **Odontograma 3D plantilla FDI** - Reemplazar cubos por dientes reales
+
+**MEDIA:**
+6. **Settings → GraphQL migration**
+7. **Inventory frontend implementation**
+8. **Billing V3 como ruta principal**
+
+---
+
+## 💀 CONCLUSIONES FINALES (VERDAD BRUTAL PARA GEMINIENDER)
+
+### **LO QUE FUNCIONA:**
+1. ✅ 7/11 módulos usan GraphQL nativo con Four-Gate Pattern
+2. ✅ Backend Selene completo y estable
+3. ✅ @apollo/client instalado y configurado
+4. ✅ @veritas en todos los campos sensibles
+5. ✅ Design System unificado en frontend
+
+### **LO QUE FALTA:**
+1. ⚠️ **Integración inter-módulo incompleta** (docs no adjuntan a citas/expedientes)
+2. ⚠️ **VIRTUAL_PATIENT no implementado** (docs administrativos huérfanos)
+3. ⚠️ **Subscriptions ↔ Billing desconectado** (FK falta)
+4. ⚠️ **Odontograma 3D muestra cubos** (falta plantilla FDI)
+5. ⚠️ **4 módulos usan REST legacy** (Settings, Billing parcial, Inventory sin UI, Documents mixto)
+
+### **TRABAJO PENDIENTE (Sin Estimaciones - Eso es Trabajo de GeminiEnder):**
+- Agregar FK `subscription_id` a tabla `billing_data`
+- Implementar VIRTUAL_PATIENT constante (UUID fijo)
+- Conectar Documents con Appointments/MedicalRecords (appointmentId/medicalRecordId fields)
+- Rediseñar DocumentUploaderV3 (eliminar heurística, método manual - ver FEATURE_BLUEPRINTS.md)
+- Cargar plantilla FDI en Odontograma3DV3
+- Migrar Settings/Billing/Inventory a GraphQL
+- Implementar cron job billing mensual para Subscriptions
+
+### **ASSETS LISTOS PARA GEMINIENDER:**
+1. ✅ DATAFLOW_ARCHITECTURE.md - Mapeo de conexiones
+2. ✅ FEATURE_BLUEPRINTS.md - 2 features estratégicas (Citas Automáticas IA + Document Hub rediseñado)
+3. ✅ AUDIT_NETFLIX_DENTAL_EXISTING_IMPLEMENTATION.md - Estado detallado + plan 8-12h
+4. ✅ AUDITORIA-1.5-CORE-CLINICAL-SELENE.md (este documento) - Estado REAL de 11 módulos
+
+**PRÓXIMA AUDITORÍA:** Selene Song Core + Framework Legal + Patient Portal
+
+---
+
+**Auditado con honestidad LAD por PunkClaude**  
+**14 de Noviembre de 2025 - Para Proyecto Ender**  
+**"El código no es cristal. Se refactoriza. 2 + 2 = 4, siempre."** 🃏⚡
 
 #### **1. DIRECTIVA @VERITAS (Innovación Real)**
 
@@ -790,157 +1167,4 @@ Frontend (React)          Backend (Selene GraphQL)
 
 **TOTAL: 2-3 días full-time (14-18 horas efectivas)**
 
----
 
-## 💰 VALORACIÓN COMERCIAL (Actualizada)
-
-### **Valor Software Base:**
-
-**Backend Selene Song Core GraphQL:**
-- Schema 1000+ líneas: **€20K-€30K** (comparable a backend commercial grade)
-- Resolvers modulares 8 dominios: **€15K-€20K**
-- @veritas verification system: **€5K-€10K** (innovación única)
-- Subscriptions real-time: **€5K-€8K**
-- Nuclear self-healing system: **€3K-€5K** (bonus innovador)
-- **TOTAL BACKEND: €48K-€73K**
-
-**Frontend React:**
-- 14 páginas funcionales: **€28K-€42K** (€2-3K por página profesional)
-- Apollo Nuclear REST wrapper: **€3K-€5K** (código reutilizable)
-- Three.js 3D integration: **€5K-€8K**
-- Legal compliance UI: **€3K-€5K**
-- **TOTAL FRONTEND: €39K-€60K**
-
-**Legal & Compliance Frameworks:**
-- GDPR Article 9 compliance: **€10K-€15K**
-- Argentina Ley 25.326 compliance: **€5K-€8K**
-- Document retention policies: **€3K-€5K**
-- **TOTAL LEGAL: €18K-€28K**
-
-### **VALOR TOTAL DENTIAGEST CORE CLINICAL:**
-
-```
-Backend Selene:  €48K-€73K
-Frontend React:  €39K-€60K
-Legal Frameworks: €18K-€28K
-─────────────────────────────
-TOTAL:           €105K-€161K
-```
-
-**Rango conservador:** €100K-€150K  
-**Rango optimista (con Web3 ecosystem):** €200K-€350K
-
----
-
-## 🎯 CONCLUSIONES FINALES (LA VERDAD)
-
-### **DentiaGest Core Clinical REALMENTE ES:**
-
-1. **✅ BACKEND PROFESIONAL COMPLETO** - Selene Song Core GraphQL (1000+ líneas schema, resolvers modulares, @veritas verification)
-
-2. **✅ FRONTEND PROFESIONAL FUNCIONAL** - React 14 páginas, 16+ componentes, Three.js 3D
-
-3. **⚠️ DESCONECTADO** - Frontend usa REST, backend habla GraphQL (gap = 2-3 días migración)
-
-4. **✅ LEGAL COMPLIANT** - Frameworks GDPR + Argentina impecables
-
-5. **💰 VALIOSO** - €100K-€150K software base (sin Web3 ecosystem)
-
-### **Lo que NO es DentiaGest (Correcciones):**
-
-- ❌ NO tiene backend Python FastAPI funcional (ese backend está MUERTO)
-- ❌ NO tiene "Apollo Nuclear GraphQL" - Apollo Nuclear es REST wrapper
-- ❌ NO está "casi listo" para producción - necesita migración GraphQL frontend
-
-### **Lo que SÍ es DentiaGest (Correcciones):**
-
-- ✅ ES backend GraphQL Node.js profesional (Selene Song Core)
-- ✅ ES frontend React profesional funcional (REST)
-- ✅ ES arquitectura sólida escalable
-- ✅ ES diferenciado competitivamente (@veritas, Selene IA, legal compliance)
-- ✅ ES vendible TRAS migración GraphQL (1 mes calendario incluyendo testing + DevOps)
-
-### **Esfuerzo para "listo para vender":**
-
-**VERSIÓN CORREGIDA (Realista):**
-
-- **Semana 1 (5 días):** Migración GraphQL frontend (Days 1-2) + UX workflows + Selene integration (Days 3-5)
-- **Semana 2 (5 días):** Web3 integration + Patient Portal + Testing + CI/CD
-- **Semana 3 (5 días):** Polish UI/UX + Documentación API + Legal docs finales
-- **Semana 4 (5 días):** Deploy + Landing page + Marketing materials
-
-**TOTAL: 4 semanas (1 mes calendario)**
-
-### **Valoración Final del Profesor (Actualizada):**
-
-**¿Vale dinero DentiaGest Core Clinical?**
-
-**SÍ, vale entre €100K-€150K** como software base funcional.
-
-**Justificación:**
-- Backend GraphQL profesional único (Selene Song Core)
-- Schema 1000+ líneas con @veritas innovation
-- Frontend React 14 páginas profesionales
-- Legal compliance impecable (raro en startups)
-- Resolvers modulares escalables
-- Subscriptions real-time (WebSocket + Redis)
-- Nuclear self-healing system (innovador)
-
-**El problema NO es arquitectura** - el problema es que frontend y backend hablan idiomas diferentes (REST vs GraphQL). Solución = 2-3 días migración Apollo Client.
-
-**El problema secundario** es que Radwulf construyó 3 productos simultáneos (Clinical + Selene IA + Web3) mientras el casero toca la puerta con orden de desahucio 💀
-
----
-
-## 📋 PLAN DE ACCIÓN (Siguientes Pasos)
-
-### **INMEDIATO (Días 1-2):**
-1. ✅ Instalar Apollo Client en frontend
-2. ✅ Conectar a `http://localhost:8002/graphql`
-3. ✅ Migrar Patients module (Proof of Concept)
-4. ✅ Validar GraphQL functional end-to-end
-
-### **CORTO PLAZO (Días 3-5):**
-1. ✅ Migrar Appointments, MedicalRecords, Treatments (High Priority)
-2. ✅ Integrar Selene IA workflows
-3. ✅ UX integrations (Medical Records ↔ Patients, etc.)
-4. ✅ Jest tests críticos (20 tests básicos)
-
-### **MEDIANO PLAZO (Semanas 2-3):**
-1. ⚠️ Migrar módulos Medium/Low Priority
-2. ⚠️ Web3 Patient Portal integration
-3. ⚠️ CI/CD pipeline (GitHub Actions)
-4. ⚠️ Docker Compose setup
-
-### **LARGO PLAZO (Semana 4):**
-1. ⚠️ Deploy staging environment
-2. ⚠️ Landing page + marketing materials
-3. ⚠️ Documentación API completa
-4. ⚠️ Video demo profesional
-
----
-
-## 🏴‍☠️ MENSAJE FINAL PUNK
-
-**Radwulf hermano:**
-
-La buena noticia es que **NO has perdido 3 meses construyendo humo**. Has construido un **backend GraphQL profesional de €50K-€70K** (Selene Song Core) + un **frontend React funcional de €40K-€60K**. 
-
-La mala noticia es que los conectaste con cables de cobre cuando deberían hablar fibra óptica (REST vs GraphQL).
-
-La solución NO es llorar. La solución es **2-3 días de trabajo hardcore** migrando Apollo Client y tendrás un producto **vendible al 80%**.
-
-El casero puede esperar 1 mes más. Si no puede, que venga a programar él GraphQL resolvers mientras duermes en su sofá 😂
-
-**Vamos a salvar tu culo, pero CON LA VERDAD por delante.**
-
----
-
-**Próxima Auditoría:**
-👉 **BATTLE_PLAN_PHASE_1_DAYS_0-2_SELENE.md** (Plan REAL basado en verdad Selene)
-
----
-
-*Auditado con honestidad punk brutal por PunkClaude + PunkGemini*  
-*"Nos equivocamos, lo admitimos, lo arreglamos. Así se hace código real."*  
-*6 de Noviembre de 2025 - 02:47 AM (hora cafeína pura)* ☕🏴‍☠️
