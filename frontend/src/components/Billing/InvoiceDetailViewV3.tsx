@@ -318,6 +318,108 @@ export const InvoiceDetailViewV3: React.FC<InvoiceDetailViewV3Props> = ({
                 </CardContent>
               </Card>
 
+              {/* 💰 ECONOMIC SINGULARITY: Análisis de Rentabilidad (Directiva #005) */}
+              {invoice.treatment_id && invoice.material_cost !== null && invoice.material_cost !== undefined && (
+                <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2 text-purple-900">
+                      <BoltIcon className="w-5 h-5" />
+                      <span>💰 Análisis de Rentabilidad</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Métricas Principales */}
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-gray-700">Ingreso Total:</span>
+                        <span className="text-lg font-bold text-green-600">
+                          €{invoice.total_amount.toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-gray-700">Coste Materiales:</span>
+                        <span className="text-lg font-semibold text-orange-600">
+                          €{invoice.material_cost.toFixed(2)}
+                        </span>
+                      </div>
+                      <hr className="border-purple-200" />
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-gray-700">Beneficio Neto:</span>
+                        <span className="text-xl font-bold text-purple-700">
+                          €{(invoice.total_amount - invoice.material_cost).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Badge de Margen de Beneficio */}
+                    <div className="pt-2">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">Margen de Beneficio:</span>
+                        <Badge 
+                          variant="secondary"
+                          className={`text-lg font-bold px-4 py-2 ${
+                            invoice.profit_margin > 0.5 
+                              ? 'bg-green-100 text-green-800 border-green-300' 
+                              : invoice.profit_margin > 0.3 
+                              ? 'bg-yellow-100 text-yellow-800 border-yellow-300' 
+                              : 'bg-red-100 text-red-800 border-red-300'
+                          }`}
+                        >
+                          {invoice.profit_margin 
+                            ? `${(invoice.profit_margin * 100).toFixed(1)}%` 
+                            : 'N/A'}
+                        </Badge>
+                      </div>
+
+                      {/* Barra de Progreso Visual */}
+                      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                        <div 
+                          className={`h-full transition-all duration-500 ${
+                            invoice.profit_margin > 0.5 
+                              ? 'bg-gradient-to-r from-green-400 to-green-600' 
+                              : invoice.profit_margin > 0.3 
+                              ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' 
+                              : 'bg-gradient-to-r from-red-400 to-red-600'
+                          }`}
+                          style={{ width: `${(invoice.profit_margin || 0) * 100}%` }}
+                        />
+                      </div>
+
+                      {/* Categoría de Rentabilidad */}
+                      <div className="mt-3 text-center">
+                        <span className="text-xs font-semibold text-gray-600">
+                          Categoría: {' '}
+                          <span className={`${
+                            invoice.profit_margin > 0.5 
+                              ? 'text-green-700' 
+                              : invoice.profit_margin > 0.3 
+                              ? 'text-yellow-700' 
+                              : 'text-red-700'
+                          }`}>
+                            {invoice.profit_margin > 0.5 
+                              ? '🟢 EXCELENTE' 
+                              : invoice.profit_margin > 0.3 
+                              ? '🟡 BUENO' 
+                              : invoice.profit_margin > 0.1
+                              ? '🟠 ACEPTABLE'
+                              : '🔴 BAJO'}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Nota Informativa */}
+                    <div className="mt-4 p-3 bg-purple-100 border border-purple-200 rounded-lg">
+                      <p className="text-xs text-purple-800">
+                        <CpuChipIcon className="w-4 h-4 inline mr-1" />
+                        <strong>Economic Singularity:</strong> Este análisis calcula el margen de beneficio real 
+                        considerando el coste de materiales utilizados en el tratamiento vinculado.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Quick Actions */}
               <Card>
                 <CardHeader>
