@@ -7,7 +7,7 @@
  */
 
 export { default as DocumentManagerV3 } from './DocumentManagerV3';
-export { DocumentUploaderV3 } from './DocumentUploaderV3';
+export { DocumentUploaderV3Redesigned as DocumentUploaderV3 } from './DocumentUploaderV3Redesigned';
 export { DocumentListV3 } from './DocumentListV3';
 export { default as DocumentViewerV3 } from './DocumentViewerV3';
 export { AIDocumentAnalysisV3 } from './AIDocumentAnalysisV3';

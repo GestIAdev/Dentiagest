@@ -18,7 +18,7 @@ import { useDocumentLogger } from '../../utils/documentLogger';
 
 // 🎯 MODULAR COMPONENTS - V3 Architecture
 import { DocumentListV3 } from './DocumentListV3';
-import { DocumentUploaderV3 } from './DocumentUploaderV3';
+import { DocumentUploaderV3Redesigned as DocumentUploaderV3 } from './DocumentUploaderV3Redesigned';
 import { AIDocumentAnalysisV3 } from './AIDocumentAnalysisV3';
 import { VeritasProofViewer } from './VeritasProofViewer';
 import DocumentViewerV3 from './DocumentViewerV3';
@@ -391,11 +391,7 @@ const DocumentManagerV3: React.FC<DocumentManagerV3Props> = ({
       if (showUploader) {
         return (
           <DocumentUploaderV3
-            patientId={patientId}
-            medicalRecordId={medicalRecordId}
-            appointmentId={appointmentId}
             onUploadSuccess={handleUploadSuccess}
-            onUploadError={handleUploadError}
             onCancel={() => setShowUploader(false)}
           />
         );

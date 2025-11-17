@@ -14,7 +14,8 @@ import {
   CardHeader,
   CardBody,
   Badge,
-  Spinner
+  Spinner,
+  Alert
 } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 
@@ -130,6 +131,18 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
   allowedTypes = DEFAULT_ALLOWED_TYPES,
   className = ''
 }) => {
+  // 🚨 DEPRECATION WARNING - ENDER-D1-002
+  React.useEffect(() => {
+    console.warn(
+      '⚠️ DEPRECATED: DocumentUploaderV3 is legacy code. Use DocumentUploaderV3Redesigned instead.',
+      {
+        component: 'DocumentUploaderV3.legacy.tsx',
+        reason: 'Heuristic upload logic replaced by deterministic 3-step wizard',
+        migration: 'Import DocumentUploaderV3Redesigned from ./DocumentUploaderV3Redesigned'
+      }
+    );
+  }, []);
+
   // 🎯 STATE MANAGEMENT
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formData, setFormData] = useState<DocumentFormData>({
@@ -428,12 +441,21 @@ export const DocumentUploaderV3: React.FC<DocumentUploaderV3Props> = ({
   // 🎯 MAIN RENDER
   return (
     <div className={`space-y-6 ${className}`}>
+      {/* 🚨 DEPRECATION BANNER - ENDER-D1-002 */}
+      <Alert variant="warning" title="⚠️ Componente Deprecado">
+        Este uploader usa lógica heurística obsoleta. Migra a{' '}
+        <code className="font-mono bg-yellow-100 dark:bg-yellow-900/40 px-1 rounded">
+          DocumentUploaderV3Redesigned
+        </code>
+        {' '}para el wizard determinístico de 3 pasos.
+      </Alert>
+
       {/* Header */}
       <Card className="cyberpunk-card">
         <CardHeader>
           <h2 className="cyberpunk-text text-lg font-bold flex items-center">
             <CloudArrowUpIcon className="w-6 h-6 mr-2" />
-            Subir Documento - Olympus V3.0
+            Subir Documento - Olympus V3.0 (LEGACY)
           </h2>
         </CardHeader>
       </Card>
