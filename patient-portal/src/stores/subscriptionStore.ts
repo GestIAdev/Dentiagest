@@ -1,4 +1,15 @@
 import { create } from 'zustand';
+import { apolloClient } from '../config/apollo';
+import {
+  GET_SUBSCRIPTION_PLANS,
+  GET_PATIENT_SUBSCRIPTIONS,
+  CREATE_SUBSCRIPTION,
+  UPDATE_SUBSCRIPTION,
+  CANCEL_SUBSCRIPTION,
+  type SubscriptionPlan as GraphQLPlan,
+  type PatientSubscription as GraphQLSubscription,
+  type CreateSubscriptionInput
+} from '../graphql/subscriptions';
 
 // ============================================================================
 // INTERFACES Y TIPOS - NETFLIX DENTAL MODEL V3
@@ -137,66 +148,161 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
 }));
 
 // ============================================================================
-// AVAILABLE DENTAL PLANS - TITAN V3 CATALOG
+// REAL GRAPHQL FUNCTIONS - NO MORE MOCKS
+// By PunkClaude - Directiva #003 GeminiEnder
 // ============================================================================
 
-export const AVAILABLE_PLANS: DentalPlan[] = [
-  {
-    id: 'basic-cleaning',
-    name: 'Limpieza Básica',
-    description: 'Limpieza dental profesional cada 6 meses',
-    price: 150,
-    currency: 'ARS',
-    features: [
-      'Limpieza profesional',
-      'Chequeo general',
-      'Aplicación de flúor',
-      '2 consultas al año',
-    ],
-    isPopular: false,
-    maxAppointments: 2,
-    validityDays: 365,
-  },
-  {
-    id: 'premium-care',
-    name: 'Cuidado Premium',
-    description: 'Atención dental completa con beneficios exclusivos',
-    price: 450,
-    currency: 'ARS',
-    features: [
-      'Limpieza profesional',
-      'Chequeo completo',
-      'Tratamientos preventivos',
-      'Radiografías digitales',
-      'Blanqueamiento dental',
-      'Descuento en tratamientos',
-      '4 consultas al año',
-      'Emergencias 24/7',
-    ],
-    isPopular: true,
-    maxAppointments: 4,
-    validityDays: 365,
-  },
-  {
-    id: 'family-plan',
-    name: 'Plan Familiar',
-    description: 'Cobertura completa para toda la familia',
-    price: 850,
-    currency: 'ARS',
-    features: [
-      'Hasta 4 miembros',
-      'Limpieza profesional',
-      'Chequeo completo',
-      'Tratamientos preventivos',
-      'Radiografías digitales',
-      'Blanqueamiento dental',
-      'Ortodoncia descuento 30%',
-      'Implantes descuento 20%',
-      '8 consultas al año',
-      'Emergencias 24/7',
-    ],
-    isPopular: false,
-    maxAppointments: 8,
-    validityDays: 365,
-  },
-];
+/**
+ * 📦 Fetch available subscription plans from Selene
+ */
+export const fetchSubscriptionPlans = async (activeOnly = true): Promise<DentalPlan[]> => {
+  try {
+    const { data } = await apolloClient.query<{ subscriptionPlansV3: GraphQLPlan[] }>({
+      query: GET_SUBSCRIPTION_PLANS,
+      variables: { activeOnly },
+      fetchPolicy: 'network-only' // Always get fresh data
+    });
+
+    if (!data?.subscriptionPlansV3) {
+      throw new Error('No subscription plans found');
+    }
+
+    // Map GraphQL response to store format
+    return data.subscriptionPlansV3.map(plan => ({
+      id: plan.id,
+      name: plan.name,
+      description: plan.description || '',
+      price: plan.price,
+      currency: plan.currency,
+      features: plan.features || [],
+      isPopular: plan.priority === 1, // Highest priority = popular
+      maxAppointments: plan.maxAppointments,
+      validityDays: plan.billingPeriod === 'yearly' ? 365 : 30,
+    }));
+  } catch (error) {
+    console.error('❌ Error fetching subscription plans:', error);
+    throw error;
+  }
+};
+
+/**
+ * 📋 Fetch patient subscriptions from Selene
+ */
+export const fetchPatientSubscriptions = async (
+  patientId: string,
+  clinicId?: string, // Not used in query, kept for backwards compatibility
+  status?: string
+): Promise<PatientSubscription[]> => {
+  try {
+    const { data } = await apolloClient.query<{ subscriptionsV3: GraphQLSubscription[] }>({
+      query: GET_PATIENT_SUBSCRIPTIONS,
+      variables: { patientId, status }, // clinicId removed - not in schema
+      fetchPolicy: 'network-only'
+    });
+
+    if (!data?.subscriptionsV3) {
+      return [];
+    }
+
+    // Map GraphQL response to store format
+    return data.subscriptionsV3.map(sub => ({
+      id: sub.id,
+      planId: sub.plan.id,
+      status: sub.status as 'active' | 'inactive' | 'cancelled' | 'expired',
+      startDate: sub.startDate,
+      endDate: sub.endDate,
+      autoRenew: sub.autoRenew,
+      remainingAppointments: sub.plan.maxAppointments - sub.usedAppointments,
+      usedAppointments: sub.usedAppointments,
+      plan: {
+        id: sub.plan.id,
+        name: sub.plan.name,
+        description: sub.plan.description || '',
+        price: sub.plan.price,
+        currency: sub.plan.currency,
+        features: sub.plan.features || [],
+        isPopular: sub.plan.priority === 1,
+        maxAppointments: sub.plan.maxAppointments,
+        validityDays: sub.plan.billingPeriod === 'yearly' ? 365 : 30,
+      },
+    }));
+  } catch (error) {
+    console.error('❌ Error fetching patient subscriptions:', error);
+    throw error;
+  }
+};
+
+/**
+ * ➕ Create new subscription
+ */
+export const createPatientSubscription = async (
+  patientId: string,
+  clinicId: string,
+  planId: string,
+  autoRenew = true
+): Promise<PatientSubscription> => {
+  try {
+    const { data } = await apolloClient.mutate<{ createSubscriptionV3: GraphQLSubscription }>({
+      mutation: CREATE_SUBSCRIPTION,
+      variables: {
+        input: {
+          patientId,
+          clinicId,
+          planId,
+          autoRenew,
+          startDate: new Date().toISOString(),
+        } as CreateSubscriptionInput
+      }
+    });
+
+    if (!data?.createSubscriptionV3) {
+      throw new Error('Failed to create subscription');
+    }
+
+    const sub = data.createSubscriptionV3;
+    return {
+      id: sub.id,
+      planId: sub.plan.id,
+      status: sub.status as 'active' | 'inactive' | 'cancelled' | 'expired',
+      startDate: sub.startDate,
+      endDate: sub.endDate,
+      autoRenew: sub.autoRenew,
+      remainingAppointments: sub.plan.maxAppointments - sub.usedAppointments,
+      usedAppointments: sub.usedAppointments,
+      plan: {
+        id: sub.plan.id,
+        name: sub.plan.name,
+        description: sub.plan.description || '',
+        price: sub.plan.price,
+        currency: sub.plan.currency,
+        features: sub.plan.features || [],
+        isPopular: sub.plan.priority === 1,
+        maxAppointments: sub.plan.maxAppointments,
+        validityDays: sub.plan.billingPeriod === 'yearly' ? 365 : 30,
+      },
+    };
+  } catch (error) {
+    console.error('❌ Error creating subscription:', error);
+    throw error;
+  }
+};
+
+/**
+ * ❌ Cancel subscription
+ */
+export const cancelPatientSubscription = async (
+  subscriptionId: string,
+  reason?: string
+): Promise<void> => {
+  try {
+    await apolloClient.mutate({
+      mutation: CANCEL_SUBSCRIPTION,
+      variables: { id: subscriptionId, reason }
+    });
+
+    console.log('✅ Subscription cancelled successfully');
+  } catch (error) {
+    console.error('❌ Error cancelling subscription:', error);
+    throw error;
+  }
+};

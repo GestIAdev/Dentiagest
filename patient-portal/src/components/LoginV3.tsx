@@ -4,73 +4,59 @@ import {
   LockClosedIcon,
   ArrowRightIcon,
   ExclamationTriangleIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
+  EnvelopeIcon
 } from '@heroicons/react/24/outline';
-import { useAuthStore, initiateSSO, handleSSOCallback } from '../stores/authStore';
-import { useSearchParams } from 'react-router-dom';
+import { useAuthStore, loginWithCredentials } from '../stores/authStore';
+import { useNavigate } from 'react-router-dom';
 
 // ============================================================================
-// COMPONENTE: LOGIN/SSO V3 - CYBERPUNK AUTHENTICATION
+// COMPONENTE: LOGIN V3 - REAL AUTHENTICATION (NO MORE MOCKS)
+// By PunkClaude - Directiva #003 GeminiEnder
 // ============================================================================
 
 const LoginV3: React.FC = () => {
-  const { auth, setLoading, setError, clearError } = useAuthStore();
-  const [searchParams] = useSearchParams();
-  const [isRedirecting, setIsRedirecting] = useState(false);
-
-  // Handle SSO callback
-  useEffect(() => {
-    const code = searchParams.get('code');
-    const state = searchParams.get('state');
-    const error = searchParams.get('error');
-
-    if (error) {
-      setError('Error en la autenticación SSO');
-      return;
-    }
-
-    if (code && state) {
-      handleSSOCallback(code, state).catch((err) => {
-        console.error('SSO callback failed:', err);
-        setError('Error al procesar la autenticación');
-      });
-    }
-  }, [searchParams, setError]);
+  const { auth, setLoading, setError, clearError, error, isLoading } = useAuthStore();
+  const navigate = useNavigate();
+  
+  // Form state
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Redirect if already authenticated
   useEffect(() => {
     if (auth?.isAuthenticated) {
-      window.location.href = '/';
+      navigate('/');
     }
-  }, [auth]);
+  }, [auth, navigate]);
 
-  const handleSSOLogin = async () => {
+  // 🔐 REAL LOGIN HANDLER - No más mocks
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      setError('Por favor ingresa email y contraseña');
+      return;
+    }
+
     try {
+      setIsSubmitting(true);
       setLoading(true);
       clearError();
-      setIsRedirecting(true);
 
-      // For demo purposes, use mock patient/clinic IDs
-      // In production, this would come from user input or URL params
-      await initiateSSO('patient-001', 'clinic-001');
+      await loginWithCredentials(email, password);
 
-    } catch (error) {
-      console.error('SSO initiation failed:', error);
-      setError('Error al iniciar la autenticación');
-      setIsRedirecting(false);
+      console.log('✅ Login exitoso - redirigiendo...');
+      navigate('/');
+
+    } catch (err) {
+      console.error('❌ Login falló:', err);
+      setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
     } finally {
+      setIsSubmitting(false);
       setLoading(false);
     }
-  };
-
-  const handleDemoLogin = () => {
-    // Demo login for development
-    useAuthStore.getState().login(
-      'demo-patient-001',
-      'demo-clinic-001',
-      'demo-jwt-token',
-      900 // 15 minutes
-    );
   };
 
   if (auth?.isAuthenticated) {
@@ -113,47 +99,82 @@ const LoginV3: React.FC = () => {
           </div>
 
           {/* Error Display */}
-          {useAuthStore.getState().error && (
+          {error && (
             <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-4 mb-6">
               <div className="flex items-center">
                 <ExclamationTriangleIcon className="w-5 h-5 text-red-400 mr-3 flex-shrink-0" />
                 <div>
                   <p className="text-sm text-red-400 font-medium">Error de Autenticación</p>
                   <p className="text-xs text-red-300 mt-1">
-                    {useAuthStore.getState().error}
+                    {error}
                   </p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* SSO Login Button */}
-          <button
-            onClick={handleSSOLogin}
-            disabled={isRedirecting || useAuthStore.getState().isLoading}
-            className="w-full bg-gradient-to-r from-neon-cyan to-neon-blue text-cyber-black py-4 px-6 rounded-xl font-bold text-lg hover:from-neon-cyan/80 hover:to-neon-blue/80 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-neon-cyan mb-4 flex items-center justify-center"
-          >
-            {isRedirecting || useAuthStore.getState().isLoading ? (
-              <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-cyber-black mr-3"></div>
-                Conectando...
-              </>
-            ) : (
-              <>
-                <ShieldCheckIcon className="w-6 h-6 mr-3" />
-                🔐 INICIAR SESIÓN SSO
-                <ArrowRightIcon className="w-6 h-6 ml-3" />
-              </>
-            )}
-          </button>
+          {/* REAL LOGIN FORM - Conectado a Selene GraphQL */}
+          <form onSubmit={handleLogin} className="space-y-4 mb-6">
+            {/* Email Input */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-cyber-light mb-2">
+                Email
+              </label>
+              <div className="relative">
+                <EnvelopeIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neon-cyan" />
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="tu@email.com"
+                  className="w-full bg-cyber-gray border border-neon-cyan/30 text-white rounded-lg py-3 px-10 focus:outline-none focus:border-neon-cyan transition-colors"
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+            </div>
 
-          {/* Demo Login Button (Development Only) */}
-          <button
-            onClick={handleDemoLogin}
-            className="w-full bg-cyber-gray hover:bg-cyber-light text-cyber-light hover:text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 border border-cyber-light mb-6"
-          >
-            🚀 DEMO LOGIN (Desarrollo)
-          </button>
+            {/* Password Input */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-cyber-light mb-2">
+                Contraseña
+              </label>
+              <div className="relative">
+                <LockClosedIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neon-cyan" />
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-cyber-gray border border-neon-cyan/30 text-white rounded-lg py-3 px-10 focus:outline-none focus:border-neon-cyan transition-colors"
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+            </div>
+
+            {/* Login Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting || isLoading}
+              className="w-full bg-gradient-to-r from-neon-cyan to-neon-blue text-cyber-black py-4 px-6 rounded-xl font-bold text-lg hover:from-neon-cyan/80 hover:to-neon-blue/80 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-neon-cyan flex items-center justify-center"
+            >
+              {isSubmitting || isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-cyber-black mr-3"></div>
+                  Autenticando...
+                </>
+              ) : (
+                <>
+                  <ShieldCheckIcon className="w-6 h-6 mr-3" />
+                  🔐 INICIAR SESIÓN
+                  <ArrowRightIcon className="w-6 h-6 ml-3" />
+                </>
+              )}
+            </button>
+          </form>
 
           {/* Info Section */}
           <div className="space-y-4 text-sm text-cyber-light">

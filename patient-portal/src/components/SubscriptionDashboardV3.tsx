@@ -7,13 +7,22 @@ import {
   CalendarIcon,
   UserGroupIcon,
   ShieldCheckIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  PlusIcon
 } from '@heroicons/react/24/outline';
-import { useSubscriptionStore, AVAILABLE_PLANS, type PatientSubscription } from '../stores/subscriptionStore';
+import {
+  useSubscriptionStore,
+  fetchSubscriptionPlans,
+  fetchPatientSubscriptions,
+  createPatientSubscription,
+  type PatientSubscription,
+  type DentalPlan
+} from '../stores/subscriptionStore';
 import { useAuthStore } from '../stores/authStore';
 
 // ============================================================================
-// COMPONENTE: SUBSCRIPTION DASHBOARD V3 - NETFLIX DENTAL MODEL
+// COMPONENTE: SUBSCRIPTION DASHBOARD V3 - NETFLIX DENTAL MODEL (REAL DATA)
+// By PunkClaude - Directiva #003 GeminiEnder
 // ============================================================================
 
 const SubscriptionDashboardV3: React.FC = () => {
@@ -21,38 +30,82 @@ const SubscriptionDashboardV3: React.FC = () => {
   const {
     subscriptions,
     currentPlan,
-    isLoading,
-    error,
+    isLoading: storeLoading,
+    error: storeError,
     setSubscriptions,
+    setLoading,
+    setError,
     getActiveSubscriptions,
     getTotalSpent,
     getUpcomingRenewals,
   } = useSubscriptionStore();
 
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [availablePlans, setAvailablePlans] = useState<DentalPlan[]>([]);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(false);
+  const [isCreatingSubscription, setIsCreatingSubscription] = useState(false);
 
-  // Mock data loading (replace with GraphQL query)
+  // 📦 LOAD REAL DATA from Selene GraphQL
   useEffect(() => {
-    if (auth?.isAuthenticated) {
-      // Simulate loading subscriptions from Apollo Nuclear
-      setTimeout(() => {
-        const mockSubscriptions: PatientSubscription[] = [
-          {
-            id: 'sub-001',
-            planId: 'premium-care',
-            status: 'active',
-            startDate: '2024-01-01',
-            endDate: '2024-12-31',
-            autoRenew: true,
-            remainingAppointments: 2,
-            usedAppointments: 2,
-            plan: AVAILABLE_PLANS[1], // Premium Care
-          },
-        ];
-        setSubscriptions(mockSubscriptions);
-      }, 1000);
+    if (auth?.isAuthenticated && auth.patientId) {
+      loadSubscriptionData();
     }
-  }, [auth, setSubscriptions]);
+  }, [auth]);
+
+  const loadSubscriptionData = async () => {
+    if (!auth?.patientId) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Load patient's subscriptions and available plans in parallel
+      const [subs, plans] = await Promise.all([
+        fetchPatientSubscriptions(auth.patientId, auth.clinicId),
+        fetchSubscriptionPlans(true)
+      ]);
+
+      setSubscriptions(subs);
+      setAvailablePlans(plans);
+
+      console.log('✅ Subscription data loaded:', { subs: subs.length, plans: plans.length });
+    } catch (err) {
+      console.error('❌ Error loading subscription data:', err);
+      setError(err instanceof Error ? err.message : 'Error al cargar suscripciones');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubscribe = async (planId: string) => {
+    if (!auth?.patientId || !auth?.clinicId) {
+      setError('No se pudo identificar el paciente o clínica');
+      return;
+    }
+
+    try {
+      setIsCreatingSubscription(true);
+      setError(null);
+
+      const newSub = await createPatientSubscription(
+        auth.patientId,
+        auth.clinicId,
+        planId,
+        true // autoRenew
+      );
+
+      // Refresh subscriptions
+      await loadSubscriptionData();
+
+      console.log('✅ Suscripción creada:', newSub.id);
+      alert('¡Suscripción creada exitosamente!');
+    } catch (err) {
+      console.error('❌ Error creating subscription:', err);
+      setError(err instanceof Error ? err.message : 'Error al crear suscripción');
+    } finally {
+      setIsCreatingSubscription(false);
+    }
+  };
 
   const activeSubscriptions = getActiveSubscriptions();
   const totalSpent = getTotalSpent();
@@ -93,6 +146,9 @@ const SubscriptionDashboardV3: React.FC = () => {
     );
   }
 
+  const isLoading = storeLoading || isLoadingPlans;
+  const error = storeError;
+
   return (
     <div className="min-h-screen bg-cyber-gradient text-white">
       {/* Header */}
@@ -103,7 +159,7 @@ const SubscriptionDashboardV3: React.FC = () => {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan to-neon-blue bg-clip-text text-transparent">
                 Dashboard de Suscripciones
               </h1>
-              <p className="text-cyber-light mt-1">Modelo Netflix Dental - Titan V3</p>
+              <p className="text-cyber-light mt-1">Modelo Netflix Dental - Titan V3 (REAL DATA)</p>
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-right">
@@ -222,11 +278,11 @@ const SubscriptionDashboardV3: React.FC = () => {
           </div>
         </div>
 
-        {/* Available Plans */}
+        {/* Available Plans - REAL DATA FROM SELENE */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-6">Planes Disponibles</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">Planes Disponibles (Datos Reales)</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {AVAILABLE_PLANS.map((plan) => (
+            {availablePlans.map((plan) => (
               <div
                 key={plan.id}
                 className={`bg-cyber-gray rounded-lg p-6 border transition-all duration-300 cursor-pointer ${
@@ -254,7 +310,7 @@ const SubscriptionDashboardV3: React.FC = () => {
                 </div>
 
                 <ul className="space-y-2 mb-6">
-                  {plan.features.map((feature, index) => (
+                  {plan.features.map((feature: string, index: number) => (
                     <li key={index} className="flex items-center text-sm text-cyber-light">
                       <CheckCircleIcon className="w-4 h-4 text-neon-green mr-2 flex-shrink-0" />
                       {feature}
@@ -263,20 +319,43 @@ const SubscriptionDashboardV3: React.FC = () => {
                 </ul>
 
                 <button
-                  className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSubscribe(plan.id);
+                  }}
+                  disabled={isCreatingSubscription}
+                  className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
                     plan.isPopular
                       ? 'bg-neon-cyan text-cyber-black hover:bg-neon-cyan/80'
                       : 'bg-cyber-dark text-neon-blue border border-neon-blue hover:bg-neon-blue hover:text-cyber-black'
                   }`}
                 >
-                  {activeSubscriptions.some(sub => sub.planId === plan.id)
-                    ? 'Plan Actual'
-                    : 'Seleccionar Plan'
-                  }
+                  {isCreatingSubscription ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current mr-2 inline-block"></div>
+                      Procesando...
+                    </>
+                  ) : activeSubscriptions.some(sub => sub.planId === plan.id) ? (
+                    <>
+                      <CheckCircleIcon className="w-5 h-5 inline mr-2" />
+                      Plan Actual
+                    </>
+                  ) : (
+                    <>
+                      <PlusIcon className="w-5 h-5 inline mr-2" />
+                      Suscribirme
+                    </>
+                  )}
                 </button>
               </div>
             ))}
           </div>
+
+          {availablePlans.length === 0 && !isLoading && (
+            <div className="text-center py-12 bg-cyber-gray rounded-lg border border-cyber-light">
+              <p className="text-cyber-light">No hay planes disponibles en este momento.</p>
+            </div>
+          )}
         </div>
 
         {/* Subscription History */}

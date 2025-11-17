@@ -2,6 +2,7 @@
 // 🔥 PUNK PHILOSOPHY: SPEED AS WEAPON - DEMOCRACY THROUGH CODE
 
 import { ApolloClient, InMemoryCache, from, HttpLink, split } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { RetryLink } from '@apollo/client/link/retry';
 import { PatientPortalOfflineStorage } from '../utils/OfflineStorage';
@@ -68,9 +69,22 @@ export class OfflineApolloClient {
 
   // 🚀 CREATE OFFLINE-CAPABLE APOLLO CLIENT
   private createOfflineClient(): ApolloClient<any> {
+    // Auth link - adds JWT Bearer token to requests
+    const authLink = setContext((_, { headers }) => {
+      // Get token from localStorage (set by authStore)
+      const token = localStorage.getItem('patient_portal_token');
+      
+      return {
+        headers: {
+          ...headers,
+          authorization: token ? `Bearer ${token}` : '',
+        }
+      };
+    });
+
     // HTTP link with offline handling
     const httpLink = new HttpLink({
-      uri: process.env.REACT_APP_GRAPHQL_URI || 'http://localhost:8003/graphql',
+      uri: process.env.REACT_APP_GRAPHQL_URI || 'http://localhost:8005/graphql',
       fetch: this.offlineAwareFetch.bind(this)
     });
 
@@ -165,7 +179,7 @@ export class OfflineApolloClient {
     });
 
     return new ApolloClient({
-      link: from([errorLink, retryLink, httpLink]),
+      link: from([errorLink, retryLink, authLink, httpLink]),
       cache,
       defaultOptions: {
         watchQuery: {

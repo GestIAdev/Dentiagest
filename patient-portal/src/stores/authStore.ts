@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { apolloClient } from '../config/apollo';
+import { LOGIN_MUTATION, LOGOUT_MUTATION, REFRESH_TOKEN_MUTATION, type LoginInput, type AuthResponse } from '../graphql/auth';
 
 // ============================================================================
 // INTERFACES Y TIPOS - TITAN V3 AUTH SYSTEM
@@ -119,56 +121,109 @@ export const useAuthStore = create<AuthState>()(
 );
 
 // ============================================================================
-// SSO UTILITIES - TITAN V3 INTEGRATION
+// REAL AUTHENTICATION UTILITIES - SELENE GRAPHQL INTEGRATION
 // ============================================================================
 
-export const initiateSSO = async (patientId: string, clinicId: string): Promise<void> => {
+/**
+ * 🔐 REAL LOGIN - Conecta a Selene Song Core via GraphQL
+ * By PunkClaude - Directiva #003 GeminiEnder
+ */
+export const loginWithCredentials = async (email: string, password: string): Promise<void> => {
   try {
-    // Redirect to Apollo Nuclear SSO endpoint
-    const ssoUrl = `http://localhost:8003/auth/sso/patient?patientId=${patientId}&clinicId=${clinicId}&redirectUri=${encodeURIComponent(window.location.origin + '/auth/callback')}`;
-    window.location.href = ssoUrl;
+    const { data } = await apolloClient.mutate<{ login: AuthResponse }>({
+      mutation: LOGIN_MUTATION,
+      variables: {
+        input: {
+          email,
+          password
+        } as LoginInput
+      }
+    });
+
+    if (!data?.login) {
+      throw new Error('Invalid response from server');
+    }
+
+    const { accessToken, refreshToken, expiresIn, user } = data.login;
+
+    // Store in authStore (which persists to localStorage)
+    useAuthStore.getState().login(
+      user.id,
+      'default-clinic', // TODO: Get from user data if available
+      accessToken,
+      expiresIn
+    );
+
+    // Store refresh token separately
+    localStorage.setItem('patient_portal_refresh_token', refreshToken);
+
+    console.log('✅ Login successful:', user.email);
   } catch (error) {
-    console.error('SSO initiation failed:', error);
-    throw new Error('Failed to initiate SSO authentication');
+    console.error('❌ Login failed:', error);
+    useAuthStore.getState().setError(error instanceof Error ? error.message : 'Login failed');
+    throw error;
   }
 };
 
-export const handleSSOCallback = async (code: string, state: string): Promise<void> => {
+/**
+ * 🔓 REAL LOGOUT - Calls Selene logout mutation
+ */
+export const logoutUser = async (): Promise<void> => {
   try {
-    // Exchange code for JWT token from Apollo Nuclear
-    const response = await fetch('http://localhost:8003/auth/sso/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        code,
-        state,
-        grant_type: 'authorization_code',
-      }),
+    await apolloClient.mutate({
+      mutation: LOGOUT_MUTATION
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to exchange SSO code for token');
+    // Clear local storage and auth state
+    useAuthStore.getState().logout();
+    localStorage.removeItem('patient_portal_refresh_token');
+
+    console.log('✅ Logout successful');
+  } catch (error) {
+    console.error('❌ Logout error:', error);
+    // Even if server logout fails, clear local state
+    useAuthStore.getState().logout();
+    localStorage.removeItem('patient_portal_refresh_token');
+  }
+};
+
+/**
+ * 🔄 TOKEN REFRESH - Refreshes expired access token
+ */
+export const refreshAccessToken = async (): Promise<boolean> => {
+  try {
+    const refreshToken = localStorage.getItem('patient_portal_refresh_token');
+    
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
     }
 
-    const data = await response.json();
+    const { data } = await apolloClient.mutate<{ refreshToken: AuthResponse }>({
+      mutation: REFRESH_TOKEN_MUTATION,
+      variables: {
+        input: {
+          refreshToken
+        }
+      }
+    });
 
-    // Extract patient info from JWT (without verification for demo)
-    const tokenParts = data.access_token.split('.');
-    const payload = JSON.parse(atob(tokenParts[1]));
+    if (!data?.refreshToken) {
+      throw new Error('Invalid refresh response');
+    }
 
-    // Login with received data
-    useAuthStore.getState().login(
-      payload.patientId,
-      payload.clinicId,
-      data.access_token,
-      data.expires_in || 900 // 15 minutes default
-    );
+    const { accessToken, refreshToken: newRefreshToken, expiresIn, user } = data.refreshToken;
 
+    // Update tokens
+    useAuthStore.getState().refreshToken(accessToken, expiresIn);
+    localStorage.setItem('patient_portal_refresh_token', newRefreshToken);
+
+    console.log('✅ Token refreshed successfully');
+    return true;
   } catch (error) {
-    console.error('SSO callback failed:', error);
-    useAuthStore.getState().setError('Authentication failed');
-    throw error;
+    console.error('❌ Token refresh failed:', error);
+    // Force logout on refresh failure
+    useAuthStore.getState().logout();
+    localStorage.removeItem('patient_portal_refresh_token');
+    return false;
   }
 };

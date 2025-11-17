@@ -18,19 +18,23 @@ async function runMigration() {
     await client.connect();
     console.log('✅ Conexión exitosa\n');
 
-    // Leer el archivo SQL
-    const sqlFile = path.join(__dirname, 'migrations', '001-create-compliance-checks.sql');
+    // Leer el archivo SQL (arg o default)
+    const sqlFileName = process.argv[2] || 'migrations/create_netflix_dental_tables.sql';
+    const sqlFile = path.join(__dirname, sqlFileName);
     const sql = fs.readFileSync(sqlFile, 'utf8');
 
-    console.log('📝 Ejecutando migración...\n');
+    console.log(`📝 Ejecutando migración: ${sqlFileName}...\n`);
     
     // Ejecutar el SQL completo como un único statement
     await client.query(sql);
     console.log('✅ Migración completada');
 
-    // Verificar que se creó la tabla
-    const result = await client.query(`SELECT COUNT(*) as compliance_records FROM compliance_checks;`);
-    console.log(`✅ Tabla compliance_checks creada con ${result.rows[0].compliance_records} registros\n`);
+    // Verificar que se crearon las tablas y planes
+    const plansResult = await client.query(`SELECT COUNT(*) as plan_count FROM subscription_plans_v3;`);
+    console.log(`✅ Tabla subscription_plans_v3 creada con ${plansResult.rows[0].plan_count} planes seed\n`);
+    
+    const subsResult = await client.query(`SELECT COUNT(*) as sub_count FROM subscriptions_v3;`);
+    console.log(`✅ Tabla subscriptions_v3 creada con ${subsResult.rows[0].sub_count} suscripciones\n`);
     
   } catch (error) {
     console.error('❌ Error en migración:', error.message);
