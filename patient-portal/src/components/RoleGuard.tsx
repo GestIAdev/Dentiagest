@@ -274,16 +274,39 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
  * Extracts user role from JWT token stored in auth state
  * 
  * In Patient Portal:
- * - If patientId exists → PATIENT role
- * - Otherwise → Try to decode JWT token to get role
+ * - First check localStorage for stored role (from login response)
+ * - Then try to decode JWT token to get role
+ * - If patientId exists → PATIENT role (for backward compatibility)
  */
 function getUserRoleFromAuth(auth: any): UserRole | null {
-  // Patient Portal specific: if patientId exists, it's a patient
+  // FIRST: Check if we stored the role directly from login response
+  const storedRole = localStorage.getItem('patient_portal_user_role');
+  if (storedRole) {
+    const roleMap: Record<string, UserRole> = {
+      'PATIENT': 'PATIENT',
+      'patient': 'PATIENT',
+      'STAFF': 'STAFF',
+      'staff': 'STAFF',
+      'ADMIN': 'ADMIN',
+      'admin': 'ADMIN',
+      'DENTIST': 'DENTIST',
+      'dentist': 'DENTIST',
+      'professional': 'DENTIST',
+      'RECEPTIONIST': 'RECEPTIONIST',
+      'receptionist': 'RECEPTIONIST',
+    };
+    const role = roleMap[storedRole];
+    console.log('🛡️ RoleGuard: Using stored role from localStorage:', storedRole, '→', role);
+    return role || null;
+  }
+
+  // SECOND: Patient Portal specific - if patientId exists, it's a patient
   if (auth.patientId) {
+    console.log('🛡️ RoleGuard: Detected patientId, inferring PATIENT role');
     return 'PATIENT';
   }
 
-  // Try to decode JWT token from localStorage
+  // THIRD: Try to decode JWT token from localStorage
   try {
     const token = localStorage.getItem('patient_portal_token');
     if (!token) return null;
@@ -306,7 +329,9 @@ function getUserRoleFromAuth(auth: any): UserRole | null {
       'receptionist': 'RECEPTIONIST',
     };
 
-    return roleMap[payload.role] || null;
+    const role = roleMap[payload.role];
+    console.log('🛡️ RoleGuard: Decoded role from JWT token:', payload.role, '→', role);
+    return role || null;
   } catch (error) {
     console.error('Failed to decode JWT:', error);
     return null;

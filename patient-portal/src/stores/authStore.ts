@@ -146,6 +146,15 @@ export const loginWithCredentials = async (email: string, password: string): Pro
 
     const { accessToken, refreshToken, expiresIn, user } = data.login;
 
+    // 🔐 ROLE SEGREGATION: Only PATIENT role can access Patient Portal (3001)
+    // If someone with STAFF/DENTIST/ADMIN role tries to login here → redirect to dashboard
+    if (user.role !== 'PATIENT') {
+      console.warn('❌ Non-patient role tried to access Patient Portal:', user.role);
+      // Redirect to staff dashboard instead
+      window.location.href = 'http://localhost:3000/login?redirectFrom=patient-portal';
+      throw new Error(`${user.role} role cannot access Patient Portal. Redirecting to Staff Dashboard...`);
+    }
+
     // Store in authStore (which persists to localStorage)
     useAuthStore.getState().login(
       user.id,
@@ -156,8 +165,12 @@ export const loginWithCredentials = async (email: string, password: string): Pro
 
     // Store refresh token separately
     localStorage.setItem('patient_portal_refresh_token', refreshToken);
+    
+    // Also store role and email for session restoration
+    localStorage.setItem('patient_portal_user_role', user.role);
+    localStorage.setItem('patient_portal_user_email', user.email);
 
-    console.log('✅ Login successful:', user.email);
+    console.log('✅ Login successful:', user.email, '(role:', user.role + ')');
   } catch (error) {
     console.error('❌ Login failed:', error);
     useAuthStore.getState().setError(error instanceof Error ? error.message : 'Login failed');
