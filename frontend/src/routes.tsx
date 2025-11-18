@@ -12,6 +12,7 @@ import DashboardContent from './pages/DashboardContent';
 import PatientsPageGraphQL from './pages/PatientsPageGraphQL';
 import AppointmentsPage from './pages/AppointmentsPage'; // 🆕 UNIFIED APPOINTMENTS
 import { DocumentsPage } from './pages/DocumentsPage';
+import { StaffGuard } from './components/StaffGuard'; // 🔒 GDPR ROLE SEGREGATION
 // 🔥 V3 ARSENAL COMPLETE - POST-VITE ACTIVATION - 14 JEWELS AWAKENED
 import FinancialManagerV3 from './components/Billing/FinancialManagerV3';
 import TreatmentManagementV3 from './components/Treatments/TreatmentManagementV3';
@@ -128,10 +129,12 @@ function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* Dashboard con rutas anidadas - TODAS PROTEGIDAS */}
+        {/* Dashboard con rutas anidadas - STAFF/ADMIN ONLY */}
         <Route path="/dashboard" element={
           <ProtectedRoute>
-            <DashboardLayout />
+            <StaffGuard>
+              <DashboardLayout />
+            </StaffGuard>
           </ProtectedRoute>
         }>
           <Route index element={<DashboardContent />} />

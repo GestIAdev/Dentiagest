@@ -203,6 +203,19 @@ const LoginV3: React.FC = () => {
             </div>
           </div>
 
+          {/* Register Link */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-cyber-light">
+              ¿No tienes cuenta?{' '}
+              <button
+                onClick={() => navigate('/register')}
+                className="text-neon-cyan hover:text-neon-blue font-medium transition-colors"
+              >
+                Regístrate aquí
+              </button>
+            </p>
+          </div>
+
           {/* Footer */}
           <div className="mt-8 pt-6 border-t border-cyber-light text-center">
             <p className="text-xs text-cyber-light">

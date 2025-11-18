@@ -4,12 +4,14 @@ import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from './config/apollo';
 import PatientPortalLayout from './components/PatientPortalLayout';
 import LoginV3 from './components/LoginV3';
+import RegisterPage from './pages/RegisterPage';
 import SubscriptionDashboardV3 from './components/SubscriptionDashboardV3';
 import DocumentVaultV3 from './components/DocumentVaultV3';
 import AppointmentsManagementV3 from './components/AppointmentsManagementV3';
 import PaymentManagementV3 from './components/PaymentManagementV3';
 import NotificationManagementV3 from './components/NotificationManagementV3';
 import { useAuthStore } from './stores/authStore';
+import { PatientOnlyGuard } from './components/RoleGuard';
 
 // ============================================================================
 // COMPONENTE: DASHBOARD PRINCIPAL
@@ -152,66 +154,81 @@ const App: React.FC = () => {
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<LoginV3 />} />
+          <Route path="/register" element={<RegisterPage />} />
 
-          {/* Protected Routes */}
+          {/* Protected Routes - PATIENT ONLY */}
           <Route path="/" element={
             <ProtectedRoute>
-              <PatientPortalLayout>
-                <Dashboard />
-              </PatientPortalLayout>
+              <PatientOnlyGuard>
+                <PatientPortalLayout>
+                  <Dashboard />
+                </PatientPortalLayout>
+              </PatientOnlyGuard>
             </ProtectedRoute>
           } />
 
           <Route path="/subscriptions" element={
             <ProtectedRoute>
-              <PatientPortalLayout>
-                <SubscriptionDashboardV3 />
-              </PatientPortalLayout>
+              <PatientOnlyGuard>
+                <PatientPortalLayout>
+                  <SubscriptionDashboardV3 />
+                </PatientPortalLayout>
+              </PatientOnlyGuard>
             </ProtectedRoute>
           } />
 
           <Route path="/documents" element={
             <ProtectedRoute>
-              <PatientPortalLayout>
-                <DocumentVaultV3 />
-              </PatientPortalLayout>
+              <PatientOnlyGuard>
+                <PatientPortalLayout>
+                  <DocumentVaultV3 />
+                </PatientPortalLayout>
+              </PatientOnlyGuard>
             </ProtectedRoute>
           } />
 
           <Route path="/appointments" element={
             <ProtectedRoute>
-              <PatientPortalLayout>
-                <AppointmentsManagementV3 />
-              </PatientPortalLayout>
+              <PatientOnlyGuard>
+                <PatientPortalLayout>
+                  <AppointmentsManagementV3 />
+                </PatientPortalLayout>
+              </PatientOnlyGuard>
             </ProtectedRoute>
           } />
 
           <Route path="/payments" element={
             <ProtectedRoute>
-              <PatientPortalLayout>
-                <PaymentManagementV3 />
-              </PatientPortalLayout>
+              <PatientOnlyGuard>
+                <PatientPortalLayout>
+                  <PaymentManagementV3 />
+                </PatientPortalLayout>
+              </PatientOnlyGuard>
             </ProtectedRoute>
           } />
 
           <Route path="/notifications" element={
             <ProtectedRoute>
-              <PatientPortalLayout>
-                <NotificationManagementV3 />
-              </PatientPortalLayout>
+              <PatientOnlyGuard>
+                <PatientPortalLayout>
+                  <NotificationManagementV3 />
+                </PatientPortalLayout>
+              </PatientOnlyGuard>
             </ProtectedRoute>
           } />
 
           <Route path="/profile" element={
             <ProtectedRoute>
-              <PatientPortalLayout>
-                <div className="min-h-screen bg-cyber-gradient flex items-center justify-center">
-                  <div className="text-center">
-                    <h2 className="text-2xl font-bold text-neon-cyan mb-4">Perfil del Paciente</h2>
-                    <p className="text-cyber-light">Funcionalidad en desarrollo</p>
+              <PatientOnlyGuard>
+                <PatientPortalLayout>
+                  <div className="min-h-screen bg-cyber-gradient flex items-center justify-center">
+                    <div className="text-center">
+                      <h2 className="text-2xl font-bold text-neon-cyan mb-4">Perfil del Paciente</h2>
+                      <p className="text-cyber-light">Funcionalidad en desarrollo</p>
+                    </div>
                   </div>
-                </div>
-              </PatientPortalLayout>
+                </PatientPortalLayout>
+              </PatientOnlyGuard>
             </ProtectedRoute>
           } />
 
