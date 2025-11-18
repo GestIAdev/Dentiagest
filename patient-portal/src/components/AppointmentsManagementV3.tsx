@@ -7,98 +7,65 @@ import {
   XCircleIcon,
   ExclamationTriangleIcon,
   PlusIcon,
-  PencilIcon,
-  TrashIcon,
 } from '@heroicons/react/24/outline';
-import { useAppointmentsStore, APPOINTMENT_TYPES, type DentalAppointment } from '../stores/appointmentsStore';
+import { apolloClient } from '../config/apollo';
 import { useAuthStore } from '../stores/authStore';
+import {
+  GET_PATIENT_APPOINTMENTS,
+  type Appointment,
+  type AppointmentStatus
+} from '../graphql/appointments';
 
 // ============================================================================
-// COMPONENTE: APPOINTMENTS MANAGEMENT V3 - REAL-TIME
+// COMPONENTE: APPOINTMENTS MANAGEMENT V3 - REAL DATA
+// By PunkClaude - Directiva PRE-007 GeminiEnder
+// NO MORE MOCKS - Conectado a appointmentsV3 de Selene
 // ============================================================================
 
 const AppointmentsManagementV3: React.FC = () => {
   const { auth } = useAuthStore();
-  const {
-    appointments,
-    availableSlots,
-    isLoading,
-    error,
-    setAppointments,
-    getUpcomingAppointments,
-    getTodayAppointments,
-    setLoading,
-    setError,
-  } = useAppointmentsStore();
 
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'upcoming' | 'today' | 'history'>('upcoming');
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<DentalAppointment | null>(null);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
-  // Mock data loading (replace with GraphQL subscription)
+  // 📅 LOAD REAL APPOINTMENTS from Selene
   useEffect(() => {
-    if (auth?.isAuthenticated) {
-      setLoading(true);
-      // Simulate loading appointments from Apollo Nuclear
-      setTimeout(() => {
-        const mockAppointments: DentalAppointment[] = [
-          {
-            id: 'apt-001',
-            patientId: auth.patientId,
-            clinicId: auth.clinicId,
-            dentistId: 'dentist-001',
-            serviceType: 'cleaning',
-            status: 'scheduled',
-            scheduledDate: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
-            duration: 60,
-            price: 150,
-            currency: 'ARS',
-            notes: 'Limpieza rutinaria',
-            isEmergency: false,
-            reminderSent: false,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: 'apt-002',
-            patientId: auth.patientId,
-            clinicId: auth.clinicId,
-            dentistId: 'dentist-002',
-            serviceType: 'checkup',
-            status: 'confirmed',
-            scheduledDate: new Date(Date.now() + 172800000).toISOString(), // Day after tomorrow
-            duration: 30,
-            price: 100,
-            currency: 'ARS',
-            notes: 'Control post limpieza',
-            isEmergency: false,
-            reminderSent: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: 'apt-003',
-            patientId: auth.patientId,
-            clinicId: auth.clinicId,
-            dentistId: 'dentist-001',
-            serviceType: 'cleaning',
-            status: 'completed',
-            scheduledDate: new Date(Date.now() - 86400000).toISOString(), // Yesterday
-            duration: 60,
-            price: 150,
-            currency: 'ARS',
-            notes: 'Limpieza completada exitosamente',
-            isEmergency: false,
-            reminderSent: true,
-            createdAt: new Date(Date.now() - 172800000).toISOString(),
-            updatedAt: new Date(Date.now() - 86400000).toISOString(),
-          },
-        ];
-        setAppointments(mockAppointments);
-        setLoading(false);
-      }, 1000);
+    if (auth?.isAuthenticated && auth.patientId) {
+      loadAppointments();
     }
-  }, [auth, setAppointments, setLoading]);
+  }, [auth]);
+
+  const loadAppointments = async () => {
+    if (!auth?.patientId) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const { data } = await apolloClient.query<{ appointmentsV3: Appointment[] }>({
+        query: GET_PATIENT_APPOINTMENTS,
+        variables: {
+          patientId: auth.patientId,
+          limit: 100
+        },
+        fetchPolicy: 'network-only'
+      });
+
+      if (data?.appointmentsV3) {
+        setAppointments(data.appointmentsV3);
+        console.log('✅ Appointments loaded:', data.appointmentsV3.length, 'records');
+      }
+    } catch (err) {
+      console.error('❌ Error loading appointments:', err);
+      setError(err instanceof Error ? err.message : 'Error al cargar citas');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString('es-AR', {
@@ -109,65 +76,80 @@ const AppointmentsManagementV3: React.FC = () => {
     });
   };
 
-  const formatTime = (dateString: string): string => {
-    return new Date(dateString).toLocaleTimeString('es-AR', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  const formatTime = (timeString: string): string => {
+    // timeString is HH:MM:SS format, extract HH:MM
+    const [hours, minutes] = timeString.split(':');
+    return `${hours}:${minutes}`;
   };
 
-  const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: currency === 'ARS' ? 'ARS' : 'USD',
-    }).format(amount);
-  };
-
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: AppointmentStatus) => {
     switch (status) {
-      case 'scheduled':
+      case 'PENDING':
         return <ClockIcon className="w-5 h-5 text-neon-yellow" />;
-      case 'confirmed':
+      case 'CONFIRMED':
         return <CheckCircleIcon className="w-5 h-5 text-neon-green" />;
-      case 'completed':
+      case 'COMPLETED':
         return <CheckCircleIcon className="w-5 h-5 text-neon-blue" />;
-      case 'cancelled':
+      case 'CANCELLED':
         return <XCircleIcon className="w-5 h-5 text-red-400" />;
-      case 'no-show':
+      case 'NO_SHOW':
         return <ExclamationTriangleIcon className="w-5 h-5 text-red-500" />;
+      case 'REJECTED':
+        return <XCircleIcon className="w-5 h-5 text-red-500" />;
       default:
         return <ClockIcon className="w-5 h-5 text-cyber-light" />;
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: AppointmentStatus) => {
     switch (status) {
-      case 'scheduled':
+      case 'PENDING':
         return 'border-neon-yellow bg-neon-yellow/10';
-      case 'confirmed':
+      case 'CONFIRMED':
         return 'border-neon-green bg-neon-green/10';
-      case 'completed':
+      case 'COMPLETED':
         return 'border-neon-blue bg-neon-blue/10';
-      case 'cancelled':
+      case 'CANCELLED':
+      case 'REJECTED':
         return 'border-red-400 bg-red-900/20';
-      case 'no-show':
+      case 'NO_SHOW':
         return 'border-red-500 bg-red-900/30';
       default:
         return 'border-cyber-light bg-cyber-gray';
     }
   };
 
-  const getServiceTypeInfo = (serviceType: string) => {
-    return APPOINTMENT_TYPES.find(type => type.id === serviceType) || APPOINTMENT_TYPES[0];
+  const getStatusLabel = (status: AppointmentStatus) => {
+    const labels = {
+      'PENDING': 'Pendiente',
+      'CONFIRMED': 'Confirmada',
+      'REJECTED': 'Rechazada',
+      'CANCELLED': 'Cancelada',
+      'COMPLETED': 'Completada',
+      'NO_SHOW': 'No Asistió',
+      'FOLLOWUP': 'Seguimiento'
+    };
+    return labels[status] || status;
   };
 
-  const upcomingAppointments = getUpcomingAppointments();
-  const todayAppointments = getTodayAppointments();
-  const completedAppointments = appointments.filter(apt => apt.status === 'completed');
+  // Filter appointments by date
+  const today = new Date().toISOString().split('T')[0];
+  const now = Date.now();
+  
+  const upcomingAppointments = appointments.filter(apt => {
+    const aptDate = new Date(apt.appointmentDate + 'T' + apt.appointmentTime);
+    return aptDate.getTime() > now && apt.status !== 'COMPLETED' && apt.status !== 'CANCELLED';
+  });
 
-  const renderAppointmentCard = (appointment: DentalAppointment) => {
-    const serviceInfo = getServiceTypeInfo(appointment.serviceType);
+  const todayAppointments = appointments.filter(apt => 
+    apt.appointmentDate === today && apt.status !== 'COMPLETED'
+  );
 
+  const completedAppointments = appointments.filter(apt => 
+    apt.status === 'COMPLETED' || apt.status === 'NO_SHOW'
+  );
+
+  const renderAppointmentCard = (appointment: Appointment) => {
     return (
       <div
         key={appointment.id}
@@ -179,15 +161,12 @@ const AppointmentsManagementV3: React.FC = () => {
             {getStatusIcon(appointment.status)}
             <div className="ml-3">
               <h3 className="text-lg font-semibold text-white group-hover:text-neon-cyan transition-colors">
-                {serviceInfo.name}
+                {appointment.type}
               </h3>
-              <p className="text-sm text-cyber-light capitalize">{appointment.status.replace('-', ' ')}</p>
+              <p className="text-sm text-cyber-light">{getStatusLabel(appointment.status)}</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-lg font-bold text-neon-cyan">
-              {formatCurrency(appointment.price, appointment.currency)}
-            </p>
             <p className="text-xs text-cyber-light">{appointment.duration} min</p>
           </div>
         </div>
@@ -195,16 +174,18 @@ const AppointmentsManagementV3: React.FC = () => {
         <div className="space-y-2 mb-4">
           <div className="flex items-center text-sm">
             <CalendarIcon className="w-4 h-4 text-cyber-light mr-2" />
-            <span className="text-white">{formatDate(appointment.scheduledDate)}</span>
+            <span className="text-white">{formatDate(appointment.appointmentDate)}</span>
           </div>
           <div className="flex items-center text-sm">
             <ClockIcon className="w-4 h-4 text-cyber-light mr-2" />
-            <span className="text-white">{formatTime(appointment.scheduledDate)}</span>
+            <span className="text-white">{formatTime(appointment.appointmentTime)}</span>
           </div>
-          <div className="flex items-center text-sm">
-            <UserIcon className="w-4 h-4 text-cyber-light mr-2" />
-            <span className="text-cyber-light">Dr. {appointment.dentistId.split('-')[1]}</span>
-          </div>
+          {appointment.practitionerId && (
+            <div className="flex items-center text-sm">
+              <UserIcon className="w-4 h-4 text-cyber-light mr-2" />
+              <span className="text-cyber-light">Dr. {appointment.practitionerId}</span>
+            </div>
+          )}
         </div>
 
         {appointment.notes && (
@@ -213,9 +194,15 @@ const AppointmentsManagementV3: React.FC = () => {
           </p>
         )}
 
+        {appointment.treatmentDetails && (
+          <p className="text-xs text-cyan-400 mb-4">
+            {appointment.treatmentDetails}
+          </p>
+        )}
+
         <div className="flex items-center justify-between">
           <div className="flex space-x-2">
-            {appointment.status === 'scheduled' && (
+            {appointment.status === 'PENDING' && (
               <>
                 <button className="px-3 py-1 text-xs bg-neon-green/20 text-neon-green border border-neon-green rounded hover:bg-neon-green/30 transition-colors">
                   Confirmar
@@ -225,19 +212,16 @@ const AppointmentsManagementV3: React.FC = () => {
                 </button>
               </>
             )}
-            {appointment.status === 'confirmed' && (
+            {appointment.status === 'CONFIRMED' && (
               <button className="px-3 py-1 text-xs bg-neon-blue/20 text-neon-blue border border-neon-blue rounded hover:bg-neon-blue/30 transition-colors">
                 Modificar
               </button>
             )}
           </div>
 
-          {appointment.reminderSent && (
-            <div className="flex items-center text-xs text-neon-green">
-              <CheckCircleIcon className="w-3 h-3 mr-1" />
-              Recordatorio enviado
-            </div>
-          )}
+          <div className="text-xs text-cyber-light">
+            ID: {appointment.id.substring(0, 8)}
+          </div>
         </div>
       </div>
     );

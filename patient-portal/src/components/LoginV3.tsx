@@ -200,8 +200,8 @@ const LoginV3: React.FC = () => {
             <div className="flex items-start">
               <CheckCircleIcon className="w-5 h-5 text-neon-green mr-3 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-medium text-white">Integración Apollo Nuclear</p>
-                <p>Conexión directa con el backend GraphQL en puerto 8002</p>
+                <p className="font-medium text-white">Conexión Segura a Selene</p>
+                <p>Backend GraphQL en puerto 8005 - Selene Song Core</p>
               </div>
             </div>
 
