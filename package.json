@@ -9,6 +9,13 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:appointments": "playwright test tests/e2e/appointments.spec.ts",
+    "test:e2e:documents": "playwright test tests/e2e/documents.spec.ts",
+    "test:e2e:notifications": "playwright test tests/e2e/notifications.spec.ts",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
     "build:selene": "cd selene && npm run build",
     "build:dashboard": "cd dashboard-new && npm run build",
     "sync:backend": "node sync-backend-to-dashboard.cjs",
@@ -95,6 +102,7 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
     "@types/express": "^5.0.3",
     "typescript": "^5.9.3"
   }
