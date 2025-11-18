@@ -68,30 +68,30 @@ const PaymentManagementV3: React.FC = () => {
   // Filter billing data by status
   const filteredBillingData = billingData.filter(bill => {
     if (activeTab === 'all') return true;
-    if (activeTab === 'paid') return bill.status === 'paid';
-    if (activeTab === 'pending') return bill.status === 'pending';
+    if (activeTab === 'paid') return bill.status === 'PAID';
+    if (activeTab === 'pending') return bill.status === 'PENDING';
     return true;
   });
 
   // Calculate total paid amount
   const getTotalPaid = () => {
     return billingData
-      .filter(bill => bill.status === 'paid')
-      .reduce((sum, bill) => sum + bill.amount, 0);
+      .filter(bill => bill.status === 'PAID')
+      .reduce((sum, bill) => sum + bill.totalAmount, 0);
   };
 
   // Get pending payments count
   const getPendingCount = () => {
-    return billingData.filter(bill => bill.status === 'pending').length;
+    return billingData.filter(bill => bill.status === 'PENDING').length;
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'paid':
+      case 'PAID':
         return <CheckCircleIcon className="h-5 w-5 text-green-400" />;
-      case 'pending':
+      case 'PENDING':
         return <ClockIcon className="h-5 w-5 text-yellow-400" />;
-      case 'overdue':
+      case 'OVERDUE':
         return <ExclamationTriangleIcon className="h-5 w-5 text-red-400" />;
       default:
         return <ClockIcon className="h-5 w-5 text-gray-400" />;
@@ -100,11 +100,11 @@ const PaymentManagementV3: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'paid':
+      case 'PAID':
         return 'text-green-400 bg-green-400/10';
-      case 'pending':
+      case 'PENDING':
         return 'text-yellow-400 bg-yellow-400/10';
-      case 'overdue':
+      case 'OVERDUE':
         return 'text-red-400 bg-red-400/10';
       default:
         return 'text-gray-400 bg-gray-400/10';
@@ -191,12 +191,7 @@ const PaymentManagementV3: React.FC = () => {
                         Factura #{bill.id.substring(0, 8)}
                       </div>
                       <div className="text-sm text-gray-400">
-                        {new Date(bill.billingDate).toLocaleDateString('es-ES')}
-                        {bill.subscription && (
-                          <span className="ml-2 text-cyan-400">
-                            • Suscripción: {bill.subscription.plan.name}
-                          </span>
-                        )}
+                        {new Date(bill.issueDate).toLocaleDateString('es-ES')}
                       </div>
                       {bill.dueDate && (
                         <div className="text-xs text-gray-500 mt-1">
@@ -210,25 +205,13 @@ const PaymentManagementV3: React.FC = () => {
                       {bill.currency === 'EUR' && '€'}
                       {bill.currency === 'USD' && '$'}
                       {bill.currency === 'ARS' && '$'}
-                      {bill.amount.toFixed(2)}
+                      {bill.totalAmount.toFixed(2)}
                     </div>
                     <div className={`text-xs px-2 py-1 rounded-full inline-block ${getStatusColor(bill.status)}`}>
-                      {bill.status === 'paid' && 'PAGADO'}
-                      {bill.status === 'pending' && 'PENDIENTE'}
-                      {bill.status === 'overdue' && 'VENCIDO'}
+                      {bill.status === 'PAID' && 'PAGADO'}
+                      {bill.status === 'PENDING' && 'PENDIENTE'}
+                      {bill.status === 'OVERDUE' && 'VENCIDO'}
                     </div>
-                    {bill.receiptDocument && (
-                      <div className="mt-2">
-                        <a
-                          href={bill.receiptDocument.fileUrl}
-                          download
-                          className="flex items-center space-x-1 text-xs text-cyan-400 hover:text-cyan-300"
-                        >
-                          <DocumentArrowDownIcon className="h-4 w-4" />
-                          <span>Descargar Recibo</span>
-                        </a>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>

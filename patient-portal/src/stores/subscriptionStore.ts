@@ -174,10 +174,10 @@ export const fetchSubscriptionPlans = async (activeOnly = true): Promise<DentalP
       description: plan.description || '',
       price: plan.price,
       currency: plan.currency,
-      features: plan.features || [],
-      isPopular: plan.priority === 1, // Highest priority = popular
-      maxAppointments: plan.maxAppointments,
-      validityDays: plan.billingPeriod === 'yearly' ? 365 : 30,
+      features: (plan.features || []).map(f => f.name), // Map SubscriptionFeature[] to string[]
+      isPopular: plan.popular || false,
+      maxAppointments: plan.maxServicesPerMonth,
+      validityDays: plan.billingCycle === 'ANNUAL' ? 365 : 30,
     }));
   } catch (error) {
     console.error('❌ Error fetching subscription plans:', error);
@@ -207,23 +207,23 @@ export const fetchPatientSubscriptions = async (
     // Map GraphQL response to store format
     return data.subscriptionsV3.map(sub => ({
       id: sub.id,
-      planId: sub.plan.id,
+      planId: sub.planId,
       status: sub.status as 'active' | 'inactive' | 'cancelled' | 'expired',
       startDate: sub.startDate,
-      endDate: sub.endDate,
+      endDate: sub.endDate || '',
       autoRenew: sub.autoRenew,
-      remainingAppointments: sub.plan.maxAppointments - sub.usedAppointments,
-      usedAppointments: sub.usedAppointments,
+      remainingAppointments: sub.remainingServices,
+      usedAppointments: sub.usageThisMonth + sub.usageThisYear,
       plan: {
         id: sub.plan.id,
         name: sub.plan.name,
         description: sub.plan.description || '',
         price: sub.plan.price,
         currency: sub.plan.currency,
-        features: sub.plan.features || [],
-        isPopular: sub.plan.priority === 1,
-        maxAppointments: sub.plan.maxAppointments,
-        validityDays: sub.plan.billingPeriod === 'yearly' ? 365 : 30,
+        features: (sub.plan.features || []).map(f => f.name),
+        isPopular: sub.plan.popular || false,
+        maxAppointments: sub.plan.maxServicesPerMonth,
+        validityDays: sub.plan.billingCycle === 'ANNUAL' ? 365 : 30,
       },
     }));
   } catch (error) {
@@ -262,23 +262,23 @@ export const createPatientSubscription = async (
     const sub = data.createSubscriptionV3;
     return {
       id: sub.id,
-      planId: sub.plan.id,
+      planId: sub.planId,
       status: sub.status as 'active' | 'inactive' | 'cancelled' | 'expired',
       startDate: sub.startDate,
-      endDate: sub.endDate,
+      endDate: sub.endDate || '',
       autoRenew: sub.autoRenew,
-      remainingAppointments: sub.plan.maxAppointments - sub.usedAppointments,
-      usedAppointments: sub.usedAppointments,
+      remainingAppointments: sub.remainingServices,
+      usedAppointments: sub.usageThisMonth + sub.usageThisYear,
       plan: {
         id: sub.plan.id,
         name: sub.plan.name,
         description: sub.plan.description || '',
         price: sub.plan.price,
         currency: sub.plan.currency,
-        features: sub.plan.features || [],
-        isPopular: sub.plan.priority === 1,
-        maxAppointments: sub.plan.maxAppointments,
-        validityDays: sub.plan.billingPeriod === 'yearly' ? 365 : 30,
+        features: (sub.plan.features || []).map(f => f.name),
+        isPopular: sub.plan.popular || false,
+        maxAppointments: sub.plan.maxServicesPerMonth,
+        validityDays: sub.plan.billingCycle === 'ANNUAL' ? 365 : 30,
       },
     };
   } catch (error) {
