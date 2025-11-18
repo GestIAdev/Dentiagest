@@ -11,7 +11,7 @@ import { useMedicalRecordStore } from '../../stores';
 import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Spinner } from '../../design-system';
 import { createModuleLogger } from '../../utils/logger';
 import { useMedicalSecurity } from './MedicalSecurity';
-import { DocumentUploaderV3 } from '../DocumentManagement/DocumentUploaderV3';
+// import { DocumentUploaderV3Redesigned as DocumentUploaderV3 } from '../DocumentManagement/DocumentUploaderV3Redesigned'; // TODO: Fix props mismatch
 
 // 🎯 ICONS - Heroicons for medical theme
 import {
@@ -595,14 +595,15 @@ export const MedicalRecordDetailV3: React.FC<MedicalRecordDetailV3Props> = ({
                 </div>
 
                 {/* 🔥 DOCUMENT UPLOADER - Integration with medicalRecordId */}
-                {showUploader && accessLevel.canUploadDocuments && (
+                {/* TODO: Fix DocumentUploader props - Redesigned version has different API */}
+                {/* {showUploader && accessLevel.canUploadDocuments && (
                   <div className="mb-6">
                     <DocumentUploaderV3
                       patientId={currentRecord.patient_id}
                       medicalRecordId={recordId}
                     />
                   </div>
-                )}
+                )} */}
 
                 {currentRecord.attachments && (currentRecord.attachments as any[]).length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

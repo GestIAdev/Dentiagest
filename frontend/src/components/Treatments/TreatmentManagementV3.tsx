@@ -26,8 +26,8 @@ import { Input } from '../../design-system/Input';
 import { Badge } from '../../design-system/Badge';
 import { Spinner } from '../../design-system/Spinner';
 
-// 3D Components
-import Odontogram3DV3 from './Odontogram3DV3';
+// 3D Components (SVG Supremacy - Directiva #006)
+import OdontogramV3SVG from './OdontogramV3SVG';
 import AestheticsPreviewV3 from './AestheticsPreviewV3';
 
 // UI Components
@@ -837,13 +837,10 @@ export const TreatmentManagementV3: React.FC<TreatmentManagementV3Props> = ({
         {activeTab === 'overview' && renderOverviewTab()}
         {activeTab === 'planning' && renderPlanningTab()}
         {activeTab === 'odontogram' && (
-          <Odontogram3DV3
+          <OdontogramV3SVG
             patientId={patientId}
             onToothSelect={(tooth) => {
               console.log('Tooth selected:', tooth);
-            }}
-            onToothUpdate={(toothId, updates) => {
-              console.log('Tooth updated:', toothId, updates);
             }}
           />
         )}
