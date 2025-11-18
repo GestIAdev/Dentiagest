@@ -27,6 +27,7 @@ import SubscriptionPlansManager from './components/Subscription/SubscriptionPlan
 function HomePage() {
   const { state } = useAuth();
   const navigate = useNavigate();
+  const [initialMount, setInitialMount] = React.useState(true);
 
   React.useEffect(() => {
     // 🛡️ SOLO redirigir si estamos exactamente en la ruta raíz
@@ -34,17 +35,34 @@ function HomePage() {
 
     if (currentPath !== '/') {
       // Si no estamos en la raíz, no hacer nada (evita redirects no deseados)
+      // CRITICAL: This includes /dashboard, /login, etc.
       return;
     }
 
-    if (state.isAuthenticated) {
-      // Solo redirigir a dashboard si estamos en la raíz
-      navigate('/dashboard');
+    // 🔥 CRITICAL: Skip if we just mounted (gives time for router to settle)
+    if (initialMount) {
+      setInitialMount(false);
+      return;
+    }
+
+    if (state.isAuthenticated && state.user) {
+      // Check role to redirect to correct portal
+      const userRole = state.user.role;
+      
+      if (userRole === 'PATIENT') {
+        // Redirect patients to Patient Portal on port 3001
+        console.log('📍 [HOME] Paciente detectado, redirigiendo al Patient Portal...');
+        window.location.href = 'http://localhost:3001';
+      } else {
+        // Redirect staff to dashboard
+        console.log('📍 [HOME] Personal clínico detectado, redirigiendo al dashboard...');
+        navigate('/dashboard');
+      }
     } else if (!state.isLoading) {
       // Si no está autenticado y terminó de cargar, ir al login
       navigate('/login');
     }
-  }, [state.isAuthenticated, state.isLoading, navigate]);
+  }, [state.isAuthenticated, state.user, state.isLoading, navigate, initialMount]);
 
   // Mostrar loading mientras determina el estado
   return (

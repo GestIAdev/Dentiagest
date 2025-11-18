@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -16,12 +16,31 @@ const LoginPage: React.FC = () => {
   const successMessage = location.state?.message;
   const prefilledEmail = location.state?.email;
 
-  // Redirigir si ya está autenticado
+  // Anti-loop guard: solo navegar UNA VEZ durante MANUAL LOGIN
+  const isSubmitting = useRef(false);
+
+  // 🔥 CRITICAL: Remove autorestore redirect from LoginPage
+  // Reason: Causes conflict with StaffGuard verification
+  // Flow: If authed + tries to access /login → user is redirected by routes themselves
+  // If coming from logout → user needs to manually login again
+  // If restoring from localStorage → AuthContext handles state, routes do final check
+  // No useEffect redirect needed here!
+
+  // 🔍 Debug: Read stored logs after redirect
   React.useEffect(() => {
-    if (state.isAuthenticated) {
-      navigate('/dashboard');
+    const debugLogs = sessionStorage.getItem('loginDebugLogs');
+    const loginError = sessionStorage.getItem('loginError');
+    
+    if (debugLogs) {
+      console.log('📋 [DEBUG LOGS FROM REDIRECT]:', JSON.parse(debugLogs));
+      sessionStorage.removeItem('loginDebugLogs');
     }
-  }, [state.isAuthenticated, navigate]);
+    
+    if (loginError) {
+      console.log('❌ [LOGIN ERROR FROM REDIRECT]:', loginError);
+      sessionStorage.removeItem('loginError');
+    }
+  }, []);
 
   // Prellenar email si viene del registro
   React.useEffect(() => {
@@ -36,15 +55,45 @@ const LoginPage: React.FC = () => {
     setError('');
 
     try {
-      const success = await login(email, password);
-      if (success) {
-        navigate('/dashboard');
-      } else {
+      // Marcar que estamos en proceso de submit (bloquea cualquier interference)
+      isSubmitting.current = true;
+      
+      // 🔥 Get result with user and role directly (don't wait for async setState)
+      const loginResult = await login(email, password);
+      
+      if (!loginResult.success) {
+        // Reset flag si falla
+        isSubmitting.current = false;
         setError('Credenciales inválidas. Verifica tu email y contraseña.');
+        setIsLoading(false);
+        return;
       }
+
+      // 🔥 Use role from the login response (not from state which is still updating)
+      const userRole = loginResult.role;
+      
+      console.log('✅ [HANDLE SUBMIT] Login exitoso');
+      console.log('✅ [HANDLE SUBMIT] loginResult:', loginResult);
+      console.log('✅ [HANDLE SUBMIT] userRole:', userRole);
+      
+      // Si es PACIENTE → Redirigir al Patient Portal (3001)
+      if (userRole === 'PATIENT') {
+        console.log('✅ [MANUAL LOGIN] PACIENTE - Redirigiendo a Patient Portal (3001)...');
+        // For cross-port, MUST use window.location.href
+        window.location.href = 'http://localhost:3001';
+        return;
+      }
+      
+      // Si es STAFF/ADMIN/DENTIST/RECEPTIONIST → Dashboard
+      // 🔥 Use window.location.href to force a REAL page load that resets React state
+      console.log('✅ [MANUAL LOGIN] STAFF - Redirigiendo a dashboard con window.location...');
+      window.location.href = 'http://localhost:3000/dashboard';
+      return;
+      
     } catch (err) {
+      // Reset flag si error
+      isSubmitting.current = false;
       setError('Error al iniciar sesión. Inténtalo de nuevo.');
-    } finally {
       setIsLoading(false);
     }
   };

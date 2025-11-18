@@ -9,9 +9,10 @@
  * 
  * By PunkClaude - November 2025
  * Directiva #006.5 - Gateway Repair Complete
+ * FIXED: Anti-loop navigation guard
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 // ============================================================================
@@ -170,52 +171,106 @@ export const StaffGuard: React.FC<StaffGuardProps> = ({
   allowedRoles = ['STAFF', 'ADMIN', 'DENTIST', 'RECEPTIONIST'],
   redirectTo = '/login',
 }) => {
-  // Check authentication
-  const token = localStorage.getItem('token');
-  const userStr = localStorage.getItem('user');
+  // Estado para controlar si ya verificamos el rol (evitar bucle)
+  const [roleChecked, setRoleChecked] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [normalizedRole, setNormalizedRole] = useState<StaffRole | null>(null);
+  const [isPatient, setIsPatient] = useState(false);
 
-  if (!token || !userStr) {
-    return <Navigate to={redirectTo} replace />;
-  }
+  // Effect para verificar rol UNA SOLA VEZ
+  useEffect(() => {
+    if (!roleChecked) {
+      // Check authentication
+      // 🔥 CRITICAL: Use 'accessToken' not 'token' (AuthContext saves as accessToken)
+      const token = localStorage.getItem('accessToken');
+      const userStr = localStorage.getItem('user');
 
-  // Decode user
-  let user: any;
-  try {
-    user = JSON.parse(userStr);
-  } catch {
-    return <Navigate to={redirectTo} replace />;
-  }
+      console.log('🛡️ StaffGuard checking auth:', {
+        hasToken: !!token,
+        hasUser: !!userStr,
+        tokenKey: 'accessToken'
+      });
 
-  // Get role from user object or JWT
-  let userRole: string | null = user.role || null;
+      if (!token || !userStr) {
+        console.log('🛡️ StaffGuard: No auth found, redirecting to login');
+        setRoleChecked(true);
+        return;
+      }
 
-  // If not in user object, try JWT
-  if (!userRole) {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      userRole = payload.role;
-    } catch {
-      return <UnauthorizedAccessScreen />;
+      // Decode user
+      let user: any;
+      try {
+        user = JSON.parse(userStr);
+      } catch {
+        console.log('🛡️ StaffGuard: Failed to parse user');
+        setRoleChecked(true);
+        return;
+      }
+
+      // Get role from user object or JWT
+      let role: string | null = user.role || null;
+
+      // If not in user object, try JWT
+      if (!role) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          role = payload.role;
+        } catch {
+          console.log('🛡️ StaffGuard: Failed to extract role from JWT');
+          setRoleChecked(true);
+          return;
+        }
+      }
+
+      // Normalize role (map backend roles to frontend)
+      const roleMap: Record<string, StaffRole> = {
+        'STAFF': 'STAFF',
+        'staff': 'STAFF',
+        'ADMIN': 'ADMIN',
+        'admin': 'ADMIN',
+        'DENTIST': 'DENTIST',
+        'dentist': 'DENTIST',
+        'professional': 'DENTIST',
+        'RECEPTIONIST': 'RECEPTIONIST',
+        'receptionist': 'RECEPTIONIST',
+      };
+
+      const normalized = role ? roleMap[role] : null;
+
+      // Detectar si es paciente
+      const isPat = role === 'PATIENT' || role === 'patient';
+
+      setUserRole(role);
+      setNormalizedRole(normalized);
+      setIsPatient(isPat);
+      setRoleChecked(true);
+
+      console.log('🛡️ StaffGuard verified:', { role, normalized, isPatient: isPat, allowedRoles });
     }
+  }, [roleChecked, allowedRoles]);
+
+  // Not authenticated → Redirect to login
+  const token = localStorage.getItem('accessToken');
+  const userStr = localStorage.getItem('user');
+  if (!token || !userStr) {
+    console.log('🛡️ StaffGuard: Redirecting to login (no auth found)');
+    return <Navigate to={redirectTo} replace />;
   }
 
-  // Normalize role (map backend roles to frontend)
-  const roleMap: Record<string, StaffRole> = {
-    'STAFF': 'STAFF',
-    'staff': 'STAFF',
-    'ADMIN': 'ADMIN',
-    'admin': 'ADMIN',
-    'DENTIST': 'DENTIST',
-    'dentist': 'DENTIST',
-    'professional': 'DENTIST',
-    'RECEPTIONIST': 'RECEPTIONIST',
-    'receptionist': 'RECEPTIONIST',
-  };
+  // Esperando verificación de rol
+  if (!roleChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Verificando permisos...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const normalizedRole = userRole ? roleMap[userRole] : null;
-
-  // Special case: PATIENT role → Show different screen
-  if (userRole === 'PATIENT' || userRole === 'patient') {
+  // Special case: PATIENT role → Show different screen (NO <Navigate>)
+  if (isPatient) {
     return <PatientAccessDeniedScreen />;
   }
 

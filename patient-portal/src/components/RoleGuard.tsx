@@ -9,9 +9,10 @@
  * 
  * By PunkClaude - November 2025
  * Directiva #006.5 - Gateway Repair Complete
+ * FIXED: Anti-loop navigation + Staff block screen
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 
@@ -29,7 +30,78 @@ export interface RoleGuardProps {
 }
 
 // ============================================================================
-// ACCESS DENIED SCREEN
+// ACCESS DENIED SCREEN (Patient Portal - Staff Blocked)
+// ============================================================================
+
+const StaffBlockedScreen: React.FC = () => {
+  const { logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = '/login';
+  };
+
+  const goToStaffDashboard = () => {
+    // Redirect to Staff Dashboard on port 3000
+    window.location.href = 'http://localhost:3000';
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-100 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center">
+        {/* Icon */}
+        <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <span className="text-5xl">🏥</span>
+        </div>
+        
+        {/* Title */}
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          Portal Incorrecto
+        </h1>
+        
+        {/* Message */}
+        <p className="text-gray-600 mb-6">
+          Has iniciado sesión como <strong className="text-orange-600">PERSONAL CLÍNICO</strong>.
+          <br />
+          <br />
+          Este es el <strong>Portal de Pacientes</strong>, exclusivo para usuarios que reciben atención dental.
+          <br />
+          <br />
+          Por favor, accede al <strong>Dashboard Administrativo</strong> para gestionar pacientes, 
+          citas y tratamientos.
+        </p>
+        
+        {/* GDPR Notice */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
+          <p className="text-sm text-gray-700">
+            <strong>🔒 Seguridad GDPR:</strong> La segregación de roles protege los datos 
+            según el Artículo 9 del RGPD. El personal clínico no debe acceder al Portal de Pacientes.
+          </p>
+        </div>
+        
+        {/* Actions */}
+        <div className="space-y-3">
+          <button
+            onClick={goToStaffDashboard}
+            className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 px-4 rounded-lg font-semibold transition-colors"
+          >
+            🚀 Ir al Dashboard Administrativo
+          </button>
+          
+          <button
+            onClick={handleLogout}
+            className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-4 rounded-lg font-semibold transition-colors"
+          >
+            Cerrar Sesión
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================================
+// ACCESS DENIED SCREEN (Generic - Invalid Role)
 // ============================================================================
 
 const AccessDeniedScreen: React.FC<{ userRole?: string; requiredRoles: UserRole[] }> = ({ 
@@ -138,19 +210,49 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
   showAccessDenied = true,
 }) => {
   const { auth } = useAuthStore();
+  
+  // Estado para controlar si ya verificamos el rol (evitar bucle)
+  const [roleChecked, setRoleChecked] = useState(false);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [isStaff, setIsStaff] = useState(false);
+
+  // Effect para verificar rol UNA SOLA VEZ
+  useEffect(() => {
+    if (!roleChecked && auth?.isAuthenticated) {
+      const role = getUserRoleFromAuth(auth);
+      setUserRole(role);
+      
+      // Detectar si es personal clínico (STAFF, ADMIN, DENTIST, RECEPTIONIST)
+      const staffRoles: UserRole[] = ['STAFF', 'ADMIN', 'DENTIST', 'RECEPTIONIST'];
+      setIsStaff(role ? staffRoles.includes(role) : false);
+      
+      setRoleChecked(true);
+      
+      console.log('🛡️ RoleGuard checked:', { role, allowedRoles, isStaff: staffRoles.includes(role!) });
+    }
+  }, [auth?.isAuthenticated, roleChecked, allowedRoles]);
 
   // Not authenticated → Redirect to login
   if (!auth?.isAuthenticated) {
     return <Navigate to={redirectTo} replace />;
   }
 
-  // Get user role from JWT (stored in localStorage during login)
-  // NOTE: In Patient Portal, we don't have a direct `role` field in auth state
-  // We need to decode the JWT or fetch user data
-  
-  // For now, we'll check if user is in Patient Portal context
-  // Patient Portal users will have patientId, Staff won't
-  const userRole = getUserRoleFromAuth(auth);
+  // Esperando verificación de rol
+  if (!roleChecked) {
+    return (
+      <div className="min-h-screen bg-cyber-gradient flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neon-cyan mx-auto mb-4"></div>
+          <p className="text-cyber-light">Verificando permisos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Special case: Staff trying to access Patient Portal
+  if (isStaff && allowedRoles.includes('PATIENT')) {
+    return <StaffBlockedScreen />;
+  }
 
   // Check if user role is allowed
   if (!userRole || !allowedRoles.includes(userRole)) {

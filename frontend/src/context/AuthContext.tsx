@@ -60,26 +60,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             accessToken,
           });
           
-          // 🎯 Verify token with ME query (V3)
-          try {
-            const result = await apolloClient.query({ 
-              query: ME_QUERY,
-              fetchPolicy: 'network-only' // Always check server
-            });
-            
-            if (!result.data?.me) {
-              console.log('🔄 Token expired, clearing session');
-              await logout();
-            } else {
-              // Update user data with fresh data from server
-              const freshUser = result.data.me;
-              localStorage.setItem('user', JSON.stringify(freshUser));
-              setState(prev => ({ ...prev, user: freshUser }));
-            }
-          } catch (error) {
-            console.log('🔄 Token validation failed, clearing session');
-            await logout();
-          }
+          console.log('✅ [AUTO-RESTORE] Session restored from localStorage');
+          
+          // NOTE: We DON'T verify token here because:
+          // 1. ME_QUERY might not exist or fail for other reasons
+          // 2. Invalid tokens will fail on next GraphQL request anyway
+          // 3. Causes infinite logout loops during login
+          // Token validation happens naturally when queries fail
             
         } catch (error) {
           console.error('❌ Error parsing stored user data:', error);
@@ -96,7 +83,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   // 🚀 V3 LOGIN - GraphQL Mutation with Veritas validation
-  const login = async (email: string, password: string): Promise<boolean> => {
+  // 🔥 RETURNS: { success: boolean, user: User | null, role: string | null }
+  const login = async (email: string, password: string): Promise<any> => {
     try {
       setState(prev => ({ ...prev, isLoading: true }));
 
@@ -111,18 +99,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       });
 
+      // 🔥 Store debug logs in sessionStorage before redirect (survives page reload)
+      const debugLogs = [
+        `🔍 [LOGIN] Full result: ${JSON.stringify(result.data, null, 2)}`,
+        `🔍 [LOGIN] result.data.login: ${JSON.stringify(result.data?.login, null, 2)}`,
+      ];
+      sessionStorage.setItem('loginDebugLogs', JSON.stringify(debugLogs));
+
+      console.log('🔍 [LOGIN] Full result:', result.data);
+      console.log('🔍 [LOGIN] result.data.login:', result.data?.login);
+
       if (!result.data?.login) {
         console.error('❌ Login mutation returned no data');
+        sessionStorage.setItem('loginError', 'No login data returned');
         setState(prev => ({ ...prev, isLoading: false }));
-        return false;
+        return { success: false, user: null, role: null };
       }
 
       const { accessToken, refreshToken, user, expiresIn } = result.data.login;
 
+      console.log('🔍 [LOGIN] Extracted tokens:', {
+        accessToken: accessToken ? '✅ present' : '❌ missing',
+        refreshToken: refreshToken ? '✅ present' : '❌ missing',
+        user: user ? '✅ present' : '❌ missing',
+        expiresIn
+      });
+
       if (!accessToken || !user) {
         console.error('❌ Login response missing tokens or user');
+        sessionStorage.setItem('loginError', `Missing: token=${!accessToken}, user=${!user}`);
         setState(prev => ({ ...prev, isLoading: false }));
-        return false;
+        return { success: false, user: null, role: null };
       }
 
       // 🎯 Store tokens in localStorage
@@ -130,6 +137,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('user', JSON.stringify(user));
 
+      console.log('✅ [LOGIN] Tokens stored in localStorage');
       console.log('✅ Login successful:', {
         userId: user.id,
         role: user.role,
@@ -144,10 +152,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         accessToken,
       });
 
-      return true;
+      // 🔥 CRITICAL: Return success WITH user and role (don't depend on async setState)
+      return { success: true, user, role: user.role };
 
     } catch (error: any) {
       console.error('❌ Login error:', error);
+      
+      // Store error in sessionStorage
+      const errorMsg = error.message || JSON.stringify(error);
+      sessionStorage.setItem('loginError', errorMsg);
       
       // GraphQL errors contain useful info
       if (error.graphQLErrors) {
@@ -157,7 +170,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
       
       setState(prev => ({ ...prev, isLoading: false }));
-      return false;
+      return { success: false, user: null, role: null };
     }
   };
 

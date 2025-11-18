@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   ShieldCheckIcon,
   LockClosedIcon,
@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 // ============================================================================
 // COMPONENTE: LOGIN V3 - REAL AUTHENTICATION (NO MORE MOCKS)
 // By PunkClaude - Directiva #003 GeminiEnder
+// FIXED: Anti-loop navigation guard
 // ============================================================================
 
 const LoginV3: React.FC = () => {
@@ -23,13 +24,18 @@ const LoginV3: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Anti-loop guard: solo navegar UNA VEZ
+  const hasRedirected = useRef(false);
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (SOLO UNA VEZ)
   useEffect(() => {
-    if (auth?.isAuthenticated) {
-      navigate('/');
+    if (auth?.isAuthenticated && !hasRedirected.current) {
+      hasRedirected.current = true;
+      console.log('✅ Ya autenticado, redirigiendo a dashboard...');
+      navigate('/', { replace: true });
     }
-  }, [auth, navigate]);
+  }, [auth?.isAuthenticated, navigate]);
 
   // 🔐 REAL LOGIN HANDLER - No más mocks
   const handleLogin = async (e: React.FormEvent) => {
@@ -48,7 +54,12 @@ const LoginV3: React.FC = () => {
       await loginWithCredentials(email, password);
 
       console.log('✅ Login exitoso - redirigiendo...');
-      navigate('/');
+      
+      // Marcar que vamos a redirigir
+      hasRedirected.current = true;
+      
+      // Navegación con replace para evitar bucle de history
+      navigate('/', { replace: true });
 
     } catch (err) {
       console.error('❌ Login falló:', err);
