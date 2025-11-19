@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from './config/apollo';
 import PatientPortalLayout from './components/PatientPortalLayout';
@@ -30,76 +30,118 @@ const Dashboard: React.FC = () => {
           </p>
         </div>
 
+        {/* 🔥 BLOCKER #2 FIX - NETFLIX DENTAL CTA DESTACADO */}
+        <div className="mb-8 sm:mb-10">
+          <Link to="/subscriptions">
+            <div className="relative bg-gradient-to-br from-neon-cyan/20 via-neon-blue/20 to-neon-purple/20 rounded-2xl p-6 sm:p-8 border-2 border-neon-cyan/40 hover:border-neon-cyan transition-all duration-300 cursor-pointer overflow-hidden group">
+              {/* Animated background effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan/10 to-neon-blue/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              
+              <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex-1 text-center sm:text-left">
+                  <div className="flex items-center justify-center sm:justify-start gap-3 mb-3">
+                    <span className="text-4xl sm:text-5xl">🌟</span>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-white">
+                      ¡Únete a Premium Care!
+                    </h2>
+                  </div>
+                  <p className="text-base sm:text-lg text-cyber-light mb-2">
+                    <strong className="text-neon-cyan">Netflix Dental:</strong> Consultas ilimitadas, sin seguros, pago mensual predecible
+                  </p>
+                  <p className="text-sm text-cyber-light/80">
+                    🚀 Acceso prioritario • 💰 Ahorro hasta 40% • 📱 Gestión 100% online
+                  </p>
+                </div>
+                <div className="flex-shrink-0">
+                  <div className="bg-neon-cyan hover:bg-neon-cyan/90 text-cyber-black py-3 sm:py-4 px-6 sm:px-8 rounded-xl font-bold text-base sm:text-lg shadow-neon-cyan group-hover:scale-105 transition-transform duration-300">
+                    Ver Planes Premium →
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Link>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
           {/* Subscription Card */}
-          <div className="bg-cyber-dark rounded-xl p-4 sm:p-6 border border-neon-cyan/20 hover:border-neon-cyan transition-all duration-300">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neon-cyan/20 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-              <span className="text-neon-cyan text-xl sm:text-2xl">💎</span>
+          <Link to="/subscriptions" className="block">
+            <div className="bg-cyber-dark rounded-xl p-4 sm:p-6 border border-neon-cyan/20 hover:border-neon-cyan transition-all duration-300 h-full">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neon-cyan/20 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
+                <span className="text-neon-cyan text-xl sm:text-2xl">💎</span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Suscripciones</h3>
+              <p className="text-cyber-light text-sm sm:text-base mb-3 sm:mb-4">
+                Gestiona tus planes dentales con el modelo Netflix Dental
+              </p>
+              <div className="w-full bg-neon-cyan hover:bg-neon-cyan/80 text-cyber-black py-2 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base text-center">
+                Ver Suscripciones
+              </div>
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Suscripciones</h3>
-            <p className="text-cyber-light text-sm sm:text-base mb-3 sm:mb-4">
-              Gestiona tus planes dentales con el modelo Netflix Dental
-            </p>
-            <button className="w-full bg-neon-cyan hover:bg-neon-cyan/80 text-cyber-black py-2 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base">
-              Ver Suscripciones
-            </button>
-          </div>
+          </Link>
 
           {/* Documents Card */}
-          <div className="bg-cyber-dark rounded-xl p-4 sm:p-6 border border-neon-blue/20 hover:border-neon-blue transition-all duration-300">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neon-blue/20 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-              <span className="text-neon-blue text-xl sm:text-2xl">🔒</span>
+          <Link to="/documents" className="block">
+            <div className="bg-cyber-dark rounded-xl p-4 sm:p-6 border border-neon-blue/20 hover:border-neon-blue transition-all duration-300 h-full">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neon-blue/20 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
+                <span className="text-neon-blue text-xl sm:text-2xl">🔒</span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Documentos Seguros</h3>
+              <p className="text-cyber-light text-sm sm:text-base mb-3 sm:mb-4">
+                Accede a tus radiografías y tratamientos con encriptación
+              </p>
+              <div className="w-full bg-neon-blue hover:bg-neon-blue/80 text-cyber-black py-2 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base text-center">
+                Ver Documentos
+              </div>
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Documentos Seguros</h3>
-            <p className="text-cyber-light text-sm sm:text-base mb-3 sm:mb-4">
-              Accede a tus radiografías y tratamientos con encriptación
-            </p>
-            <button className="w-full bg-neon-blue hover:bg-neon-blue/80 text-cyber-black py-2 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base">
-              Ver Documentos
-            </button>
-          </div>
+          </Link>
 
           {/* Appointments Card */}
-          <div className="bg-cyber-dark rounded-xl p-4 sm:p-6 border border-neon-green/20 hover:border-neon-green transition-all duration-300">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neon-green/20 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-              <span className="text-neon-green text-xl sm:text-2xl">📅</span>
+          <Link to="/appointments" className="block">
+            <div className="bg-cyber-dark rounded-xl p-4 sm:p-6 border border-neon-green/20 hover:border-neon-green transition-all duration-300 h-full">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neon-green/20 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
+                <span className="text-neon-green text-xl sm:text-2xl">📅</span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Próximas Citas</h3>
+              <p className="text-cyber-light text-sm sm:text-base mb-3 sm:mb-4">
+                Programa y administra tus consultas dentales
+              </p>
+              <div className="w-full bg-neon-green hover:bg-neon-green/80 text-cyber-black py-2 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base text-center">
+                Ver Citas
+              </div>
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Próximas Citas</h3>
-            <p className="text-cyber-light text-sm sm:text-base mb-3 sm:mb-4">
-              Programa y administra tus consultas dentales
-            </p>
-            <button className="w-full bg-neon-green hover:bg-neon-green/80 text-cyber-black py-2 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base">
-              Ver Citas
-            </button>
-          </div>
+          </Link>
 
           {/* Payments Card */}
-          <div className="bg-cyber-dark rounded-xl p-4 sm:p-6 border border-neon-purple/20 hover:border-neon-purple transition-all duration-300">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neon-purple/20 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-              <span className="text-neon-purple text-xl sm:text-2xl">💳</span>
+          <Link to="/payments" className="block">
+            <div className="bg-cyber-dark rounded-xl p-4 sm:p-6 border border-neon-purple/20 hover:border-neon-purple transition-all duration-300 h-full">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neon-purple/20 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
+                <span className="text-neon-purple text-xl sm:text-2xl">💳</span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Pagos Agnósticos</h3>
+              <p className="text-cyber-light text-sm sm:text-base mb-3 sm:mb-4">
+                Sistema universal VISA/MC + QR/Bizum con @veritas
+              </p>
+              <div className="w-full bg-neon-purple hover:bg-neon-purple/80 text-cyber-black py-2 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base text-center">
+                Gestionar Pagos
+              </div>
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Pagos Agnósticos</h3>
-            <p className="text-cyber-light text-sm sm:text-base mb-3 sm:mb-4">
-              Sistema universal VISA/MC + QR/Bizum con @veritas
-            </p>
-            <button className="w-full bg-neon-purple hover:bg-neon-purple/80 text-cyber-black py-2 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base">
-              Gestionar Pagos
-            </button>
-          </div>
+          </Link>
 
           {/* Notifications Card */}
-          <div className="bg-cyber-dark rounded-xl p-4 sm:p-6 border border-neon-pink/20 hover:border-neon-pink transition-all duration-300">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neon-pink/20 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-              <span className="text-neon-pink text-xl sm:text-2xl">🔔</span>
+          <Link to="/notifications" className="block">
+            <div className="bg-cyber-dark rounded-xl p-4 sm:p-6 border border-neon-pink/20 hover:border-neon-pink transition-all duration-300 h-full">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neon-pink/20 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
+                <span className="text-neon-pink text-xl sm:text-2xl">🔔</span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Notificaciones</h3>
+              <p className="text-cyber-light text-sm sm:text-base mb-3 sm:mb-4">
+                SMS/Email automatizados - Recordatorios 24h
+              </p>
+              <div className="w-full bg-neon-pink hover:bg-neon-pink/80 text-cyber-black py-2 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base text-center">
+                Ver Notificaciones
+              </div>
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Notificaciones</h3>
-            <p className="text-cyber-light text-sm sm:text-base mb-3 sm:mb-4">
-              SMS/Email automatizados - Recordatorios 24h
-            </p>
-            <button className="w-full bg-neon-pink hover:bg-neon-pink/80 text-cyber-black py-2 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base">
-              Ver Notificaciones
-            </button>
-          </div>
+          </Link>
         </div>
 
         {/* Stats Overview */}

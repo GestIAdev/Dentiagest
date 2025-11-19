@@ -15,6 +15,7 @@ import {
   type Appointment,
   type AppointmentStatus
 } from '../graphql/appointments';
+import { RequestAppointmentForm } from './RequestAppointmentForm';
 
 // ============================================================================
 // COMPONENTE: APPOINTMENTS MANAGEMENT V3 - REAL DATA
@@ -362,6 +363,35 @@ const AppointmentsManagementV3: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 🚨 BOOKING MODAL - AI-Assisted Appointment Request (Directiva #004) */}
+      {showBookingModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-xl flex items-center justify-between">
+              <h2 className="text-2xl font-bold">📅 Solicitar Nueva Cita</h2>
+              <button
+                onClick={() => setShowBookingModal(false)}
+                className="text-white hover:text-gray-200 transition-colors text-3xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6">
+              <RequestAppointmentForm
+                patientId={auth.patientId!}
+                onSuccess={() => {
+                  setShowBookingModal(false);
+                  loadAppointments(); // Refresh appointments list
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
