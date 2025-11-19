@@ -44,6 +44,7 @@ import PaymentFormModalV3 from './PaymentFormModalV3';
 import InvoiceDetailViewV3 from './InvoiceDetailViewV3';
 import PaymentDetailViewV3 from './PaymentDetailViewV3';
 import BillingAnalyticsV3 from './BillingAnalyticsV3';
+import SubscriptionPlanManagerV3 from '../Subscription/SubscriptionPlanManagerV3';
 
 // 🎯 ICONS - Heroicons for financial theme
 import {
@@ -202,7 +203,7 @@ export const FinancialManagerV3: React.FC<FinancialManagerV3Props> = ({
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>('all');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-  const [activeTab, setActiveTab] = useState<'invoices' | 'payments' | 'analytics'>('invoices');
+  const [activeTab, setActiveTab] = useState<'invoices' | 'payments' | 'analytics' | 'subscription-plans'>('invoices');
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
@@ -537,6 +538,14 @@ export const FinancialManagerV3: React.FC<FinancialManagerV3Props> = ({
             >
               <ChartBarIcon className="w-4 h-4 mr-2" />
               Analytics
+            </Button>
+            <Button
+              onClick={() => setActiveTab('subscription-plans')}
+              variant={activeTab === 'subscription-plans' ? 'default' : 'ghost'}
+              className={`flex-1 ${activeTab === 'subscription-plans' ? 'bg-green-500/20 text-green-300 border-green-500/30' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'}`}
+            >
+              <CreditCardIcon className="w-4 h-4 mr-2" />
+              Planes de Suscripción
             </Button>
           </div>
         </CardContent>
@@ -920,6 +929,11 @@ export const FinancialManagerV3: React.FC<FinancialManagerV3Props> = ({
       {activeTab === 'analytics' && (
         /* Analytics View */
         <BillingAnalyticsV3 />
+      )}
+
+      {activeTab === 'subscription-plans' && (
+        /* Subscription Plans Manager */
+        <SubscriptionPlanManagerV3 />
       )}
 
       {/* Modals */}

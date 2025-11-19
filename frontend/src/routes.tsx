@@ -163,8 +163,8 @@ function AppRoutes() {
           
           {/* 🔥 V3 ARSENAL COMPLETE - 8 JEWELS ACTIVATED (74% DORMIDOS → 100% BRILLANDO) */}
           <Route path="treatments" element={<TreatmentManagementV3 />} />
-          <Route path="billing" element={<ComingSoonPage pageName="Facturación" />} />
-          <Route path="billing-v3" element={<FinancialManagerV3 />} />
+          <Route path="billing" element={<FinancialManagerV3 />} />
+          {/* Legacy route removed - now using FinancialManagerV3 directly */}
           <Route path="inventory" element={<InventoryManagementV3 />} />
           <Route path="marketplace" element={<SupplierManagerV3 />} />
           <Route path="purchase-orders" element={<PurchaseOrderManagerV3 />} />

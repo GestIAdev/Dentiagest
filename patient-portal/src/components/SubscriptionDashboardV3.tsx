@@ -112,9 +112,17 @@ const SubscriptionDashboardV3: React.FC = () => {
   const upcomingRenewals = getUpcomingRenewals();
 
   const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('es-AR', {
+    const currencyMap: Record<string, string> = {
+      EUR: 'EUR',
+      USD: 'USD',
+      ARS: 'ARS',
+    };
+    
+    const locale = currency === 'ARS' ? 'es-AR' : currency === 'EUR' ? 'es-ES' : 'en-US';
+    
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: currency === 'ARS' ? 'ARS' : 'USD',
+      currency: currencyMap[currency] || 'USD',
     }).format(amount);
   };
 

@@ -67,7 +67,6 @@
     "@types/winston": "^2.4.4",
     "@types/ws": "^8.18.1",
     "axios": "^1.12.2",
-    "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
     "bull": "^4.16.5",
     "chai": "^6.0.1",
@@ -104,6 +103,7 @@
   "devDependencies": {
     "@playwright/test": "^1.56.1",
     "@types/express": "^5.0.3",
+    "bcrypt": "^6.0.0",
     "typescript": "^5.9.3"
   }
 }
