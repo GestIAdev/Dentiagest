@@ -374,7 +374,6 @@ const SubscriptionPlanManagerV3: React.FC = () => {
       {showModal && (
         <PlanFormModal
           plan={editingPlan}
-          clinicId={clinicId}
           onClose={() => {
             setShowModal(false);
             setEditingPlan(null);
@@ -396,21 +395,20 @@ const SubscriptionPlanManagerV3: React.FC = () => {
 
 interface PlanFormModalProps {
   plan: SubscriptionPlan | null;
-  clinicId: string;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-const PlanFormModal: React.FC<PlanFormModalProps> = ({ plan, clinicId, onClose, onSuccess }) => {
+const PlanFormModal: React.FC<PlanFormModalProps> = ({ plan, onClose, onSuccess }) => {
   const [formData, setFormData] = useState<FormData>({
-    name: plan?.name || '',
-    description: plan?.description || '',
-    price: plan?.price || 29.99,
-    currency: plan?.currency || 'EUR',
-    code: plan?.code || '',
-    max_services_per_month: plan?.max_services_per_month || 0,
+    name: plan?.name ?? '',
+    description: plan?.description ?? '',
+    price: plan?.price ?? 29.99,
+    currency: plan?.currency ?? 'EUR',
+    code: plan?.code ?? '',
+    max_services_per_month: plan?.max_services_per_month ?? 0,
     is_active: plan?.is_active ?? true,
-    features: plan?.features || [],
+    features: plan?.features ?? [],
   });
 
   const [loading, setLoading] = useState(false);
@@ -432,14 +430,11 @@ const PlanFormModal: React.FC<PlanFormModalProps> = ({ plan, clinicId, onClose, 
         });
         alert('Plan actualizado exitosamente');
       } else {
-        // Create new plan
+        // Create new plan (clinic_id injected by backend from JWT)
         await apolloClient.mutate({
           mutation: CREATE_SUBSCRIPTION_PLAN,
           variables: {
-            input: {
-              ...formData,
-              clinic_id: clinicId,
-            },
+            input: formData,
           },
         });
         alert('Plan creado exitosamente');

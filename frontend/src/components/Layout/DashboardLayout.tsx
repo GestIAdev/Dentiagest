@@ -126,9 +126,6 @@ const DashboardLayout: React.FC = () => {
       )
     },
     {
-      /* ❌ DELETED: "Citas Avanzadas" - Now unified in /appointments as "Citas" */
-    },
-    {
       name: 'Suscripciones',
       href: '/dashboard/subscriptions',
       icon: (
