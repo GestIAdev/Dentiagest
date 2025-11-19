@@ -1,4 +1,21 @@
-// ============================================================================
+// ================================================const GET_SUBSCRIPTION_PLANS = gql`
+  query GetSubscriptionPlans($activeOnly: Boolean) {
+    subscriptionPlansV3(activeOnly: $activeOnly) {
+      id
+      name
+      description
+      price
+      currency
+      code
+      max_services_per_month
+      is_active
+      features
+      clinic_id
+      created_at
+      updated_at
+    }
+  }
+`;============
 // SUBSCRIPTION PLAN MANAGER V3 - CRUD FOR STAFF DASHBOARD
 // By PunkClaude - Directiva #007.1 - "LA FÁBRICA"
 // Purpose: Create, Edit, Delete subscription plans with multi-currency support
@@ -28,9 +45,11 @@ interface SubscriptionPlan {
   description: string;
   price: number;
   currency: 'EUR' | 'USD' | 'ARS';
-  consultas_incluidas: number;
+  code?: string;
+  max_services_per_month?: number; // consultas_incluidas
   is_active: boolean;
   features: string[];
+  clinic_id: string;
   created_at: string;
   updated_at: string;
 }
@@ -40,7 +59,8 @@ interface FormData {
   description: string;
   price: number;
   currency: 'EUR' | 'USD' | 'ARS';
-  consultas_incluidas: number;
+  code?: string;
+  max_services_per_month: number; // 0 = unlimited
   is_active: boolean;
   features: string[];
 }
@@ -50,16 +70,18 @@ interface FormData {
 // ============================================================================
 
 const GET_SUBSCRIPTION_PLANS = gql`
-  query GetSubscriptionPlans($clinicId: ID!) {
-    subscriptionPlansV3(clinicId: $clinicId) {
+  query GetSubscriptionPlans($activeOnly: Boolean) {
+    subscriptionPlansV3(activeOnly: $activeOnly) {
       id
       name
       description
       price
       currency
-      consultas_incluidas
+      code
+      max_services_per_month
       is_active
       features
+      clinic_id
       created_at
       updated_at
     }
@@ -150,8 +172,8 @@ const getCurrencyEquivalents = (price: number, currency: string) => {
 
 const SubscriptionPlanManagerV3: React.FC = () => {
   const { state } = useAuth();
-  // TODO: Get clinicId from user context or localStorage
-  const clinicId = localStorage.getItem('clinicId') || '1'; // Default clinic
+  // DIRECTIVA ENDER-D1-006.9-B: clinic_id comes from user context (backend extracts it)
+  // No need to pass clinicId from frontend - backend gets it from JWT token
 
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(false);
@@ -168,11 +190,11 @@ const SubscriptionPlanManagerV3: React.FC = () => {
       setLoading(true);
       const { data } = await apolloClient.query({
         query: GET_SUBSCRIPTION_PLANS,
-        variables: { clinicId },
+        variables: { activeOnly: false }, // Show all plans (active + inactive)
         fetchPolicy: 'network-only',
       });
 
-      const plansData = (data as any).subscriptionPlansV3 || [];
+      const plansData = (data as any)?.subscriptionPlansV3 || [];
       setPlans(plansData);
       console.log('✅ Plans loaded:', plansData.length);
     } catch (err) {
@@ -290,7 +312,7 @@ const SubscriptionPlanManagerV3: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 hidden sm:table-cell">
                       <span className="text-white">
-                        {plan.consultas_incluidas === 0 ? '♾️ Ilimitadas' : `${plan.consultas_incluidas} /mes`}
+                        {(plan.max_services_per_month || 0) === 0 ? '♾️ Ilimitadas' : `${plan.max_services_per_month} /mes`}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -385,7 +407,8 @@ const PlanFormModal: React.FC<PlanFormModalProps> = ({ plan, clinicId, onClose, 
     description: plan?.description || '',
     price: plan?.price || 29.99,
     currency: plan?.currency || 'EUR',
-    consultas_incluidas: plan?.consultas_incluidas || 0,
+    code: plan?.code || '',
+    max_services_per_month: plan?.max_services_per_month || 0,
     is_active: plan?.is_active ?? true,
     features: plan?.features || [],
   });
@@ -532,8 +555,8 @@ const PlanFormModal: React.FC<PlanFormModalProps> = ({ plan, clinicId, onClose, 
             <input
               type="number"
               min="0"
-              value={formData.consultas_incluidas}
-              onChange={(e) => setFormData({ ...formData, consultas_incluidas: parseInt(e.target.value) })}
+              value={formData.max_services_per_month || 0}
+              onChange={(e) => setFormData({ ...formData, max_services_per_month: parseInt(e.target.value) || 0 })}
               className="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
             />
             <p className="text-xs text-gray-400 mt-1">💡 Usa 0 para consultas ilimitadas</p>
