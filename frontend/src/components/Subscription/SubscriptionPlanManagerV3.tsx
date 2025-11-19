@@ -452,10 +452,10 @@ const PlanFormModal: React.FC<PlanFormModalProps> = ({ plan, clinicId, onClose, 
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-cyber-dark rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border-2 border-neon-cyan shadow-neon-cyan">
+      <div className="bg-gray-800 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border-2 border-purple-500 shadow-2xl">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-neon-cyan to-neon-blue p-6 rounded-t-xl">
-          <h2 className="text-2xl font-bold text-cyber-black">
+        <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-blue-600 p-6 rounded-t-xl">
+          <h2 className="text-2xl font-bold text-white">
             {plan ? '✏️ Editar Plan' : '➕ Crear Plan Nuevo'}
           </h2>
         </div>
@@ -471,7 +471,7 @@ const PlanFormModal: React.FC<PlanFormModalProps> = ({ plan, clinicId, onClose, 
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="Ej: Dental Basic"
-              className="w-full bg-cyber-black border border-neon-cyan/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-neon-cyan"
+              className="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
             />
           </div>
 
@@ -484,7 +484,7 @@ const PlanFormModal: React.FC<PlanFormModalProps> = ({ plan, clinicId, onClose, 
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Essential preventive care for healthy smiles"
               rows={3}
-              className="w-full bg-cyber-black border border-neon-cyan/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-neon-cyan"
+              className="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
             />
           </div>
 
@@ -499,7 +499,7 @@ const PlanFormModal: React.FC<PlanFormModalProps> = ({ plan, clinicId, onClose, 
                 min="0"
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-                className="w-full bg-cyber-black border border-neon-cyan/30 rounded-lg px-4 py-3 text-white font-mono focus:outline-none focus:border-neon-cyan"
+                className="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 font-mono focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
               />
             </div>
             <div>
@@ -507,19 +507,19 @@ const PlanFormModal: React.FC<PlanFormModalProps> = ({ plan, clinicId, onClose, 
               <select
                 value={formData.currency}
                 onChange={(e) => setFormData({ ...formData, currency: e.target.value as 'EUR' | 'USD' | 'ARS' })}
-                className="w-full bg-cyber-black border border-neon-cyan/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-neon-cyan"
+                className="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
               >
-                <option value="EUR">EUR (€) - Europa</option>
-                <option value="USD">USD ($) - Estados Unidos</option>
-                <option value="ARS">ARS ($) - Argentina</option>
+                <option value="EUR" className="bg-gray-900 text-white">EUR (€) - Europa</option>
+                <option value="USD" className="bg-gray-900 text-white">USD ($) - Estados Unidos</option>
+                <option value="ARS" className="bg-gray-900 text-white">ARS ($) - Argentina</option>
               </select>
             </div>
           </div>
 
           {/* Currency Equivalents */}
-          <div className="bg-neon-blue/10 border border-neon-blue/30 rounded-lg p-4">
-            <div className="text-sm text-neon-blue font-semibold mb-2">💱 Equivalencias Aproximadas:</div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-cyber-light">
+          <div className="bg-blue-900/20 border border-blue-600/30 rounded-lg p-4">
+            <div className="text-sm text-blue-400 font-semibold mb-2">💱 Equivalencias Aproximadas:</div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-gray-300">
               {formData.currency !== 'EUR' && <div>EUR: {formatCurrency(equivalents.EUR || 0, 'EUR')}</div>}
               {formData.currency !== 'USD' && <div>USD: {formatCurrency(equivalents.USD || 0, 'USD')}</div>}
               {formData.currency !== 'ARS' && <div>ARS: {formatCurrency(equivalents.ARS || 0, 'ARS')}</div>}
@@ -534,9 +534,9 @@ const PlanFormModal: React.FC<PlanFormModalProps> = ({ plan, clinicId, onClose, 
               min="0"
               value={formData.consultas_incluidas}
               onChange={(e) => setFormData({ ...formData, consultas_incluidas: parseInt(e.target.value) })}
-              className="w-full bg-cyber-black border border-neon-cyan/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-neon-cyan"
+              className="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
             />
-            <p className="text-xs text-cyber-light mt-1">💡 Usa 0 para consultas ilimitadas</p>
+            <p className="text-xs text-gray-400 mt-1">💡 Usa 0 para consultas ilimitadas</p>
           </div>
 
           {/* Features */}
@@ -549,19 +549,19 @@ const PlanFormModal: React.FC<PlanFormModalProps> = ({ plan, clinicId, onClose, 
                 onChange={(e) => setNewFeature(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddFeature())}
                 placeholder="Ej: Preventive Care (limpiezas, revisiones)"
-                className="flex-1 bg-cyber-black border border-neon-cyan/30 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-neon-cyan"
+                className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
               />
               <button
                 type="button"
                 onClick={handleAddFeature}
-                className="px-4 py-2 bg-neon-blue hover:bg-neon-blue/80 text-white rounded-lg font-semibold transition-colors"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
               >
                 Agregar
               </button>
             </div>
             <div className="space-y-2">
               {formData.features.map((feature, index) => (
-                <div key={index} className="flex items-center justify-between bg-cyber-black border border-neon-cyan/20 rounded-lg px-4 py-2">
+                <div key={index} className="flex items-center justify-between bg-gray-900 border border-gray-700 rounded-lg px-4 py-2">
                   <span className="text-white">✓ {feature}</span>
                   <button
                     type="button"
@@ -590,18 +590,18 @@ const PlanFormModal: React.FC<PlanFormModalProps> = ({ plan, clinicId, onClose, 
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-4 pt-4 border-t border-cyber-light/20">
+          <div className="flex justify-end gap-4 pt-4 border-t border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 bg-cyber-light hover:bg-cyber-light/80 text-cyber-black rounded-lg font-semibold transition-colors"
+              className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-semibold transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-3 bg-neon-cyan hover:bg-neon-cyan/80 text-cyber-black rounded-lg font-semibold transition-colors disabled:opacity-50"
+              className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Guardando...' : (plan ? 'Actualizar Plan' : 'Crear Plan')}
             </button>
