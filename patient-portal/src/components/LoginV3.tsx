@@ -58,7 +58,7 @@ const LoginV3: React.FC = () => {
       // Marcar que vamos a redirigir
       hasRedirected.current = true;
       
-      // Navegación con replace para evitar bucle de history
+      // ✅ Use navigate() for smooth SPA navigation (no page reload needed)
       navigate('/', { replace: true });
 
     } catch (err) {

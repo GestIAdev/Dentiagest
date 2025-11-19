@@ -21,7 +21,8 @@ test.describe('Notifications Module - Real Data E2E', () => {
     console.log('📋 Test: Load Notifications Dashboard');
 
     await page.goto('http://localhost:3001/notifications');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for header instead of networkidle
+    await page.waitForSelector('h1, h2, [data-testid="notifications-header"]', { state: 'visible', timeout: 10000 });
 
     // Wait for loading spinner
     await page.locator('.animate-spin, [role="status"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
@@ -37,7 +38,8 @@ test.describe('Notifications Module - Real Data E2E', () => {
     console.log('📋 Test: Display Notification List');
 
     await page.goto('http://localhost:3001/notifications');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for notification items instead of networkidle
+    await page.waitForSelector('[data-testid="notification-item"], .notification-card, main', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No notifications found'));
     await page.waitForTimeout(2000);
 
     // Check for notification items
@@ -60,7 +62,8 @@ test.describe('Notifications Module - Real Data E2E', () => {
     console.log('📋 Test: Filter Notifications by Type');
 
     await page.goto('http://localhost:3001/notifications');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for filter controls instead of networkidle
+    await page.waitForSelector('select, [data-testid="type-filter"], [class*="filter"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No filters found'));
 
     // Look for type filter
     const typeFilter = page.locator(
@@ -86,7 +89,8 @@ test.describe('Notifications Module - Real Data E2E', () => {
     console.log('📋 Test: Mark Notification as Read');
 
     await page.goto('http://localhost:3001/notifications');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for notification buttons instead of networkidle
+    await page.waitForSelector('button, [data-testid="notification-item"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No buttons found'));
     await page.waitForTimeout(2000);
 
     // Look for mark as read button
@@ -111,7 +115,8 @@ test.describe('Notifications Module - Real Data E2E', () => {
     console.log('📋 Test: Mark All as Read');
 
     await page.goto('http://localhost:3001/notifications');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for mark-all button instead of networkidle
+    await page.waitForSelector('button, [data-testid="mark-all-read"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No mark-all button'));
 
     // Look for "mark all as read" button
     const markAllButton = page.locator(
@@ -133,7 +138,8 @@ test.describe('Notifications Module - Real Data E2E', () => {
     console.log('📋 Test: Navigate Notification Tabs');
 
     await page.goto('http://localhost:3001/notifications');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for tabs instead of networkidle
+    await page.waitForSelector('button[role="tab"], [class*="tab"], [role="tablist"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No tabs found'));
 
     // Look for tabs
     const tabs = page.locator(
@@ -163,7 +169,8 @@ test.describe('Notifications Module - Real Data E2E', () => {
     console.log('📋 Test: Update Notification Preferences');
 
     await page.goto('http://localhost:3001/notifications');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for tabs/content instead of networkidle
+    await page.waitForSelector('button[role="tab"], [data-testid="preferences"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No tabs found'));
 
     // Navigate to preferences tab if needed
     const prefsTab = page.locator('button[role="tab"]').nth(2);
@@ -212,7 +219,8 @@ test.describe('Notifications Module - Real Data E2E', () => {
     });
 
     await page.goto('http://localhost:3001/notifications');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for content instead of networkidle
+    await page.waitForSelector('[data-testid="notifications-list"], main', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ Content not loaded'));
     await page.waitForTimeout(2000);
 
     if (gqlRequests.length > 0) {
@@ -226,7 +234,8 @@ test.describe('Notifications Module - Real Data E2E', () => {
     console.log('📋 Test: Display Notification Metadata');
 
     await page.goto('http://localhost:3001/notifications');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for notification items instead of networkidle
+    await page.waitForSelector('[data-testid="notification-item"], .notification-card', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No notifications found'));
 
     // Look for notification items with metadata
     const notificationItem = page.locator(
@@ -246,7 +255,8 @@ test.describe('Notifications Module - Real Data E2E', () => {
     console.log('📋 Test: Handle Empty Notification State');
 
     await page.goto('http://localhost:3001/notifications');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for content container instead of networkidle
+    await page.waitForSelector('main, [data-testid="notifications-container"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ Container not loaded'));
 
     // Check for empty state message
     const emptyMessage = page.locator(

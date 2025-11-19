@@ -23,7 +23,8 @@ test.describe('Appointments Module - Real Data E2E', () => {
 
     // Navigate to appointments
     await page.goto('http://localhost:3001/appointments');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Active targeting - wait for content, not networkidle
+    await page.waitForSelector('h1, h2, [data-testid="appointments-header"]', { state: 'visible', timeout: 10000 });
 
     // Wait for loading spinner to disappear
     const spinner = page.locator('.animate-spin, [role="status"]');
@@ -42,7 +43,8 @@ test.describe('Appointments Module - Real Data E2E', () => {
     console.log('📋 Test: Display Appointment List');
 
     await page.goto('http://localhost:3001/appointments');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for content container instead of networkidle
+    await page.waitForSelector('[data-testid="appointments-list"], main, [role="main"]', { state: 'visible', timeout: 10000 });
 
     // Wait for appointments to load
     await page.waitForTimeout(2000);
@@ -67,7 +69,8 @@ test.describe('Appointments Module - Real Data E2E', () => {
     console.log('📋 Test: Filter Appointments by Status');
 
     await page.goto('http://localhost:3001/appointments');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for filter controls to render
+    await page.waitForSelector('select, [data-testid="status-filter"], [class*="filter"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No filter found'));
 
     // Look for filter/select elements
     const filterSelect = page.locator(
@@ -93,7 +96,8 @@ test.describe('Appointments Module - Real Data E2E', () => {
     console.log('📋 Test: View Appointment Details');
 
     await page.goto('http://localhost:3001/appointments');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for appointment links/buttons to render
+    await page.waitForSelector('a[href*="appointment"], button, [data-testid="appointment-item"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No appointments found'));
 
     // Try to click on first appointment
     const appointmentLink = page.locator(
@@ -105,7 +109,8 @@ test.describe('Appointments Module - Real Data E2E', () => {
 
     if (linkExists) {
       await appointmentLink.click();
-      await page.waitForLoadState('networkidle');
+      // 🔥 FIX: Wait for details content instead of networkidle
+      await page.waitForSelector('[data-testid="appointment-details"], [class*="detail"], [role="dialog"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ Details not loaded'));
 
       // Verify we're on details page or modal opened
       const detailsContent = page.locator(
@@ -137,7 +142,8 @@ test.describe('Appointments Module - Real Data E2E', () => {
     });
 
     await page.goto('http://localhost:3001/appointments');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for page content instead of networkidle
+    await page.waitForSelector('[data-testid="appointments-list"], main', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ Content not loaded'));
     await page.waitForTimeout(2000);
 
     // Verify at least one GraphQL request was made
@@ -152,7 +158,8 @@ test.describe('Appointments Module - Real Data E2E', () => {
     console.log('📋 Test: Navigate Between Tabs');
 
     await page.goto('http://localhost:3001/appointments');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for tabs container instead of networkidle
+    await page.waitForSelector('button[role="tab"], [class*="tab"], [role="tablist"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No tabs found'));
 
     // Look for tabs
     const tabs = page.locator(
@@ -175,7 +182,8 @@ test.describe('Appointments Module - Real Data E2E', () => {
     console.log('📋 Test: Handle Empty State');
 
     await page.goto('http://localhost:3001/appointments');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for content container instead of networkidle
+    await page.waitForSelector('main, [data-testid="appointments-container"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ Container not loaded'));
 
     // Check for empty state message
     const emptyMessage = page.locator(

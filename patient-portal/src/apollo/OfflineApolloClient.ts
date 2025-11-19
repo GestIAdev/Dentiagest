@@ -67,6 +67,21 @@ export class OfflineApolloClient {
     });
   }
 
+  // 🎸 ROUND-ROBIN LOAD BALANCER - PUNK CLIENT-SIDE SOLUTION
+  private seleneNodes: string[] = [
+    'http://localhost:8005/graphql',  // selene-node-1
+    'http://localhost:8006/graphql',  // selene-node-2
+    'http://localhost:8007/graphql'   // selene-node-3
+  ];
+  private currentNodeIndex: number = 0;
+
+  private getNextSeleneNode(): string {
+    // Round-robin: rotate through available nodes
+    const node = this.seleneNodes[this.currentNodeIndex];
+    this.currentNodeIndex = (this.currentNodeIndex + 1) % this.seleneNodes.length;
+    return node;
+  }
+
   // 🚀 CREATE OFFLINE-CAPABLE APOLLO CLIENT
   private createOfflineClient(): ApolloClient<any> {
     // Auth link - adds JWT Bearer token to requests
@@ -82,9 +97,14 @@ export class OfflineApolloClient {
       };
     });
 
-    // HTTP link with offline handling
+    // 🔥 HTTP link with CLIENT-SIDE LOAD BALANCING + offline handling
+    // PUNK PHILOSOPHY: No nginx, no haproxy, no enterprise bullshit
+    // Just code that fucking works distributing load across 3 Selene nodes
     const httpLink = new HttpLink({
-      uri: process.env.REACT_APP_GRAPHQL_URI || 'http://localhost:8005/graphql',
+      uri: () => {
+        // Use env var if set (production), otherwise round-robin through local nodes
+        return process.env.REACT_APP_GRAPHQL_URI || this.getNextSeleneNode();
+      },
       fetch: this.offlineAwareFetch.bind(this)
     });
 

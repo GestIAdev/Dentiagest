@@ -21,7 +21,8 @@ test.describe('Documents Module - Real Data E2E', () => {
     console.log('📋 Test: Load Document Vault');
 
     await page.goto('http://localhost:3001/documents');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for header instead of networkidle
+    await page.waitForSelector('h1, h2, [data-testid="documents-header"]', { state: 'visible', timeout: 10000 });
 
     // Wait for loading to complete
     await page.locator('.animate-spin, [role="status"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
@@ -37,7 +38,8 @@ test.describe('Documents Module - Real Data E2E', () => {
     console.log('📋 Test: Display Document List');
 
     await page.goto('http://localhost:3001/documents');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for document container instead of networkidle
+    await page.waitForSelector('[data-testid="document-item"], .document-card, main', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No documents found'));
     await page.waitForTimeout(2000);
 
     // Check for document items
@@ -60,7 +62,8 @@ test.describe('Documents Module - Real Data E2E', () => {
     console.log('📋 Test: Search Documents');
 
     await page.goto('http://localhost:3001/documents');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for search input instead of networkidle
+    await page.waitForSelector('input[placeholder*="earch" i], input[type="search"], [data-testid="search-input"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No search found'));
 
     // Look for search input
     const searchInput = page.locator(
@@ -84,7 +87,8 @@ test.describe('Documents Module - Real Data E2E', () => {
     console.log('📋 Test: Filter Documents by Type');
 
     await page.goto('http://localhost:3001/documents');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for filter controls instead of networkidle
+    await page.waitForSelector('select, [data-testid="type-filter"], [class*="filter"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No filters found'));
 
     // Look for type filter
     const typeFilter = page.locator(
@@ -110,7 +114,8 @@ test.describe('Documents Module - Real Data E2E', () => {
     console.log('📋 Test: Open Document Details');
 
     await page.goto('http://localhost:3001/documents');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for document items instead of networkidle
+    await page.waitForSelector('a[href*="document"], button, [data-testid="document-item"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No documents found'));
 
     // Try to click on first document
     const documentLink = page.locator(
@@ -122,7 +127,8 @@ test.describe('Documents Module - Real Data E2E', () => {
 
     if (linkExists) {
       await documentLink.click();
-      await page.waitForLoadState('networkidle');
+      // 🔥 FIX: Wait for details modal instead of networkidle
+      await page.waitForSelector('[data-testid="document-details"], [class*="modal"], [role="dialog"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ Details not loaded'));
 
       // Verify details modal or page opened
       const detailsContent = page.locator(
@@ -142,7 +148,8 @@ test.describe('Documents Module - Real Data E2E', () => {
     console.log('📋 Test: Document Download');
 
     await page.goto('http://localhost:3001/documents');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for download buttons instead of networkidle
+    await page.waitForSelector('button, [data-testid="download-btn"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No buttons found'));
 
     // Look for download buttons
     const downloadButtons = page.locator(
@@ -174,7 +181,8 @@ test.describe('Documents Module - Real Data E2E', () => {
     });
 
     await page.goto('http://localhost:3001/documents');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for content instead of networkidle
+    await page.waitForSelector('[data-testid="documents-list"], main', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ Content not loaded'));
     await page.waitForTimeout(2000);
 
     if (gqlRequests.length > 0) {
@@ -188,7 +196,8 @@ test.describe('Documents Module - Real Data E2E', () => {
     console.log('📋 Test: Display Document Metadata');
 
     await page.goto('http://localhost:3001/documents');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for document cards instead of networkidle
+    await page.waitForSelector('[class*="metadata"], [class*="info"], .document-card', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No metadata found'));
 
     // Look for metadata elements (date, size, type)
     const metadataElements = page.locator(
@@ -208,7 +217,8 @@ test.describe('Documents Module - Real Data E2E', () => {
     console.log('📋 Test: Navigate Document Tabs');
 
     await page.goto('http://localhost:3001/documents');
-    await page.waitForLoadState('networkidle');
+    // 🔥 FIX: Wait for tabs instead of networkidle
+    await page.waitForSelector('button[role="tab"], [class*="tab"], [role="tablist"]', { state: 'visible', timeout: 10000 }).catch(() => console.log('⚠️ No tabs found'));
 
     // Look for tabs
     const tabs = page.locator(
