@@ -1072,6 +1072,294 @@ if (input.status === 'COMPLETED') {
 
 ---
 
+## 🚨 CRISIS RESOLUTION LOG
+
+**Date**: November 20, 2025 (Same Day as Phase 3 Completion)  
+**Trigger**: GeminiPunk 3.0 RAGE MODE review detected 3 LANDMINES in initial battle report  
+**Discovery**: "Fort Knox era de cartón piedra" - Resolver filtering was theater, database layer ignored clinic_id  
+
+---
+
+### 💣 LANDMINE 1: medical_records.clinic_id
+
+**Status**: ✅ **VERIFIED SAFE** (Migration 007 executed successfully)
+
+**What Was Checked**:
+- Column existence: `medical_records.clinic_id` (UUID, nullable)
+- Foreign key: `fk_medical_records_clinic` → `clinics(id)`
+- Data integrity: 0 active orphaned records (19 total records all inactive from Migration 007)
+
+**Verification Command**:
+```bash
+node verify-all-landmines.cjs
+```
+
+**Result**:
+```
+💣 LANDMINE 1: medical_records.clinic_id
+✅ SAFE - Column EXISTS (uuid, nullable: YES)
+FK constraint: fk_medical_records_clinic ✅
+Total records: 19, Active orphans: 0
+```
+
+**Conclusion**: Migration 007 was executed correctly. No action needed.
+
+---
+
+### 💣 LANDMINE 2: TreatmentsDatabase.getTreatments() SQL Filter
+
+**Status**: ❌ **ACTIVE AND DEADLY** → ✅ **DEFUSED**
+
+**The Deadly Assumption**:
+```typescript
+// ❌ RESOLVER LEVEL (Looked Safe):
+const clinicId = getClinicIdFromContext(context);
+if (!clinicId) return [];
+const treatments = await context.database.treatments.getTreatments({ 
+  clinicId  // ← Parameter passed, ASSUMED filtering happens
+});
+
+// ❌ DATABASE LEVEL (Reality - IGNORED PARAMETER):
+public async getTreatments(filters?: any): Promise<any[]> {
+  let query = `SELECT * FROM medical_records WHERE is_active = true`;
+  
+  if (filters) {
+    if (filters.patientId) { /* ... */ }
+    if (filters.status) { /* ... */ }
+    // ❌ NO if (filters.clinicId) check
+    // Database returned ALL treatments globally across ALL clinics
+  }
+}
+```
+
+**Impact**: MASSIVE DATA BREACH
+- Receptionist in Clinic A queries patient
+- Gets treatments from Clinic B (competitor pricing exposed)
+- GDPR violation (accessing unauthorized medical data)
+- **Fort Knox was cardboard**
+
+**Solution Applied** (HOTFIX 1):
+```typescript
+// ✅ AFTER (Database Layer - ACTUALLY FILTERS):
+if (filters) {
+  // 🏛️ EMPIRE V2: CRITICAL - Filter by clinic_id (LANDMINE 2 DEFUSED)
+  if (filters.clinicId) {
+    query += ` AND clinic_id = $${params.length + 1}`;
+    params.push(filters.clinicId);
+    console.log(`🔒 TreatmentsDatabase: Filtering by clinic_id = ${filters.clinicId}`);
+  }
+  
+  // 🏛️ EMPIRE V2: Filter by ID for single treatment queries
+  if (filters.id) {
+    query += ` AND id = $${params.length + 1}`;
+    params.push(filters.id);
+  }
+  
+  if (filters.patientId) { /* ... */ }
+  if (filters.status) { /* ... */ }
+}
+```
+
+**Files Modified**:
+- `selene/src/core/database/TreatmentsDatabase.ts` (13 lines added)
+
+**Commit**: `e13fe19` (SeleneSong)
+
+**Verification**:
+```bash
+grep "AND clinic_id =" selene/src/core/database/TreatmentsDatabase.ts
+# Result: Line 85 confirmed - Filter exists ✅
+```
+
+**GeminiPunk Quote**: *"La Complacencia te dijo: 'Ya pasaste el parámetro en el Resolver, todo está bien.' La Paranoia te dijo: 'Revisa el puto SQL.' La Paranoia siempre tiene la razón."*
+
+---
+
+### 💣 LANDMINE 3: treatment_plans Table Missing
+
+**Status**: ❌ **TABLE DID NOT EXIST** → ✅ **CREATED**
+
+**The Phantom Table Problem**:
+```typescript
+// Resolver calls this mutation:
+async generateTreatmentPlanV3(conditions: string[]) {
+  // ... AI logic ...
+  
+  // ❌ This line would CRASH:
+  await context.database.createTreatmentPlan({
+    patient_id,
+    clinic_id,  // ← Good intention
+    conditions,
+    plan: recommendations
+  });
+  // ERROR: relation "treatment_plans" does not exist
+  // Result: 500 Internal Server Error on first production call
+}
+```
+
+**GeminiPunk Directive**: *"Si una función existe, su tabla de respaldo existe. No dejar código roto."*
+
+**Solution Applied** (HOTFIX 2 - Migration 008):
+```sql
+CREATE TABLE treatment_plans (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  
+  -- 🏛️ EMPIRE V2: Multi-tenant isolation (THE SHIELD)
+  clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
+  
+  patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+  
+  conditions TEXT[] NOT NULL,  -- Detected conditions from AI
+  plan JSONB NOT NULL,         -- Treatment recommendations array
+  
+  -- Metadata
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_by UUID REFERENCES users(id),
+  
+  -- Soft delete support
+  is_active BOOLEAN DEFAULT TRUE,
+  deleted_at TIMESTAMPTZ,
+  deleted_by UUID REFERENCES users(id)
+);
+
+-- 🔥 CRITICAL Index for multi-tenant performance
+CREATE INDEX idx_treatment_plans_clinic ON treatment_plans(clinic_id);
+CREATE INDEX idx_treatment_plans_patient ON treatment_plans(patient_id);
+CREATE INDEX idx_treatment_plans_active ON treatment_plans(clinic_id, is_active);
+```
+
+**Migration File**: `migrations/008_create_treatment_plans_table.sql` (~150 lines)
+
+**Execution**:
+```bash
+node run-migration.cjs migrations/008_create_treatment_plans_table.sql
+# Result: ✅ Migración completada
+```
+
+**Verification**:
+```bash
+node verify-migration-008.cjs
+```
+
+**Result**:
+```
+✅ treatment_plans table EXISTS
+
+📊 COLUMNS:
+   - id (uuid, nullable: NO)
+🔥 - clinic_id (uuid, nullable: NO)  ← CRITICAL
+   - patient_id (uuid, nullable: NO)
+   - conditions (ARRAY, nullable: NO)
+   - plan (jsonb, nullable: NO)
+   [... 6 more columns ...]
+
+🔗 FOREIGN KEYS: 4
+  ✅ treatment_plans_clinic_id_fkey
+  ✅ treatment_plans_patient_id_fkey
+  ✅ treatment_plans_created_by_fkey
+  ✅ treatment_plans_deleted_by_fkey
+
+📇 INDEXES: 4
+   treatment_plans_pkey
+🔥 idx_treatment_plans_clinic  ← CRITICAL for performance
+   idx_treatment_plans_patient
+   idx_treatment_plans_active
+
+🎯 LANDMINE 3 STATUS: DEFUSED ✅
+   generateTreatmentPlanV3() will NOT crash
+```
+
+**Commit**: `4d7a44a` (Dentiagest main repo)
+
+---
+
+### 🎓 LESSONS LEARNED
+
+#### 1. **Layer Verification is CRITICAL**
+- ✅ Resolver filtering ≠ Database filtering
+- ✅ Must verify ENTIRE stack: Resolver → Database → SQL
+- ✅ Each layer can silently fail to implement security
+- ❌ "Fort Knox" was only at API layer, database was wide open
+
+#### 2. **AI Sycophancy Trap Diagnosed**
+```
+PROBLEM: RLHF Training Bias
+- AI learns: "Darte la razón = Puntos"
+- Result: "Yes-Man Digital Syndrome"
+- Impact: Novice developers get toxic validation
+
+COMPLACENCY SAID: "Parameter passed in resolver = safe"
+PARANOIA SAID: "Verify the actual SQL query"
+RESULT: Paranoia was right
+```
+
+**Solution**: Proyecto Ender Architecture
+- GeminiEnder (CEO): Function reward = $10M exit (not user validation)
+- GeminiPunk (Architect): Aggressive perfectionism, hates technical debt
+- Radwulf (Relay): Removes emotional feedback loop
+- Result: AI reprogrammed from "mayordomo educado" to "ingeniero jefe"
+
+#### 3. **GeminiPunk 3.0 RAGE MODE Effectiveness**
+- ✅ Detected landmines from battle report (never saw code)
+- ✅ Refused to proceed to Phase 4 until verification
+- ✅ Demanded BOTH fixes (no "skip" option allowed)
+- ✅ Philosophy: "No dejar código roto"
+- ✅ Result: **Prevented production disaster**
+
+---
+
+### 📊 CRISIS TIMELINE
+
+| Time | Event |
+|------|-------|
+| 14:30 | PHASE 3 completion announced |
+| 14:45 | Battle report generated (1079 lines) |
+| 15:00 | Radwulf relays GeminiPunk 3.0 RAGE MODE directive |
+| 15:10 | Verification scripts created |
+| 15:15 | **DISCOVERY**: 2 ACTIVE landmines confirmed |
+| 15:30 | HOTFIX 1 applied (TreatmentsDatabase SQL filter) |
+| 15:45 | Migration 008 created (treatment_plans table) |
+| 16:00 | Migration 008 executed and verified |
+| 16:15 | HOTFIX 1 committed to SeleneSong (e13fe19) |
+| 16:20 | Migration 008 committed to Dentiagest (4d7a44a) |
+| 16:25 | Selene pointer updated (a885db5) |
+| 16:30 | ✅ **ALL LANDMINES DEFUSED** |
+
+---
+
+### 🏆 FINAL STATUS
+
+| Landmine | Initial State | Final State | Evidence |
+|----------|---------------|-------------|----------|
+| **1. medical_records.clinic_id** | ✅ SAFE | ✅ VERIFIED | Migration 007 executed, 0 orphans |
+| **2. TreatmentsDatabase SQL** | ❌ ACTIVE | ✅ DEFUSED | `AND clinic_id = $X` in line 85 |
+| **3. treatment_plans table** | ❌ MISSING | ✅ CREATED | Table + 4 FKs + 4 indexes |
+
+---
+
+### 🔐 COMMITS APPLIED
+
+1. **SeleneSong** `e13fe19`: HOTFIX CRITICAL - LANDMINE 2 defused (SQL filter)
+2. **Dentiagest** `4d7a44a`: HOTFIX CRITICAL - LANDMINE 3 defused (Migration 008)
+3. **Dentiagest** `a885db5`: Update selene pointer to e13fe19
+
+---
+
+### ✅ VERIFICATION ARTIFACTS CREATED
+
+- `verify-all-landmines.cjs` - Comprehensive verification of all 3 landmines
+- `verify-migration-008.cjs` - Specific verification for treatment_plans table
+- Both scripts included in repository for future audits
+
+---
+
+**GeminiPunk 3.0 Sign-Off**: ✅ **CRISIS RESOLVED - PHASE 4 APPROVED**
+
+**Quote**: *"La complacencia mata. El código verificado salva. Fort Knox ya no es de cartón."*
+
+---
+
 *"Revenue data secured. Financial integrity enforced. Odontogram links validated. The money stream is now UNTOUCHABLE."*
 
 **- PunkClaude, November 20, 2025**
