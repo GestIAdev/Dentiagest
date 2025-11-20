@@ -1,21 +1,4 @@
-// ================================================const GET_SUBSCRIPTION_PLANS = gql`
-  query GetSubscriptionPlans($activeOnly: Boolean) {
-    subscriptionPlansV3(activeOnly: $activeOnly) {
-      id
-      name
-      description
-      price
-      currency
-      code
-      max_services_per_month
-      is_active
-      features
-      clinic_id
-      created_at
-      updated_at
-    }
-  }
-`;============
+// ================================================
 // SUBSCRIPTION PLAN MANAGER V3 - CRUD FOR STAFF DASHBOARD
 // By PunkClaude - Directiva #007.1 - "LA FÁBRICA"
 // Purpose: Create, Edit, Delete subscription plans with multi-currency support
