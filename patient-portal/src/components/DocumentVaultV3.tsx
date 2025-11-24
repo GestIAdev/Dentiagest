@@ -153,16 +153,44 @@ const DocumentVaultV3: React.FC = () => {
     return true;
   });
 
-  // Handle download
-  const handleDownload = async (document: Document) => {
+  // Handle download -  SECURITY UPGRADE: httpOnly cookies authentication
+  const handleDownload = async (doc: Document) => {
     try {
-      console.log('ðŸ“¥ Downloading document:', document.fileName);
-      // TODO: Implement actual download with Bearer token
-      // For now, open in new tab
-      window.open(document.filePath, '_blank');
+      console.log(' Downloading document:', doc.fileName);
+      
+      //  CRITICAL: Fetch con credentials para enviar httpOnly cookies
+      // Backend debe validar cookie y retornar BLOB con Content-Disposition header
+      const response = await fetch(`http://localhost:8005/api/documents/${doc.id}/download`, {
+        method: 'GET',
+        credentials: 'include', //  Envía httpOnly cookies automáticamente
+        headers: {
+          'Accept': 'application/octet-stream',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Download failed: ${response.statusText}`);
+      }
+
+      // Convert response to Blob
+      const blob = await response.blob();
+      
+      // Create temporary download link
+      const url = window.URL.createObjectURL(blob);
+      const anchor = window.document.createElement('a');
+      anchor.href = url;
+      anchor.download = doc.fileName;
+      window.document.body.appendChild(anchor);
+      anchor.click();
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      window.document.body.removeChild(anchor);
+      
+      console.log(' Document downloaded:', doc.fileName);
     } catch (err) {
-      console.error('âŒ Download error:', err);
-      alert('Error al descargar documento');
+      console.error(' Download error:', err);
+      alert(`Error al descargar documento: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
 
@@ -405,7 +433,7 @@ const DocumentVaultV3: React.FC = () => {
                 onClick={() => setSelectedDocument(null)}
                 className="text-cyber-light hover:text-white transition-colors"
               >
-                ✕
+                ?
               </button>
             </div>
 
@@ -471,3 +499,6 @@ const DocumentVaultV3: React.FC = () => {
 };
 
 export default DocumentVaultV3;
+
+
+

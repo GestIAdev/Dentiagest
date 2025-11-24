@@ -149,8 +149,8 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             <span className="text-cyber-black font-bold text-lg">D</span>
           </div>
           <div className="ml-3">
-            <h1 className="text-lg font-bold text-white">Dentiagest</h1>
-            <p className="text-xs text-cyber-light">Portal Paciente V3</p>
+            <h1 className="text-lg font-bold text-white">VitalPass</h1>
+            <p className="text-xs text-cyber-light">Salud Digital V3</p>
           </div>
         </div>
         {!isDesktop && onClose && (

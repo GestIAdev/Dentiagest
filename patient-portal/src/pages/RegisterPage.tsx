@@ -197,10 +197,10 @@ export default function RegisterPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Crear Cuenta de Paciente
+            Crear Cuenta en VitalPass
           </h1>
           <p className="text-gray-600">
-            Completa el formulario para registrarte en nuestro sistema
+            Completa el formulario para acceder a tu historia clínica digital
           </p>
         </div>
         

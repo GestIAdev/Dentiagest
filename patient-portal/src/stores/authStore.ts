@@ -51,7 +51,7 @@ export const useAuthStore = create<AuthState>()(
           auth: {
             patientId,
             clinicId,
-            token,
+            token: '', // ⚠️ NO almacenar token en state (viene de httpOnly cookie)
             expiresAt,
             isAuthenticated: true,
           },
@@ -59,8 +59,9 @@ export const useAuthStore = create<AuthState>()(
           error: null,
         });
 
-        // Store token in localStorage for Apollo Client
-        localStorage.setItem('patient_portal_token', token);
+        // 🔒 SECURITY UPGRADE: Tokens ahora en httpOnly cookies (backend maneja Set-Cookie)
+        // Ya NO usamos localStorage para tokens (vulnerable a XSS)
+        // El backend debe retornar Set-Cookie header con httpOnly, secure, sameSite
       },
 
       logout: () => {
@@ -70,8 +71,9 @@ export const useAuthStore = create<AuthState>()(
           error: null,
         });
 
-        // Clear token from localStorage
-        localStorage.removeItem('patient_portal_token');
+        // 🔒 SECURITY UPGRADE: Cookies se limpian via backend (logout mutation)
+        // Backend debe retornar Set-Cookie con maxAge=0 para eliminar cookies
+        // Ya NO usamos localStorage.removeItem (tokens en httpOnly cookies)
       },
 
       refreshToken: (newToken: string, expiresIn: number) => {
@@ -83,14 +85,14 @@ export const useAuthStore = create<AuthState>()(
         set({
           auth: {
             ...currentAuth,
-            token: newToken,
+            token: '', // ⚠️ NO almacenar token en state (viene de httpOnly cookie)
             expiresAt,
           },
           error: null,
         });
 
-        // Update token in localStorage
-        localStorage.setItem('patient_portal_token', newToken);
+        // 🔒 SECURITY UPGRADE: Nuevo token viene en httpOnly cookie (backend maneja Set-Cookie)
+        // Ya NO usamos localStorage.setItem (tokens en httpOnly cookies)
       },
 
       setLoading: (loading: boolean) => set({ isLoading: loading }),
@@ -159,14 +161,13 @@ export const loginWithCredentials = async (email: string, password: string): Pro
     useAuthStore.getState().login(
       user.id,
       'default-clinic', // TODO: Get from user data if available
-      accessToken,
+      '', // ⚠️ Token NO se pasa (viene en httpOnly cookie desde backend)
       expiresIn
     );
 
-    // Store refresh token separately
-    localStorage.setItem('patient_portal_refresh_token', refreshToken);
-    
-    // Also store role and email for session restoration
+    // 🔒 SECURITY UPGRADE: Ya NO almacenamos tokens en localStorage
+    // Tokens vienen en httpOnly cookies (Set-Cookie header desde Selene)
+    // Solo guardamos metadata no sensible (role, email) para UI
     localStorage.setItem('patient_portal_user_role', user.role);
     localStorage.setItem('patient_portal_user_email', user.email);
 
@@ -189,14 +190,18 @@ export const logoutUser = async (): Promise<void> => {
 
     // Clear local storage and auth state
     useAuthStore.getState().logout();
-    localStorage.removeItem('patient_portal_refresh_token');
+    // 🔒 SECURITY UPGRADE: Ya NO limpiamos tokens manualmente (httpOnly cookies)
+    // Backend limpia cookies via Set-Cookie maxAge=0
+    localStorage.removeItem('patient_portal_user_role');
+    localStorage.removeItem('patient_portal_user_email');
 
     console.log('✅ Logout successful');
   } catch (error) {
     console.error('❌ Logout error:', error);
     // Even if server logout fails, clear local state
     useAuthStore.getState().logout();
-    localStorage.removeItem('patient_portal_refresh_token');
+    localStorage.removeItem('patient_portal_user_role');
+    localStorage.removeItem('patient_portal_user_email');
   }
 };
 
@@ -205,17 +210,14 @@ export const logoutUser = async (): Promise<void> => {
  */
 export const refreshAccessToken = async (): Promise<boolean> => {
   try {
-    const refreshToken = localStorage.getItem('patient_portal_refresh_token');
+    // 🔒 SECURITY UPGRADE: refreshToken viene en httpOnly cookie (no localStorage)
+    // Backend lee cookie automáticamente vía credentials: 'include'
     
-    if (!refreshToken) {
-      throw new Error('No refresh token available');
-    }
-
     const { data } = await apolloClient.mutate<{ refreshToken: AuthResponse }>({
       mutation: REFRESH_TOKEN_MUTATION,
       variables: {
         input: {
-          refreshToken
+          refreshToken: '' // ⚠️ Backend lee de cookie (no desde body)
         }
       }
     });
@@ -226,9 +228,8 @@ export const refreshAccessToken = async (): Promise<boolean> => {
 
     const { accessToken, refreshToken: newRefreshToken, expiresIn, user } = data.refreshToken;
 
-    // Update tokens
-    useAuthStore.getState().refreshToken(accessToken, expiresIn);
-    localStorage.setItem('patient_portal_refresh_token', newRefreshToken);
+    // Update expiry time (token viene en nueva cookie desde backend)
+    useAuthStore.getState().refreshToken('', expiresIn);
 
     console.log('✅ Token refreshed successfully');
     return true;
@@ -236,7 +237,8 @@ export const refreshAccessToken = async (): Promise<boolean> => {
     console.error('❌ Token refresh failed:', error);
     // Force logout on refresh failure
     useAuthStore.getState().logout();
-    localStorage.removeItem('patient_portal_refresh_token');
+    localStorage.removeItem('patient_portal_user_role');
+    localStorage.removeItem('patient_portal_user_email');
     return false;
   }
 };

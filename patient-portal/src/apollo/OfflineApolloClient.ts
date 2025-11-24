@@ -84,15 +84,14 @@ export class OfflineApolloClient {
 
   // 🚀 CREATE OFFLINE-CAPABLE APOLLO CLIENT
   private createOfflineClient(): ApolloClient<any> {
-    // Auth link - adds JWT Bearer token to requests
+    // 🔒 SECURITY UPGRADE: Auth link ya NO usa Bearer token (httpOnly cookies)
+    // Cookies se envían automáticamente con credentials: 'include'
     const authLink = setContext((_, { headers }) => {
-      // Get token from localStorage (set by authStore)
-      const token = localStorage.getItem('patient_portal_token');
-      
       return {
         headers: {
           ...headers,
-          authorization: token ? `Bearer ${token}` : '',
+          // ⚠️ Ya NO enviamos Authorization header (tokens en httpOnly cookies)
+          // Backend lee cookies automáticamente si configuramos credentials: 'include'
         }
       };
     });
@@ -105,6 +104,7 @@ export class OfflineApolloClient {
         // Use env var if set (production), otherwise round-robin through local nodes
         return process.env.REACT_APP_GRAPHQL_URI || this.getNextSeleneNode();
       },
+      credentials: 'include', // 🔒 CRITICAL: Envía httpOnly cookies en cada request
       fetch: this.offlineAwareFetch.bind(this)
     });
 
