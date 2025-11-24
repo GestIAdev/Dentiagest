@@ -1,6 +1,6 @@
 {
-  "short_name": "DentalCoin",
-  "name": "Portal del Paciente - DentalCoin",
+  "short_name": "VitalPass",
+  "name": "VitalPass - Salud Digital V3",
   "icons": [
     {
       "src": "favicon.ico",
@@ -10,6 +10,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#2563eb",
-  "background_color": "#ffffff"
+  "theme_color": "#667eea",
+  "background_color": "#1a1a2e"
 }

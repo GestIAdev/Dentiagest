@@ -20,6 +20,9 @@ import { PWAInstallPrompt } from './PWAInstallPrompt';
 import { SyncQueueManager } from './SyncQueueManager';
 import { useOfflineCapabilities } from '../hooks/useOfflineCapabilities';
 
+// ⚡ WEB3 GENESIS - WALLET CONNECTION
+import { WalletConnect } from './web3/WalletConnect';
+
 // ============================================================================
 // COMPONENTE: NAVEGACIÓN RESPONSIVA CYBERPUNK V3
 // ============================================================================
@@ -99,6 +102,20 @@ const PatientPortalLayout: React.FC<{ children: React.ReactNode }> = ({ children
 
             {/* 🔥 OFFLINE SUPREMACY - INDICADOR DE CONECTIVIDAD */}
             <div className="flex items-center space-x-2">
+              {/* ⚡ WEB3 GENESIS - WALLET CONNECTION */}
+              <WalletConnect />
+              <OfflineIndicator />
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop top bar - WEB3 HEADER */}
+        <div className="sticky top-0 z-30 bg-cyber-dark/95 backdrop-blur-sm border-b border-neon-cyan/20 hidden lg:block">
+          <div className="flex items-center justify-end px-6 py-3">
+            <div className="flex items-center space-x-4">
+              {/* ⚡ WEB3 GENESIS - WALLET CONNECTION */}
+              <WalletConnect />
+              {/* 🔥 OFFLINE SUPREMACY */}
               <OfflineIndicator />
             </div>
           </div>
