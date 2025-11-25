@@ -35,10 +35,11 @@ export default defineConfig({
     //   use: { ...devices['Desktop Firefox'] },
     // },
   ],
-  webServer: {
-    command: 'npm run start --workspace=patient-portal',
-    url: 'http://localhost:3001',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
+  // ⚡ GOLDEN THREAD MODE: Servers managed externally (Selene:8005 + VitalPass:3001)
+  // webServer: {
+  //   command: 'npm run start --workspace=patient-portal',
+  //   url: 'http://localhost:3001',
+  //   reuseExistingServer: !process.env.CI,
+  //   timeout: 120 * 1000,
+  // },
 });

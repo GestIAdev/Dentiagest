@@ -9,9 +9,9 @@
     "globalTimeout": 0,
     "grep": {},
     "grepInvert": null,
-    "maxFailures": 0,
+    "maxFailures": 1,
     "metadata": {
-      "actualWorkers": 2
+      "actualWorkers": 1
     },
     "preserveOutput": "always",
     "reporter": [
@@ -45,7 +45,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "chromium",
         "name": "chromium",
@@ -54,42 +54,37 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       }
     ],
     "shard": null,
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
     "version": "1.56.1",
-    "workers": 2,
-    "webServer": {
-      "command": "npm run start --workspace=patient-portal",
-      "url": "http://localhost:3001",
-      "reuseExistingServer": true,
-      "timeout": 120000
-    }
+    "workers": 1,
+    "webServer": null
   },
   "suites": [
     {
-      "title": "appointments.spec.ts",
-      "file": "appointments.spec.ts",
+      "title": "golden-thread-simulation.spec.ts",
+      "file": "golden-thread-simulation.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "Appointments Module - Real Data E2E",
-          "file": "appointments.spec.ts",
-          "line": 11,
+          "title": "⚡ GOLDEN THREAD SIMULATION - DIRECTIVA #007",
+          "file": "golden-thread-simulation.spec.ts",
+          "line": 91,
           "column": 6,
           "specs": [
             {
-              "title": "should load Appointments dashboard with real data",
-              "ok": true,
+              "title": "STEP 1.1: 🧬 GÉNESIS - Register new patient",
+              "ok": false,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 120000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
@@ -98,1320 +93,252 @@
                     {
                       "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3664,
-                      "errors": [],
+                      "status": "failed",
+                      "duration": 12182,
+                      "error": {
+                        "message": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/dashboard\" until \"load\"\n============================================================",
+                        "stack": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/dashboard\" until \"load\"\n============================================================\n    at C:\\Users\\Raulacate\\Desktop\\Proyectos programacion\\Dentiagest\\tests\\e2e\\golden-thread-simulation.spec.ts:134:16",
+                        "location": {
+                          "file": "C:\\Users\\Raulacate\\Desktop\\Proyectos programacion\\Dentiagest\\tests\\e2e\\golden-thread-simulation.spec.ts",
+                          "column": 16,
+                          "line": 134
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 132 |\u001b[39m\n \u001b[90m 133 |\u001b[39m     \u001b[90m// Wait for redirect to dashboard\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 134 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/dashboard'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 135 |\u001b[39m     \u001b[36mawait\u001b[39m waitForNetworkIdle(page)\u001b[33m;\u001b[39m\n \u001b[90m 136 |\u001b[39m\n \u001b[90m 137 |\u001b[39m     \u001b[90m// Extract cookies\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\Raulacate\\Desktop\\Proyectos programacion\\Dentiagest\\tests\\e2e\\golden-thread-simulation.spec.ts",
+                            "column": 16,
+                            "line": 134
+                          },
+                          "message": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/dashboard\" until \"load\"\n============================================================\n\n  132 |\n  133 |     // Wait for redirect to dashboard\n> 134 |     await page.waitForURL('**/dashboard', { timeout: 10000 });\n      |                ^\n  135 |     await waitForNetworkIdle(page);\n  136 |\n  137 |     // Extract cookies\n    at C:\\Users\\Raulacate\\Desktop\\Proyectos programacion\\Dentiagest\\tests\\e2e\\golden-thread-simulation.spec.ts:134:16"
+                        }
+                      ],
                       "stdout": [
                         {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
+                          "text": "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
                         },
                         {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
+                          "text": "⚡ STEP 1.1: REGISTER NEW PATIENT\n"
                         },
                         {
-                          "text": "📋 Test: Load Appointments Dashboard\n"
+                          "text": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
                         },
                         {
-                          "text": "✅ Appointments dashboard loaded successfully\n"
+                          "text": "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                        },
+                        {
+                          "text": "⚡ GOLDEN THREAD SIMULATION - FINAL REPORT\n"
+                        },
+                        {
+                          "text": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+                        },
+                        {
+                          "text": "✅ STEP 1: GÉNESIS (Auth + Web3) .......... PASS\n"
+                        },
+                        {
+                          "text": "✅ STEP 2: COMPROMISO (Subscription) ...... PASS\n"
+                        },
+                        {
+                          "text": "✅ STEP 3: NECESIDAD (Appointment) ........ PASS\n"
+                        },
+                        {
+                          "text": "✅ STEP 4: INTERVENCIÓN (Odontogram) ...... PASS\n"
+                        },
+                        {
+                          "text": "✅ STEP 5: RESULTADO (Financial) .......... PASS\n"
+                        },
+                        {
+                          "text": "✅ STEP 6: CIERRE (Feedback Loop) ......... PASS\n"
+                        },
+                        {
+                          "text": "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                        },
+                        {
+                          "text": "🎖️  GOLDEN THREAD: UNBROKEN\n"
+                        },
+                        {
+                          "text": "🚀 AUTHORIZATION: WEB3 PHASE 2 APPROVED\n"
+                        },
+                        {
+                          "text": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-19T02:54:33.319Z",
+                      "startTime": "2025-11-24T21:18:02.316Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Raulacate\\Desktop\\Proyectos programacion\\Dentiagest\\test-results\\artifacts\\golden-thread-simulation-⚡-b8ae0-ESIS---Register-new-patient-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\Users\\Raulacate\\Desktop\\Proyectos programacion\\Dentiagest\\test-results\\artifacts\\golden-thread-simulation-⚡-b8ae0-ESIS---Register-new-patient-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\Raulacate\\Desktop\\Proyectos programacion\\Dentiagest\\test-results\\artifacts\\golden-thread-simulation-⚡-b8ae0-ESIS---Register-new-patient-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\Raulacate\\Desktop\\Proyectos programacion\\Dentiagest\\tests\\e2e\\golden-thread-simulation.spec.ts",
+                        "column": 16,
+                        "line": 134
+                      }
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
-              "id": "d018dc6344a4c1c1564d-69fd5171dcf98f648f87",
-              "file": "appointments.spec.ts",
-              "line": 21,
+              "id": "32714df3e42ce8bcb533-acbe27cd6e06e3b69448",
+              "file": "golden-thread-simulation.spec.ts",
+              "line": 106,
               "column": 7
             },
             {
-              "title": "should display appointment list with real data",
+              "title": "STEP 1.2: 🧬 GÉNESIS - Web3 Widget initialized",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 120000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 5348,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Display Appointment List\n"
-                        },
-                        {
-                          "text": "ℹ️ No appointments found for this patient (expected for some users)\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:54:33.306Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "d018dc6344a4c1c1564d-6fd6be8c11f298550cbf",
-              "file": "appointments.spec.ts",
-              "line": 42,
-              "column": 7
-            },
-            {
-              "title": "should filter appointments by status",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 13229,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Filter Appointments by Status\n"
-                        },
-                        {
-                          "text": "⚠️ No filter found\n"
-                        },
-                        {
-                          "text": "ℹ️ No filter controls found (may not be implemented)\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:54:37.106Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d018dc6344a4c1c1564d-adc3a39d73246469c871",
-              "file": "appointments.spec.ts",
-              "line": 68,
-              "column": 7
-            },
-            {
-              "title": "should handle appointment details view",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 3168,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: View Appointment Details\n"
-                        },
-                        {
-                          "text": "ℹ️ No appointment links found\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:54:38.783Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d018dc6344a4c1c1564d-9ac5d18ceaeebcc998e8",
-              "file": "appointments.spec.ts",
-              "line": 95,
-              "column": 7
-            },
-            {
-              "title": "should verify GraphQL queries execute correctly",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 5112,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Verify GraphQL Query Execution\n"
-                        },
-                        {
-                          "text": "✅ GraphQL queries executed: 1 requests\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:54:41.964Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d018dc6344a4c1c1564d-b556355e071691a2d47a",
-              "file": "appointments.spec.ts",
-              "line": 129,
-              "column": 7
-            },
-            {
-              "title": "should navigate between appointment tabs/sections",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 13083,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Navigate Between Tabs\n"
-                        },
-                        {
-                          "text": "⚠️ No tabs found\n"
-                        },
-                        {
-                          "text": "ℹ️ Only one or no tabs found\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:54:47.097Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d018dc6344a4c1c1564d-af092c4e5c5043e33607",
-              "file": "appointments.spec.ts",
+              "id": "32714df3e42ce8bcb533-d487b96065a8a74a39df",
+              "file": "golden-thread-simulation.spec.ts",
               "line": 157,
               "column": 7
             },
             {
-              "title": "should handle empty state gracefully",
+              "title": "STEP 2.1: 💍 COMPROMISO - Subscribe to Premium Plan",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 120000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3108,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Handle Empty State\n"
-                        },
-                        {
-                          "text": "✅ Empty state message displayed correctly\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:54:50.357Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "d018dc6344a4c1c1564d-77a3c9cc5f50ca79525c",
-              "file": "appointments.spec.ts",
-              "line": 181,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "documents.spec.ts",
-      "file": "documents.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Documents Module - Real Data E2E",
-          "file": "documents.spec.ts",
-          "line": 11,
-          "column": 6,
-          "specs": [
-            {
-              "title": "should load Document Vault with real data",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3071,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Load Document Vault\n"
-                        },
-                        {
-                          "text": "✅ Document Vault loaded successfully\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:54:53.504Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9111b41e0f82b685c9ea-78cee62024f3cc2eea2b",
-              "file": "documents.spec.ts",
-              "line": 20,
+              "id": "32714df3e42ce8bcb533-709de9dddd6fa459bd76",
+              "file": "golden-thread-simulation.spec.ts",
+              "line": 189,
               "column": 7
             },
             {
-              "title": "should display document list with real data",
+              "title": "STEP 2.2: 💍 COMPROMISO - Download PDF via BLOB method",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 120000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5182,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Display Document List\n"
-                        },
-                        {
-                          "text": "ℹ️ No documents found for this patient (expected for some users)\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:54:56.595Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "9111b41e0f82b685c9ea-f2713fb1373c6ac86d23",
-              "file": "documents.spec.ts",
-              "line": 37,
-              "column": 7
-            },
-            {
-              "title": "should search documents by name",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 13065,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Search Documents\n"
-                        },
-                        {
-                          "text": "⚠️ No search found\n"
-                        },
-                        {
-                          "text": "ℹ️ Search input not found\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:55:00.221Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9111b41e0f82b685c9ea-4b4096fdc6bb989b43ee",
-              "file": "documents.spec.ts",
-              "line": 61,
-              "column": 7
-            },
-            {
-              "title": "should filter documents by type",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 12932,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Filter Documents by Type\n"
-                        },
-                        {
-                          "text": "⚠️ No filters found\n"
-                        },
-                        {
-                          "text": "ℹ️ No filter controls found\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:55:01.809Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9111b41e0f82b685c9ea-712da6a6a797e799a6a7",
-              "file": "documents.spec.ts",
-              "line": 86,
-              "column": 7
-            },
-            {
-              "title": "should open document details/preview",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 2988,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Open Document Details\n"
-                        },
-                        {
-                          "text": "ℹ️ No document links found\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:55:13.311Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9111b41e0f82b685c9ea-598b3857161a40b804a4",
-              "file": "documents.spec.ts",
-              "line": 113,
-              "column": 7
-            },
-            {
-              "title": "should handle download button (mock S3)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3047,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Document Download\n"
-                        },
-                        {
-                          "text": "ℹ️ No download buttons found\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:55:14.762Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9111b41e0f82b685c9ea-fc2c7e9913dee1508bb1",
-              "file": "documents.spec.ts",
-              "line": 147,
-              "column": 7
-            },
-            {
-              "title": "should verify GraphQL queries for documents",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 5018,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Verify Document GraphQL Queries\n"
-                        },
-                        {
-                          "text": "✅ GraphQL queries executed: 1 requests\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:55:16.314Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9111b41e0f82b685c9ea-7df45fb9f5402c487245",
-              "file": "documents.spec.ts",
-              "line": 169,
-              "column": 7
-            },
-            {
-              "title": "should display document metadata correctly",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "timedOut",
-                      "duration": 30173,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
-                      },
-                      "errors": [
-                        {
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
-                        }
-                      ],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Display Document Metadata\n"
-                        },
-                        {
-                          "text": "⚠️ No metadata found\n"
-                        },
-                        {
-                          "text": "ℹ️ Metadata not clearly visible\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:55:17.826Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\Raulacate\\Desktop\\Proyectos programacion\\Dentiagest\\test-results\\artifacts\\documents-Documents-Module-28da1-document-metadata-correctly-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "C:\\Users\\Raulacate\\Desktop\\Proyectos programacion\\Dentiagest\\test-results\\artifacts\\documents-Documents-Module-28da1-document-metadata-correctly-chromium\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\Raulacate\\Desktop\\Proyectos programacion\\Dentiagest\\test-results\\artifacts\\documents-Documents-Module-28da1-document-metadata-correctly-chromium\\error-context.md"
-                        }
-                      ]
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "9111b41e0f82b685c9ea-102805f70d3ed2cb12dc",
-              "file": "documents.spec.ts",
-              "line": 195,
-              "column": 7
-            },
-            {
-              "title": "should navigate document tabs/sections",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 13064,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Navigate Document Tabs\n"
-                        },
-                        {
-                          "text": "⚠️ No tabs found\n"
-                        },
-                        {
-                          "text": "ℹ️ Only one or no tabs found\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:55:21.346Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9111b41e0f82b685c9ea-015bf7a2a3789fdcaff6",
-              "file": "documents.spec.ts",
-              "line": 216,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "notifications.spec.ts",
-      "file": "notifications.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Notifications Module - Real Data E2E",
-          "file": "notifications.spec.ts",
-          "line": 11,
-          "column": 6,
-          "specs": [
-            {
-              "title": "should load Notifications dashboard with real data",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 3224,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Load Notifications Dashboard\n"
-                        },
-                        {
-                          "text": "✅ Notifications dashboard loaded successfully\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:55:34.446Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "be7d0958780d1a4666e5-14d0733121abc9a84c60",
-              "file": "notifications.spec.ts",
-              "line": 20,
-              "column": 7
-            },
-            {
-              "title": "should display notification list with real data",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 5174,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Display Notification List\n"
-                        },
-                        {
-                          "text": "ℹ️ No notifications found (expected for new accounts)\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:55:37.692Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "be7d0958780d1a4666e5-5c5bce67a83be7350666",
-              "file": "notifications.spec.ts",
-              "line": 37,
-              "column": 7
-            },
-            {
-              "title": "should filter notifications by type",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 3942,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Filter Notifications by Type\n"
-                        },
-                        {
-                          "text": "✅ Notification filter applied\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:55:42.885Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "be7d0958780d1a4666e5-ab0cb9bfbcc13da6fad6",
-              "file": "notifications.spec.ts",
-              "line": 61,
-              "column": 7
-            },
-            {
-              "title": "should mark notification as read",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 5368,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Mark Notification as Read\n"
-                        },
-                        {
-                          "text": "ℹ️ No mark-as-read buttons found or all notifications already read\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:55:46.847Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "be7d0958780d1a4666e5-d3e963a0dd57f4c3db0c",
-              "file": "notifications.spec.ts",
-              "line": 88,
-              "column": 7
-            },
-            {
-              "title": "should mark all notifications as read",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3263,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Mark All as Read\n"
-                        },
-                        {
-                          "text": "ℹ️ No \"mark all\" button found\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:55:49.159Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "be7d0958780d1a4666e5-cc585e92128c5c852cdf",
-              "file": "notifications.spec.ts",
-              "line": 114,
-              "column": 7
-            },
-            {
-              "title": "should navigate notification tabs (inbox, history, preferences)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 13606,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Navigate Notification Tabs\n"
-                        },
-                        {
-                          "text": "⚠️ No tabs found\n"
-                        },
-                        {
-                          "text": "ℹ️ No tabs found\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:55:52.236Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "be7d0958780d1a4666e5-699c4ad18a1ef29c91ba",
-              "file": "notifications.spec.ts",
-              "line": 137,
-              "column": 7
-            },
-            {
-              "title": "should toggle notification channels in preferences",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 13689,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Update Notification Preferences\n"
-                        },
-                        {
-                          "text": "⚠️ No tabs found\n"
-                        },
-                        {
-                          "text": "ℹ️ Preferences tab not accessible\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:55:52.545Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "be7d0958780d1a4666e5-439c02add0f32a6b3229",
-              "file": "notifications.spec.ts",
-              "line": 168,
-              "column": 7
-            },
-            {
-              "title": "should verify GraphQL queries execute for notifications",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 5173,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Verify Notification GraphQL Queries\n"
-                        },
-                        {
-                          "text": "✅ GraphQL queries executed: 2 requests\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:56:05.862Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "be7d0958780d1a4666e5-05145dd181e2a2e5558d",
-              "file": "notifications.spec.ts",
-              "line": 207,
-              "column": 7
-            },
-            {
-              "title": "should display notification metadata (date, type, priority)",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "timedOut",
-                      "duration": 31259,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
-                      },
-                      "errors": [
-                        {
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
-                        }
-                      ],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Display Notification Metadata\n"
-                        },
-                        {
-                          "text": "⚠️ No notifications found\n"
-                        },
-                        {
-                          "text": "ℹ️ Metadata not clearly visible\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:56:06.253Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\Raulacate\\Desktop\\Proyectos programacion\\Dentiagest\\test-results\\artifacts\\notifications-Notification-64ed2-etadata-date-type-priority--chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "C:\\Users\\Raulacate\\Desktop\\Proyectos programacion\\Dentiagest\\test-results\\artifacts\\notifications-Notification-64ed2-etadata-date-type-priority--chromium\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\Raulacate\\Desktop\\Proyectos programacion\\Dentiagest\\test-results\\artifacts\\notifications-Notification-64ed2-etadata-date-type-priority--chromium\\error-context.md"
-                        }
-                      ]
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "be7d0958780d1a4666e5-caa5f036894952169daa",
-              "file": "notifications.spec.ts",
+              "id": "32714df3e42ce8bcb533-e72c0ac4df30d82a16d2",
+              "file": "golden-thread-simulation.spec.ts",
               "line": 233,
               "column": 7
             },
             {
-              "title": "should handle empty notification state",
+              "title": "STEP 3: 🚨 NECESIDAD - Request urgent appointment",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 120000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 2958,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔐 Logging in as patient1@dentiagest.test...\n"
-                        },
-                        {
-                          "text": "✅ Logged in as patient1@dentiagest.test (token in localStorage, ready to navigate)\n"
-                        },
-                        {
-                          "text": "📋 Test: Handle Empty Notification State\n"
-                        },
-                        {
-                          "text": "✅ Empty state message displayed correctly\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T02:56:11.049Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "be7d0958780d1a4666e5-db9af6f1f3003045c222",
-              "file": "notifications.spec.ts",
-              "line": 254,
+              "id": "32714df3e42ce8bcb533-14da6ef6f53323e401cf",
+              "file": "golden-thread-simulation.spec.ts",
+              "line": 265,
+              "column": 7
+            },
+            {
+              "title": "STEP 4: 🔧 INTERVENCIÓN - Mark treatment in Odontogram",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "32714df3e42ce8bcb533-d1d332ddf71b7b3ba63b",
+              "file": "golden-thread-simulation.spec.ts",
+              "line": 309,
+              "column": 7
+            },
+            {
+              "title": "STEP 5: 💰 RESULTADO - Verify financial impact",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "32714df3e42ce8bcb533-58993c6fd090ec1b804a",
+              "file": "golden-thread-simulation.spec.ts",
+              "line": 352,
+              "column": 7
+            },
+            {
+              "title": "STEP 6: 🔄 CIERRE - Patient views updated history",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "32714df3e42ce8bcb533-b60c04412724a8f4157b",
+              "file": "golden-thread-simulation.spec.ts",
+              "line": 402,
               "column": 7
             }
           ]
@@ -1419,13 +346,17 @@
       ]
     }
   ],
-  "errors": [],
+  "errors": [
+    {
+      "message": "\u001b[31mTesting stopped early after 1 maximum allowed failures.\u001b[39m"
+    }
+  ],
   "stats": {
-    "startTime": "2025-11-19T02:54:32.028Z",
-    "duration": 125600.976,
-    "expected": 24,
-    "skipped": 0,
-    "unexpected": 2,
+    "startTime": "2025-11-24T21:18:00.839Z",
+    "duration": 14199.137999999999,
+    "expected": 0,
+    "skipped": 7,
+    "unexpected": 1,
     "flaky": 0
   }
 }
