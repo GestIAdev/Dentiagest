@@ -16,6 +16,12 @@
 
 import { create } from 'zustand';
 import { ethers } from 'ethers';
+import { 
+  CONTRACTS, 
+  DENTIA_TOKEN_ABI, 
+  formatTokenAmount,
+  NETWORKS 
+} from '../config/web3';
 
 // ═══════════════════════════════════════════════════════════
 // TYPES & INTERFACES
@@ -47,6 +53,7 @@ interface Web3Actions {
   disconnect: () => void;
   switchNetwork: (targetChainId: number) => Promise<void>;
   clearError: () => void;
+  fetchTokenBalance: () => Promise<void>; // NEW: Fetch DENTIA balance
   
   // Event handlers (internal)
   handleAccountsChanged: (accounts: string[]) => void;
@@ -191,6 +198,9 @@ export const useWeb3Store = create<Web3Store>((set, get) => ({
 
       console.log('🎉 VitalPass Web3 connection established!');
 
+      // Fetch DENTIA balance from blockchain
+      await get().fetchTokenBalance();
+
       // Setup event listeners
       ethereum.on('accountsChanged', get().handleAccountsChanged);
       ethereum.on('chainChanged', get().handleChainChanged);
@@ -306,7 +316,7 @@ export const useWeb3Store = create<Web3Store>((set, get) => ({
                 symbol: 'ETH',
                 decimals: 18,
               },
-              rpcUrls: ['https://sepolia.infura.io/v3/'],
+              rpcUrls: ['https://1rpc.io/sepolia'],
               blockExplorerUrls: ['https://sepolia.etherscan.io'],
             }],
           });
@@ -327,6 +337,51 @@ export const useWeb3Store = create<Web3Store>((set, get) => ({
     set({ error: null });
   },
 
+  /**
+   * Fetch DENTIA token balance from blockchain
+   */
+  fetchTokenBalance: async () => {
+    const { provider, address, chainId } = get();
+    
+    if (!provider || !address || !chainId) {
+      console.warn('⚠️ Cannot fetch balance: wallet not connected');
+      return;
+    }
+
+    try {
+      // Get contract address for current network
+      const tokenAddress = CONTRACTS.DENTIA_TOKEN[chainId as keyof typeof CONTRACTS.DENTIA_TOKEN];
+      
+      if (!tokenAddress) {
+        console.warn(`⚠️ DENTIA token not deployed on chain ${chainId}`);
+        set({ balance: '0 DENTIA' });
+        return;
+      }
+
+      // Create contract instance
+      const tokenContract = new ethers.Contract(
+        tokenAddress,
+        DENTIA_TOKEN_ABI,
+        provider
+      );
+
+      // Fetch balance
+      console.log('🔍 Fetching DENTIA balance for:', address);
+      const balanceWei = await tokenContract.balanceOf(address);
+      
+      // Format balance (18 decimals)
+      const balanceFormatted = formatTokenAmount(balanceWei);
+      
+      console.log('💰 DENTIA Balance:', balanceFormatted);
+      
+      set({ balance: `${balanceFormatted} DENTIA` });
+
+    } catch (error) {
+      console.error('❌ Error fetching token balance:', error);
+      set({ balance: '0 DENTIA' }); // Fallback to 0 on error
+    }
+  },
+
   // ─────────────────────────────────────────────────────────
   // EVENT HANDLERS (Private methods accessed via get())
   // ─────────────────────────────────────────────────────────
@@ -341,7 +396,7 @@ export const useWeb3Store = create<Web3Store>((set, get) => ({
     } else {
       // User switched accounts
       console.log('🔄 Account switched, reconnecting...');
-      get().connectWallet();
+      get().connectWallet(); // This will also fetch the new balance
     }
   },
 

@@ -25,7 +25,7 @@ export const NETWORKS = {
   SEPOLIA: {
     chainId: 11155111,
     name: 'Sepolia Testnet',
-    rpcUrl: 'https://sepolia.infura.io/v3/',
+    rpcUrl: 'https://1rpc.io/sepolia',
     blockExplorer: 'https://sepolia.etherscan.io',
     nativeCurrency: {
       name: 'Sepolia Ether',
@@ -36,23 +36,25 @@ export const NETWORKS = {
 } as const;
 
 // ═══════════════════════════════════════════════════════════
-// CONTRACT ADDRESSES (Phase 2 - Empty for now)
+// CONTRACT ADDRESSES - LIVE ON SEPOLIA ⚡
+// Deployed: November 25, 2025
 // ═══════════════════════════════════════════════════════════
 
 export const CONTRACTS = {
   DENTIA_TOKEN: {
     // Mainnet address (to be deployed)
     [NETWORKS.MAINNET.chainId]: '',
-    // Sepolia testnet address (to be deployed)
-    [NETWORKS.SEPOLIA.chainId]: '',
+    // Sepolia testnet address (LIVE ✅)
+    [NETWORKS.SEPOLIA.chainId]: '0x9Aef082d6A8EB49Dc6e7db19E5D118746f599Fad',
   },
   REWARDS_VAULT: {
     [NETWORKS.MAINNET.chainId]: '',
-    [NETWORKS.SEPOLIA.chainId]: '',
+    // Sepolia testnet address (LIVE ✅)
+    [NETWORKS.SEPOLIA.chainId]: '0x30f21027Abe424AfAFe3DBE0c7BC842C1Ea86B3f',
   },
   STAKING_POOL: {
     [NETWORKS.MAINNET.chainId]: '',
-    [NETWORKS.SEPOLIA.chainId]: '',
+    [NETWORKS.SEPOLIA.chainId]: '', // Future feature
   },
 } as const;
 
@@ -157,3 +159,114 @@ export function parseTokenAmount(amount: string, decimals: number = WEB3_CONFIG.
   
   return BigInt(combined);
 }
+
+// ═══════════════════════════════════════════════════════════
+// CONTRACT ABIs (Minimal for reading balance)
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * DentiaCoin ERC-20 ABI (minimal interface for frontend)
+ */
+export const DENTIA_TOKEN_ABI = [
+  // Read functions
+  {
+    constant: true,
+    inputs: [{ name: '_owner', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: 'balance', type: 'uint256' }],
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ name: '', type: 'uint8' }],
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ name: '', type: 'string' }],
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'name',
+    outputs: [{ name: '', type: 'string' }],
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ name: '', type: 'uint256' }],
+    type: 'function',
+  },
+  // Write functions
+  {
+    constant: false,
+    inputs: [
+      { name: '_to', type: 'address' },
+      { name: '_value', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ name: '', type: 'bool' }],
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      { name: '_spender', type: 'address' },
+      { name: '_value', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', type: 'bool' }],
+    type: 'function',
+  },
+  // Events
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'from', type: 'address' },
+      { indexed: true, name: 'to', type: 'address' },
+      { indexed: false, name: 'value', type: 'uint256' },
+    ],
+    name: 'Transfer',
+    type: 'event',
+  },
+] as const;
+
+/**
+ * DentiaRewards ABI (minimal interface for frontend)
+ */
+export const DENTIA_REWARDS_ABI = [
+  // Read functions
+  {
+    constant: true,
+    inputs: [{ name: '', type: 'address' }],
+    name: 'totalRewardsReceived',
+    outputs: [{ name: '', type: 'uint256' }],
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [{ name: '', type: 'address' }],
+    name: 'lastRewardTimestamp',
+    outputs: [{ name: '', type: 'uint256' }],
+    type: 'function',
+  },
+  // Events
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'patient', type: 'address' },
+      { indexed: false, name: 'amount', type: 'uint256' },
+      { indexed: false, name: 'reason', type: 'string' },
+      { indexed: false, name: 'timestamp', type: 'uint256' },
+    ],
+    name: 'RewardDistributed',
+    type: 'event',
+  },
+] as const;
