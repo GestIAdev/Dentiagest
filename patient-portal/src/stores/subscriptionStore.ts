@@ -242,17 +242,25 @@ export const createPatientSubscription = async (
   autoRenew = true
 ): Promise<PatientSubscription> => {
   try {
+    // 🔧 FIX: Solo enviar clinicId si es un UUID válido
+    // Si es 'default-clinic' o similar, el backend buscará el anclaje
+    const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clinicId);
+    
+    const input: CreateSubscriptionInput = {
+      patientId,
+      planId,
+      autoRenew,
+      startDate: new Date().toISOString(),
+    };
+    
+    // Solo incluir clinicId si es UUID válido
+    if (isValidUUID) {
+      input.clinicId = clinicId;
+    }
+    
     const { data } = await apolloClient.mutate<{ createSubscriptionV3: GraphQLSubscription }>({
       mutation: CREATE_SUBSCRIPTION,
-      variables: {
-        input: {
-          patientId,
-          clinicId,
-          planId,
-          autoRenew,
-          startDate: new Date().toISOString(),
-        } as CreateSubscriptionInput
-      }
+      variables: { input }
     });
 
     if (!data?.createSubscriptionV3) {

@@ -273,6 +273,7 @@ export interface PatientSubscription {
 export interface CreateSubscriptionInput {
   patientId: string;
   planId: string;
+  clinicId?: string;  // 🔧 OPCIONAL: Si no se envía, backend usa anclaje del paciente
   paymentMethodId?: string;
   autoRenew?: boolean;
   startDate?: string;
