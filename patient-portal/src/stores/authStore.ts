@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { apolloClient } from '../config/apollo';
 import { LOGIN_MUTATION, LOGOUT_MUTATION, REFRESH_TOKEN_MUTATION, type LoginInput, type AuthResponse } from '../graphql/auth';
+import { UPDATE_PATIENT_WALLET_MUTATION } from '../graphql/patient';
 
 // ============================================================================
 // INTERFACES Y TIPOS - TITAN V3 AUTH SYSTEM
@@ -178,6 +179,23 @@ export const loginWithCredentials = async (email: string, password: string): Pro
     localStorage.setItem('patient_portal_user_email', user.email);
 
     console.log('✅ Login successful:', user.email, '(role:', user.role + ')');
+    
+    // 🔗 DIRECTIVA #007.6: Persist wallet after login if connected
+    // Import dynamically to avoid circular dependency
+    import('./web3Store').then(({ useWeb3Store }) => {
+      const web3State = useWeb3Store.getState();
+      if (web3State.isConnected && web3State.address) {
+        console.log('🔗 Post-login: Persisting wallet to backend...');
+        apolloClient.mutate({
+          mutation: UPDATE_PATIENT_WALLET_MUTATION,
+          variables: { walletAddress: web3State.address },
+        }).then(() => {
+          console.log('✅ Wallet persisted after login');
+        }).catch((err: any) => {
+          console.warn('⚠️ Failed to persist wallet after login:', err.message);
+        });
+      }
+    });
   } catch (error) {
     console.error('❌ Login failed:', error);
     useAuthStore.getState().setError(error instanceof Error ? error.message : 'Login failed');

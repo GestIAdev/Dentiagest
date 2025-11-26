@@ -25,6 +25,7 @@ import {
 } from '../config/web3';
 import { apolloClient } from '../config/apollo';
 import { UPDATE_PATIENT_WALLET_MUTATION } from '../graphql/patient';
+import { useAuthStore } from './authStore';
 
 // ═══════════════════════════════════════════════════════════
 // TYPES & INTERFACES
@@ -201,18 +202,22 @@ export const useWeb3Store = create<Web3Store>((set, get) => ({
 
       console.log('🎉 VitalPass Web3 connection established!');
 
-      // 🔗 DIRECTIVA #007.6: Persist wallet to backend
-      try {
-        console.log('🔗 Persisting wallet to backend...');
-        await apolloClient.mutate({
-          mutation: UPDATE_PATIENT_WALLET_MUTATION,
-          variables: { walletAddress: address },
-        });
-        console.log('✅ Wallet persisted to backend successfully');
-      } catch (walletError: any) {
-        // Non-blocking: log but don't fail the connection
-        console.warn('⚠️ Failed to persist wallet to backend:', walletError.message);
-        // This can happen if user is not authenticated yet
+      // 🔗 DIRECTIVA #007.6: Persist wallet to backend (only if authenticated)
+      const authState = useAuthStore.getState();
+      if (authState.auth?.isAuthenticated) {
+        try {
+          console.log('🔗 Persisting wallet to backend...');
+          await apolloClient.mutate({
+            mutation: UPDATE_PATIENT_WALLET_MUTATION,
+            variables: { walletAddress: address },
+          });
+          console.log('✅ Wallet persisted to backend successfully');
+        } catch (walletError: any) {
+          // Non-blocking: log but don't fail the connection
+          console.warn('⚠️ Failed to persist wallet to backend:', walletError.message);
+        }
+      } else {
+        console.log('ℹ️ User not authenticated - wallet will be persisted after login');
       }
 
       // Fetch DENTIA balance from blockchain
