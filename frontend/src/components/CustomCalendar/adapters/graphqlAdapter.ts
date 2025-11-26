@@ -30,6 +30,7 @@ export interface GraphQLAppointmentV3 {
   practitionerId?: string;
   appointmentDate: string;       // ISO date string: "2025-11-09"
   appointmentTime: string;       // Time string: "14:30:00"
+  scheduled_date?: string;       // Combined timestamp from DB (optional)
   duration: number;              // Minutes: 30, 45, 60
   type: string;                  // Backend type: "consulta", "limpieza", etc.
   status: string;                // Backend status: "confirmed", "pending", etc.
@@ -37,14 +38,6 @@ export interface GraphQLAppointmentV3 {
   treatmentDetails?: string;
   createdAt: string;
   updatedAt: string;
-  
-  // @veritas quantum verification
-  _veritas?: {
-    verified: boolean;
-    confidence: number;
-    level: string;
-    certificate?: string;
-  };
 }
 
 // ============================================================================
@@ -95,20 +88,12 @@ const STATUS_MAPPING: Record<string, AppointmentData['status']> = {
 };
 
 /**
- * Determines priority based on appointment type and @veritas confidence
+ * Determines priority based on appointment type
  */
-function calculatePriority(
-  type: string, 
-  veritasConfidence?: number
-): AppointmentData['priority'] {
+function calculatePriority(type: string): AppointmentData['priority'] {
   // Emergencies are always urgent
   if (type.toLowerCase().includes('emergencia') || type.toLowerCase().includes('emergency')) {
     return 'urgent';
-  }
-  
-  // High confidence from @veritas = high priority (verified accuracy)
-  if (veritasConfidence && veritasConfidence > 0.9) {
-    return 'high';
   }
   
   // Default
@@ -131,10 +116,10 @@ function calculatePriority(
 export function adaptGraphQLToCalendar(
   gqlAppointment: GraphQLAppointmentV3
 ): AppointmentData {
-  // 1️⃣ Parse date/time from separate fields
-  const appointmentDateTime = parseISO(
-    `${gqlAppointment.appointmentDate}T${gqlAppointment.appointmentTime}`
-  );
+  // 1️⃣ Parse date/time from separate fields OR scheduled_date
+  const appointmentDateTime = gqlAppointment.scheduled_date
+    ? parseISO(gqlAppointment.scheduled_date)
+    : parseISO(`${gqlAppointment.appointmentDate}T${gqlAppointment.appointmentTime}`);
   
   // 2️⃣ Calculate end time from duration
   const endTime = addMinutes(appointmentDateTime, gqlAppointment.duration);
@@ -150,13 +135,10 @@ export function adaptGraphQLToCalendar(
   // 5️⃣ Map status
   const calendarStatus = STATUS_MAPPING[gqlAppointment.status.toLowerCase()] || 'pending';
   
-  // 6️⃣ Calculate priority (emergency + @veritas confidence)
-  const priority = calculatePriority(
-    gqlAppointment.type, 
-    gqlAppointment._veritas?.confidence
-  );
+  // 6️⃣ Calculate priority (emergency check only)
+  const priority = calculatePriority(gqlAppointment.type);
   
-  // 7️⃣ Assemble calendar appointment
+  // 7️⃣ Assemble calendar appointment (include scheduled_date for compatibility)
   return {
     id: gqlAppointment.id,
     patientName,
@@ -173,6 +155,8 @@ export function adaptGraphQLToCalendar(
     phone: gqlAppointment.patient?.phone,
     doctorName: undefined, // TODO: Add practitioner data when available
     treatmentCode: gqlAppointment.treatmentDetails,
+    // @ts-ignore - Add scheduled_date for MonthViewSimple compatibility
+    scheduled_date: gqlAppointment.scheduled_date || `${gqlAppointment.appointmentDate}T${gqlAppointment.appointmentTime}`,
   };
 }
 
