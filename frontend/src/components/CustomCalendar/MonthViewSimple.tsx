@@ -28,24 +28,24 @@ const MonthViewSimple: React.FC<MonthViewSimpleProps> = ({
 
   return (
     <div className="month-view" style={{
-      background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+      background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
       borderRadius: '16px',
       padding: '24px',
-      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.08)',
-      border: '1px solid #e2e8f0'
+      boxShadow: '0 10px 25px rgba(139, 92, 246, 0.2)',
+      border: '1px solid #6366f1'
     }}>
       {/* Calendar Grid */}
       <div className="calendar-grid">
         {/* Weekday headers */}
         <div className="grid grid-cols-7 gap-3 mb-4" style={{
-          background: 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%)',
+          background: 'linear-gradient(135deg, #334155 0%, #1e293b 100%)',
           borderRadius: '12px',
           padding: '16px 8px',
-          border: '1px solid #cbd5e1'
+          border: '1px solid #6366f1'
         }}>
           {weekDays.map(day => (
-            <div key={day} className="text-center text-sm font-bold text-gray-700" style={{
-              textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+            <div key={day} className="text-center text-sm font-bold text-cyan-400" style={{
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
               letterSpacing: '0.5px'
             }}>
               {day}
@@ -69,23 +69,23 @@ const MonthViewSimple: React.FC<MonthViewSimpleProps> = ({
                 onClick={() => onDateClick(date)} // 📍 Allow navigation to any date
               style={{
                 background: isPastDate
-                  ? 'linear-gradient(135deg, #fefbfb 0%, #fef2f2 100%)' // 🌸 SUPER soft pink for past dates
+                  ? 'linear-gradient(135deg, #0a0e1a 0%, #0f172a 100%)' // 🌸 Dark for past dates
                   : helpers.isDateInCurrentMonth(date) 
-                    ? 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)' 
-                    : 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+                    ? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)' 
+                    : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
                 borderRadius: '12px',
                 border: helpers.isDateToday(date) 
-                  ? '3px solid #64748b' 
-                  : '1px solid #e2e8f0',
+                  ? '3px solid #6366f1' 
+                  : '1px solid #475569',
                 boxShadow: helpers.isDateToday(date) 
-                  ? '0 8px 25px rgba(100, 116, 139, 0.15)' 
-                  : '0 4px 12px rgba(0, 0, 0, 0.05)',
+                  ? '0 8px 25px rgba(99, 102, 241, 0.25)' 
+                  : '0 4px 12px rgba(139, 92, 246, 0.1)',
                 height: '90px',
-                cursor: 'pointer', // 📍 Always pointer - MonthView is navigator, not editor
+                cursor: 'pointer',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 color: isPastDate 
-                  ? '#9ca3af' // 🌸 Subtle gray for past dates (like out-of-month)
-                  : helpers.isDateInCurrentMonth(date) ? '#1f2937' : '#9ca3af',
+                  ? '#64748b' // Subtle gray for past dates
+                  : helpers.isDateInCurrentMonth(date) ? '#e2e8f0' : '#64748b',
                 fontWeight: helpers.isDateToday(date) ? 'bold' : '500',
                 opacity: isPastDate ? 0.85 : 1
               }}
@@ -93,20 +93,20 @@ const MonthViewSimple: React.FC<MonthViewSimpleProps> = ({
               onMouseEnter={(e) => {
                 if (helpers.isDateInCurrentMonth(date) && !isPastDate) {
                   e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 12px 25px rgba(0, 0, 0, 0.12)';
-                  e.currentTarget.style.background = 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)';
+                  e.currentTarget.style.boxShadow = '0 12px 25px rgba(139, 92, 246, 0.25)';
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #334155 0%, #475569 100%)';
                 }
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
                 e.currentTarget.style.boxShadow = helpers.isDateToday(date) 
-                  ? '0 8px 25px rgba(100, 116, 139, 0.15)' 
-                  : '0 4px 12px rgba(0, 0, 0, 0.05)';
+                  ? '0 8px 25px rgba(99, 102, 241, 0.25)' 
+                  : '0 4px 12px rgba(139, 92, 246, 0.1)';
                 e.currentTarget.style.background = isPastDate
-                  ? 'linear-gradient(135deg, #fefbfb 0%, #fef2f2 100%)' // 🌸 Restore past date background
+                  ? 'linear-gradient(135deg, #0a0e1a 0%, #0f172a 100%)'
                   : helpers.isDateInCurrentMonth(date) 
-                    ? 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)' 
-                    : 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)';
+                    ? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)' 
+                    : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)';
               }}
             >
               <div className="font-medium">

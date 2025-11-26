@@ -20,15 +20,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Button } from '../components/ui/button';
 import PatientFormSheet from '../components/Forms/PatientFormSheet';
+import CreateAppointmentModal from '../components/Appointments/CreateAppointmentModal';
 import {
   GET_PENDING_SUGGESTIONS,
+  GET_TODAY_APPOINTMENTS,
   APPROVE_SUGGESTION,
   REJECT_SUGGESTION,
   getUrgencyFromScore,
   POLL_INTERVAL,
   type AppointmentSuggestion,
+  type TodayAppointment,
   type GetPendingSuggestionsData,
   type GetPendingSuggestionsVars,
+  type GetTodayAppointmentsData,
+  type GetTodayAppointmentsVars,
   type ApproveSuggestionVars,
   type RejectSuggestionVars
 } from '../graphql/queries/dashboard';
@@ -72,15 +77,32 @@ function transformSuggestionToRequest(suggestion: AppointmentSuggestion): Selene
 }
 
 // ============================================================================
-// MOCK DATA (Solo para stats - TODO: conectar con métricas reales)
+// HELPERS
 // ============================================================================
 
-const MOCK_TODAY_STATS = {
-  totalAppointments: 8,
-  completedAppointments: 3,
-  estimatedRevenue: 2450,
-  newPatients: 2
-};
+/**
+ * Obtiene la fecha de hoy en formato YYYY-MM-DD para la query
+ */
+function getTodayDateString(): string {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+}
+
+/**
+ * Cuenta citas por estado
+ */
+function countAppointmentsByStatus(
+  appointments: TodayAppointment[]
+): { total: number; completed: number; pending: number; confirmed: number } {
+  const total = appointments.length;
+  const completed = appointments.filter(a => a.status === 'COMPLETED').length;
+  const confirmed = appointments.filter(a => 
+    a.status === 'CONFIRMED' || a.status === 'CHECKED_IN'
+  ).length;
+  const pending = total - completed;
+  
+  return { total, completed, pending, confirmed };
+}
 
 // ============================================================================
 // SUB-COMPONENTS
@@ -320,6 +342,7 @@ const DashboardPageV4: React.FC = () => {
   const { state } = useAuth();
   const navigate = useNavigate();
   const [isPatientFormOpen, setIsPatientFormOpen] = useState(false);
+  const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
   const [rejectModal, setRejectModal] = useState<{ open: boolean; id: string | null }>({ 
     open: false, 
     id: null 
@@ -340,6 +363,29 @@ const DashboardPageV4: React.FC = () => {
     }
   );
 
+  // 📅 WIDGET IZQUIERDO: Citas del Día (La Agenda)
+  const todayDate = getTodayDateString();
+  const {
+    data: todayAppointmentsData,
+    loading: appointmentsLoading,
+    refetch: refetchAppointments
+  } = useQuery<GetTodayAppointmentsData, GetTodayAppointmentsVars>(
+    GET_TODAY_APPOINTMENTS,
+    {
+      variables: { date: todayDate },
+      pollInterval: POLL_INTERVAL * 2, // 10 segundos para la agenda
+      fetchPolicy: 'network-only'
+    }
+  );
+
+  // 📊 Estadísticas de citas del día
+  const todayStats = React.useMemo(() => {
+    if (!todayAppointmentsData?.appointmentsV3ByDate) {
+      return { total: 0, completed: 0, pending: 0, confirmed: 0 };
+    }
+    return countAppointmentsByStatus(todayAppointmentsData.appointmentsV3ByDate);
+  }, [todayAppointmentsData]);
+
   // 🎬 Mutations para aprobar/rechazar
   const [approveSuggestion, { loading: approving }] = useMutation<unknown, ApproveSuggestionVars>(
     APPROVE_SUGGESTION,
@@ -347,6 +393,7 @@ const DashboardPageV4: React.FC = () => {
       onCompleted: () => {
         console.log('✅ Cita creada exitosamente desde sugerencia');
         refetchSuggestions();
+        refetchAppointments(); // 📅 Actualizar contador de citas del día
       },
       onError: (error) => {
         console.error('❌ Error al aprobar sugerencia:', error);
@@ -509,20 +556,33 @@ const DashboardPageV4: React.FC = () => {
             
             {/* COLUMNA 1: ESTADO (3 cols) */}
             <div className="col-span-3 flex flex-col gap-4">
-              <KPICard 
-                title="Ingresos Hoy"
-                value={`$${MOCK_TODAY_STATS.estimatedRevenue.toLocaleString()}`}
-                subtitle="vs $2,100 ayer"
-                icon="💵"
-                trend="up"
-              />
-              <KPICard 
-                title="Citas del Día"
-                value={`${MOCK_TODAY_STATS.completedAppointments}/${MOCK_TODAY_STATS.totalAppointments}`}
-                subtitle={`${MOCK_TODAY_STATS.totalAppointments - MOCK_TODAY_STATS.completedAppointments} pendientes`}
-                icon="📅"
-                trend="neutral"
-              />
+              {/* 📅 WIDGET: Citas del Día - Click → Calendario */}
+              <Card 
+                className="bg-slate-900/40 backdrop-blur-md border-purple-500/20 shadow-lg shadow-purple-500/10 cursor-pointer hover:border-cyan-500/40 transition-all group"
+                onClick={() => navigate('/calendar')}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-slate-400 text-sm font-medium">Citas del Día</p>
+                      <p className="text-3xl font-bold text-white mt-1">
+                        {appointmentsLoading ? (
+                          <span className="text-slate-500">...</span>
+                        ) : (
+                          `${todayStats.completed}/${todayStats.total}`
+                        )}
+                      </p>
+                      <p className="text-slate-500 text-xs mt-1">
+                        {appointmentsLoading ? 'Cargando...' : `${todayStats.pending} pendientes`}
+                      </p>
+                    </div>
+                    <div className="text-3xl group-hover:scale-110 transition-transform">📅</div>
+                  </div>
+                  <div className="mt-2 text-xs text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Click para ver agenda →
+                  </div>
+                </CardContent>
+              </Card>
               <Web3BalanceCard />
             </div>
 
@@ -606,7 +666,7 @@ const DashboardPageV4: React.FC = () => {
               <QuickActionButton
                 icon="📅"
                 label="+ Cita"
-                onClick={() => navigate('/appointments')}
+                onClick={() => setIsAppointmentModalOpen(true)}
               />
               <QuickActionButton
                 icon="💰"
@@ -660,6 +720,21 @@ const DashboardPageV4: React.FC = () => {
           setIsPatientFormOpen(false);
           console.log('✅ Paciente creado desde Dashboard');
         }}
+      />
+
+      {/* ================================================================== */}
+      {/* MODAL: NUEVA CITA MANUAL */}
+      {/* ================================================================== */}
+      <CreateAppointmentModal
+        isOpen={isAppointmentModalOpen}
+        onClose={() => setIsAppointmentModalOpen(false)}
+        onCreate={(appointment) => {
+          console.log('✅ Cita creada desde Dashboard:', appointment);
+          setIsAppointmentModalOpen(false);
+          refetchAppointments(); // Actualizar contador de citas del día
+        }}
+        selectedDate={getTodayDateString()}
+        selectedTime={null}
       />
     </div>
   );

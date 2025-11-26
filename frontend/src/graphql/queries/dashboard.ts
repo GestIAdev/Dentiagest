@@ -12,10 +12,39 @@ import { gql } from '@apollo/client';
 // ============================================================================
 
 /**
+ * GET_TODAY_APPOINTMENTS
+ * -------------------------
+ * Obtiene las citas del día actual para mostrar en el Widget Izquierdo.
+ * Usa appointmentsV3ByDate que ya filtra por clinic_id via EMPIRE V2.
+ * Widget: "Citas del Día" - La Agenda
+ */
+export const GET_TODAY_APPOINTMENTS = gql`
+  query GetTodayAppointments($date: String!) {
+    appointmentsV3ByDate(date: $date) {
+      id
+      patient_id
+      patient {
+        id
+        firstName
+        lastName
+      }
+      scheduled_date
+      duration_minutes
+      appointment_type
+      status
+      title
+      description
+      dentist_id
+    }
+  }
+`;
+
+/**
  * GET_PENDING_SUGGESTIONS
  * -------------------------
  * Obtiene las sugerencias de cita pendientes de revisión.
  * Filtro: status = "PENDING"
+ * Widget: "Solicitudes Entrantes" - El Buzón de VitalPass
  * Uso: War Room Dashboard con pollInterval para real-time
  */
 export const GET_PENDING_SUGGESTIONS = gql`
@@ -115,6 +144,31 @@ export const REJECT_SUGGESTION = gql`
 // ============================================================================
 // 🔧 TYPES (Para TypeScript)
 // ============================================================================
+
+export interface TodayAppointment {
+  id: string;
+  patient_id: string;
+  patient?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  scheduled_date: string;
+  duration_minutes: number;
+  appointment_type: string;
+  status: 'CONFIRMED' | 'CHECKED_IN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
+  title?: string;
+  description?: string;
+  dentist_id?: string;
+}
+
+export interface GetTodayAppointmentsData {
+  appointmentsV3ByDate: TodayAppointment[];
+}
+
+export interface GetTodayAppointmentsVars {
+  date: string; // Format: YYYY-MM-DD
+}
 
 export interface AppointmentSuggestion {
   id: string;

@@ -202,38 +202,30 @@ export function WeekViewSimple({
 
   return (
     <div className={`week-view-compact ${className}`} style={{ 
-      backgroundColor: '#f8fafc', // 🎨 Actually gray background
+      backgroundColor: '#0f172a', // 🎨 Actually gray background
       borderRadius: '16px',
       padding: '20px',
       boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
     }}>
-      {/* ✨ MAGICAL AINARKLENDAR HEADER */}
+      {/* 🎯 WEEK HEADER - Cyberpunk Medical */}
       <div className="grid grid-cols-8 gap-2 mb-4">
-        <div className="text-sm p-3 rounded-xl text-center font-bold text-gray-700" style={{
-          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-          border: '1px solid #e2e8f0'
-        }}>
+        <div className="text-xs p-3 rounded-lg text-center font-medium text-slate-400 uppercase tracking-wider bg-slate-900/20 border border-slate-800">
           Hora
         </div>
         {weekDays.map(day => (
-          <div key={day.toISOString()} className="text-sm p-3 rounded-xl text-center border-2 border-gray-100 shadow-sm" style={{
-            background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
-          }}>
-            <div className="font-bold text-gray-700">{format(day, 'EEE', { locale: es })}</div>
-            <div className="text-xs text-gray-600 font-medium">{format(day, 'd')}</div>
+          <div key={day.toISOString()} className="text-xs p-3 rounded-lg text-center border border-slate-800 bg-slate-900/20">
+            <div className="font-bold text-slate-300 uppercase">{format(day, 'EEE', { locale: es })}</div>
+            <div className="text-slate-500 font-medium mt-1">{format(day, 'd')}</div>
           </div>
         ))}
       </div>
 
-      {/* 🎯 OPTIMIZED GRID - Perfect balance of compact & functional */}
+      {/* 🎯 WEEK GRID - Cyberpunk */}
       <div className="week-grid">
         {workingHours.map(hour => (
           <div key={hour} className="grid grid-cols-8 gap-1 mb-1">
-            {/* Time label - AINARKLENDAR Gray Style */}
-        <div className="text-sm p-3 rounded-xl text-center font-bold text-gray-700 shadow-sm" style={{
-          background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
-          border: '1px solid #cbd5e0'
-        }}>
+            {/* Time label - Cyberpunk */}
+        <div className="text-xs p-3 rounded-lg text-center font-medium text-slate-400 bg-slate-900/20 border border-slate-800">
           {hour}:00
         </div>
 
@@ -250,28 +242,28 @@ export function WeekViewSimple({
               return (
                 <div 
                   key={`${day.toISOString()}-${hour}`}
-                  className={`relative border-2 rounded-xl cursor-pointer group transition-all duration-300`}
+                  className={`relative border rounded-lg cursor-pointer group transition-all duration-300`}
                   style={{ 
-                    height: '65px', // ⚡ Slightly taller for better visual
+                    height: '65px',
                     overflow: 'visible',
-                    zIndex: dayAppointments.length > 1 ? 40 : 1, // Higher z-index for multi-appointment slots
-                    // ✨ MAGICAL STYLING based on state
+                    zIndex: dayAppointments.length > 1 ? 40 : 1,
+                    // ✨ CYBERPUNK STYLING based on state
                     background: isPastSlot 
-                      ? 'linear-gradient(135deg, #fefbfb 0%, #fef2f2 100%)' // 🌸 SUPER soft pink for past (matching MonthView)
+                      ? 'linear-gradient(135deg, #0a0e1a 0%, #0f172a 100%)' // � Dark for past
                       : dayAppointments.length > 0 
-                        ? 'linear-gradient(135deg, #dbeafe 0%, #f0f9ff 100%)' // Blue gradient for appointments
-                        : 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)', // Clean gradient for empty
+                        ? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)' // Slate for appointments
+                        : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', // Dark for empty
                     borderColor: isPastSlot 
-                      ? '#f87171' // 🌸 Soft pink border (matching MonthView)
+                      ? '#334155' // Subtle slate border for past
                       : dayAppointments.length > 0 
-                        ? '#3b82f6' // blue-500 for appointments  
-                        : '#e2e8f0', // gray-300 for empty
-                    opacity: isPastSlot ? 0.7 : 1,
+                        ? '#6366f1' // purple for appointments  
+                        : '#334155', // slate for empty
+                    opacity: isPastSlot ? 0.6 : 1,
                     cursor: isPastSlot ? 'not-allowed' : 'pointer',
                     transform: dayAppointments.length > 0 ? 'scale(1.02)' : 'scale(1)',
                     boxShadow: dayAppointments.length > 0 
-                      ? '0 4px 15px rgba(59, 130, 246, 0.15)' 
-                      : '0 2px 8px rgba(0,0,0,0.05)'
+                      ? '0 4px 15px rgba(139, 92, 246, 0.2)' 
+                      : '0 2px 8px rgba(0,0,0,0.1)'
                   }}
                   onClick={() => {
                     if (!isPastSlot) {
@@ -281,47 +273,45 @@ export function WeekViewSimple({
                   onDragOver={(e) => {
                     e.preventDefault();
                     if (isDragging && !isPastSlot) {
-                      // 🎨 VALID DRAG FEEDBACK - Blue inline styling
+                      // 🎨 VALID DRAG FEEDBACK - Cyan/purple cyberpunk
                       e.currentTarget.style.transition = 'all 0.15s ease-out';
-                      e.currentTarget.style.backgroundColor = '#dbeafe'; // blue-50
-                      e.currentTarget.style.borderColor = '#93c5fd'; // blue-300
+                      e.currentTarget.style.backgroundColor = '#1e1b4b'; // indigo-950
+                      e.currentTarget.style.borderColor = '#06b6d4'; // cyan-500
                       e.currentTarget.style.transform = 'scale(1.02)';
                     } else if (isDragging && isPastSlot) {
-                      // 🚫 PROHIBITED ZONE FEEDBACK - Red inline styling
+                      // 🚫 PROHIBITED ZONE FEEDBACK - Red subtle
                       e.currentTarget.style.transition = 'all 0.15s ease-out';
-                      e.currentTarget.style.backgroundColor = '#fecaca'; // red-200
-                      e.currentTarget.style.borderColor = '#f87171'; // red-400
+                      e.currentTarget.style.backgroundColor = '#450a0a'; // red-950
+                      e.currentTarget.style.borderColor = '#dc2626'; // red-600
                       e.currentTarget.style.cursor = 'not-allowed';
-                      e.currentTarget.style.transform = 'scale(0.98)'; // Slight shrink for rejection
+                      e.currentTarget.style.transform = 'scale(0.98)';
                     }
                   }}
                   onDragLeave={(e) => {
-                    // 🎨 RESET to original past slot styling
+                    // 🎨 RESET to original dark styling
                     e.currentTarget.style.transition = 'all 0.15s ease-out';
-                    e.currentTarget.style.backgroundColor = isPastSlot ? '#fef2f2' : ''; // red-50 or normal
-                    e.currentTarget.style.borderColor = isPastSlot ? '#ef4444' : ''; // red-500 or normal
+                    e.currentTarget.style.backgroundColor = isPastSlot ? '#0a0e1a' : '';
+                    e.currentTarget.style.borderColor = isPastSlot ? '#334155' : '';
                     e.currentTarget.style.transform = '';
                     e.currentTarget.style.cursor = isPastSlot ? 'not-allowed' : 'pointer';
                   }}
                   onDrop={(e) => {
                     e.preventDefault();
                     
-                    // 🚫 PREVENT DROP ON PAST SLOTS - No annoying alerts!
+                    // 🚫 PREVENT DROP ON PAST SLOTS
                     if (isPastSlot) {
-                      // Reset to past slot styling
-                      e.currentTarget.style.backgroundColor = '#fef2f2'; // red-50
-                      e.currentTarget.style.borderColor = '#ef4444'; // red-500
+                      e.currentTarget.style.backgroundColor = '#0a0e1a';
+                      e.currentTarget.style.borderColor = '#334155';
                       return;
                     }
                     
-                    // 🎬 SUCCESS ANIMATION (only for valid drops)
+                    // 🎬 SUCCESS ANIMATION - Green cyberpunk flash
                     const target = e.currentTarget;
                     target.style.transition = 'all 0.2s ease-out';
                     target.style.transform = '';
                     
-                    // Green success flash
-                    target.style.backgroundColor = '#dcfce7'; // green-100
-                    target.style.borderColor = '#16a34a'; // green-600
+                    target.style.backgroundColor = '#064e3b'; // emerald-950
+                    target.style.borderColor = '#10b981'; // emerald-500
                     setTimeout(() => {
                       if (target && target.style) {
                         target.style.backgroundColor = '';
@@ -333,10 +323,10 @@ export function WeekViewSimple({
                     handleDropOnSlot(day, hour);
                   }}
                 >
-                  {/* EMPTY SLOT - AINARKLENDAR Style */}
+                  {/* EMPTY SLOT - Cyberpunk Style */}
                   {dayAppointments.length === 0 && (
-                    <div className="h-full flex items-center justify-center text-sm text-gray-400">
-                      <span className="opacity-0 group-hover:opacity-100 transition-opacity text-lg">+</span>
+                    <div className="h-full flex items-center justify-center text-sm text-slate-600">
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity text-lg text-cyan-400">+</span>
                     </div>
                   )}
 
@@ -455,23 +445,23 @@ export function WeekViewSimple({
         ))}
       </div>
 
-      {/* 💡 PONCIO PILATOS TIPS FOOTER */}
-      <div className="calendar-footer mt-4 px-4 py-3 bg-gray-50 border-t border-gray-200 text-xs text-gray-600">
+      {/* 💡 CYBERPUNK FOOTER */}
+      <div className="calendar-footer mt-4 px-4 py-3 bg-slate-900/60 border-t border-purple-500/20 text-xs text-slate-400">
         {/* 🔄 LOADING INDICATOR */}
         {isUpdating && (
-          <div className="flex items-center justify-center mb-2 text-blue-600 font-medium">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+          <div className="flex items-center justify-center mb-2 text-cyan-400 font-medium">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-400 mr-2"></div>
             <span>Actualizando cita en la base de datos...</span>
           </div>
         )}
         
-        <div className="flex flex-wrap gap-6 justify-center">
+        <div className="flex flex-wrap gap-6 justify-center text-slate-300">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-green-500 rounded"></div>
+            <div className="w-3 h-3 bg-emerald-500 rounded"></div>
             <span>Consultas</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-blue-500 rounded"></div>
+            <div className="w-3 h-3 bg-cyan-500 rounded"></div>
             <span>Limpiezas</span>
           </div>
           <div className="flex items-center gap-1">
@@ -483,14 +473,14 @@ export function WeekViewSimple({
             <span>Emergencias</span>
           </div>
           <div className="flex items-center gap-1">
-            <span className="text-orange-500 font-bold">⚡</span>
+            <span className="text-orange-400 font-bold">⚡</span>
             <span>Alta Prioridad</span>
           </div>
           <div className="flex items-center gap-1">
-            <span className="text-red-600 font-bold">🚨</span>
+            <span className="text-red-400 font-bold">🚨</span>
             <span>Urgente</span>
           </div>
-          <div className="flex items-center gap-1 ml-4 border-l pl-4">
+          <div className="flex items-center gap-1 ml-4 border-l border-purple-500/30 pl-4">
             <span>{isUpdating ? '⏳ Actualizando...' : '🎯 Arrastra para reprogramar'}</span>
           </div>
         </div>

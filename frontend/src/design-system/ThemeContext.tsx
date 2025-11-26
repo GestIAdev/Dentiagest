@@ -27,7 +27,8 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // Load theme from localStorage or use default
   const [themeId, setThemeId] = useState<ThemeType>(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return (stored as ThemeType) || DEFAULT_THEME;
+    // 🔥 FORCE DARK MODE IF NO STORED THEME
+    return (stored as ThemeType) || 'dark'; // Changed from DEFAULT_THEME to force dark
   });
 
   const currentTheme = getTheme(themeId);
@@ -93,6 +94,13 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     
     // Add theme class to body for conditional styling
     document.body.className = `theme-${themeId}`;
+    
+    // 🔥 APPLY 'dark' CLASS FOR SHADCN/UI COMPONENTS
+    if (themeId === 'dark' || themeId === 'cyberpunk-medical') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
     
   }, [currentTheme, themeId]);
 

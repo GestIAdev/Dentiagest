@@ -8,13 +8,14 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import SettingsPage from './pages/SettingsPage';
 import DashboardLayout from './components/Layout/DashboardLayout';
-import DashboardContent from './pages/DashboardContent';
+import DashboardPageV4 from './pages/DashboardPageV4'; // 🎮 TORRE DE CONTROL V4
 import PatientsPageGraphQL from './pages/PatientsPageGraphQL';
 import AppointmentsPage from './pages/AppointmentsPage'; // 🆕 UNIFIED APPOINTMENTS
 import { DocumentsPage } from './pages/DocumentsPage';
 import { StaffGuard } from './components/StaffGuard'; // 🔒 GDPR ROLE SEGREGATION
 // 🔥 V3 ARSENAL COMPLETE - POST-VITE ACTIVATION - 14 JEWELS AWAKENED
-import FinancialManagerV3 from './components/Billing/FinancialManagerV3';
+// import FinancialManagerV3 from './components/Billing/FinancialManagerV3'; // 💀 DEPRECATED by LÁZARO
+import BillingPageV4 from './pages/BillingPageV4'; // 🎯💰 OPERACIÓN LÁZARO FASE 4
 import TreatmentManagementV3 from './components/Treatments/TreatmentManagementV3';
 import InventoryManagementV3 from './components/Inventory/InventoryManagementV3';
 import SupplierManagerV3 from './components/MarketplacePage/SupplierManagerV3';
@@ -155,7 +156,7 @@ function AppRoutes() {
             </StaffGuard>
           </ProtectedRoute>
         }>
-          <Route index element={<DashboardContent />} />
+          <Route index element={<DashboardPageV4 />} />
           <Route path="patients" element={<PatientsPageGraphQL />} /> {/* 🆕 UNIFIED ROUTE - PATIENTS */}
           <Route path="appointments" element={<AppointmentsPage />} /> {/* 🆕 UNIFIED ROUTE - APPOINTMENTS */}
           <Route path="medical-records/*" element={<MedicalRouter />} />
@@ -163,8 +164,8 @@ function AppRoutes() {
           
           {/* 🔥 V3 ARSENAL COMPLETE - 8 JEWELS ACTIVATED (74% DORMIDOS → 100% BRILLANDO) */}
           <Route path="treatments" element={<TreatmentManagementV3 />} />
-          <Route path="billing" element={<FinancialManagerV3 />} />
-          {/* Legacy route removed - now using FinancialManagerV3 directly */}
+          <Route path="billing" element={<BillingPageV4 />} /> {/* 🎯💰 OPERACIÓN LÁZARO FASE 4 */}
+          {/* Legacy route removed - now using BillingPageV4 directly */}
           <Route path="inventory" element={<InventoryManagementV3 />} />
           <Route path="marketplace" element={<SupplierManagerV3 />} />
           <Route path="purchase-orders" element={<PurchaseOrderManagerV3 />} />

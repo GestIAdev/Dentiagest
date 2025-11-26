@@ -71,75 +71,75 @@ interface AppointmentCardProps {
 
 // 🎨 DENTIAGEST COLOR SYSTEM (Following style guide)
 const APPOINTMENT_COLORS = {
-  // 🟢 CONSULTAS Y REVISIONES
+  // 🟢 CONSULTAS Y REVISIONES - Cyberpunk
   consultation: {
-    bg: 'bg-green-100',
-    border: 'border-green-300',
-    text: 'text-green-800',
-    dot: 'bg-green-500',
-    shadow: 'shadow-green-100'
+    bg: 'bg-slate-800/80',
+    border: 'border-l-4 border-l-emerald-400 border-slate-700',
+    text: 'text-emerald-300',
+    dot: 'bg-emerald-400',
+    shadow: 'shadow-lg shadow-emerald-500/20'
   },
   checkup: {
-    bg: 'bg-emerald-100',
-    border: 'border-emerald-300',
-    text: 'text-emerald-800',
-    dot: 'bg-emerald-500',
-    shadow: 'shadow-emerald-100'
+    bg: 'bg-slate-800/80',
+    border: 'border-l-4 border-l-green-400 border-slate-700',
+    text: 'text-green-300',
+    dot: 'bg-green-400',
+    shadow: 'shadow-lg shadow-green-500/20'
   },
   
-  // 🔵 LIMPIEZAS E HIGIENE
+  // 🔵 LIMPIEZAS E HIGIENE - Cyberpunk
   cleaning: {
-    bg: 'bg-blue-100', 
-    border: 'border-blue-300',
-    text: 'text-blue-800',
-    dot: 'bg-blue-500',
-    shadow: 'shadow-blue-100'
+    bg: 'bg-slate-800/80', 
+    border: 'border-l-4 border-l-cyan-400 border-slate-700',
+    text: 'text-cyan-300',
+    dot: 'bg-cyan-400',
+    shadow: 'shadow-lg shadow-cyan-500/20'
   },
   
-  // 🟠 TRATAMIENTOS
+  // 🟠 TRATAMIENTOS - Cyberpunk
   treatment: {
-    bg: 'bg-orange-100',
-    border: 'border-orange-300', 
-    text: 'text-orange-800',
-    dot: 'bg-orange-500',
-    shadow: 'shadow-orange-100'
+    bg: 'bg-slate-800/80',
+    border: 'border-l-4 border-l-amber-400 border-slate-700', 
+    text: 'text-amber-300',
+    dot: 'bg-amber-400',
+    shadow: 'shadow-lg shadow-amber-500/20'
   },
   filling: {
-    bg: 'bg-violet-100',
-    border: 'border-violet-300',
-    text: 'text-violet-800',
-    dot: 'bg-violet-500',
-    shadow: 'shadow-violet-100'
+    bg: 'bg-slate-800/80',
+    border: 'border-l-4 border-l-purple-400 border-slate-700',
+    text: 'text-purple-300',
+    dot: 'bg-purple-400',
+    shadow: 'shadow-lg shadow-purple-500/20'
   },
   orthodontics: {
-    bg: 'bg-amber-100',
-    border: 'border-amber-300',
-    text: 'text-amber-800',
-    dot: 'bg-amber-500',
-    shadow: 'shadow-amber-100'
+    bg: 'bg-slate-800/80',
+    border: 'border-l-4 border-l-yellow-400 border-slate-700',
+    text: 'text-yellow-300',
+    dot: 'bg-yellow-400',
+    shadow: 'shadow-lg shadow-yellow-500/20'
   },
   
-  // 🔴 EMERGENCIAS Y CIRUGÍAS
+  // 🔴 EMERGENCIAS Y CIRUGÍAS - Cyberpunk
   emergency: {
-    bg: 'bg-red-100',
-    border: 'border-red-300',
-    text: 'text-red-800',
-    dot: 'bg-red-500',
-    shadow: 'shadow-red-100'
+    bg: 'bg-slate-800/80',
+    border: 'border-l-4 border-l-red-400 border-slate-700',
+    text: 'text-red-300',
+    dot: 'bg-red-400',
+    shadow: 'shadow-lg shadow-red-500/20'
   },
   extraction: {
-    bg: 'bg-red-200',
-    border: 'border-red-400',
-    text: 'text-red-900',
-    dot: 'bg-red-600',
-    shadow: 'shadow-red-200'
+    bg: 'bg-slate-800/80',
+    border: 'border-l-4 border-l-red-500 border-slate-700',
+    text: 'text-red-300',
+    dot: 'bg-red-500',
+    shadow: 'shadow-lg shadow-red-500/25'
   },
   surgery: {
-    bg: 'bg-red-300',
-    border: 'border-red-500',
-    text: 'text-red-900',
-    dot: 'bg-red-700',
-    shadow: 'shadow-red-300'
+    bg: 'bg-slate-800/80',
+    border: 'border-l-4 border-l-red-600 border-slate-700',
+    text: 'text-red-200',
+    dot: 'bg-red-600',
+    shadow: 'shadow-lg shadow-red-500/30'
   }
 };
 
@@ -261,20 +261,21 @@ export function AppointmentCard({
     e.dataTransfer.setData('application/json', JSON.stringify(appointment));
     e.dataTransfer.effectAllowed = 'move';
     
-    // 🎪 ENHANCED DRAG ANIMATIONS
+    // 🎪 CYBERPUNK DRAG GHOST
     if (cardRef.current) {
       cardRef.current.classList.add('dragging');
-      // Add elevation and glow effect
-      cardRef.current.style.transform = 'scale(1.05) rotate(2deg)';
+      // Cyberpunk elevation
+      cardRef.current.style.transform = 'scale(1.05)';
       cardRef.current.style.zIndex = '1000';
-      cardRef.current.style.filter = 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))';
+      cardRef.current.style.filter = 'drop-shadow(0 0 20px rgba(168, 85, 247, 0.6))';
     }
     
-    // 🎨 Create enhanced drag image
+    // 🎨 Cyberpunk drag image - semitransparente con borde punteado neón
     const dragImage = e.currentTarget.cloneNode(true) as HTMLElement;
-    dragImage.style.transform = 'rotate(8deg) scale(0.95)';
-    dragImage.style.opacity = '0.9';
-    dragImage.style.filter = 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))';
+    dragImage.style.opacity = '0.7';
+    dragImage.style.border = '2px dashed #a855f7'; // purple-500 neón
+    dragImage.style.backgroundColor = 'rgba(30, 41, 59, 0.9)'; // slate-800/90
+    dragImage.style.filter = 'drop-shadow(0 0 12px rgba(168, 85, 247, 0.5))';
     dragImage.style.borderRadius = '8px';
     e.dataTransfer.setDragImage(dragImage, 10, 10);
     

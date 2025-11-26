@@ -147,75 +147,69 @@ const DashboardLayout: React.FC = () => {
     }
   ];
 
+  // 🎯 VIEWPORT CONTROL PATTERN - SINGLE SCROLL ARCHITECTURE
   return (
-    <div className="min-h-screen bg-secondary-100">
-      {/* Barra Superior */}
-      <header className="bg-white shadow-soft border-b border-secondary-200">
-        <div className="w-full px-6">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo de la Clínica */}
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-primary-500">🦷 DentiaGest</h1>
-              </div>
+    <div className="h-screen flex flex-col overflow-hidden bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900">
+      {/* 📌 FIXED HEADER - NO SCROLL */}
+      <header className="flex-shrink-0 h-16 bg-card border-b border-border shadow-sm">
+        <div className="h-full px-6 flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center">
+            <h1 className="text-2xl font-bold text-primary">🦷 DentiaGest</h1>
+          </div>
+          
+          {/* Center Bar */}
+          <div className="flex items-center space-x-4">
+            <LegalTransparencyModule />
+          </div>
+          
+          {/* User Info */}
+          <div className="flex items-center space-x-4">
+            <div className="text-right">
+              <p className="text-sm font-medium text-foreground">
+                {state.user?.firstName} {state.user?.lastName}
+              </p>
+              <p className="text-xs text-muted-foreground capitalize">{state.user?.role}</p>
             </div>
-            
-            {/* Área Central del Top Bar */}
-            <div className="flex items-center space-x-4">
-              {/* Legal Transparency Module */}
-              <LegalTransparencyModule />
-            </div>
-            
-            {/* Información del Usuario */}
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">
-                  {state.user?.first_name} {state.user?.last_name}
-                </p>
-                <p className="text-xs text-gray-500 capitalize">{state.user?.role}</p>
+            <button className="flex items-center space-x-2 bg-secondary hover:bg-accent px-3 py-2 rounded-lg transition-colors">
+              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                <span className="text-primary-foreground text-sm font-medium">
+                  {state.user?.firstName?.charAt(0).toUpperCase()}
+                  {state.user?.lastName?.charAt(0).toUpperCase()}
+                </span>
               </div>
-              <div className="relative">
-                <button className="flex items-center space-x-2 bg-secondary-50 hover:bg-secondary-100 px-3 py-2 rounded-lg transition-colors">
-                  <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">
-                      {state.user?.first_name?.charAt(0).toUpperCase()}
-                      {state.user?.last_name?.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {/* Aquí iría el menú desplegable del usuario */}
-              </div>
-            </div>
+              <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
           </div>
         </div>
       </header>
 
-      <div className="flex">
-        {/* Barra de Navegación Lateral */}
-        <nav className="w-64 bg-white shadow-soft h-screen">
+      {/* 🏗️ MAIN CONTAINER - FLEX ROW */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* 📌 FIXED SIDEBAR - INDEPENDENT SCROLL */}
+        <nav className="w-64 flex-shrink-0 bg-card border-r border-border overflow-y-auto">
           <div className="p-6">
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               {navigationItems.map((item) => {
                 const isActive = isActiveRoute(item.href);
                 return (
                   <li key={item.name}>
                     <button
                       onClick={() => navigate(item.href)}
-                      className={`flex items-center justify-between px-3 py-2 rounded-lg font-medium w-full text-left transition-colors ${
+                      className={`flex items-center justify-between px-3 py-2 rounded-lg font-medium w-full text-left transition-all duration-200 ${
                         isActive
-                          ? 'text-primary-600 bg-primary-50'
-                          : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
+                          ? 'text-primary-foreground bg-primary shadow-sm'
+                          : 'text-foreground hover:text-primary hover:bg-accent'
                       }`}
                     >
                       <div className="flex items-center space-x-3">
                         {item.icon}
-                        <span>{item.name}</span>
+                        <span className="text-sm">{item.name}</span>
                       </div>
                       {(item as any).badge && (
-                        <span className="text-xs px-1 text-gray-500">
+                        <span className="text-xs">
                           {(item as any).badge}
                         </span>
                       )}
@@ -225,23 +219,23 @@ const DashboardLayout: React.FC = () => {
               })}
             </ul>
             
-            {/* Botón de Cerrar Sesión */}
-            <div className="mt-8 pt-6 border-t border-secondary-200">
+            {/* Logout */}
+            <div className="mt-8 pt-6 border-t border-border">
               <button
                 onClick={handleLogout}
-                className="flex items-center space-x-3 text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-2 rounded-lg w-full transition-colors"
+                className="flex items-center space-x-3 text-destructive hover:text-destructive-foreground hover:bg-destructive/10 px-3 py-2 rounded-lg w-full transition-all duration-200"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                <span>Cerrar Sesión</span>
+                <span className="text-sm">Cerrar Sesión</span>
               </button>
             </div>
           </div>
         </nav>
 
-        {/* Área Central - Aquí se renderiza el contenido dinámico */}
-        <main className="flex-1 p-6">
+        {/* 🎯 MAIN CONTENT - SINGLE SCROLL ZONE */}
+        <main className="flex-1 overflow-hidden bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900">
           <Outlet />
         </main>
       </div>

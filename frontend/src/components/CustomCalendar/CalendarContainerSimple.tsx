@@ -56,13 +56,10 @@ export function CalendarContainer({
 
   // 🔴 DIRECTIVA 012: Transform Apollo data to Calendar format
   const transformAppointmentData = (apt: any): any => {
-    const startDate = parseClinicDateTime(apt.appointmentDate);
-    const [hours, minutes] = (apt.appointmentTime || '09:00').split(':').map(Number);
+    // 🔧 FIX: Use scheduled_date if available, otherwise construct from date+time
+    const scheduledDateStr = apt.scheduled_date || `${apt.appointmentDate}T${apt.appointmentTime || '09:00'}`;
+    const startDate = parseClinicDateTime(scheduledDateStr);
     
-    if (startDate) {
-      startDate.setHours(hours || 9, minutes || 0, 0, 0);
-    }
-
     const endDate = startDate ? new Date(startDate) : new Date();
     if (startDate) {
       endDate.setMinutes(endDate.getMinutes() + (apt.duration || 30));
@@ -82,6 +79,10 @@ export function CalendarContainer({
       notes: apt.notes,
       appointmentDate: apt.appointmentDate,
       appointmentTime: apt.appointmentTime,
+      // 🔧 FIX: Always include scheduled_date for MonthViewSimple compatibility
+      scheduled_date: scheduledDateStr,
+      appointment_type: apt.type, // Also add for color mapping
+      priority: apt.priority || 'normal',
       _veritas: apt._veritas,
     };
   };
@@ -215,19 +216,19 @@ export function CalendarContainer({
   const weekDays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
   return (
-    <div className={`dentiagest-calendar ${className}`}>
-      {/* 🎯 AINARKLENDAR NAVIGATION - Complete Gray Theme */}
-      <div className="calendar-header flex justify-between items-center mb-4 p-4 bg-gray-100 rounded-lg border border-gray-200 shadow-sm">
+    <div className={`dentiagest-calendar h-full flex flex-col overflow-hidden ${className}`}>
+      {/* 🎯 AINARKLENDAR NAVIGATION - Cyberpunk Medical Theme */}
+      <div className="calendar-header flex-shrink-0 flex justify-between items-center mb-4 p-4 bg-slate-900/40 backdrop-blur-md rounded-lg border border-purple-500/20 shadow-lg shadow-purple-500/10">
         <div className="flex items-center space-x-3">
           <button
             onClick={navigation.goToPrevious}
-            className="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors shadow-sm flex items-center justify-center min-w-[40px]"
+            className="px-3 py-2 bg-slate-800/80 hover:bg-slate-700/80 border border-purple-500/30 text-cyan-400 rounded transition-all shadow-sm flex items-center justify-center min-w-[40px]"
             title="Anterior"
           >
             ←
           </button>
           
-          <h2 className="text-xl font-semibold text-gray-800 min-w-[200px] text-center">
+          <h2 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 min-w-[200px] text-center">
             {currentView === 'month' && calendarData.monthName}
             {currentView === 'week' && format(currentDate, "'Semana del' d MMM yyyy", { locale: es })}
             {currentView === 'day' && format(currentDate, "EEEE, d MMM yyyy", { locale: es })}
@@ -235,23 +236,15 @@ export function CalendarContainer({
           
           <button
             onClick={navigation.goToNext}
-            className="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors shadow-sm flex items-center justify-center min-w-[40px]"
+            className="px-3 py-2 bg-slate-800/80 hover:bg-slate-700/80 border border-purple-500/30 text-cyan-400 rounded transition-all shadow-sm flex items-center justify-center min-w-[40px]"
             title="Siguiente"
           >
             →
           </button>
         </div>
 
-        {/* 🎨 AINARKLENDAR View Selector - NUCLEAR ANTI-BLUE ZONE */}
-        <div 
-          className="view-selector flex space-x-1 bg-white rounded-lg p-1 shadow-sm" 
-          style={{ 
-            border: '2px solid #d1d5db !important',
-            borderColor: '#d1d5db !important',
-            outline: 'none !important',
-            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important'
-          }}
-        >
+        {/* 🎨 AINARKLENDAR View Selector - Cyberpunk */}
+        <div className="view-selector flex space-x-1 bg-slate-900/60 backdrop-blur-sm rounded-lg p-1 border border-purple-500/20">
           {(['month', 'week', 'day'] as const).map(viewOption => (
             <button
               key={viewOption}
@@ -259,15 +252,10 @@ export function CalendarContainer({
               className={`
                 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200
                 ${currentView === viewOption 
-                  ? 'bg-gray-700 text-white shadow-sm' 
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+                  ? 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg shadow-purple-500/25' 
+                  : 'text-slate-400 hover:bg-slate-800/60 hover:text-cyan-300'
                 }
               `}
-              style={{ 
-                border: 'none !important', 
-                outline: 'none !important',
-                boxShadow: currentView === viewOption ? '0 1px 3px 0 rgba(0, 0, 0, 0.1) !important' : 'none !important'
-              }}
             >
               {viewOption === 'month' ? 'Mes' : viewOption === 'week' ? 'Semana' : 'Día'}
             </button>
@@ -276,7 +264,7 @@ export function CalendarContainer({
       </div>
 
       {/* Calendar Content - Switch between views */}
-      <div className="calendar-content">
+      <div className="calendar-content flex-1 overflow-y-auto">
         {currentView === 'month' && (
           <MonthViewSimple
             currentDate={currentDate}
@@ -312,11 +300,11 @@ export function CalendarContainer({
         )}
       </div>
 
-      {/* Today button - Clean & Simple */}
-      <div className="calendar-footer mt-4 text-center">
+      {/* Today button - Cyberpunk */}
+      <div className="calendar-footer flex-shrink-0 mt-4 text-center">
         <button
           onClick={navigation.goToToday}
-          className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+          className="px-4 py-2 bg-slate-800/80 hover:bg-slate-700/80 border border-purple-500/30 text-cyan-400 rounded transition-all shadow-sm"
         >
           Hoy
         </button>

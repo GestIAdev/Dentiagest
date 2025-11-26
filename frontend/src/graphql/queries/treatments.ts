@@ -13,43 +13,20 @@ import { gql } from "@apollo/client";
 // ============================================================================
 
 export const GET_TREATMENTS_V3 = gql`
-  query GetTreatmentsV3($limit: Int, $offset: Int, $patientId: ID, $status: String) {
-    treatmentsV3(limit: $limit, offset: $offset, patientId: $patientId, status: $status) {
+  query GetTreatmentsV3($limit: Int, $offset: Int, $patientId: ID) {
+    treatmentsV3(limit: $limit, offset: $offset, patientId: $patientId) {
       id
       patientId
-      patientId_veritas
       practitionerId
-      practitionerId_veritas
       treatmentType
-      treatmentType_veritas
       description
-      description_veritas
       status
-      status_veritas
       startDate
-      startDate_veritas
       endDate
-      endDate_veritas
       cost
-      cost_veritas
       notes
-      notes_veritas
-      aiRecommendations
-      aiRecommendations_veritas
-      veritasScore
       createdAt
       updatedAt
-      
-      # @veritas quantum verification metadata
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
     }
   }
 `;
@@ -59,39 +36,16 @@ export const GET_TREATMENT_V3 = gql`
     treatmentV3(id: $id) {
       id
       patientId
-      patientId_veritas
       practitionerId
-      practitionerId_veritas
       treatmentType
-      treatmentType_veritas
       description
-      description_veritas
       status
-      status_veritas
       startDate
-      startDate_veritas
       endDate
-      endDate_veritas
       cost
-      cost_veritas
       notes
-      notes_veritas
-      aiRecommendations
-      aiRecommendations_veritas
-      veritasScore
       createdAt
       updatedAt
-      
-      # @veritas quantum verification metadata
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
     }
   }
 `;
@@ -177,10 +131,10 @@ export interface DeleteTreatmentData {
   deleteTreatment: boolean;
 }
 
-// GET ALL TREATMENTS
+// GET ALL TREATMENTS (Legacy - sin status)
 export const GET_TREATMENTS = gql`
-  query GetTreatments($limit: Int, $offset: Int, $patientId: ID, $status: String) {
-    treatments(limit: $limit, offset: $offset, patientId: $patientId, status: $status) {
+  query GetTreatments($limit: Int, $offset: Int, $patientId: ID) {
+    treatments(limit: $limit, offset: $offset, patientId: $patientId) {
       id
       patientId
       practitionerId

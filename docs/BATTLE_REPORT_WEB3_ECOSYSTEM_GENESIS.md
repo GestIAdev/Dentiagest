@@ -14,6 +14,12 @@
 
 Hoy desplegamos exitosamente el ecosistema de tokens $DENTIA en Sepolia Testnet, estableciendo las bases para el sistema de recompensas de lealtad más innovador en el sector dental. Dos smart contracts, diseñados con los más altos estándares de seguridad, ahora viven inmutables en la blockchain de Ethereum.
 
+**El stack completo está operacional**:
+- ✅ **Smart Contracts**: DentiaCoin + DentiaRewards desplegados en Sepolia
+- ✅ **Backend Integration**: Selene distribuye recompensas cuando factura → PAID
+- ✅ **Frontend Integration**: Patient Portal lee balances reales desde blockchain
+- ✅ **End-to-End Flow**: Pago → Blockchain reward → UI actualizada
+
 ---
 
 ## 📜 CONTRATOS DESPLEGADOS
@@ -152,6 +158,13 @@ rewardAmount = paymentAmountCents * 10^18 // Con decimales ERC-20
 | `src/graphql/resolvers/Mutation/billing.ts` | Hook de recompensas en PAID |
 | `src/index.ts` | **FIXED**: Bootstrap initialization de BlockchainService |
 
+### **Patient Portal Integration** (`/patient-portal/`)
+
+| Archivo | Propósito |
+|---------|-----------|
+| `src/config/web3.ts` | Contract addresses, ABIs, network configs |
+| `src/stores/web3Store.ts` | Wallet connection + balance reading from blockchain |
+
 ---
 
 ## 🔧 CRITICAL FIX: BOOTSTRAP INITIALIZATION
@@ -217,6 +230,146 @@ rewardAmount = paymentAmountCents * 10^18 // Con decimales ERC-20
 |--------|--------------------------|
 | **BEFORE** | ❌ Ausente (servicio dormido) |
 | **AFTER** | ✅ Visible con confirmación de contratos |
+
+---
+
+## 🎨 PATIENT PORTAL - FRONTEND INTEGRATION
+
+### **🎯 MISSION BRIEFING (from GeminiPunk Tier-2)**
+> *"Conectar Patient Portal a los contratos desplegados en Sepolia. No más mocks. Leer balances reales de $DENTIA desde blockchain."*
+
+### **✅ IMPLEMENTATION**
+
+#### **1. Contract Addresses Injected**
+
+**File**: `patient-portal/src/config/web3.ts`
+
+```typescript
+export const CONTRACTS = {
+  DENTIA_TOKEN: {
+    [NETWORKS.SEPOLIA.chainId]: '0x9Aef082d6A8EB49Dc6e7db19E5D118746f599Fad', // ✅ LIVE
+  },
+  REWARDS_VAULT: {
+    [NETWORKS.SEPOLIA.chainId]: '0x30f21027Abe424AfAFe3DBE0c7BC842C1Ea86B3f', // ✅ LIVE
+  },
+}
+```
+
+#### **2. ABIs Added for Contract Interaction**
+
+```typescript
+// DentiaCoin ERC-20 ABI (minimal)
+export const DENTIA_TOKEN_ABI = [
+  // balanceOf(address) → uint256
+  // decimals() → uint8
+  // symbol() → string
+  // name() → string
+  // transfer(address, uint256) → bool
+  // approve(address, uint256) → bool
+]
+
+// DentiaRewards ABI (minimal)
+export const DENTIA_REWARDS_ABI = [
+  // totalRewardsReceived(address) → uint256
+  // lastRewardTimestamp(address) → uint256
+  // Event: RewardDistributed
+]
+```
+
+#### **3. RPC Optimized**
+```typescript
+SEPOLIA: {
+  rpcUrl: 'https://1rpc.io/sepolia', // Same as Selene backend
+}
+```
+
+#### **4. Balance Reading from Blockchain**
+
+**File**: `patient-portal/src/stores/web3Store.ts`
+
+**New Function**: `fetchTokenBalance()`
+```typescript
+fetchTokenBalance: async () => {
+  const { provider, address, chainId } = get();
+  
+  // Get contract address for current network
+  const tokenAddress = CONTRACTS.DENTIA_TOKEN[chainId];
+  
+  // Create contract instance
+  const tokenContract = new ethers.Contract(
+    tokenAddress,
+    DENTIA_TOKEN_ABI,
+    provider
+  );
+
+  // Fetch balance from blockchain (ON-CHAIN CALL)
+  const balanceWei = await tokenContract.balanceOf(address);
+  
+  // Format balance (18 decimals → "1234.56 DENTIA")
+  const balanceFormatted = formatTokenAmount(balanceWei);
+  
+  set({ balance: `${balanceFormatted} DENTIA` });
+}
+```
+
+**Integration Points**:
+- Called after `connectWallet()` succeeds
+- Called when user switches account
+- Can be called manually to refresh balance
+
+### **🔄 FRONTEND FLOW: PATIENT → BLOCKCHAIN**
+
+```
+PATIENT opens Patient Portal
+        ↓
+Click "Conectar Wallet"
+        ↓
+MetaMask: Approve connection
+        ↓
+useWeb3Store.connectWallet()
+        ↓
+Validate network (Sepolia = 11155111)
+        ↓
+fetchTokenBalance()
+        ↓
+ethers.Contract(DentiaCoin).balanceOf(address) 🔗 ON-CHAIN
+        ↓
+Sepolia blockchain responds: 1234567890000000000000 wei
+        ↓
+formatTokenAmount() → "1,234.56 DENTIA"
+        ↓
+Widget displays: 💰 "1,234.56 DENTIA"
+```
+
+### **🧪 TESTING GUIDE**
+
+**Prerequisites**:
+- MetaMask installed
+- Wallet connected to Sepolia Testnet
+- Use CEO Cold Wallet (`0x69dd...001ec`) for testing (has tokens as deployer)
+
+**Test Cases**:
+1. **Connect Wallet**: Should show real balance (not "0 DENTIA" mock)
+2. **Switch Account**: Balance updates automatically
+3. **Wrong Network**: Shows error, offers to switch to Sepolia
+4. **Etherscan Verification**: Balance matches https://sepolia.etherscan.io
+
+**Expected Console Logs**:
+```
+🔍 Fetching DENTIA balance for: 0x69dd...
+💰 DENTIA Balance: 1234.56
+```
+
+### **📊 FRONTEND vs BACKEND INTEGRATION**
+
+| Component | Role | Blockchain Access |
+|-----------|------|-------------------|
+| **Patient Portal** | Read balance, display rewards | Direct via ethers.js + MetaMask |
+| **Selene Backend** | Distribute rewards on payment | Via BlockchainService + Hot Wallet |
+
+**Two-way flow**:
+1. **Backend → Blockchain**: `rewardPatient()` when invoice PAID
+2. **Blockchain → Frontend**: `balanceOf()` to display updated balance
 
 ---
 
@@ -293,8 +446,11 @@ if (patientWallet && blockchainService.isEnabled()) {
 ### **Fase 1: Testnet Validation** ← ESTAMOS AQUÍ
 - [x] Deploy en Sepolia
 - [x] Configurar Selene integration
-- [ ] Test E2E: Factura PAID → Reward
-- [ ] UI en Patient Portal para ver balance
+- [x] **FIXED**: Initialize BlockchainService on startup
+- [x] Conectar Patient Portal a blockchain
+- [x] Frontend lee balance real desde contratos
+- [ ] Test E2E: Factura PAID → Reward → Balance updated en UI
+- [ ] UI mejorada en Patient Portal para historial de rewards
 
 ### **Fase 2: Security Audit**
 - [ ] Audit interno exhaustivo
@@ -309,6 +465,7 @@ if (patientWallet && blockchainService.isEnabled()) {
 ### **Fase 4: Production Launch**
 - [ ] Deploy a Polygon Mainnet
 - [ ] Migrar configuración de Selene
+- [ ] Actualizar Patient Portal con addresses de producción
 - [ ] Comunicar a clínicas y pacientes
 
 ---

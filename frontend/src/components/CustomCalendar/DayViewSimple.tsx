@@ -299,33 +299,33 @@ export function DayViewSimple({
 
   return (
     <div className={`day-view ${className}`} style={{ 
-      backgroundColor: '#f8fafc', // 🎨 Actually gray this time!
+      backgroundColor: 'transparent', // 🎨 Cyberpunk dark theme
       minHeight: '100vh'
     }}>
-      {/* ✨ ELEGANT HEADER with subtle gradient */}
+      {/* ✨ CYBERPUNK HEADER */}
       <div className="day-header mb-4 p-4 rounded-xl text-center border shadow-sm" style={{
-        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-        borderColor: '#e2e8f0'
+        background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+        borderColor: '#6366f1'
       }}>
-        <h2 className="text-xl font-bold text-gray-800 mb-1">
+        <h2 className="text-xl font-bold text-slate-200 mb-1">
           {format(currentDate, 'EEEE, d MMMM yyyy', { locale: es })}
         </h2>
-        <div className="text-gray-600 text-sm">
+        <div className="text-cyan-400 text-sm">
           ✨ {allTimeSlots.filter(slot => getAppointmentsForSlot(slot.hour, slot.quarter).length > 0).length} slots con citas
         </div>
       </div>
 
-      {/* 🎯 SPECTACULAR FULL-SCREEN GRID with enhanced styling */}
+      {/* 🎯 CYBERPUNK GRID with dark styling */}
       <div className="day-grid-container" style={{ 
-        backgroundColor: '#ffffff',
+        backgroundColor: '#0f172a',
         borderRadius: '16px',
         padding: '16px',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
-        border: '1px solid #e2e8f0',
-        overflow: 'visible' // 🚀 CRITICAL: Stack animations NEED this!
+        boxShadow: '0 4px 20px rgba(139, 92, 246, 0.15)',
+        border: '1px solid #6366f1',
+        overflow: 'visible'
       }}>
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 p-2" style={{ 
-          overflow: 'visible' // 🚀 DOUBLE CRITICAL: Stack needs grid overflow too!
+          overflow: 'visible'
         }}>
           {allTimeSlots.map(slot => {
             const slotAppointments = getAppointmentsForSlot(slot.hour, slot.quarter);
@@ -343,12 +343,12 @@ export function DayViewSimple({
                 className={`
                   time-slot border-2 rounded-xl p-3 transition-all flex flex-col relative group/stack
                   ${hasAppointments 
-                    ? 'bg-gradient-to-br from-white to-gray-50/30 border-gray-300 shadow-md hover:shadow-lg transform hover:scale-[1.02]' 
+                    ? 'bg-gradient-to-br from-slate-800 to-slate-900 border-purple-500 shadow-md hover:shadow-lg transform hover:scale-[1.02]' 
                     : isPastSlot
-                      ? 'border-gray-300 opacity-85'
-                      : 'bg-gradient-to-br from-gray-50/50 to-white border-gray-200/60 hover:bg-gradient-to-br hover:from-gray-100 hover:to-white hover:border-gray-400 hover:shadow-md transform hover:scale-[1.01]'
+                      ? 'border-slate-700 opacity-85 bg-slate-950/80'
+                      : 'bg-gradient-to-br from-slate-900/50 to-slate-800/50 border-slate-700 hover:bg-gradient-to-br hover:from-slate-800 hover:to-slate-900 hover:border-purple-500 hover:shadow-md transform hover:scale-[1.01]'
                   }
-                  ${isDragging && !hasAppointments && !isPastSlot ? 'border-dashed border-2 border-blue-400 bg-blue-50' : ''}
+                  ${isDragging && !hasAppointments && !isPastSlot ? 'border-dashed border-2 border-cyan-400 bg-cyan-500/10' : ''}
                   ${isUpdating ? 'opacity-50 pointer-events-none' : ''}
                 `}
                 style={{ 
@@ -358,9 +358,9 @@ export function DayViewSimple({
                   // 🎯 DYNAMIC HEIGHT: More space for stacks, normal for singles
                   minHeight: slotAppointments.length > 1 ? '180px' : '120px',
                   cursor: isPastSlot ? 'not-allowed' : 'pointer',
-                  // 🌸 SUPER soft pink background for past slots (matching MonthView)
+                  // 🌸 Cyberpunk dark background for past slots
                   background: isPastSlot 
-                    ? 'linear-gradient(135deg, #fefbfb 0%, #fef2f2 100%)' 
+                    ? 'linear-gradient(135deg, #0a0e1a 0%, #0f172a 100%)' 
                     : undefined
                 }}
                 onClick={() => !hasAppointments && !isPastSlot && handleTimeSlotClick(slot)}
@@ -400,13 +400,13 @@ export function DayViewSimple({
                     : `Crear nueva cita - ${slot.time}`
                 }
               >
-                {/* ✨ ELEGANT Time Label - Gray Theme */}
+                {/* ✨ Time Label - Cyberpunk */}
                 <div className="text-xs font-bold mb-2 text-center px-2 py-1 rounded-lg" style={{
                   background: hasAppointments 
-                    ? 'linear-gradient(45deg, #6b7280, #4b5563)' // gray-500 to gray-600
-                    : 'linear-gradient(45deg, #d1d5db, #9ca3af)', // gray-300 to gray-400
+                    ? 'linear-gradient(45deg, #6366f1, #8b5cf6)' // purple gradient
+                    : 'linear-gradient(45deg, #334155, #1e293b)', // slate gradient
                   color: 'white',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.2)'
+                  textShadow: '0 1px 2px rgba(0,0,0,0.3)'
                 }}>
                   {slot.time}
                 </div>
@@ -451,7 +451,7 @@ export function DayViewSimple({
                         });
                       }}
                     >
-                      <div className="text-center text-sm font-medium text-gray-700 mb-1">
+                      <div className="text-center text-sm font-medium text-cyan-400 mb-1">
                         {slotAppointments.length} citas
                       </div>
                       
@@ -497,7 +497,7 @@ export function DayViewSimple({
                   )
                 ) : (
                   <div className="flex-1 flex items-center justify-center">
-                    <div className="text-center text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="text-center text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">
                       <span className="text-xs mt-1">
                         {isDragging ? 'Soltar aquí' : 'Crear cita'}
                       </span>
@@ -510,26 +510,26 @@ export function DayViewSimple({
         </div>
       </div>
 
-      {/* ✨ ELEGANT STATS FOOTER */}
+      {/* ✨ CYBERPUNK STATS FOOTER */}
       <div className="calendar-footer mt-6 px-6 py-4 rounded-xl shadow-lg border" style={{
-        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-        borderColor: '#e2e8f0'
+        background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+        borderColor: '#6366f1'
       }}>
         {/* 🔄 LOADING INDICATOR */}
         {isUpdating && (
-          <div className="flex items-center justify-center mb-3 text-gray-700 font-medium">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
+          <div className="flex items-center justify-center mb-3 text-cyan-400 font-medium">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-400 mr-2"></div>
             <span>✨ Actualizando cita en la base de datos...</span>
           </div>
         )}
         
-        <div className="flex flex-wrap gap-6 justify-center">
+        <div className="flex flex-wrap gap-6 justify-center text-slate-300">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-green-500 rounded"></div>
+            <div className="w-3 h-3 bg-emerald-500 rounded"></div>
             <span>Consultas</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-blue-500 rounded"></div>
+            <div className="w-3 h-3 bg-cyan-500 rounded"></div>
             <span>Limpiezas</span>
           </div>
           <div className="flex items-center gap-1">
@@ -540,13 +540,13 @@ export function DayViewSimple({
             <div className="w-3 h-3 bg-red-500 rounded"></div>
             <span>Urgencias</span>
           </div>
-          <div className="flex items-center gap-1 ml-4 border-l pl-4">
+          <div className="flex items-center gap-1 ml-4 border-l border-purple-500/30 pl-4">
             <span>⚡ Alta prioridad</span>
           </div>
           <div className="flex items-center gap-1">
             <span>🚨 Urgencia crítica</span>
           </div>
-          <div className="flex items-center gap-1 ml-4 border-l pl-4">
+          <div className="flex items-center gap-1 ml-4 border-l border-purple-500/30 pl-4">
             <span>{isUpdating ? '⏳ Actualizando...' : '🎯 Arrastra para reprogramar'}</span>
           </div>
         </div>

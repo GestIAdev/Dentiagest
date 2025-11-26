@@ -179,6 +179,9 @@ export const GET_PATIENTS = gql`
       phone
       dateOfBirth
       address
+      emergencyContactName
+      emergencyContactPhone
+      emergencyContactRelationship
       emergencyContact
       insuranceProvider
       policyNumber
@@ -199,6 +202,9 @@ export const GET_PATIENT = gql`
       phone
       dateOfBirth
       address
+      emergencyContactName
+      emergencyContactPhone
+      emergencyContactRelationship
       emergencyContact
       insuranceProvider
       policyNumber
@@ -238,6 +244,9 @@ export const CREATE_PATIENT = gql`
       phone
       dateOfBirth
       address
+      emergencyContactName
+      emergencyContactPhone
+      emergencyContactRelationship
       emergencyContact
       insuranceProvider
       policyNumber
@@ -257,6 +266,9 @@ export const UPDATE_PATIENT = gql`
       phone
       dateOfBirth
       address
+      emergencyContactName
+      emergencyContactPhone
+      emergencyContactRelationship
       emergencyContact
       insuranceProvider
       policyNumber
@@ -306,14 +318,18 @@ export const DEACTIVATE_PATIENT = gql`
 
 export interface Patient {
   id: string;
-  name?: string; // ?? Added: Combined name from apollo_patients view
+  name?: string; // Combined name from apollo_patients view
   firstName: string;
   lastName: string;
   email?: string;
   phone?: string;
   dateOfBirth?: string;
   address?: string;
-  emergencyContact?: string;
+  // 🔥 EMERGENCY CONTACT - Campos separados (fix arquitectónico)
+  emergencyContact?: string; // DEPRECATED: JSON legacy
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelationship?: string;
   insuranceProvider?: string;
   policyNumber?: string;
   medicalHistory?: string;
@@ -329,7 +345,11 @@ export interface PatientInput {
   phone?: string;
   dateOfBirth?: string;
   address?: string;
-  emergencyContact?: string;
+  // 🔥 EMERGENCY CONTACT - Campos separados (fix arquitectónico)
+  emergencyContact?: string; // DEPRECATED: JSON legacy
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelationship?: string;
   insuranceProvider?: string;
   policyNumber?: string;
 }
@@ -341,7 +361,11 @@ export interface UpdatePatientInput {
   phone?: string;
   dateOfBirth?: string;
   address?: string;
-  emergencyContact?: string;
+  // 🔥 EMERGENCY CONTACT - Campos separados (fix arquitectónico)
+  emergencyContact?: string; // DEPRECATED: JSON legacy
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelationship?: string;
   insuranceProvider?: string;
   policyNumber?: string;
   medicalHistory?: string;

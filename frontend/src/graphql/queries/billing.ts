@@ -1,525 +1,241 @@
-// 🎯🎸💀 BILLING GRAPHQL QUERIES V3.0 - TITAN PATTERN IMPLEMENTATION
-// Date: September 25, 2025
-// Mission: Complete GraphQL queries for billing system with @veritas verification
-// Status: V3.0 - Full billing GraphQL operations with quantum verification
-// Challenge: Financial data integrity and multi-currency support
-// 🔒 SECURITY: @veritas quantum truth verification on financial transactions
+﻿//  BILLING GRAPHQL QUERIES V4.0 - OPERACIÓN LÁZARO
+// Date: November 26, 2025
+// Mission: Clean billing queries aligned with Selene V5 BillingDataV3 schema
+// Status: PURGED of all _veritas legacy corruption
 
 import { gql } from '@apollo/client';
 
-// 🎯 INVOICE QUERIES - V3.0 GraphQL Operations
+// ============================================================================
+// TYPES - Aligned with Selene V5 BillingDataV3
+// ============================================================================
+
+export interface BillingData {
+  id: string;
+  patientId: string;
+  invoiceNumber: string;
+  subtotal: number;
+  taxRate: number | null;
+  taxAmount: number | null;
+  discountAmount: number | null;
+  totalAmount: number;
+  currency: string;
+  issueDate: string;
+  dueDate: string | null;
+  paidDate: string | null;
+  status: 'PENDING' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+  paymentTerms: string | null;
+  notes: string | null;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  treatmentId: string | null;
+  materialCost: number | null;
+  profitMargin: number | null;
+}
+
+export interface GetBillingDataResponse {
+  billingDataV3: BillingData[];
+}
+
+export interface GetBillingDatumResponse {
+  billingDatumV3: BillingData | null;
+}
+
+// ============================================================================
+// QUERIES
+// ============================================================================
+
 export const GET_INVOICES = gql`
-  query GetInvoicesV3(
-    $status: String
-    $patientId: ID
-    $dateFrom: DateTime
-    $dateTo: DateTime
-    $limit: Int
-    $offset: Int
-  ) {
-    invoicesV3(
-      status: $status
-      patientId: $patientId
-      dateFrom: $dateFrom
-      dateTo: $dateTo
-      limit: $limit
-      offset: $offset
-    ) {
+  query GetBillingData($patientId: ID, $limit: Int, $offset: Int) {
+    billingDataV3(patientId: $patientId, limit: $limit, offset: $offset) {
       id
-      invoiceNumber
-      invoiceNumber_veritas
       patientId
-      patientName
-      amount
-      amount_veritas
+      invoiceNumber
+      subtotal
+      taxRate
       taxAmount
+      discountAmount
       totalAmount
-      totalAmount_veritas
-      status
-      status_veritas
+      currency
       issueDate
       dueDate
       paidDate
+      status
+      paymentTerms
       notes
-      notes_veritas
       createdBy
       createdAt
       updatedAt
-      items {
-        id
-        description
-        quantity
-        unitPrice
-        totalPrice
-        taxRate
-      }
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
+      treatmentId
+      materialCost
+      profitMargin
     }
   }
 `;
 
 export const GET_INVOICE = gql`
-  query GetInvoiceV3($id: ID!) {
-    invoiceV3(id: $id) {
+  query GetBillingDatum($id: ID!) {
+    billingDatumV3(id: $id) {
       id
-      invoiceNumber
-      invoiceNumber_veritas
       patientId
-      patientName
-      amount
-      amount_veritas
+      invoiceNumber
+      subtotal
+      taxRate
       taxAmount
+      discountAmount
       totalAmount
-      totalAmount_veritas
-      status
-      status_veritas
+      currency
       issueDate
       dueDate
       paidDate
+      status
+      paymentTerms
       notes
-      notes_veritas
       createdBy
       createdAt
       updatedAt
-      items {
-        id
-        description
-        quantity
-        unitPrice
-        totalPrice
-        taxRate
-      }
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
+      treatmentId
+      materialCost
+      profitMargin
     }
   }
 `;
 
-// 🎯 PAYMENT QUERIES - V3.0 GraphQL Operations
-export const GET_PAYMENTS = gql`
-  query GetPaymentsV3(
-    $status: String
-    $patientId: ID
-    $invoiceId: ID
-    $dateFrom: DateTime
-    $dateTo: DateTime
-    $limit: Int
-    $offset: Int
-  ) {
-    paymentsV3(
-      status: $status
-      patientId: $patientId
-      invoiceId: $invoiceId
-      dateFrom: $dateFrom
-      dateTo: $dateTo
-      limit: $limit
-      offset: $offset
-    ) {
-      id
-      paymentNumber
-      paymentNumber_veritas
-      invoiceId
-      patientId
-      patientName
-      amount
-      amount_veritas
-      method
-      status
-      status_veritas
-      paymentDate
-      processedDate
-      reference
-      notes
-      notes_veritas
-      processedBy
-      createdAt
-      updatedAt
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
-    }
-  }
-`;
+// ============================================================================
+// MUTATIONS
+// ============================================================================
 
-export const GET_PAYMENT = gql`
-  query GetPaymentV3($id: ID!) {
-    paymentV3(id: $id) {
-      id
-      paymentNumber
-      paymentNumber_veritas
-      invoiceId
-      patientId
-      patientName
-      amount
-      amount_veritas
-      method
-      status
-      status_veritas
-      paymentDate
-      processedDate
-      reference
-      notes
-      notes_veritas
-      processedBy
-      createdAt
-      updatedAt
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
-    }
-  }
-`;
-
-// 🎯 FINANCIAL ANALYTICS QUERIES - V3.0 GraphQL Operations
-export const GET_FINANCIAL_ANALYTICS = gql`
-  query GetFinancialAnalyticsV3(
-    $dateFrom: DateTime
-    $dateTo: DateTime
-  ) {
-    financialAnalyticsV3(
-      dateFrom: $dateFrom
-      dateTo: $dateTo
-    ) {
-      totalRevenue
-      totalRevenue_veritas
-      outstandingAmount
-      overdueAmount
-      paidInvoicesCount
-      totalInvoicesCount
-      pendingPaymentsCount
-      collectionRate
-      paymentSuccessRate
-      averageInvoiceValue
-      monthlyRevenue {
-        month
-        revenue
-        revenue_veritas
-      }
-      revenueByPaymentMethod {
-        method
-        amount
-        amount_veritas
-        percentage
-      }
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
-    }
-  }
-`;
-
-// 🎯 INVOICE MUTATIONS - V3.0 GraphQL Operations
 export const CREATE_INVOICE = gql`
-  mutation CreateInvoiceV3($input: CreateInvoiceInput!) {
-    createInvoiceV3(input: $input) {
+  mutation CreateBillingDataV3($input: BillingDataV3Input!) {
+    createBillingDataV3(input: $input) {
       id
-      invoiceNumber
-      invoiceNumber_veritas
       patientId
-      patientName
-      amount
-      amount_veritas
+      invoiceNumber
+      subtotal
+      taxRate
       taxAmount
+      discountAmount
       totalAmount
-      totalAmount_veritas
-      status
-      status_veritas
+      currency
       issueDate
       dueDate
+      status
       notes
-      notes_veritas
-      createdBy
       createdAt
-      updatedAt
-      items {
-        id
-        description
-        quantity
-        unitPrice
-        totalPrice
-        taxRate
-      }
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
+      treatmentId
+      materialCost
+      profitMargin
     }
   }
 `;
 
 export const UPDATE_INVOICE = gql`
-  mutation UpdateInvoiceV3($id: ID!, $input: UpdateInvoiceInput!) {
-    updateInvoiceV3(id: $id, input: $input) {
+  mutation UpdateBillingDataV3($id: ID!, $input: UpdateBillingDataV3Input!) {
+    updateBillingDataV3(id: $id, input: $input) {
       id
-      invoiceNumber
-      invoiceNumber_veritas
       patientId
-      patientName
-      amount
-      amount_veritas
+      invoiceNumber
+      subtotal
+      taxRate
       taxAmount
+      discountAmount
       totalAmount
-      totalAmount_veritas
-      status
-      status_veritas
+      currency
       issueDate
       dueDate
       paidDate
+      status
       notes
-      notes_veritas
-      createdBy
-      createdAt
       updatedAt
-      items {
-        id
-        description
-        quantity
-        unitPrice
-        totalPrice
-        taxRate
-      }
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
+      treatmentId
+      materialCost
+      profitMargin
     }
   }
 `;
 
 export const DELETE_INVOICE = gql`
-  mutation DeleteInvoiceV3($id: ID!) {
-    deleteInvoiceV3(id: $id) {
-      success
-      message
-    }
+  mutation DeleteBillingDataV3($id: ID!) {
+    deleteBillingDataV3(id: $id)
   }
 `;
 
-// 🎯 PAYMENT MUTATIONS - V3.0 GraphQL Operations
-export const CREATE_PAYMENT = gql`
-  mutation CreatePaymentV3($input: CreatePaymentInput!) {
-    createPaymentV3(input: $input) {
+// ============================================================================
+// PAYMENT PLANS
+// ============================================================================
+
+export const GET_PAYMENT_PLANS = gql`
+  query GetPaymentPlans($billingId: ID, $patientId: ID, $status: String) {
+    getPaymentPlans(billingId: $billingId, patientId: $patientId, status: $status) {
       id
-      paymentNumber
-      paymentNumber_veritas
-      invoiceId
+      billingId
       patientId
-      patientName
-      amount
-      amount_veritas
-      method
+      totalAmount
+      installments
+      frequency
+      startDate
       status
-      status_veritas
-      paymentDate
-      processedDate
-      reference
-      notes
-      notes_veritas
-      processedBy
       createdAt
       updatedAt
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
     }
   }
 `;
 
-export const UPDATE_PAYMENT = gql`
-  mutation UpdatePaymentV3($id: ID!, $input: UpdatePaymentInput!) {
-    updatePaymentV3(id: $id, input: $input) {
+export const GET_PARTIAL_PAYMENTS = gql`
+  query GetPartialPayments($invoiceId: ID!, $patientId: ID) {
+    getPartialPayments(invoiceId: $invoiceId, patientId: $patientId) {
       id
-      paymentNumber
-      paymentNumber_veritas
       invoiceId
-      patientId
-      patientName
+      paymentPlanId
       amount
-      amount_veritas
+      paymentDate
       method
       status
-      status_veritas
-      paymentDate
-      processedDate
       reference
-      notes
-      notes_veritas
-      processedBy
       createdAt
-      updatedAt
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
     }
   }
 `;
 
-export const DELETE_PAYMENT = gql`
-  mutation DeletePaymentV3($id: ID!) {
-    deletePaymentV3(id: $id) {
-      success
-      message
+export const CREATE_PAYMENT_PLAN = gql`
+  mutation CreatePaymentPlan($input: CreatePaymentPlanInput!) {
+    createPaymentPlan(input: $input) {
+      id
+      billingId
+      patientId
+      totalAmount
+      installments
+      frequency
+      startDate
+      status
+      createdAt
     }
   }
 `;
 
-// 🎯 BULK OPERATIONS - V3.0 GraphQL Operations
-export const BULK_UPDATE_INVOICES = gql`
-  mutation BulkUpdateInvoicesV3($ids: [ID!]!, $input: UpdateInvoiceInput!) {
-    bulkUpdateInvoicesV3(ids: $ids, input: $input) {
-      success
-      updatedCount
-      errors {
-        id
-        message
-      }
+export const RECORD_PARTIAL_PAYMENT = gql`
+  mutation RecordPartialPayment($input: RecordPartialPaymentInput!) {
+    recordPartialPayment(input: $input) {
+      id
+      invoiceId
+      amount
+      paymentDate
+      method
+      status
+      reference
+      createdAt
     }
   }
 `;
 
-export const BULK_UPDATE_PAYMENTS = gql`
-  mutation BulkUpdatePaymentsV3($ids: [ID!]!, $input: UpdatePaymentInput!) {
-    bulkUpdatePaymentsV3(ids: $ids, input: $input) {
-      success
-      updatedCount
-      errors {
-        id
-        message
-      }
-    }
+// ============================================================================
+// LEGACY STUBS (prevent import errors)
+// ============================================================================
+
+export const GET_PAYMENTS = GET_PARTIAL_PAYMENTS;
+
+export const GET_FINANCIAL_ANALYTICS = gql`
+  query GetFinancialAnalyticsStub {
+    __typename
   }
 `;
-
-// 🎯 FINANCIAL REPORTS - V3.0 GraphQL Operations
-export const GENERATE_FINANCIAL_REPORT = gql`
-  mutation GenerateFinancialReportV3($input: FinancialReportInput!) {
-    generateFinancialReportV3(input: $input) {
-      reportId
-      reportType
-      generatedAt
-      downloadUrl
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
-    }
-  }
-`;
-
-// 🎯 EXPORT OPERATIONS - V3.0 GraphQL Operations
-export const EXPORT_INVOICES = gql`
-  mutation ExportInvoicesV3($input: ExportInvoicesInput!) {
-    exportInvoicesV3(input: $input) {
-      exportId
-      fileName
-      downloadUrl
-      recordCount
-      exportedAt
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
-    }
-  }
-`;
-
-export const EXPORT_PAYMENTS = gql`
-  mutation ExportPaymentsV3($input: ExportPaymentsInput!) {
-    exportPaymentsV3(input: $input) {
-      exportId
-      fileName
-      downloadUrl
-      recordCount
-      exportedAt
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
-    }
-  }
-`;
-
-// 🎯🎸💀 BILLING GRAPHQL QUERIES V3.0 EXPORTS - CYBERPUNK FINANCIAL REVOLUTION
-/**
- * Export all billing GraphQL operations for the Titan Pattern implementation
- *
- * 🎯 MISSION ACCOMPLISHED: Complete GraphQL operations for billing system
- * ✅ Invoice CRUD operations with @veritas verification
- * ✅ Payment processing with quantum security
- * ✅ Financial analytics and reporting
- * ✅ Bulk operations for efficiency
- * ✅ Export capabilities for compliance
- * ✅ Multi-currency support ready
- *
- * "Financial quantum supremacy achieved through GraphQL!" ⚡💰🎸
- */

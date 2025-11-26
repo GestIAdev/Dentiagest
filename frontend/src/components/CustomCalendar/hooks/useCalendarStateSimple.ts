@@ -27,15 +27,16 @@ interface CalendarData {
 }
 
 export function useCalendarState(initialView: CalendarView = 'month', initialDate?: Date) {
-  const [currentDate, setCurrentDate] = useState(initialDate || new Date());
+  // 🔥 FIX NUCLEAR: Use useMemo to stabilize initial date ONCE
+  // This prevents infinite loops from parent passing new Date() each render
+  const stableInitialDate = useMemo(() => initialDate || new Date(), []);
+  
+  const [currentDate, setCurrentDate] = useState(stableInitialDate);
   const [view, setView] = useState<CalendarView>(initialView);
 
-  // 🔄 SYNC WITH PARENT WHEN INITIAL DATE CHANGES
-  useEffect(() => {
-    if (initialDate) {
-      setCurrentDate(initialDate);
-    }
-  }, [initialDate]);
+  // � REMOVED: useEffect that caused infinite loop
+  // The calendar now manages its own state independently
+  // Parent can navigate using navigation.goToDate() if needed
 
   // Navigation functions
   const goToNextMonth = () => setCurrentDate(prev => addMonths(prev, 1));
