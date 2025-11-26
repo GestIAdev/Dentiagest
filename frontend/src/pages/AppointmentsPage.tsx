@@ -18,8 +18,6 @@ import {
 import { APPOINTMENT_UPDATES } from '../graphql/subscriptions';
 
 // 🎨 DESIGN SYSTEM
-import { Button } from '../design-system/Button';
-import { Card, CardHeader, CardBody } from '../design-system/Card';
 import { Badge } from '../design-system/Badge';
 
 // 📅 CUSTOM CALENDAR (Beautiful UI)
@@ -35,7 +33,10 @@ import type { AppointmentData } from '../components/CustomCalendar/AppointmentCa
 // 🎨 EDIT APPOINTMENT MODAL V3
 import { EditAppointmentModalV3 } from '../components/Appointments/EditAppointmentModalV3';
 
-// 📊 APPOINTMENT COMPONENTS (V3 GraphQL)
+// � APPOINTMENT FORM SHEET - STANDARD DE ORO V4
+import AppointmentFormSheet from '../components/Forms/AppointmentFormSheet';
+
+// �📊 APPOINTMENT COMPONENTS (V3 GraphQL)
 // Note: We'll extract list view from AppointmentManagementV3
 // For now, we use the calendar as primary view
 
@@ -69,6 +70,12 @@ const AppointmentsPage: React.FC = () => {
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentData | null>(null);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [realtimeNotification, setRealtimeNotification] = useState<string | null>(null);
+  
+  // 🔥 APPOINTMENT FORM SHEET STATE - V4
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetAppointment, setSheetAppointment] = useState<any | null>(null);
+  const [prefilledDate, setPrefilledDate] = useState<Date | undefined>(undefined);
+  const [prefilledTime, setPrefilledTime] = useState<string | undefined>(undefined);
 
   // 🔌 GRAPHQL V3 QUERY
   const { data, loading, error, refetch } = useQuery(GET_APPOINTMENTS_V3, {
@@ -136,27 +143,11 @@ const AppointmentsPage: React.FC = () => {
   };
 
   const handleTimeSlotClick = (date: Date, time: string) => {
-    // Create temporary appointment with clicked date/time
-    const [hours, minutes] = time.split(':');
-    const startTime = new Date(date);
-    startTime.setHours(parseInt(hours), parseInt(minutes), 0);
-
-    const endTime = new Date(startTime);
-    endTime.setMinutes(endTime.getMinutes() + 30); // Default 30 min
-
-    setSelectedAppointment({
-      id: undefined,
-      patientId: '',
-      patientName: '',
-      startTime,
-      endTime,
-      duration: 30,
-      type: 'consultation',
-      status: 'pending',
-      priority: 'normal',
-    } as AppointmentData);
-    setModalMode('create');
-    setModalOpen(true);
+    // 🔥 V4 - Open Sheet with prefilled date/time
+    setSheetAppointment(null); // Create mode
+    setPrefilledDate(date);
+    setPrefilledTime(time);
+    setSheetOpen(true);
   };
 
   const handleModalClose = () => {
@@ -167,39 +158,62 @@ const AppointmentsPage: React.FC = () => {
   const handleModalSuccess = () => {
     refetch(); // Refresh appointments list
   };
+  
+  // 🔥 SHEET HANDLERS - V4 STANDARD DE ORO
+  const handleCreateAppointment = () => {
+    setSheetAppointment(null);
+    setPrefilledDate(undefined);
+    setPrefilledTime(undefined);
+    setSheetOpen(true);
+  };
+  
+  const handleEditAppointment = (appointment: any) => {
+    setSheetAppointment(appointment);
+    setSheetOpen(true);
+  };
+  
+  const handleSheetClose = () => {
+    setSheetOpen(false);
+    setSheetAppointment(null);
+    setPrefilledDate(undefined);
+    setPrefilledTime(undefined);
+  };
+  
+  const handleSheetSave = () => {
+    refetch(); // Refresh appointments from GraphQL
+  };
 
-  // �🎨 RENDER LOADING
+  // 🎨 RENDER LOADING - CYBERPUNK
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      <div className="flex items-center justify-center h-full bg-transparent">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
       </div>
     );
   }
 
-  // 🎨 RENDER ERROR
+  // 🎨 RENDER ERROR - CYBERPUNK
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Card variant="elevated" className="max-w-md">
-          <CardHeader>
-            <h2 className="text-xl font-bold text-red-600">Error al cargar citas</h2>
-          </CardHeader>
-          <CardBody>
-            <p className="text-gray-600">{error.message}</p>
-            <Button variant="primary" onClick={() => refetch()} className="mt-4">
-              Reintentar
-            </Button>
-          </CardBody>
-        </Card>
+      <div className="flex items-center justify-center h-full bg-transparent">
+        <div className="bg-slate-900/80 backdrop-blur-sm border border-red-500/50 rounded-lg p-8 max-w-md text-center">
+          <h2 className="text-xl font-bold text-red-400 mb-4">Error al cargar citas</h2>
+          <p className="text-slate-400 mb-6">{error.message}</p>
+          <button 
+            onClick={() => refetch()} 
+            className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-lg hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+          >
+            Reintentar
+          </button>
+        </div>
       </div>
     );
   }
 
-  // 🎨 RENDER MAIN UI
+  // 🎨 RENDER MAIN UI - FULL BLEED CYBERPUNK
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* � REAL-TIME NOTIFICATION TOAST */}
+    <div className="h-full flex flex-col overflow-hidden bg-transparent">
+      {/* 🔔 REAL-TIME NOTIFICATION TOAST */}
       {realtimeNotification && (
         <div className="fixed top-4 right-4 z-50 animate-fade-in">
           <div className="bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2">
@@ -209,148 +223,148 @@ const AppointmentsPage: React.FC = () => {
         </div>
       )}
 
-      {/* �📱 HEADER */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-gray-900">
-                📅 Citas
-              </h1>
-              <Badge variant="info" size="sm">
-                {rawAppointments.length} citas
-              </Badge>
-            </div>
+      {/* 📱 COMPACT HEADER - INTEGRATED CYBERPUNK */}
+      <header className="flex-shrink-0 bg-slate-900/60 backdrop-blur-sm border-b border-purple-500/20 px-4 py-2">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <h1 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
+              📅 Citas
+            </h1>
+            <Badge variant="info" size="sm">
+              {rawAppointments.length} citas
+            </Badge>
+            
+            {/* 🔥 BOTÓN NUEVA CITA - V4 */}
+            <button
+              onClick={handleCreateAppointment}
+              className="ml-2 px-3 py-1.5 bg-gradient-to-r from-cyan-500 to-purple-500 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:shadow-purple-500/25 transition-all flex items-center space-x-1"
+            >
+              <span>+</span>
+              <span>Nueva Cita</span>
+            </button>
+          </div>
 
-            {/* 🎨 VIEW SWITCHER */}
-            <div className="flex space-x-2">
-              <Button
-                variant={view === 'calendar' ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setView('calendar')}
-              >
-                📅 Calendario
-              </Button>
-              <Button
-                variant={view === 'list' ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setView('list')}
-              >
-                📋 Lista
-              </Button>
-              <Button
-                variant={view === 'stats' ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setView('stats')}
-              >
-                📊 Estadísticas
-              </Button>
-            </div>
+          {/* 🎨 VIEW SWITCHER - COMPACT */}
+          <div className="flex space-x-1 bg-slate-900/60 rounded-lg p-1 border border-purple-500/20">
+            <button
+              onClick={() => setView('calendar')}
+              className={`px-3 py-1.5 rounded text-sm font-medium transition-all ${
+                view === 'calendar' 
+                  ? 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg shadow-purple-500/25' 
+                  : 'text-slate-400 hover:text-cyan-300'
+              }`}
+            >
+              📅 Calendario
+            </button>
+            <button
+              onClick={() => setView('list')}
+              className={`px-3 py-1.5 rounded text-sm font-medium transition-all ${
+                view === 'list' 
+                  ? 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg shadow-purple-500/25' 
+                  : 'text-slate-400 hover:text-cyan-300'
+              }`}
+            >
+              📋
+            </button>
+            <button
+              onClick={() => setView('stats')}
+              className={`px-3 py-1.5 rounded text-sm font-medium transition-all ${
+                view === 'stats' 
+                  ? 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg shadow-purple-500/25' 
+                  : 'text-slate-400 hover:text-cyan-300'
+              }`}
+            >
+              📊
+            </button>
           </div>
         </div>
       </header>
 
-      {/* 📊 MAIN CONTENT */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* 📅 CALENDAR VIEW */}
+      {/* 📊 MAIN CONTENT - FULL BLEED */}
+      <main className="flex-1 overflow-hidden">
+        {/* 📅 CALENDAR VIEW - FULL HEIGHT */}
         {view === 'calendar' && (
-          <div className="bg-white rounded-lg shadow-sm">
-            {/* 🔥 PHASE 2: GRAPHQL V3 INTEGRATED! */}
+          <div className="h-full">
             <CalendarContainer 
-              appointments={calendarAppointments}
               onAppointmentClick={handleAppointmentClick}
               onTimeSlotClick={handleTimeSlotClick}
               onAppointmentUpdate={() => refetch()}
+              className="h-full"
             />
           </div>
         )}
 
-        {/* 📋 LIST VIEW */}
+        {/* 📋 LIST VIEW - CYBERPUNK */}
         {view === 'list' && (
-          <Card variant="elevated">
-            <CardHeader>
-              <h2 className="text-xl font-bold">Lista de Citas</h2>
-            </CardHeader>
-            <CardBody>
-              <div className="space-y-4">
+          <div className="p-4 overflow-y-auto h-full">
+            <div className="bg-slate-900/60 backdrop-blur-sm rounded-lg border border-purple-500/20 p-4">
+              <h2 className="text-xl font-bold text-cyan-400 mb-4">Lista de Citas</h2>
+              <div className="space-y-3">
                 {rawAppointments.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">
+                  <p className="text-slate-500 text-center py-8">
                     No hay citas programadas
                   </p>
                 ) : (
                   rawAppointments.map((appointment) => {
-                    // Convert to calendar format for modal
                     const calendarApt = GraphQLCalendarAdapter.toCalendar(appointment);
                     
                     return (
                       <div
                         key={appointment.id}
-                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
+                        className="flex items-center justify-between p-4 bg-slate-800/60 border border-slate-700 rounded-lg hover:border-purple-500/50 transition-all cursor-pointer"
+                        onClick={() => handleAppointmentClick(calendarApt)}
                       >
                         <div>
-                          <h3 className="font-semibold">
+                          <h3 className="font-semibold text-slate-200">
                             {appointment.patient?.firstName} {appointment.patient?.lastName}
                           </h3>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-slate-400">
                             {appointment.appointmentDate} - {appointment.appointmentTime}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-cyan-400/70">
                             {appointment.type}
                           </p>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Badge variant={getStatusVariant(appointment.status as any)}>
-                            {appointment.status}
-                          </Badge>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleAppointmentClick(calendarApt)}
-                          >
-                            Editar
-                          </Button>
-                        </div>
+                        <Badge variant={getStatusVariant(appointment.status as any)}>
+                          {appointment.status}
+                        </Badge>
                       </div>
                     );
                   })
                 )}
               </div>
-            </CardBody>
-          </Card>
+            </div>
+          </div>
         )}
 
-        {/* 📊 STATISTICS VIEW */}
+        {/* 📊 STATISTICS VIEW - CYBERPUNK */}
         {view === 'stats' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card variant="elevated">
-              <CardBody>
-                <h3 className="text-lg font-semibold text-gray-700">Hoy</h3>
-                <p className="text-3xl font-bold text-primary-600">
+          <div className="p-4 overflow-y-auto h-full">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-slate-900/60 backdrop-blur-sm rounded-lg border border-purple-500/20 p-6">
+                <h3 className="text-lg font-semibold text-slate-400">Hoy</h3>
+                <p className="text-4xl font-bold text-cyan-400">
                   {getTodayAppointments(rawAppointments).length}
                 </p>
-                <p className="text-sm text-gray-500">citas programadas</p>
-              </CardBody>
-            </Card>
+                <p className="text-sm text-slate-500">citas programadas</p>
+              </div>
 
-            <Card variant="elevated">
-              <CardBody>
-                <h3 className="text-lg font-semibold text-gray-700">Esta Semana</h3>
-                <p className="text-3xl font-bold text-primary-600">
+              <div className="bg-slate-900/60 backdrop-blur-sm rounded-lg border border-purple-500/20 p-6">
+                <h3 className="text-lg font-semibold text-slate-400">Esta Semana</h3>
+                <p className="text-4xl font-bold text-purple-400">
                   {getThisWeekAppointments(rawAppointments).length}
                 </p>
-                <p className="text-sm text-gray-500">citas programadas</p>
-              </CardBody>
-            </Card>
+                <p className="text-sm text-slate-500">citas programadas</p>
+              </div>
 
-            <Card variant="elevated">
-              <CardBody>
-                <h3 className="text-lg font-semibold text-gray-700">Completadas</h3>
-                <p className="text-3xl font-bold text-green-600">
+              <div className="bg-slate-900/60 backdrop-blur-sm rounded-lg border border-purple-500/20 p-6">
+                <h3 className="text-lg font-semibold text-slate-400">Completadas</h3>
+                <p className="text-4xl font-bold text-emerald-400">
                   {getCompletedAppointments(rawAppointments).length}
                 </p>
-                <p className="text-sm text-gray-500">este mes</p>
-              </CardBody>
-            </Card>
+                <p className="text-sm text-slate-500">este mes</p>
+              </div>
+            </div>
           </div>
         )}
       </main>
@@ -362,6 +376,16 @@ const AppointmentsPage: React.FC = () => {
         appointment={selectedAppointment || undefined}
         onSuccess={handleModalSuccess}
         mode={modalMode}
+      />
+      
+      {/* 🔥 APPOINTMENT FORM SHEET - V4 STANDARD DE ORO */}
+      <AppointmentFormSheet
+        appointment={sheetAppointment}
+        isOpen={sheetOpen}
+        onClose={handleSheetClose}
+        onSave={handleSheetSave}
+        prefilledDate={prefilledDate}
+        prefilledTime={prefilledTime}
       />
     </div>
   );

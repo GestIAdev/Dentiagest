@@ -21,7 +21,6 @@ export const GET_APPOINTMENTS_V3 = gql`
     appointmentsV3(limit: $limit, offset: $offset, patientId: $patientId, startDate: $startDate, endDate: $endDate) {
       id
       patientId
-      patientId_veritas
       patient {
         firstName
         lastName
@@ -29,32 +28,15 @@ export const GET_APPOINTMENTS_V3 = gql`
         phone
       }
       practitionerId
-      practitionerId_veritas
       appointmentDate
-      appointmentDate_veritas
       appointmentTime
-      appointmentTime_veritas
+      scheduled_date
       duration
-      duration_veritas
       type
-      type_veritas
       status
-      status_veritas
       notes
-      notes_veritas
       createdAt
       updatedAt
-      
-      # @veritas quantum verification metadata
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
     }
   }
 `;
@@ -64,7 +46,6 @@ export const GET_APPOINTMENT_V3 = gql`
     appointmentV3(id: $id) {
       id
       patientId
-      patientId_veritas
       patient {
         firstName
         lastName
@@ -72,40 +53,21 @@ export const GET_APPOINTMENT_V3 = gql`
         phone
       }
       practitionerId
-      practitionerId_veritas
       appointmentDate
-      appointmentDate_veritas
       appointmentTime
-      appointmentTime_veritas
       duration
-      duration_veritas
       type
-      type_veritas
       status
-      status_veritas
       notes
-      notes_veritas
       treatmentDetails
-      treatmentDetails_veritas
       createdAt
       updatedAt
-      
-      # @veritas quantum verification metadata
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
     }
   }
 `;
 
 export const CREATE_APPOINTMENT_V3 = gql`
-  mutation CreateAppointmentV3($input: AppointmentInputV3!) {
+  mutation CreateAppointmentV3($input: AppointmentInput!) {
     createAppointmentV3(input: $input) {
       id
       patientId
@@ -115,30 +77,18 @@ export const CREATE_APPOINTMENT_V3 = gql`
       type
       status
       createdAt
-      
-      _veritas {
-        verified
-        confidence
-        level
-      }
     }
   }
 `;
 
 export const UPDATE_APPOINTMENT_V3 = gql`
-  mutation UpdateAppointmentV3($id: ID!, $input: UpdateAppointmentInputV3!) {
+  mutation UpdateAppointmentV3($id: ID!, $input: UpdateAppointmentInput!) {
     updateAppointmentV3(id: $id, input: $input) {
       id
       appointmentDate
       appointmentTime
       status
       updatedAt
-      
-      _veritas {
-        verified
-        confidence
-        level
-      }
     }
   }
 `;
