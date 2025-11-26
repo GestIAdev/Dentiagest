@@ -157,9 +157,15 @@ export const loginWithCredentials = async (email: string, password: string): Pro
       throw new Error(`${user.role} role cannot access Patient Portal. Redirecting to Staff Dashboard...`);
     }
 
+    // 🏥 VITALPASS FIX: Use patientId (clinical ID) instead of user.id (login ID)
+    const effectivePatientId = user.patientId || user.id;
+    if (!user.patientId) {
+      console.warn('⚠️ No patientId returned from login - using user.id as fallback');
+    }
+
     // Store in authStore (which persists to localStorage)
     useAuthStore.getState().login(
-      user.id,
+      effectivePatientId, // 🏥 Use patientId for clinical operations
       'default-clinic', // TODO: Get from user data if available
       '', // ⚠️ Token NO se pasa (viene en httpOnly cookie desde backend)
       expiresIn

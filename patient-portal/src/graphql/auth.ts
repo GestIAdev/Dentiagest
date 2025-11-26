@@ -26,6 +26,7 @@ export const LOGIN_MUTATION = gql`
         isActive
         lastLoginAt
         createdAt
+        patientId
       }
     }
   }
@@ -108,4 +109,5 @@ export interface User {
   isActive: boolean;
   lastLoginAt?: string;
   createdAt: string;
+  patientId?: string; // 🏥 VITALPASS: Clinical patient ID (for subscription/medical records)
 }
