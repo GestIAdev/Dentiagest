@@ -1,6 +1,6 @@
 // 🦷💀 ODONTOGRAM 3D V3 QUERIES - QUANTUM DENTAL VISUALIZATION
-// Date: November 9, 2025
-// Version: V3.0 - @veritas Enhanced
+// Date: November 27, 2025
+// Version: V3.1 - CLEAN (no _veritas fields)
 // Architecture: GraphQL V3 + Real-time Subscriptions
 
 import { gql } from '@apollo/client';
@@ -19,43 +19,11 @@ export const GET_ODONTOGRAM_DATA_V3 = gql`
       teeth {
         id
         toothNumber
-        toothNumber_veritas {
-          verified
-          confidence
-          level
-          certificate
-          verifiedAt
-          algorithm
-        }
         status
-        status_veritas {
-          verified
-          confidence
-          level
-          certificate
-          verifiedAt
-          algorithm
-        }
         condition
-        condition_veritas {
-          verified
-          confidence
-          level
-          certificate
-          verifiedAt
-          algorithm
-        }
         surfaces {
           surface
           status
-          status_veritas {
-            verified
-            confidence
-            level
-            certificate
-            verifiedAt
-            algorithm
-          }
           notes
         }
         notes
@@ -81,14 +49,6 @@ export const UPDATE_TOOTH_STATUS_V3 = gql`
       id
       toothNumber
       status
-      status_veritas {
-        verified
-        confidence
-        level
-        certificate
-        verifiedAt
-        algorithm
-      }
       condition
       notes
       lastTreatmentDate

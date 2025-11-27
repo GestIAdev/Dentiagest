@@ -23,142 +23,78 @@ import { gql } from '@apollo/client';
 // PATIENT QUERIES V3 - WITH @VERITAS QUANTUM VERIFICATION 🔥
 // ============================================================================
 
-//  GET PATIENTS V3 - Main patient listing query with verification
+//  GET PATIENTS V3 - Main patient listing query (SCHEMA MATCHED)
 export const GET_PATIENTS_V3 = gql`
   query GetPatientsV3($limit: Int, $offset: Int) {
     patientsV3(limit: $limit, offset: $offset) {
       id
       firstName
-      firstName_veritas
       lastName
-      lastName_veritas
       email
-      email_veritas
       phone
-      phone_veritas
       dateOfBirth
-      dateOfBirth_veritas
       address
-      address_veritas
       emergencyContact
-      emergencyContact_veritas
       insuranceProvider
-      insuranceProvider_veritas
       policyNumber
-      policyNumber_veritas
       medicalHistory
-      medicalHistory_veritas
       billingStatus
-      billingStatus_veritas
       createdAt
       updatedAt
-      
-      # @veritas quantum verification metadata
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
     }
   }
 `;
 
-//  GET PATIENT V3 - Single patient query with verification
+//  GET PATIENT V3 - Single patient query (SCHEMA MATCHED)
 export const GET_PATIENT_V3 = gql`
   query GetPatientV3($id: ID!) {
     patientV3(id: $id) {
       id
       firstName
-      firstName_veritas
       lastName
-      lastName_veritas
       email
-      email_veritas
       phone
-      phone_veritas
       dateOfBirth
-      dateOfBirth_veritas
       address
-      address_veritas
       emergencyContact
-      emergencyContact_veritas
       insuranceProvider
-      insuranceProvider_veritas
       policyNumber
-      policyNumber_veritas
       medicalHistory
-      medicalHistory_veritas
       billingStatus
-      billingStatus_veritas
       createdAt
       updatedAt
-      
-      # @veritas quantum verification metadata
-      _veritas {
-        verified
-        confidence
-        level
-        certificate
-        error
-        verifiedAt
-        algorithm
-      }
     }
   }
 `;
 
 // ============================================================================
-// PATIENT MUTATIONS V3 - WITH @VERITAS QUANTUM VERIFICATION 🔥
+// PATIENT MUTATIONS V3 - SCHEMA MATCHED 🔥
 // ============================================================================
 
-//  CREATE PATIENT V3 - Add new patient with verification
+//  CREATE PATIENT V3 - Add new patient
 export const CREATE_PATIENT_V3 = gql`
   mutation CreatePatientV3($input: PatientInputV3!) {
     createPatientV3(input: $input) {
       id
       firstName
-      firstName_veritas
       lastName
-      lastName_veritas
       email
-      email_veritas
       phone
-      phone_veritas
       createdAt
-      
-      _veritas {
-        verified
-        confidence
-        level
-      }
     }
   }
 `;
 
-//  UPDATE PATIENT V3 - Modify existing patient with verification
+//  UPDATE PATIENT V3 - Modify existing patient
 export const UPDATE_PATIENT_V3 = gql`
   mutation UpdatePatientV3($id: ID!, $input: UpdatePatientInputV3!) {
     updatePatientV3(id: $id, input: $input) {
       id
       firstName
-      firstName_veritas
       lastName
-      lastName_veritas
       email
-      email_veritas
       phone
-      phone_veritas
       updatedAt
-      
-      _veritas {
-        verified
-        confidence
-        level
-      }
     }
   }
 `;

@@ -17,6 +17,7 @@ import { StaffGuard } from './components/StaffGuard'; // 🔒 GDPR ROLE SEGREGAT
 // import FinancialManagerV3 from './components/Billing/FinancialManagerV3'; // 💀 DEPRECATED by LÁZARO
 import BillingPageV4 from './pages/BillingPageV4'; // 🎯💰 OPERACIÓN LÁZARO FASE 4
 import TreatmentManagementV3 from './components/Treatments/TreatmentManagementV3';
+import TreatmentsPageV4 from './pages/TreatmentsPageV4'; // 🎯🦷 OPERACIÓN LÁZARO - QUIRÓFANO DIGITAL
 import InventoryManagementV3 from './components/Inventory/InventoryManagementV3';
 import SupplierManagerV3 from './components/MarketplacePage/SupplierManagerV3';
 import PurchaseOrderManagerV3 from './components/MarketplacePage/PurchaseOrderManagerV3';
@@ -163,7 +164,8 @@ function AppRoutes() {
           <Route path="documents" element={<DocumentsPage />} />
           
           {/* 🔥 V3 ARSENAL COMPLETE - 8 JEWELS ACTIVATED (74% DORMIDOS → 100% BRILLANDO) */}
-          <Route path="treatments" element={<TreatmentManagementV3 />} />
+          <Route path="treatments" element={<TreatmentsPageV4 />} /> {/* 🎯🦷 OPERACIÓN LÁZARO - QUIRÓFANO DIGITAL V4 */}
+          <Route path="treatments-legacy" element={<TreatmentManagementV3 />} /> {/* Legacy backup */}
           <Route path="billing" element={<BillingPageV4 />} /> {/* 🎯💰 OPERACIÓN LÁZARO FASE 4 */}
           {/* Legacy route removed - now using BillingPageV4 directly */}
           <Route path="inventory" element={<InventoryManagementV3 />} />
