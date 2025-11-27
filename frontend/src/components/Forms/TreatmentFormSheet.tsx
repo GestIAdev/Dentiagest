@@ -263,8 +263,9 @@ const TreatmentFormSheet: React.FC<TreatmentFormSheetProps> = ({
     if (!formData.startDate) {
       newErrors.startDate = 'Fecha de inicio requerida';
     }
-    if (formData.cost < 0) {
-      newErrors.cost = 'El coste no puede ser negativo';
+    // 💰 DIRECTIVA #011: Coste es OBLIGATORIO para generar factura
+    if (!formData.cost || formData.cost <= 0) {
+      newErrors.cost = 'El coste es obligatorio (se generará factura automática)';
     }
 
     setErrors(newErrors);
@@ -508,24 +509,28 @@ const TreatmentFormSheet: React.FC<TreatmentFormSheetProps> = ({
               </select>
             </div>
 
-            {/* Cost */}
+            {/* Cost - 💰 DIRECTIVA #011: OBLIGATORIO para facturación */}
             <div className="space-y-2">
-              <Label htmlFor="cost" className="text-slate-300">
-                Coste (€)
+              <Label htmlFor="cost" className="text-slate-300 flex items-center gap-2">
+                Coste (€) <span className="text-red-400">*</span>
+                <span className="text-xs text-cyan-400/70">(genera factura)</span>
               </Label>
               <Input
                 id="cost"
                 type="number"
-                min="0"
+                min="0.01"
                 step="0.01"
                 value={formData.cost}
                 onChange={(e) => handleChange('cost', parseFloat(e.target.value) || 0)}
                 className={`bg-slate-800/50 border-slate-700 text-white font-mono ${errors.cost ? 'border-red-500' : ''}`}
-                placeholder="0.00"
+                placeholder="50.00"
               />
               {errors.cost && (
                 <p className="text-red-400 text-sm">{errors.cost}</p>
               )}
+              <p className="text-xs text-slate-500">
+                💰 Se generará factura pendiente automáticamente
+              </p>
             </div>
 
             {/* Description */}

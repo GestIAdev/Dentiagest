@@ -43,13 +43,13 @@ export const GET_TODAY_APPOINTMENTS = gql`
  * GET_PENDING_SUGGESTIONS
  * -------------------------
  * Obtiene las sugerencias de cita pendientes de revisión.
- * Filtro: status = "PENDING"
+ * Filtro: status = "pending_approval" (debe coincidir con backend enum)
  * Widget: "Solicitudes Entrantes" - El Buzón de VitalPass
  * Uso: War Room Dashboard con pollInterval para real-time
  */
 export const GET_PENDING_SUGGESTIONS = gql`
   query GetPendingSuggestions($clinicId: ID) {
-    appointmentSuggestionsV3(status: "PENDING", clinicId: $clinicId) {
+    appointmentSuggestionsV3(status: "pending_approval", clinicId: $clinicId) {
       id
       patient_id
       patient {
@@ -117,14 +117,13 @@ export const APPROVE_SUGGESTION = gql`
   mutation ApproveSuggestion($suggestionId: ID!, $adjustments: AppointmentAdjustments) {
     approveAppointmentSuggestion(suggestionId: $suggestionId, adjustments: $adjustments) {
       id
-      patient_id
-      scheduled_date
-      appointment_date
-      appointment_time
-      duration_minutes
-      appointment_type
+      patientId
+      appointmentDate
+      appointmentTime
+      duration
+      type
       status
-      created_at
+      createdAt
     }
   }
 `;
@@ -187,7 +186,7 @@ export interface AppointmentSuggestion {
   confidence_score: number;
   reasoning?: string;
   patient_request?: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  status: 'pending_approval' | 'approved' | 'rejected';  // Match backend enum
   reviewed_by?: string;
   reviewed_at?: string;
   rejection_reason?: string;
@@ -213,14 +212,14 @@ export interface GetPendingSuggestionsVars {
 export interface ApproveSuggestionData {
   approveAppointmentSuggestion: {
     id: string;
-    patient_id: string;
-    scheduled_date: string;
-    appointment_date: string;
-    appointment_time: string;
-    duration_minutes: number;
-    appointment_type: string;
+    patientId: string;
+    scheduledDate: string;
+    appointmentDate: string;
+    appointmentTime: string;
+    duration: number;
+    type: string;
     status: string;
-    created_at: string;
+    createdAt: string;
   };
 }
 

@@ -61,17 +61,46 @@ interface SeleneRequest {
  * Mantiene compatibilidad con el componente SeleneRequestItem existente.
  */
 function transformSuggestionToRequest(suggestion: AppointmentSuggestion): SeleneRequest {
+  // 🔧 FIX: Manejar patient null/undefined
   const patientName = suggestion.patient 
-    ? `${suggestion.patient.firstName} ${suggestion.patient.lastName}`.trim()
-    : `Paciente #${suggestion.patient_id}`;
+    ? `${suggestion.patient.firstName || ''} ${suggestion.patient.lastName || ''}`.trim() || 'Paciente'
+    : `Paciente #${suggestion.patient_id?.slice(0, 8) || 'Desconocido'}`;
+
+  // 🔧 FIX: Parsear fecha correctamente (puede ser string ISO, timestamp, o número como string)
+  let timestamp: Date;
+  try {
+    const raw = suggestion.created_at;
+    if (!raw) {
+      timestamp = new Date();
+    } else if (typeof raw === 'number') {
+      timestamp = new Date(raw);
+    } else if (/^\d+$/.test(raw)) {
+      // Es un string numérico (timestamp)
+      timestamp = new Date(parseInt(raw, 10));
+    } else {
+      timestamp = new Date(raw);
+    }
+    // Validar que sea fecha válida
+    if (isNaN(timestamp.getTime())) {
+      timestamp = new Date();
+    }
+  } catch {
+    timestamp = new Date();
+  }
+
+  // 🔧 FIX: Truncar details si es muy largo (evitar JSON crudo en UI)
+  let details = suggestion.patient_request || suggestion.reasoning || 'Solicitud de cita vía Selene';
+  if (details.length > 150) {
+    details = details.substring(0, 150) + '...';
+  }
 
   return {
     id: suggestion.id,
     patientName,
     requestType: 'appointment', // Por ahora solo manejamos citas desde Selene
-    timestamp: new Date(suggestion.created_at),
+    timestamp,
     urgency: getUrgencyFromScore(suggestion.confidence_score),
-    details: suggestion.patient_request || suggestion.reasoning || 'Solicitud de cita vía Selene',
+    details,
     confidenceScore: suggestion.confidence_score
   };
 }
@@ -348,6 +377,10 @@ const DashboardPageV4: React.FC = () => {
     id: null 
   });
   const [rejectReason, setRejectReason] = useState('');
+  
+  // 📄 PAGINACIÓN: Solicitudes entrantes
+  const [suggestionsPage, setSuggestionsPage] = useState(1);
+  const SUGGESTIONS_PER_PAGE = 4;
 
   // 🔥 WAR ROOM: Real-time GraphQL Query con polling
   const { 
@@ -423,6 +456,20 @@ const DashboardPageV4: React.FC = () => {
     if (!suggestionsData?.appointmentSuggestionsV3) return [];
     return suggestionsData.appointmentSuggestionsV3.map(transformSuggestionToRequest);
   }, [suggestionsData]);
+
+  // 📄 PAGINACIÓN: Calcular páginas y slice actual
+  const totalPages = Math.ceil(requests.length / SUGGESTIONS_PER_PAGE);
+  const paginatedRequests = React.useMemo(() => {
+    const startIndex = (suggestionsPage - 1) * SUGGESTIONS_PER_PAGE;
+    return requests.slice(startIndex, startIndex + SUGGESTIONS_PER_PAGE);
+  }, [requests, suggestionsPage, SUGGESTIONS_PER_PAGE]);
+
+  // Reset página si cambia el número de solicitudes
+  React.useEffect(() => {
+    if (suggestionsPage > totalPages && totalPages > 0) {
+      setSuggestionsPage(totalPages);
+    }
+  }, [totalPages, suggestionsPage]);
 
   // Handlers para solicitudes
   const handleApprove = async (id: string) => {
@@ -604,7 +651,7 @@ const DashboardPageV4: React.FC = () => {
                     )}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="flex-1 overflow-auto">
+                <CardContent className="flex-1 overflow-hidden">
                   {/* 🔄 Estado de carga */}
                   {suggestionsLoading && requests.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center">
@@ -629,16 +676,42 @@ const DashboardPageV4: React.FC = () => {
                       </Button>
                     </div>
                   ) : requests.length > 0 ? (
-                    <div className="space-y-2">
-                      {requests.map(request => (
-                        <SeleneRequestItem
-                          key={request.id}
-                          request={request}
-                          onApprove={handleApprove}
-                          onReject={handleReject}
-                          isProcessing={approving || rejecting}
-                        />
-                      ))}
+                    <div className="flex flex-col h-full">
+                      {/* Lista paginada */}
+                      <div className="space-y-2 flex-1">
+                        {paginatedRequests.map(request => (
+                          <SeleneRequestItem
+                            key={request.id}
+                            request={request}
+                            onApprove={handleApprove}
+                            onReject={handleReject}
+                            isProcessing={approving || rejecting}
+                          />
+                        ))}
+                      </div>
+                      
+                      {/* 📄 PAGINADOR */}
+                      {totalPages > 1 && (
+                        <div className="flex items-center justify-center gap-2 pt-3 mt-2 border-t border-slate-700/50">
+                          <button
+                            onClick={() => setSuggestionsPage(p => Math.max(1, p - 1))}
+                            disabled={suggestionsPage === 1}
+                            className="px-2 py-1 text-sm rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300"
+                          >
+                            ←
+                          </button>
+                          <span className="text-xs text-slate-400">
+                            {suggestionsPage} / {totalPages}
+                          </span>
+                          <button
+                            onClick={() => setSuggestionsPage(p => Math.min(totalPages, p + 1))}
+                            disabled={suggestionsPage === totalPages}
+                            className="px-2 py-1 text-sm rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300"
+                          >
+                            →
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="h-full flex flex-col items-center justify-center text-center">

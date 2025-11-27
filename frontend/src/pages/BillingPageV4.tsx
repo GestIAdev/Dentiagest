@@ -31,7 +31,9 @@ import {
   FunnelIcon,
   MagnifyingGlassIcon,
   PencilIcon,
+  EyeIcon,
 } from '@heroicons/react/24/outline';
+import InvoiceDetailSheet from '../components/Billing/InvoiceDetailSheet';
 
 // ============================================================================
 // TYPES
@@ -215,7 +217,9 @@ const KPICard: React.FC<KPICardProps> = ({
 const BillingPageV4: React.FC = () => {
   // State
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
+  const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
@@ -264,6 +268,25 @@ const BillingPageV4: React.FC = () => {
   };
 
   const handleEditInvoice = (invoice: Invoice) => {
+    setEditingInvoice(invoice);
+    setIsSheetOpen(true);
+  };
+
+  // 👁 View invoice detail (read-only sheet)
+  const handleViewInvoice = (invoice: Invoice) => {
+    setViewingInvoice(invoice);
+    setIsDetailOpen(true);
+  };
+
+  const handleDetailClose = () => {
+    setIsDetailOpen(false);
+    setViewingInvoice(null);
+  };
+
+  // Edit from detail view
+  const handleEditFromDetail = (invoice: Invoice) => {
+    setIsDetailOpen(false);
+    setViewingInvoice(null);
     setEditingInvoice(invoice);
     setIsSheetOpen(true);
   };
@@ -440,7 +463,11 @@ const BillingPageV4: React.FC = () => {
               </TableHeader>
               <TableBody>
                 {filteredInvoices.map((invoice) => (
-                  <TableRow key={invoice.id} className="group">
+                  <TableRow 
+                    key={invoice.id} 
+                    className="group cursor-pointer hover:bg-cyan-500/5 transition-colors"
+                    onClick={() => handleViewInvoice(invoice)}
+                  >
                     {/* Invoice Number */}
                     <TableCell className="font-mono text-cyan-300">
                       {invoice.invoiceNumber}
@@ -488,13 +515,28 @@ const BillingPageV4: React.FC = () => {
 
                     {/* Actions */}
                     <TableCell className="text-center">
-                      <button
-                        onClick={() => handleEditInvoice(invoice)}
-                        className="p-2 text-gray-500 hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                        title="Editar factura"
-                      >
-                        <PencilIcon className="h-4 w-4" />
-                      </button>
+                      <div className="flex items-center justify-center gap-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewInvoice(invoice);
+                          }}
+                          className="p-2 text-gray-500 hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                          title="Ver detalle"
+                        >
+                          <EyeIcon className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditInvoice(invoice);
+                          }}
+                          className="p-2 text-gray-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                          title="Editar factura"
+                        >
+                          <PencilIcon className="h-4 w-4" />
+                        </button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -512,6 +554,16 @@ const BillingPageV4: React.FC = () => {
         onClose={handleSheetClose}
         invoice={editingInvoice || undefined}
         onSave={handleSave}
+      />
+
+      {/* ================================================================== */}
+      {/* INVOICE DETAIL SHEET - LA SINGULARIDAD ECONÓMICA */}
+      {/* ================================================================== */}
+      <InvoiceDetailSheet
+        isOpen={isDetailOpen}
+        onClose={handleDetailClose}
+        invoice={viewingInvoice}
+        onEdit={handleEditFromDetail}
       />
     </div>
   );
