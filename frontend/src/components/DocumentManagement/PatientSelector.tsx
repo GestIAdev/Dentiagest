@@ -131,48 +131,48 @@ export const PatientSelector: React.FC<PatientSelectorProps> = ({
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
-      {/* 🎚️ SELECTOR BUTTON */}
+      {/* 🎚️ SELECTOR BUTTON - DARK MODE */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-left shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-left shadow-sm hover:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3 flex-1 min-w-0">
             {selectedPatient ? (
               <>
-                <UserIcon className="h-5 w-5 text-gray-500 flex-shrink-0" />
-                <span className="text-gray-900 truncate">
+                <UserIcon className="h-5 w-5 text-cyan-400 flex-shrink-0" />
+                <span className="text-slate-100 truncate">
                   {selectedPatient.first_name} {selectedPatient.last_name}
                 </span>
               </>
             ) : (
               <>
-                <UserIcon className="h-5 w-5 text-gray-500 flex-shrink-0" />
-                <span className="text-gray-500 truncate">
+                <UserIcon className="h-5 w-5 text-slate-500 flex-shrink-0" />
+                <span className="text-slate-400 truncate">
                   Seleccionar paciente...
                 </span>
               </>
             )}
           </div>
           <ChevronDownIcon 
-            className={`h-5 w-5 text-gray-400 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} 
+            className={`h-5 w-5 text-slate-400 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} 
           />
         </div>
       </button>
 
-      {/* 📜 DROPDOWN MENU */}
+      {/* 📜 DROPDOWN MENU - DARK MODE */}
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-80 overflow-hidden">
+        <div className="absolute z-50 mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg shadow-lg shadow-black/50 max-h-80 overflow-hidden">
           {/* 🔍 SEARCH INPUT */}
-          <div className="p-3 border-b border-gray-200">
+          <div className="p-3 border-b border-slate-700">
             <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Buscar paciente..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-600 rounded-md text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
               />
             </div>
           </div>
@@ -184,8 +184,8 @@ export const PatientSelector: React.FC<PatientSelectorProps> = ({
               <>
                 <button
                   onClick={() => handleSelectPatient(virtualPatient.id)}
-                  className={`w-full px-4 py-4 text-left hover:bg-orange-50 flex items-center space-x-3 transition-colors border-b border-gray-200 ${
-                    selectedPatientId === virtualPatient.id ? 'bg-orange-50 text-orange-700 border-orange-200' : 'text-gray-700'
+                  className={`w-full px-4 py-4 text-left hover:bg-orange-500/10 flex items-center space-x-3 transition-colors border-b border-slate-700 ${
+                    selectedPatientId === virtualPatient.id ? 'bg-orange-500/20 text-orange-400 border-orange-500/30' : 'text-slate-300'
                   }`}
                 >
                   <div className="flex-shrink-0">
@@ -194,10 +194,10 @@ export const PatientSelector: React.FC<PatientSelectorProps> = ({
                     </svg>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-orange-600 text-sm">
+                    <div className="font-semibold text-orange-400 text-sm">
                       📁 Documentos Clínica
                     </div>
-                    <div className="text-xs text-gray-500 mt-0.5 leading-tight">
+                    <div className="text-xs text-slate-500 mt-0.5 leading-tight">
                       Documentos administrativos
                     </div>
                   </div>
@@ -205,19 +205,19 @@ export const PatientSelector: React.FC<PatientSelectorProps> = ({
                 
                 {/* DIVIDER if there are search results */}
                 {searchTerm.length >= 2 && filteredPatients.length > 0 && (
-                  <div className="border-t border-gray-200"></div>
+                  <div className="border-t border-slate-700"></div>
                 )}
               </>
             )}
 
             {/* 🔍 SEARCH HINT */}
             {searchTerm.length < 2 && filteredPatients.length === 0 && (
-              <div className="px-4 py-6 text-center text-gray-500">
-                <svg className="h-8 w-8 mx-auto mb-2 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="px-4 py-6 text-center text-slate-400">
+                <svg className="h-8 w-8 mx-auto mb-2 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <p className="font-medium">Buscar pacientes</p>
-                <p className="text-sm mt-1">
+                <p className="font-medium text-slate-300">Buscar pacientes</p>
+                <p className="text-sm mt-1 text-slate-500">
                   Escribe al menos 2 caracteres para buscar
                 </p>
               </div>
@@ -230,26 +230,26 @@ export const PatientSelector: React.FC<PatientSelectorProps> = ({
                   <button
                     key={patient.id}
                     onClick={() => handleSelectPatient(patient.id)}
-                    className={`w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center space-x-3 transition-colors ${
-                      selectedPatientId === patient.id ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                    className={`w-full px-4 py-3 text-left hover:bg-cyan-500/10 flex items-center space-x-3 transition-colors ${
+                      selectedPatientId === patient.id ? 'bg-cyan-500/20 text-cyan-400' : 'text-slate-300'
                     }`}
                   >
-                    <UserIcon className="h-5 w-5 text-gray-500" />
+                    <UserIcon className="h-5 w-5 text-slate-500" />
                     <div>
-                      <div className="font-medium">
+                      <div className="font-medium text-slate-100">
                         {patient.first_name} {patient.last_name}
                       </div>
                       {patient.email && (
-                        <div className="text-sm text-gray-500">{patient.email}</div>
+                        <div className="text-sm text-slate-400">{patient.email}</div>
                       )}
                     </div>
                   </button>
                 ))
               ) : (
-                <div className="px-4 py-6 text-center text-gray-500">
-                  <UserIcon className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                  <p>No se encontraron pacientes</p>
-                  <p className="text-sm mt-1">
+                <div className="px-4 py-6 text-center text-slate-400">
+                  <UserIcon className="h-8 w-8 mx-auto mb-2 text-slate-600" />
+                  <p className="text-slate-300">No se encontraron pacientes</p>
+                  <p className="text-sm mt-1 text-slate-500">
                     Intenta con otros términos: "{searchTerm}"
                   </p>
                 </div>

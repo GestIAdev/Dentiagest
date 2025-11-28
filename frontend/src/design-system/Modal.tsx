@@ -73,12 +73,12 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       onClick={handleOverlayClick}
     >
       <div
         className={`
-          relative bg-white rounded-lg shadow-xl 
+          relative bg-slate-900 border border-slate-700 rounded-lg shadow-xl shadow-black/50
           w-full ${sizeClasses[size]}
           max-h-[90vh] overflow-hidden
           flex flex-col
@@ -88,16 +88,16 @@ export const Modal: React.FC<ModalProps> = ({
       >
         {/* 📋 HEADER */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
             {title && (
-              <h2 className="text-xl font-bold text-gray-900">
+              <h2 className="text-xl font-bold text-slate-100">
                 {title}
               </h2>
             )}
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="ml-auto text-gray-400 hover:text-gray-600 transition-colors"
+                className="ml-auto text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg p-1 transition-colors"
                 aria-label="Close modal"
               >
                 <svg

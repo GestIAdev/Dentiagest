@@ -124,7 +124,7 @@ export const PatientSelectorModal: React.FC<PatientSelectorModalProps> = ({
         {loading && (
           <div className="flex justify-center py-8">
             <Spinner size="md" />
-            <span className="ml-2 text-gray-600">Buscando pacientes...</span>
+            <span className="ml-2 text-slate-400">Buscando pacientes...</span>
           </div>
         )}
 
@@ -155,22 +155,22 @@ export const PatientSelectorModal: React.FC<PatientSelectorModalProps> = ({
             {patients.map((patient) => (
               <Card
                 key={patient.id}
-                className="hover:shadow-md transition-shadow cursor-pointer"
+                className="hover:shadow-md hover:border-cyan-500/50 transition-all cursor-pointer bg-slate-800 border-slate-700"
                 onClick={() => handleSelectPatient(patient)}
               >
                 <CardBody className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <UserIcon className="h-10 w-10 text-gray-400" />
+                      <UserIcon className="h-10 w-10 text-cyan-400" />
                       <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                        <h3 className="font-semibold text-slate-100">
                           {patient.first_name} {patient.last_name}
                         </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-slate-400">
                           {patient.email || 'Sin email'}
                         </p>
                         {patient.phone && (
-                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                          <p className="text-xs text-slate-500">
                             📞 {patient.phone}
                           </p>
                         )}
@@ -189,7 +189,7 @@ export const PatientSelectorModal: React.FC<PatientSelectorModalProps> = ({
         )}
 
         {/* Actions */}
-        <div className="flex justify-end pt-4 border-t">
+        <div className="flex justify-end pt-4 border-t border-slate-700">
           <Button variant="outline" onClick={onClose}>
             Cancelar
           </Button>

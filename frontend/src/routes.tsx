@@ -12,16 +12,17 @@ import DashboardPageV4 from './pages/DashboardPageV4'; // 🎮 TORRE DE CONTROL 
 import PatientsPageGraphQL from './pages/PatientsPageGraphQL';
 import AppointmentsPage from './pages/AppointmentsPage'; // 🆕 UNIFIED APPOINTMENTS
 import { DocumentsPage } from './pages/DocumentsPage';
+import DocumentsPageV4 from './pages/DocumentsPageV4'; // 📄🔐 OPERACIÓN OLYMPUS - GESTOR DOCUMENTAL SEGURO
 import { StaffGuard } from './components/StaffGuard'; // 🔒 GDPR ROLE SEGREGATION
 // 🔥 V3 ARSENAL COMPLETE - POST-VITE ACTIVATION - 14 JEWELS AWAKENED
 // import FinancialManagerV3 from './components/Billing/FinancialManagerV3'; // 💀 DEPRECATED by LÁZARO
 import BillingPageV4 from './pages/BillingPageV4'; // 🎯💰 OPERACIÓN LÁZARO FASE 4
 import TreatmentManagementV3 from './components/Treatments/TreatmentManagementV3';
 import TreatmentsPageV4 from './pages/TreatmentsPageV4'; // 🎯🦷 OPERACIÓN LÁZARO - QUIRÓFANO DIGITAL
-import InventoryManagementV3 from './components/Inventory/InventoryManagementV3';
-import SupplierManagerV3 from './components/MarketplacePage/SupplierManagerV3';
-import PurchaseOrderManagerV3 from './components/MarketplacePage/PurchaseOrderManagerV3';
+import InventoryPageV4 from './pages/InventoryPageV4'; // 📦🎸 HUB LOGÍSTICO V4 - FUSIÓN INVENTORY + MARKETPLACE
+import MedicalRecordsPageV4 from './pages/MedicalRecordsPageV4'; // 🏥🎸 OPERACIÓN LÁZARO FASE 7 - STORYTELLING CLÍNICO
 import ComplianceManagementV3 from './components/Compliance/ComplianceManagementV3';
+import CompliancePageV4 from './pages/CompliancePageV4'; // ⚖️ PENTÁGONO LEGAL - AI Act 2026 Ready
 import AppointmentManagementV3 from './components/Appointments/AppointmentManagementV3';
 import SubscriptionPlansManager from './components/Subscription/SubscriptionPlansManager';
 
@@ -160,18 +161,20 @@ function AppRoutes() {
           <Route index element={<DashboardPageV4 />} />
           <Route path="patients" element={<PatientsPageGraphQL />} /> {/* 🆕 UNIFIED ROUTE - PATIENTS */}
           <Route path="appointments" element={<AppointmentsPage />} /> {/* 🆕 UNIFIED ROUTE - APPOINTMENTS */}
-          <Route path="medical-records/*" element={<MedicalRouter />} />
-          <Route path="documents" element={<DocumentsPage />} />
+          <Route path="medical-records" element={<MedicalRecordsPageV4 />} /> {/* 🏥🎸 OPERACIÓN LÁZARO FASE 7 */}
+          <Route path="medical-records-legacy/*" element={<MedicalRouter />} /> {/* Legacy backup */}
+          <Route path="documents" element={<DocumentsPageV4 />} /> {/* 📄🔐 OPERACIÓN OLYMPUS */}
+          <Route path="documents-legacy" element={<DocumentsPage />} /> {/* Legacy backup */}
           
           {/* 🔥 V3 ARSENAL COMPLETE - 8 JEWELS ACTIVATED (74% DORMIDOS → 100% BRILLANDO) */}
           <Route path="treatments" element={<TreatmentsPageV4 />} /> {/* 🎯🦷 OPERACIÓN LÁZARO - QUIRÓFANO DIGITAL V4 */}
           <Route path="treatments-legacy" element={<TreatmentManagementV3 />} /> {/* Legacy backup */}
           <Route path="billing" element={<BillingPageV4 />} /> {/* 🎯💰 OPERACIÓN LÁZARO FASE 4 */}
           {/* Legacy route removed - now using BillingPageV4 directly */}
-          <Route path="inventory" element={<InventoryManagementV3 />} />
-          <Route path="marketplace" element={<SupplierManagerV3 />} />
-          <Route path="purchase-orders" element={<PurchaseOrderManagerV3 />} />
-          <Route path="compliance" element={<ComplianceManagementV3 />} />
+          <Route path="inventory" element={<InventoryPageV4 />} /> {/* 📦🎸 HUB LOGÍSTICO V4 - FUSIÓN COMPLETA */}
+          {/* 🔥 DEPRECATED: marketplace y purchase-orders ahora están integrados en InventoryPageV4 */}
+          <Route path="compliance" element={<CompliancePageV4 />} /> {/* ⚖️ PENTÁGONO LEGAL - AI Act 2026 Ready */}
+          <Route path="compliance-legacy" element={<ComplianceManagementV3 />} /> {/* Legacy backup */}
           {/* ❌ DELETED: "Citas Avanzadas" route - now unified in /appointments */}
           <Route path="subscriptions" element={<SubscriptionPlansManager />} />
         </Route>
